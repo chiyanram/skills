@@ -11,6 +11,7 @@ A REQ, ready to hand to `/crq`, that defines: **one source** for rules and role 
 
 ## Notes
 
+- **Canonical location (2026-10-02): github.com/chiyanram/skills (private), local clone ~/workspace/skills.** The old copy under agent-platform/.claude/worktrees/crq-597-b837e3/.scratch/one-rulebook/ is frozen at commit debed19; refs/ clones stay there.
 - **Requirements + scenarios: [requirements.md](requirements.md)** — every ticket answer is checked against them.
 - Spans two repos: `agent-platform` (GitLab — rules, skills, `/crq`, `docs/agents/personas/`) and
   `agent-fleet` (GitHub `chiyanram/agent-fleet` — recipes, `SOUL.md`, rendered `CLAUDE.md`). G4 lands
