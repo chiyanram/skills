@@ -22,8 +22,8 @@ Commits below are the ones every research file cites. Updated 2026-10-02.
 | kunchenguid-firstmate | https://github.com/kunchenguid/firstmate.git | 549e07f |
 | mattpocock-skills | https://github.com/mattpocock/skills.git | d81f3a1 |
 | openclaw-openclaw | https://github.com/openclaw/openclaw.git | b94e5177 |
-| plinth-java-skills | excerpts, not a clone | — |
-| plinth-pinned | excerpts, not a clone | — |
+| plinth-java-skills | jabrena/plinth skills, copied by the operator: 121 OO design · 122 type design · 123 design patterns · 124 secure coding · 126 exception handling · 128 generics · 141 modern-Java refactoring · 142 functional · 143 functional exceptions · 144 data-oriented · 304 Spring Boot security | — |
+| plinth-pinned | jabrena/plinth rules: 130 testing strategies · 131 unit · 132 integration · 133 acceptance · 321 Spring Boot unit tests (@ c4276f64) · 058 design-bdd (@ 5e338bb8) | — |
 | rameezk-forge | https://github.com/rameezk/forge | 43d360e |
 
 plinth excerpts: jabrena/plinth @ c4276f64 (.cursor/rules 130-133, 321-323) and @ 5e338bb8 (058-design-bdd, 706 docker).
