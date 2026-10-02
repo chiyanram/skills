@@ -33,6 +33,7 @@ A REQ, ready to hand to `/crq`, that defines: **one source** for rules and role 
     the fleet's spec-reviewer never spawns it.
 - **Every decision cites what the references do (operator, 2026-10-01)** — pstack and mattpocock first; they are
   the quality bar. Each grilling question shows the reference backing next to the options.
+- Approval mode changed (operator, 2026-10-02): rules are now presented PER GROUP with a recommendation each; the operator confirms the group or names exceptions.
 - **No rule enters any reference without the operator's explicit yes (operator, 2026-10-01).** Rules are presented one small batch at a time (≤5, one reference), each with its source and a recommendation; anything not approved stays out, including reference-repo rules the agent likes.
 - Skills to consult: `grilling`, `domain-modeling`, `research`, `prototype`, `codebase-design`.
 - Standing preference: no GitLab issues for this effort — everything stays in this folder.
