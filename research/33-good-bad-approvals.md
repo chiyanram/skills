@@ -14,3 +14,6 @@
 | acceptance-criteria.md | 31c-v2.md | GA1–GA6 | approve all | 2026-10-02 |
 | scenario-to-tests.md | 31c-v2.md | GT1–GT6 | approve all | 2026-10-02 |
 | smoke-specs.md | 31d-v2.md | EA1–EA6, EB1–EB4, EC1–EC6, ED1–ED5 | approve all | 2026-10-02 |
+
+## Planning (#35) — operator 2026-10-02
+Planning Good/Bad (20 rules, research/42, page https://claude.ai/artifact/JaHyxMYJLdg74ZVj4XAEDY): approve all. DG3 rule amended to exempt `+` lines in a design diff.
