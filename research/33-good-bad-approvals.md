@@ -1,0 +1,16 @@
+# Good/Bad example approvals (operator, via Rule Review page)
+
+| reference | source file | rules | decision | date |
+|---|---|---|---|---|
+| strategy.md | 31a-v2.md | S1–S5, TM1–TM4, AT1 | approve all | 2026-10-02 |
+| coverage-design.md | 31a-v2.md | C1–C4 | approve all | 2026-10-02 |
+| boundaries.md | 31a-v2.md | B1–B3 | approve all | 2026-10-02 |
+| value-bar.md | 31a-v2.md | V1–V5 | approve all | 2026-10-02 |
+| unit-tests.md | 31b-v2.md | U1–U4 | approve all | 2026-10-02 |
+| integration-tests.md | 31b-v2.md | IT1–IT5, IT4b, SP1–SP11 | approve all | 2026-10-02 |
+| spock.md | 31b-v2.md | K1–K20, K2b | approve all | 2026-10-02 |
+| mutation.md | 31c-v2.md | M1–M10 | approve all | 2026-10-02 |
+| property-based.md | 31c-v2.md | P1–P4, P6–P8, P10 | approve all | 2026-10-02 |
+| acceptance-criteria.md | 31c-v2.md | GA1–GA6 | approve all | 2026-10-02 |
+| scenario-to-tests.md | 31c-v2.md | GT1–GT6 | approve all | 2026-10-02 |
+| smoke-specs.md | 31d-v2.md | EA1–EA6, EB1–EB4, EC1–EC6, ED1–ED5 | approve all | 2026-10-02 |

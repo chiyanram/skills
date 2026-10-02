@@ -34,6 +34,7 @@ A REQ, ready to hand to `/crq`, that defines: **one source** for rules and role 
 - **Every decision cites what the references do (operator, 2026-10-01)** — pstack and mattpocock first; they are
   the quality bar. Each grilling question shows the reference backing next to the options.
 - Approval mode changed (operator, 2026-10-02): rules are now presented PER GROUP with a recommendation each; the operator confirms the group or names exceptions.
+- **Every approval group is shown on the Rule Review page** (https://claude.ai/artifact/RTXpPjdLmv5YjTRFzew8u4, built by review/build.py from review/groups.json + the research files); the operator marks rules there and pastes the decision line into chat (operator, 2026-10-02: always follow this).
 - **No rule enters any reference without the operator's explicit yes (operator, 2026-10-01).** Rules are presented one small batch at a time (≤5, one reference), each with its source and a recommendation; anything not approved stays out, including reference-repo rules the agent likes.
 - Skills to consult: `grilling`, `domain-modeling`, `research`, `prototype`, `codebase-design`.
 - Standing preference: no GitLab issues for this effort — everything stays in this folder.

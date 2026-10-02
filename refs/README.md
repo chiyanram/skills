@@ -18,3 +18,6 @@ Docs read online: https://code.claude.com/docs/en/overview · https://docs.ag-ui
 | humanlayer-humanlayer | https://github.com/humanlayer/humanlayer |
 | humanlayer-claudelayer | https://github.com/humanlayer/claudelayer |
 | plinth-pinned/ | jabrena/plinth @ c4276f64 (.cursor/rules 130-133, 321-323) + @ 5e338bb8 (058-design-bdd, 706 docker) |
+| plinth-java-skills/ | jabrena/plinth @ c4276f64 skills/{121,122,123,124,126,128,141,142,143,144,304} (operator, 2026-10-02) |
+| jvm-skills-jvm-skills | https://github.com/jvm-skills/jvm-skills @ c6d477f (140★; a catalog of yaml pointers) |
+| Jeffallan-claude-skills | https://github.com/Jeffallan/claude-skills @ 882ef55 (11.7k★, 67 skills) |
