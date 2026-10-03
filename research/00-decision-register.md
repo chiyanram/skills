@@ -77,7 +77,7 @@ Repos: **AP** agent-platform (GitLab) · **AF** agent-fleet (GitHub) — holds A
 | status words needs-decision · blocked · done + qa verdict on SHA; done = REPORT 8 + LEARNINGS + NEXT | #50 Q12–Q13 | AF `briefs/handoff-comment.md` | W2 |
 | `post-status` refuses done unless pushed and not draft | #50 Q14 | AF `scripts/post-status` | W2 |
 | refuse to spawn when a named skill is missing or two share a name | #64 idea 2 | AF spawn script | W2, W3 |
-| one unix user; laptop = coordinator; tiers 0/1/2; agent side as plugins + one machine file | G4 #17 | AF provisioning | W3 |
+| laptop = coordinator; tiers 0/1/2; agent side as plugins + one machine file (one-unix-user part amended by #69) | G4 #17 | AF provisioning | W3 |
 | machine file `~/.config/agent-fleet/machine.env` (JAVA_HOME, DOCKER_HOST → podman socket, ports) | ND-15 · R29 | AF template | W3 |
 | delete `~/.claude/knowledge/<repo>.md` | ND-14 | AF / U | W3 |
 | reply card: shapes + ~80% ASD-STE100, one file | ND-10 | AF `plugins/reply-card/` | W3 |
@@ -98,6 +98,18 @@ Repos: **AP** agent-platform (GitLab) · **AF** agent-fleet (GitHub) — holds A
 | ProblemDetail { type https://aruvii.ai/errors/<kebab>, title, status, detail, instance, code UPPER_SNAKE, traceId } | #58 Q5, Q-TYPE, Q-WIRE | AP global handler, UI | AP #662 |
 | status by kind (400/401/403/404/409/422/429/500/502/503/504); 104-code catalogue | #58 Q6, catalogue | AP ErrorCode enum | AP #662 |
 | api/errors rules for the reference | #58 | AP code/references/api.md, errors.md | W1 (G9b #33) |
+
+## Fleet security (G13 #69)
+
+| decision | from | lands in | by |
+|---|---|---|---|
+| two zones: workers share `fleet-worker`; coordinator `fleet-coord`, runner `fleet-runner` own users (amends G4) | #69 Q1 | AF provisioning | W3 |
+| workers run in one dev container image on laptop and VM (non-root, toolchain baked, managed settings, no host secrets, egress firewall) | #69 Q2 | AF `.devcontainer/` + launch scripts | W2, W3 |
+| per-role GitLab bots (aruvii-*-agent, Developer); token by role at spawn; never the operator's token | #69 Q3 | AF spawn | W2 |
+| tokens as read-only container secrets per worker; machine.env facts only | #69 Q4 | AF | W3 |
+| no Discord token in workers; /approved by note author; auto mode, bypass disabled | #69 floor | AF worker-rules, managed settings, coordinator | W2, W3 |
+| master key not linked into worktrees | #69 floor | AP scripts | AP #670 |
+| egress allow-list; plugin allow-list; audit = GitLab + 30-day transcripts; no laptop forwarding/mounts | #69 Q5–Q8 | AF managed settings, firewall, runbook | W3 |
 
 ## Open (not yet decided — do not write)
 
