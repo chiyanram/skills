@@ -24,4 +24,6 @@ One index so no input depends on a single session. Map: chiyanram/skills#9. Upda
 | skills repo as source of truth (idea) | common skills installable anywhere, incl. office work | #65 (after this map) |
 | reconsider TDD (idea) | — | G12 (#68) |
 | WIP limit (fleet retro) | — | map #9 fog |
+| SOLID seams that chain; modern Java; no complex logic (idea) + rameezk/skills martin-fowler-code-smells.md | design rule for code + Fowler smell catalogue | G9b #33 (input comment) |
+| sources rule (idea) | rules from references, read; our code only as Bad; Good = rewritten Bad | 00-reference-format.md, map #9 Notes, #37 |
 | skills-analysis `/wiki` | the operator's mined reference corpus | R3, research/09 |
