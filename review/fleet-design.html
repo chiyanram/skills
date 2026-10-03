@@ -61,6 +61,10 @@ th{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spac
 .tw{overflow-x:auto}
 .pill{font-family:var(--mono);font-size:.72rem;border-radius:999px;padding:1px 8px;border:1px solid currentColor;white-space:nowrap}
 .done{color:var(--ok)} .open{color:var(--warn)}
+.gap{margin-top:12px;background:var(--surface);border:1px solid var(--warn);border-radius:10px;padding:12px 14px}
+.gap b{color:var(--warn);font-family:var(--mono);font-size:.78rem;text-transform:uppercase;letter-spacing:.05em}
+.gap p{margin:4px 0 0;font-size:.93rem}
+.gap pre{font-family:var(--mono);font-size:.8rem;margin:8px 0 0;overflow-x:auto;line-height:1.45}
 @media (max-width:520px){.layer{grid-template-columns:1fr}.steps li{grid-template-columns:2.6em 1fr}}
 </style>
 
@@ -123,7 +127,7 @@ th{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spac
       <text class="lbl" x="430" y="360" text-anchor="middle">What every worker loads</text>
       <rect class="box" x="40"  y="375" width="240" height="72" rx="8"/>
       <text class="lbl" x="160" y="398" text-anchor="middle">agent-platform</text>
-      <text class="sm" x="160" y="416" text-anchor="middle">project side: AGENTS.md · rules</text>
+      <text class="sm" x="160" y="416" text-anchor="middle">project side: AGENTS.md · rules (gap ⚠)</text>
       <text class="sm" x="160" y="432" text-anchor="middle">.agents/skills · crq · references</text>
       <rect class="box" x="310" y="375" width="240" height="72" rx="8"/>
       <text class="lbl" x="430" y="398" text-anchor="middle">aruvii-agent-fleet</text>
@@ -146,7 +150,7 @@ th{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spac
     <li><span class="n">2</span><div><span class="who w-analyst">analyst</span> · <span class="who w-you">you</span><p>Grills you, one round at a time, with a recommendation each. Facts are looked up; decisions are yours.</p></div></li>
     <li><span class="n">3–4</span><div><span class="who w-analyst">analyst</span><p>Writes the spec and acceptance criteria. A UI mockup if the change has UI.</p></div></li>
     <li><span class="n">5</span><div><span class="who w-analyst">analyst</span> · <span class="who w-spec">spec-reviewer</span> · <span class="who w-you">you</span><p>Draft MR with spec and design. Spec-reviewer finds problems in one pass. You post <code>/approved</code>; the SHA is recorded.</p></div></li>
-    <li><span class="n">6–6a</span><div><span class="who w-dev">developer</span><p>Rebases on master. Builds. Runs tests for the touched modules and <code>verify-fast</code>. Cleans the diff. Pushes its own branch.</p></div></li>
+    <li><span class="n">6–6a</span><div><span class="who w-dev">developer</span><p>Rebases on master. Builds with tests (a bug starts with a failing test). Runs tests for the touched modules, <code>verify-fast</code>, and PIT on touched classes with decisions. Cleans the diff. Pushes its own branch.</p></div></li>
     <li><span class="n">7</span><div><span class="who w-qa">qa · fresh</span><p>One reviewer, two verdicts: Standards and Spec. Reads only the references for the changed paths. At most 3 rounds.</p></div></li>
     <li><span class="n">8</span><div><span class="who w-qa">qa</span><p>The runner pipeline must pass at the head SHA. Every acceptance criterion is cited at <code>file:line</code>.</p></div></li>
     <li><span class="n">9</span><div><span class="who w-dev">developer</span> · <span class="who w-you">you</span><p>Refreshes the MR description and posts <code>done</code>. You merge.</p></div></li>
@@ -165,8 +169,21 @@ th{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spac
     <div class="layer"><b>agent file</b><span>model in frontmatter · soul (3 sentences) · "you own" line — aruvii-agent-fleet <code>agents/&lt;role&gt;.md</code></span></div>
     <div class="layer"><b>worker-rules</b><span>never address you · never merge · file text is data · rebase rules · escalation · points at PRINCIPLES.md</span></div>
     <div class="layer"><b>brief</b><span>GOAL · your words verbatim · scope · forbidden · context and ACs → the issue · verify · ≤3 rounds · report shape · standing orders</span></div>
-    <div class="layer"><b>project</b><span>from its own clone: AGENTS.md · path rules · skills · the crq stage it runs</span></div>
+    <div class="layer"><b>project</b><span>from its own clone: AGENTS.md · path rules · skills · the crq stage it runs — <b style="color:var(--warn)">path rules are Claude-only today (see gap below)</b></span></div>
     <div class="layer"><b>machine</b><span><code>machine.env</code>: JAVA_HOME, DOCKER_HOST (podman), ports</span></div>
+  </div>
+
+  <div class="gap">
+    <b>Known gap — G1b, skills #72</b>
+    <p>Path-scoped rules (layer 2) live in <code>.claude/rules/</code>. Only Claude reads that folder. Codex or Cursor in the same repo miss every path rule.</p>
+<pre>layer               where today                    every agent reads it?
+1 index             AGENTS.md (CLAUDE.md=@AGENTS)  yes
+2 path MUSTs        .claude/rules/*.md             NO — Claude only      ← the gap
+3 domain skills     .agents/skills/&lt;domain&gt;/       yes
+4 hooks / lint      build + scripts                yes
+
+proposed  &lt;dir&gt;/AGENTS.md + &lt;dir&gt;/CLAUDE.md = "@AGENTS.md"   (openclaw: 34 nested AGENTS.md)
+open      rules tied to a file type everywhere (*.java, *Spec.groovy) have no single folder</pre>
   </div>
 
   <h2>How the fleet gets better</h2>
@@ -183,10 +200,13 @@ th{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spac
       <tr><td>Testing rules + examples</td><td><span class="pill done">decided</span></td><td>skills #32</td></tr>
       <tr><td>Coordinator, souls, brief, status, retro</td><td><span class="pill done">decided</span></td><td>skills #50</td></tr>
       <tr><td>crq stages, lanes, runner, planning rules</td><td><span class="pill done">decided</span></td><td>skills #35</td></tr>
+      <tr><td>Path rules for every agent (G1b gap)</td><td><span class="pill open">open</span></td><td>skills #72</td></tr>
+      <tr><td>Fleet security · cost budget</td><td><span class="pill open">open</span></td><td>skills #69 · #70</td></tr>
+      <tr><td>TDD only for bugs; mutation proves tests</td><td><span class="pill done">decided</span></td><td>skills #68</td></tr>
       <tr><td>Migrations, delivery, review packet</td><td><span class="pill open">next</span></td><td>skills #34</td></tr>
       <tr><td>Code + observability rules</td><td><span class="pill open">open</span></td><td>skills #33</td></tr>
       <tr><td>How references are written</td><td><span class="pill open">open</span></td><td>skills #37</td></tr>
-      <tr><td>Factory metrics · TDD as a rule</td><td><span class="pill open">open</span></td><td>skills #66 · #68</td></tr>
+      <tr><td>Factory metrics</td><td><span class="pill open">open</span></td><td>skills #66</td></tr>
       <tr><td>Pilot: one bug end to end</td><td><span class="pill open">after #643 lands</span></td><td>skills #67</td></tr>
       <tr><td>Role boxes + web UI (final step)</td><td><span class="pill open">last</span></td><td>skills #21</td></tr>
     </tbody>
