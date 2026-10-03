@@ -90,7 +90,7 @@ Work items: **W1** agent-platform (#643 → #646 →
 |---|---|---|---|
 | agents propose MRs to the one owning file; operator merges; ≤2 per work item | G7 #26 | AP `docs/agents/lessons.md` (routing) | W1, W2 |
 | retro = mattpocock `retro` plugin as-is; thread first; operator picks from a ranked list; crq stage 10 retro worker types `/retro` | #50 Q15–Q17 · ND-12 | AP crq stage 10 · AF brief | W1, W2 |
-| factory metrics per work item, shown in the digest | #66 G11 | open | — |
+| five metrics per work item in the closing comment, fingerprinted by rulebook + fleet SHA; digest compares per fingerprint, ≥5 per side | #66 G11 | AF retro worker + digest | AF #75, #72 |
 
 ## API errors
 
@@ -116,5 +116,5 @@ Work items: **W1** agent-platform (#643 → #646 →
 
 ## Open (not yet decided — do not write)
 
-factory metrics (#66) · G9b code+obs (#33) · G9c migrations+delivery+review packet (#34) ·
+G9b code+obs (#33) · G9c migrations+delivery+review packet (#34) ·
 G10 writing standard (#37) · WIP limit (map fog) · pilot (#67) · D1 role boxes (#21).
