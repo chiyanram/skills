@@ -5,7 +5,9 @@ No new decisions here. Consolidated 2026-10-02. Rule-level decisions (each appro
 `research/19-approved-rules.md`, whose rows already carry their target file; this register covers everything else.
 
 Repos: **AP** agent-platform (GitLab) · **AF** agent-fleet (GitHub) — holds ALL agent-side files for now (G1 amendment 2026-10-03: no separate aruvii-agent-fleet until a second project needs it) ·
-**U** user level on the laptop (`~/.claude`) · **UP** upstream plugin. Work items: **W1** agent-platform (#643 → #646 →
+**U** user level on the laptop (`~/.claude`) · **UP** upstream plugin. Tickets (2026-10-03): **W1** agent-platform #643 #646 #644 #645 + #659 #662 #670 #671 #652 · **W2/W3** chiyanram/agent-fleet (private) #72 roles/coordinator/briefs · #73 dev container · #74 zones/runner/machine.env · #75 retro wiring.
+
+Work items: **W1** agent-platform (#643 → #646 →
 #644 → #645), **W2** agent-fleet: roles, coordinator, briefs (was aruvii-agent-fleet), **W3** agent-fleet: provisioning, runner, machine file.
 
 ## Where rules live and how they load
