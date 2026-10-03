@@ -90,6 +90,15 @@ Repos: **AP** agent-platform (GitLab) · **AAF** aruvii-agent-fleet (new) · **A
 | retro = mattpocock `retro` plugin as-is; thread first; operator picks from a ranked list; crq stage 10 retro worker types `/retro` | #50 Q15–Q17 · ND-12 | AP crq stage 10 · AAF brief | W1, W2 |
 | factory metrics per work item, shown in the digest | #66 G11 | open | — |
 
+## API errors
+
+| decision | from | lands in | by |
+|---|---|---|---|
+| typed outcomes up to the controller; failures implement `Failure` with an ErrorCode; one mapper + global handler for the unexpected; ArchUnit bans other paths | #58 Q4, Q2, Q7 | AP shared outcome/, web layer, ArchUnit | AP #662 |
+| ProblemDetail { type https://aruvii.ai/errors/<kebab>, title, status, detail, instance, code UPPER_SNAKE, traceId } | #58 Q5, Q-TYPE, Q-WIRE | AP global handler, UI | AP #662 |
+| status by kind (400/401/403/404/409/422/429/500/502/503/504); 104-code catalogue | #58 Q6, catalogue | AP ErrorCode enum | AP #662 |
+| api/errors rules for the reference | #58 | AP code/references/api.md, errors.md | W1 (G9b #33) |
+
 ## Open (not yet decided — do not write)
 
 factory metrics (#66) · G9b code+obs (#33) · G9c migrations+delivery+review packet (#34) ·
