@@ -33,7 +33,8 @@ Repos: **AP** agent-platform (GitLab) · **AAF** aruvii-agent-fleet (new) · **A
 | `/dod` deleted; stage 8 = runner pipeline + AC citing; dod items → references' Review checks | ND-5 | AP crq, references | W1 #645 |
 | `visual-pr` adapted and owned; `untouched-and-risk` folded into it; stages 5 and 9 | #50 Q18 · ND-16 | AP `.agents/skills/visual-pr/` | W1 #645 |
 | GitLab comment = handoff record; Discord only pings | G2 | AP crq · AAF briefs | W1, W2 |
-| TDD as a rule — under review | #68 G12 | AP crq stage 6, AGENTS.md rule 1 | open |
+| TDD only for bugs (failing test first, S4); features: any order; PIT on touched classes with decisions at 6a, every survivor dispositioned, qa checks | #68 G12 | AP crq stage 6, AGENTS.md rule 1, testing/SKILL.md | W1 #644/#645 |
+| mutation runner job for touched modules, report-only → measured baselines → operator thresholds → blocking; every module wired | #68 Q3–Q4 | AP build-logic, Makefile, runner pipeline | AP #659 |
 
 ## Review
 
@@ -91,5 +92,5 @@ Repos: **AP** agent-platform (GitLab) · **AAF** aruvii-agent-fleet (new) · **A
 
 ## Open (not yet decided — do not write)
 
-TDD as a rule (#68) · factory metrics (#66) · G9b code+obs (#33) · G9c migrations+delivery+review packet (#34) ·
+factory metrics (#66) · G9b code+obs (#33) · G9c migrations+delivery+review packet (#34) ·
 G10 writing standard (#37) · WIP limit (map fog) · pilot (#67) · D1 role boxes (#21).
