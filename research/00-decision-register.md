@@ -112,6 +112,7 @@ Work items: **W1** agent-platform (#643 → #646 →
 | no Discord token in workers; /approved by note author; auto mode, bypass disabled | #69 floor | AF worker-rules, managed settings, coordinator | W2, W3 |
 | master key not linked into worktrees | #69 floor | AP scripts | AP #670 |
 | egress allow-list; plugin allow-list; audit = GitLab + 30-day transcripts; no laptop forwarding/mounts | #69 Q5–Q8 | AF managed settings, firewall, runbook | W3 |
+| workers read chiyanram/skills via one read-only fine-grained GitHub token (contents: read); github.com in the egress allow-list | #69 amendment | AF #73, #74 | W2, W3 |
 
 ## Open (not yet decided — do not write)
 
