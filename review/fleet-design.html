@@ -174,7 +174,7 @@ th{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spac
   </div>
 
   <div class="gap">
-    <b>Known gap — G1b, skills #72</b>
+    <b>Gap found and decided — G1b, skills #72 · built in agent-platform #646</b>
     <p>Path-scoped rules (layer 2) live in <code>.claude/rules/</code>. Only Claude reads that folder. Codex or Cursor in the same repo miss every path rule.</p>
 <pre>layer               where today                    every agent reads it?
 1 index             AGENTS.md (CLAUDE.md=@AGENTS)  yes
@@ -183,7 +183,8 @@ th{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spac
 4 hooks / lint      build + scripts                yes
 
 proposed  &lt;dir&gt;/AGENTS.md + &lt;dir&gt;/CLAUDE.md = "@AGENTS.md"   (openclaw: 34 nested AGENTS.md)
-open      rules tied to a file type everywhere (*.java, *Spec.groovy) have no single folder</pre>
+decided   directory rules → nested AGENTS.md · file-type rules (*.java, tests, build files) → root AGENTS.md
+          .claude/rules/ deleted after the move</pre>
   </div>
 
   <h2>How the fleet gets better</h2>
@@ -200,9 +201,10 @@ open      rules tied to a file type everywhere (*.java, *Spec.groovy) have no si
       <tr><td>Testing rules + examples</td><td><span class="pill done">decided</span></td><td>skills #32</td></tr>
       <tr><td>Coordinator, souls, brief, status, retro</td><td><span class="pill done">decided</span></td><td>skills #50</td></tr>
       <tr><td>crq stages, lanes, runner, planning rules</td><td><span class="pill done">decided</span></td><td>skills #35</td></tr>
-      <tr><td>Path rules for every agent (G1b gap)</td><td><span class="pill open">open</span></td><td>skills #72</td></tr>
+      <tr><td>Path rules for every agent (G1b gap)</td><td><span class="pill done">decided</span></td><td>skills #72</td></tr>
       <tr><td>Fleet security · cost budget</td><td><span class="pill open">open</span></td><td>skills #69 · #70</td></tr>
       <tr><td>TDD only for bugs; mutation proves tests</td><td><span class="pill done">decided</span></td><td>skills #68</td></tr>
+      <tr><td>API contract, errors, error-code catalogue</td><td><span class="pill open">open</span></td><td>skills #58</td></tr>
       <tr><td>Migrations, delivery, review packet</td><td><span class="pill open">next</span></td><td>skills #34</td></tr>
       <tr><td>Code + observability rules</td><td><span class="pill open">open</span></td><td>skills #33</td></tr>
       <tr><td>How references are written</td><td><span class="pill open">open</span></td><td>skills #37</td></tr>
