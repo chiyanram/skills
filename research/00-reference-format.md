@@ -28,11 +28,15 @@ G5 (#13, one file per topic).
 ## Good / Bad rules
 
 1. A Good obeys **every** approved rule and house style, not only its own (GB1a, `31-good-bad-v2-BRIEF.md:9`).
-2. Real code with `path:lines` at a pinned commit, or labelled **adapted** with what it was built from. ≤15 lines.
-3. Prefer real Bads — things that actually went wrong here (a ticket, an MR round, a QA finding).
-4. House style in examples: test names are "should …" sentences; `final var` in Java, `def` in Groovy; one argument per
+2. **Bad = real code from our repo**, `path:lines` at a pinned commit, labelled *real* — things that actually went wrong
+   (a ticket, an MR round, a QA finding). ≤15 lines.
+3. **Good = that same Bad rewritten to obey the rule** — never our code as-is, because our code does not reliably follow
+   the rules. Label it *rewritten from* the Bad's `path:lines`. ≤15 lines.
+4. **A rule's source is a reference project or its internal references — read, never assumed.** Our repo supplies
+   evidence that a rule is needed (the Bad), never the rule itself.
+5. House style in examples: test names are "should …" sentences; `final var` in Java, `def` in Groovy; one argument per
    line with the closing parenthesis on the last argument; Spock for new tests (CV1–CV6, `31e-conventions.md`).
-5. One pair per rule. A rule whose text cannot be misread gets none (#35).
+6. One pair per rule. A rule whose text cannot be misread gets none (#35).
 
 ## Register
 
@@ -90,7 +94,7 @@ One sentence: what this reference governs and when it is read.
 [ ] 3  Rules: each discipline rule names the permitted alternative in the same line
 [ ] 4  Rules: no rule a hook/Checkstyle/ArchUnit already fails — cite the gate instead
 [ ] 5  When X, use Y: X is an observable predicate (file type, annotation, tier, path), never a judgement
-[ ] 6  Good/Bad: real file:line preferred, re-verified at write time; adapted allowed only when labelled
+[ ] 6  Bad = real path:line from our repo (re-verified at write time); Good = that Bad rewritten to the rule, never our code as-is; the rule's source is a reference project, read
 [ ] 7  Good/Bad: one pair per rule that can be misread; none for rules whose sentence says it all
 [ ] 8  Decided edges: Skip when / Do not skip when / Confidence
 [ ] 9  Decided edges: exceptions live here as their own predicate, never inside a Rule
