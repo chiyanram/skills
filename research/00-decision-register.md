@@ -4,9 +4,9 @@ One line per decision: where it was decided, which repo and file it lands in, an
 No new decisions here. Consolidated 2026-10-02. Rule-level decisions (each approved rule) live in the ledger
 `research/19-approved-rules.md`, whose rows already carry their target file; this register covers everything else.
 
-Repos: **AP** agent-platform (GitLab) · **AAF** aruvii-agent-fleet (new) · **AF** agent-fleet (GitHub, generic) ·
+Repos: **AP** agent-platform (GitLab) · **AF** agent-fleet (GitHub) — holds ALL agent-side files for now (G1 amendment 2026-10-03: no separate aruvii-agent-fleet until a second project needs it) ·
 **U** user level on the laptop (`~/.claude`) · **UP** upstream plugin. Work items: **W1** agent-platform (#643 → #646 →
-#644 → #645), **W2** aruvii-agent-fleet, **W3** agent-fleet.
+#644 → #645), **W2** agent-fleet: roles, coordinator, briefs (was aruvii-agent-fleet), **W3** agent-fleet: provisioning, runner, machine file.
 
 ## Where rules live and how they load
 
@@ -32,7 +32,7 @@ Repos: **AP** agent-platform (GitLab) · **AAF** aruvii-agent-fleet (new) · **A
 | full stage text 0–10 (approved page `review/crq-stages.html`) | #35 | AP crq | W1 #645 |
 | `/dod` deleted; stage 8 = runner pipeline + AC citing; dod items → references' Review checks | ND-5 | AP crq, references | W1 #645 |
 | `visual-pr` adapted and owned; `untouched-and-risk` folded into it; stages 5 and 9 | #50 Q18 · ND-16 | AP `.agents/skills/visual-pr/` | W1 #645 |
-| GitLab comment = handoff record; Discord only pings | G2 | AP crq · AAF briefs | W1, W2 |
+| GitLab comment = handoff record; Discord only pings | G2 | AP crq · AF briefs | W1, W2 |
 | TDD only for bugs (failing test first, S4); features: any order; PIT on touched classes with decisions at 6a, every survivor dispositioned, qa checks | #68 G12 | AP crq stage 6, AGENTS.md rule 1, testing/SKILL.md | W1 #644/#645 |
 | mutation runner job for touched modules, report-only → measured baselines → operator thresholds → blocking; every module wired | #68 Q3–Q4 | AP build-logic, Makefile, runner pipeline | AP #659 |
 
@@ -56,27 +56,27 @@ Repos: **AP** agent-platform (GitLab) · **AAF** aruvii-agent-fleet (new) · **A
 | gate smoke: scripted model only for specs #609 converted, Ollama for the rest, 2 workers; no nightly tier | #62 Q27 (revised after R30) | AP playwright config, crq stage 8 | W1 (needs AP #609) |
 | developer minimum before qa: touched-module test-module/it-module + verify-fast + what-ran note; only the runner runs verify-full/smoke | #35 Q26 · R28 | AP crq stages 6–6a | W1 #645 |
 | runner owns its own Compose stack; agents never deploy to it | #62 note (builder.io) | AF runner · AP Makefile | W3 |
-| workers commit and push their own branch; master protected; operator merges | #50 Q19 | AAF worker-rules.md | W2 |
-| rebase onto origin/master at spawn, before verify, before done; conflicts via resolving-merge-conflicts + module build; behaviour change → needs-decision; --force-with-lease own branch | #50 Q20 | AAF worker-rules.md · AP crq | W1, W2 |
+| workers commit and push their own branch; master protected; operator merges | #50 Q19 | AF worker-rules.md | W2 |
+| rebase onto origin/master at spawn, before verify, before done; conflicts via resolving-merge-conflicts + module build; behaviour change → needs-decision; --force-with-lease own branch | #50 Q20 | AF worker-rules.md · AP crq | W1, W2 |
 
 ## Agent side
 
 | decision | from | lands in | by |
 |---|---|---|---|
-| one always-on coordinator; fresh interactive worker per (work item, role), own tmux window + worktree | G6 #25 | AAF `agents/coordinator.md` · AF launch scripts | W2, W3 |
-| coordinator hard rules (never edits code, never /approved or merge, never tears down unlanded work) | G6 · firstmate | AAF coordinator.md | W2 |
-| relay layout = firstmate 5 parts + our reasons + recommendation; high-level → artifact (mermaid fallback) | #50 Q1–Q4 | AAF coordinator.md | W2 |
-| high-level = design/REQ, >1 work item, irreversible, G8 floor, stage-5 /approved | #50 Q3 | AAF coordinator.md · AP crq | W2 |
-| fleet PRINCIPLES.md = transferable subset of AP `docs/design/AGENT-PRINCIPLES.md` (#620) | #50 Q5 | AAF `PRINCIPLES.md` | W2 |
-| coordinator speaks for needs-decision, blocked, done + one daily digest; watchdog for stalled items | #50 Q6 · builder.io | AAF coordinator.md | W2 |
-| souls = 3 sentences + "you own" (approved text) | #50 Q7 | AAF `agents/{analyst,spec-reviewer,developer,qa}.md` | W2 |
-| one shared worker block (guardrails, escalation, principles pointer) prepended at spawn | #50 Q8–Q9 | AAF `worker-rules.md` | W2 |
-| model choice in agent frontmatter | #50 default | AAF agents/*.md | W2 |
-| brief = pstack 9 + HUMAN'S WORDS; CONTEXT/ACCEPTANCE point at the issue; refuse if missing | #50 Q10 | AAF `briefs/worker-brief.md` | W2 |
-| reversible question → default + report; high-level → stop + relay | #50 Q11 | AAF worker-rules.md | W2 |
-| status words needs-decision · blocked · done + qa verdict on SHA; done = REPORT 8 + LEARNINGS + NEXT | #50 Q12–Q13 | AAF `briefs/handoff-comment.md` | W2 |
-| `post-status` refuses done unless pushed and not draft | #50 Q14 | AAF `scripts/post-status` | W2 |
-| refuse to spawn when a named skill is missing or two share a name | #64 idea 2 | AAF/AF spawn script | W2, W3 |
+| one always-on coordinator; fresh interactive worker per (work item, role), own tmux window + worktree | G6 #25 | AF `agents/coordinator.md` · AF launch scripts | W2, W3 |
+| coordinator hard rules (never edits code, never /approved or merge, never tears down unlanded work) | G6 · firstmate | AF coordinator.md | W2 |
+| relay layout = firstmate 5 parts + our reasons + recommendation; high-level → artifact (mermaid fallback) | #50 Q1–Q4 | AF coordinator.md | W2 |
+| high-level = design/REQ, >1 work item, irreversible, G8 floor, stage-5 /approved | #50 Q3 | AF coordinator.md · AP crq | W2 |
+| fleet PRINCIPLES.md = transferable subset of AP `docs/design/AGENT-PRINCIPLES.md` (#620) | #50 Q5 | AF `PRINCIPLES.md` | W2 |
+| coordinator speaks for needs-decision, blocked, done + one daily digest; watchdog for stalled items | #50 Q6 · builder.io | AF coordinator.md | W2 |
+| souls = 3 sentences + "you own" (approved text) | #50 Q7 | AF `agents/{analyst,spec-reviewer,developer,qa}.md` | W2 |
+| one shared worker block (guardrails, escalation, principles pointer) prepended at spawn | #50 Q8–Q9 | AF `worker-rules.md` | W2 |
+| model choice in agent frontmatter | #50 default | AF agents/*.md | W2 |
+| brief = pstack 9 + HUMAN'S WORDS; CONTEXT/ACCEPTANCE point at the issue; refuse if missing | #50 Q10 | AF `briefs/worker-brief.md` | W2 |
+| reversible question → default + report; high-level → stop + relay | #50 Q11 | AF worker-rules.md | W2 |
+| status words needs-decision · blocked · done + qa verdict on SHA; done = REPORT 8 + LEARNINGS + NEXT | #50 Q12–Q13 | AF `briefs/handoff-comment.md` | W2 |
+| `post-status` refuses done unless pushed and not draft | #50 Q14 | AF `scripts/post-status` | W2 |
+| refuse to spawn when a named skill is missing or two share a name | #64 idea 2 | AF spawn script | W2, W3 |
 | one unix user; laptop = coordinator; tiers 0/1/2; agent side as plugins + one machine file | G4 #17 | AF provisioning | W3 |
 | machine file `~/.config/agent-fleet/machine.env` (JAVA_HOME, DOCKER_HOST → podman socket, ports) | ND-15 · R29 | AF template | W3 |
 | delete `~/.claude/knowledge/<repo>.md` | ND-14 | AF / U | W3 |
@@ -87,7 +87,7 @@ Repos: **AP** agent-platform (GitLab) · **AAF** aruvii-agent-fleet (new) · **A
 | decision | from | lands in | by |
 |---|---|---|---|
 | agents propose MRs to the one owning file; operator merges; ≤2 per work item | G7 #26 | AP `docs/agents/lessons.md` (routing) | W1, W2 |
-| retro = mattpocock `retro` plugin as-is; thread first; operator picks from a ranked list; crq stage 10 retro worker types `/retro` | #50 Q15–Q17 · ND-12 | AP crq stage 10 · AAF brief | W1, W2 |
+| retro = mattpocock `retro` plugin as-is; thread first; operator picks from a ranked list; crq stage 10 retro worker types `/retro` | #50 Q15–Q17 · ND-12 | AP crq stage 10 · AF brief | W1, W2 |
 | factory metrics per work item, shown in the digest | #66 G11 | open | — |
 
 ## API errors
