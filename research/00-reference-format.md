@@ -1,7 +1,6 @@
 # Reference format — the template every reference follows
 
-Draft consolidated 2026-10-02 from decisions already taken. No new decisions here; each line cites where it was
-decided. G10 (#37, "how we write skills and references") owns this file and may refine it.
+Draft consolidated 2026-10-02 from decisions already taken. Each line cites where it was decided. G10 (#37) owns this file; its checklist and proof method are decided there.
 
 ## Where a reference sits
 
@@ -82,6 +81,44 @@ One sentence: what this reference governs and when it is read.
 
 - [ ] V1 — open the new test; can each of the four questions be answered from it? (`scripts/<check>.sh` if mechanical)
 ````
+
+## Writing checklist (G10 #37, from R14 research/16 §4a)
+
+```
+[ ] 1  ≤300 lines; >100 lines → contents line at top; links one level deep, none into another ref's body
+[ ] 2  Rules: each a checkable sentence a grep or a reader can decide (no "consider", no "prefer")
+[ ] 3  Rules: each discipline rule names the permitted alternative in the same line
+[ ] 4  Rules: no rule a hook/Checkstyle/ArchUnit already fails — cite the gate instead
+[ ] 5  When X, use Y: X is an observable predicate (file type, annotation, tier, path), never a judgement
+[ ] 6  Good/Bad: real file:line preferred, re-verified at write time; adapted allowed only when labelled
+[ ] 7  Good/Bad: one pair per rule that can be misread; none for rules whose sentence says it all
+[ ] 8  Decided edges: Skip when / Do not skip when / Confidence
+[ ] 9  Decided edges: exceptions live here as their own predicate, never inside a Rule
+[ ] 10 Review checks: last section; one check per Rule, same id, each with its evidence (file:line or grep)
+[ ] 11 Review checks: state the exhaustive bar ("every changed test file walked", not "check tests")
+[ ] 12 One term per concept across all references
+[ ] 13 No dates, counts that rot, or narration — a pinned file:line carries the history
+[ ] 14 Most load-bearing rule first (after compaction only the first 5,000 tokens of a skill survive)
+[ ] 15 No-op test: if deleting a line changes no agent behaviour, delete it
+[ ] 16 The MR maps every old line → kept / moved / deleted-with-reason
+```
+
+## Proof before a rewritten reference replaces the old one (G10 #37)
+
+- **Testing references:** full replay — 2–3 past MRs whose real review hit the reference; old ref vs new ref, 3 runs
+  each, same diff and organic prompt, blinded judge with the hidden real findings as rubric. PASS when the new ref
+  finds at least as much, hits every finding it owns in ≥2/3 runs, adds no false positive the lead rejects, and costs
+  ≤1.2× the old tokens. Runner: `claude plugin eval`. Method proven on P1 (!230).
+- **Other references:** static checks + 1 past MR × 3 runs.
+
+## Descriptions and the static gate (G10 #37)
+
+- A skill description (domain routers and workflow skills; references carry none) = **"Use when <observable
+  trigger>"** + what it holds. Never the procedure — an agent that reads the steps in the description skips the body.
+  Tone and wording are settled by a trigger test (20 should / should-not prompts, `claude plugin eval` or
+  skill-creator `run_eval`), not by taste.
+- `make lint` runs: `claude plugin validate .agents/skills --strict` · check-doc-drift §5 (rulebook paths) · a
+  heading check (the five sections present, in order, in every reference).
 
 ## How a domain gets its references (the process G9a and G9d used)
 

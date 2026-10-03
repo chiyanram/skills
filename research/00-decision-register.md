@@ -115,7 +115,16 @@ Work items: **W1** agent-platform (#643 → #646 →
 | egress allow-list; plugin allow-list; audit = GitLab + 30-day transcripts; no laptop forwarding/mounts | #69 Q5–Q8 | AF managed settings, firewall, runbook | W3 |
 | workers read chiyanram/skills via one read-only fine-grained GitHub token (contents: read); github.com in the egress allow-list | #69 amendment | AF #73, #74 | W2, W3 |
 
+## Writing standard (G10 #37)
+
+| decision | from | lands in | by |
+|---|---|---|---|
+| 16-point writing checklist (line 6: adapted examples allowed when labelled) | #37 Q1 | research/00-reference-format.md → every AP reference | W1 #644, #646, later G9 domains |
+| proof before replace: full replay for testing refs, static + 1 MR × 3 for others | #37 Q2 | AP MR evidence | W1 #644, #645 |
+| descriptions = "Use when <observable trigger>" + what it holds, trigger-tested | #37 Q3 | AP .agents/skills/*/SKILL.md | W1 #643 onward |
+| `make lint` = plugin validate --strict + doc-drift §5 + 5-section heading check | #37 Q4 | AP Makefile, scripts | W1 #643 |
+
 ## Open (not yet decided — do not write)
 
 G9b code+obs (#33) · G9c migrations+delivery+review packet (#34) ·
-G10 writing standard (#37) · WIP limit (map fog) · pilot (#67) · D1 role boxes (#21).
+WIP limit (map fog) · pilot (#67) · D1 role boxes (#21).
