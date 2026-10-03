@@ -90,6 +90,7 @@ Work items: **W1** agent-platform (#643 → #646 →
 |---|---|---|---|
 | agents propose MRs to the one owning file; operator merges; ≤2 per work item | G7 #26 | AP `docs/agents/lessons.md` (routing) | W1, W2 |
 | retro = mattpocock `retro` plugin as-is; thread first; operator picks from a ranked list; crq stage 10 retro worker types `/retro` | #50 Q15–Q17 · ND-12 | AP crq stage 10 · AF brief | W1, W2 |
+| cost budget: tokens + wall time per stage; report-only → p90×1.5 per lane+stage set by operator; watchdog warns at 80 %, stops at 100 % (blocked: budget); spawn pause at ~70 % of the shared window | #70 G14 | AF coordinator watchdog | AF #72 |
 | five metrics per work item in the closing comment, fingerprinted by rulebook + fleet SHA; digest compares per fingerprint, ≥5 per side | #66 G11 | AF retro worker + digest | AF #75, #72 |
 
 ## API errors
