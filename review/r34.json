@@ -1,0 +1,412 @@
+[
+ {
+  "name": "1 · Filter chain and the public surface — code/references/security.md (Spring section)",
+  "items": [
+   {
+    "id": "SS1",
+    "title": "Deny by default, end with denyAll",
+    "rule": "End `authorizeHttpRequests` with `anyRequest().denyAll()`; every endpoint is a `PUBLIC_PATHS` entry or an explicit `authenticated()`/role matcher.",
+    "source": "SSR `docs.spring.io/spring-security/reference/servlet/authorization/authorize-http-requests.html` (canonical example ends `denyAll()`; `.authenticated()` is the weaker fallback); OWASP Authorization CS §Deny by Default; ASVS 5.0 8.2.1; pl 304 Ex1 R:40-44 (uses `authenticated()`). Ours: SC:82 `anyRequest().authenticated()` — fail-open for any authenticated caller on a forgotten path; method security is the second net (SS12).",
+    "kind": "rule",
+    "recommend": "ADAPT — adopt `authenticated()` → `denyAll()` only together with SS12, because 158 method guards rely on `authenticated()` reaching the controller. Changes: a path missing from SC becomes 403 instead of reachable.",
+    "extra": "Good (real): SC:75-77 — specific matcher ordered before the broad one, with its reason.",
+    "drop": ""
+   },
+   {
+    "id": "SS2",
+    "title": "Dispatcher types decided once",
+    "rule": "Permit `ERROR` and `ASYNC` dispatches in one matcher with the reason in a comment; never permit `REQUEST` or `FORWARD` that way.",
+    "source": "SSR authorize-http-requests (all dispatch types are authorized; permit `ERROR`/`FORWARD` explicitly). Ours: SC:64-69 ✓ (SSE + error-page reason written).",
+    "kind": "decided edge",
+    "recommend": "adopt as a Decided edge, not a rule — the code already does it; this stops a reviewer 'fixing' it.",
+    "extra": "Good (real): SC:64-69.",
+    "drop": ""
+   },
+   {
+    "id": "SS3",
+    "title": "Auth filters run only inside the security chain",
+    "rule": "A custom security `Filter` is not a plain `@Component`; register it in the chain and disable servlet registration with `FilterRegistrationBean.setEnabled(false)`.",
+    "source": "SSR `docs.spring.io/spring-security/reference/servlet/architecture.html` (a Filter bean is registered twice, out of order); SBS spring-security-jwt SKILL:66-67 + templates/SecurityConfig.java:54-55. Ours: `security/JwtAuthFilter.java:15`, `security/ApiKeyAuthFilter.java:18` and `RateLimitFilter` are `@Component` — also run by the container; `OncePerRequestFilter` hides it today.",
+    "kind": "rule",
+    "recommend": "adopt — three small beans; removes a latent ordering bug (rate limit could count before auth).",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SS4",
+    "title": "A bad token is a 401, never anonymous",
+    "rule": "An `Authorization` header with an invalid, expired or wrong-type token returns 401 at once, on public paths too; never continue the request as anonymous.",
+    "source": "SBS spring-security-jwt SKILL:61-62,80 ('Invalid supplied tokens are rejected even on public endpoints'); RFC 6750 §3.1 `invalid_token`; ASVS 16.5.3 (fail securely). Ours: `security/JwtAuthFilter.java:42-44` swallows `JwtException` and continues.",
+    "kind": "rule",
+    "recommend": "adopt. Changes: a stale token on `/api/auth/login` gets 401 — the UI interceptor already skips auth endpoints (`aruvii-ui/src/app/core/auth.interceptor.ts:30`).",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SS5",
+    "title": "CORS: none, or an allowlist",
+    "rule": "Configure CORS only for a named cross-origin client, through `http.cors(…)` with an origin allowlist; never `*` or `allowedOriginPatterns(\"*\")` with credentials.",
+    "source": "SSR `docs.spring.io/spring-security/reference/servlet/integrations/cors.html`; ASVS 5.0 3.4.2; pl 304 Ex4 R:134-164 — its Bad is our code verbatim. Ours: `config/WebConfig.java:29-36` reflects any origin with `allowCredentials(true)`; UI is same-origin (`nginx/nginx.conf:31`), so CORS is unneeded.",
+    "kind": "rule",
+    "recommend": "adopt + fix ticket (P1): delete the mapping. With SS9 missing, a cross-site page can call `/api/auth/refresh` with the cookie and read the new access token where the browser still sends the cookie cross-site.",
+    "extra": "Bad (real): `config/WebConfig.java:29-36`.",
+    "drop": ""
+   }
+  ]
+ },
+ {
+  "name": "2 · Tokens and sessions (our own JWT) — code/references/security.md",
+  "items": [
+   {
+    "id": "SS6",
+    "title": "Short access token; authority read fresh",
+    "rule": "Access tokens live ≤15 minutes; workspace membership and account status are read from the database at decision time, never trusted from the token alone.",
+    "source": "ASVS 5.0 8.3.2 (authz changes apply immediately; self-contained tokens need a mitigating control), 7.4.2 (end sessions on disable); SBS spring-security-jwt SKILL:132 (15 min), :59-60 (re-check account status); De Ryck 2020 (no revocation → short-lived). Ours: `aruvii-auth/.../JwtService.java:26` TTL 24 h with `workspaceRoles` claim (:44-55); `@wsAuth` already reads the DB (`security/WorkspaceAuthorization.java:56`) ✓; `SessionAccessMatrixIT.groovy:118` must 'sign in again' after removal — the staleness made visible.",
+    "kind": "rule",
+    "recommend": "ADAPT — adopt; TTL value is OQ-SS-1. Changes: deactivated or removed users lose access within minutes, not a day; the UI refreshes more often (interceptor exists).",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SS7",
+    "title": "One key, one purpose; pin and validate",
+    "rule": "Each token purpose has its own key and `typ`; verification pins the algorithm and checks `exp`; add `iss`/`aud` the day a second party verifies the token.",
+    "source": "RFC 8725 §3.1, §3.11, §3.12; OWASP JWT CS §MAC ('never reused for another purpose'; iss/aud may be omitted only for a self-issued token under a single-purpose key); ASVS 9.1.2, 9.2.2; SSR jwt.html `#oauth2resourceserver-jwt-decoder-secret-key` + 7.0 `JwtTypeValidator`. Ours: one secret signs access JWTs (`JwtService.java:92`), the OIDC `state` (`controller/OidcController.java:80,106`) and seeds `UserContextKeyManager` (`AuthAutoConfiguration.java:24`); no `typ`.",
+    "kind": "rule",
+    "recommend": "adopt; prefer `NimbusJwtEncoder`/`NimbusJwtDecoder.withSecretKey(...)` with composed validators over hand jjwt code (own ticket). Changes: derive per-purpose keys (HKDF from the master secret) — no new secret to operate.",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SS8",
+    "title": "No bearer token in a URL",
+    "rule": "Never put an access token, refresh token or long-lived secret in a URL path or query; use a header, an HttpOnly cookie, or a single-use short-lived ticket.",
+    "source": "RFC 6750 §2.3, §5.3; OWASP REST Security CS (no tokens or keys in URLs). Ours: SSE `?token=` (`security/JwtAuthFilter.java:31-37`); OIDC redirect `/auth/sso/complete?token=<JWT>` (`controller/OidcController.java:158`); webhook secret in path (`controller/WebhookController.java:81`).",
+    "kind": "rule",
+    "recommend": "adopt with a Decided edge for the webhook path secret (caller contract; see OQ-SS-3). SSE: issue a 30 s single-use stream ticket. OIDC: hand the token over by the refresh cookie (the callback already sets it, :155) and let the UI call `/refresh`.",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SS9",
+    "title": "Cookie credentials carry their own CSRF defence",
+    "rule": "A credential in a cookie is `HttpOnly; Secure; SameSite=Strict` with the narrowest `Path`; its endpoints also reject a cross-site `Origin`, because CSRF is off.",
+    "source": "SSR `docs.spring.io/spring-security/reference/features/exploits/csrf.html#csrf-when-stateless` (stateless is no protection when a cookie authenticates); ASVS 3.5.1; addy security-checklist:39; ADR-0006 + ARCHITECTURE.md promise `Secure; SameSite=Strict`. Ours: `controller/AuthController.java:117-123` sets only HttpOnly + Path; CSRF disabled SC:59.",
+    "kind": "rule",
+    "recommend": "adopt + fix (with SS5). Use `ResponseCookie` (the Servlet `Cookie` API has no SameSite). Changes: none for the same-origin UI.",
+    "extra": "Bad (real): `controller/AuthController.java:117-123`.",
+    "drop": ""
+   },
+   {
+    "id": "SS10",
+    "title": "Refresh tokens rotate, and die with the password",
+    "rule": "Rotate the refresh token on every use; revoke all of a user's refresh tokens on password change or reset, deactivation and role change.",
+    "source": "ASVS 5.0 7.4.1, 7.4.2; SBS spring-security-jwt SKILL:136-138 (rotate + revoke previous, token family). Ours: rotation ✓ `aruvii-auth/.../AuthService.java:87,95`; reset does not revoke (`PasswordResetService.java:86-90`); deactivation blocks refresh (`AuthService.java:90`) but not the live 24 h access token (SS6).",
+    "kind": "rule",
+    "recommend": "adopt. Reuse detection (token family) is optional — record as OQ-SS-2.",
+    "extra": "Bad (real): `PasswordResetService.java:86-90` — a stolen refresh token survives the victim's password reset for 30 days.",
+    "drop": ""
+   },
+   {
+    "id": "SS11",
+    "title": "OIDC through the framework, or validated in full",
+    "rule": "An IdP `id_token` is accepted only after signature, `iss`, `aud`(=client id), `exp` and `nonce` checks, with `state` bound to the browser that started login.",
+    "source": "OIDC Core §3.1.3.7; SSR jwt.html validators; ADR-0006:23-25 (hand-rolled OIDC is ours to maintain). Ours: `controller/OidcController.java:131` default decoder = timestamps only; state is a stateless HMAC not bound to the browser (:186-205) → login CSRF.",
+    "kind": "decision",
+    "recommend": "prefer moving to `oauth2Login` (Spring) — fixes all four; else add the validators. Options: (a) `oauth2Login` · (b) add validators + state cookie · (c) leave. Own ticket.",
+    "extra": "",
+    "drop": ""
+   }
+  ]
+ },
+ {
+  "name": "3 · Method security and object-level authorization — code/references/security.md + api.md",
+  "items": [
+   {
+    "id": "SS12",
+    "title": "Every handler has an authorization decision, gated",
+    "rule": "Every controller handler carries `@PreAuthorize` (method or class) or its path is in `PUBLIC_PATHS`; an ArchUnit rule fails otherwise, with a written exempt list.",
+    "source": "SSR method-security `#request-vs-method` (unannotated methods are not secured); OWASP Authorization CS §Validate the Permissions on Every Request; pstack encode-lessons (gate > review). Ours: 26 of 236 mappings unguarded — 22 public, 4 in `ToolApprovalController.java:47-97` (checked in the body); pattern to copy: AT:345-371.",
+    "kind": "rule (gated)",
+    "recommend": "adopt — the AT copies AT:345's exempt-map shape. Precondition for SS1's `denyAll()`.",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SS13",
+    "title": "A role name never authorizes a workspace resource",
+    "rule": "A guard on a workspace-owned resource asks `@wsAuth` about that resource; `hasRole`/`hasAnyRole` may name platform roles only.",
+    "source": "OWASP API Top 10 2023 API1 (BOLA); ASVS 5.0 8.2.2, 8.4.1; OWASP Authorization CS §Ensure Lookup IDs…; SSR method-security (bean in SpEL); REQ-010 §Workspace-aware authorization (#304). Ours: 60 guards name workspace roles; JWT users never match them, API keys with a workspace role match them in every workspace (`ApiKeyAuthFilter.java:43`; REQ-055:124-130).",
+    "kind": "rule",
+    "recommend": "adopt — this is #304's own rule, written down. Highest-risk finding (see §6).",
+    "extra": "Good (real): `controller/SessionController.java:160-166` `@wsAuth.canEditSession(#id)`. Bad (real): `controller/ToolController.java:69-74` — PATCH `/api/tools/{id}` gated by role names only; `ToolService.update` (aruvii-tools `ToolService.java:305-317`) checks no workspace.",
+    "drop": ""
+   },
+   {
+    "id": "SS14",
+    "title": "Role names come from the enums, gated",
+    "rule": "A role named in a guard is a `PlatformRole` value; an ArchUnit rule parses every `@PreAuthorize` and fails on any other name.",
+    "source": "SSR method-security §Favor Granting Authorities Over Complicated SpEL; ours: phantom `WORKSPACE_ADMIN` ×12, `PROJECT_ADMIN` ×3 (`PromptBuilderController.java:79-195`, `PdfFileController.java:29`, `SpreadsheetFileController.java:29`, `SessionExportController.java:67`, `AgentTaskController.java:124`, `WebhookJobController.java:55,64`); `ApiKeyService.java:51-61` already names the failure.",
+    "kind": "rule (gated)",
+    "recommend": "adopt now as an AT; superseded by SS15 when meta-annotations land.",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SS15",
+    "title": "Named guards, not SpEL strings",
+    "rule": "Express a recurring guard as a meta-annotation (`@PlatformAdmin`, `@SuperAdmin`) or a templated one; tools read the annotation type, never the expression string.",
+    "source": "SSR method-security §Meta Annotations, §Templating Meta-Annotation Expressions (`AnnotationTemplateExpressionDefaults`). Ours: 119 role-string guards; the same platform-admin set is spelled with different order and spacing (e.g. `PdfFileController.java:29` vs `WebhookJobController.java:55`); `security/ApiKeyScopeInterceptor.java:58-80` decides admin-only by parsing the string.",
+    "kind": "decision",
+    "recommend": "adopt for new code now; migrate the 119 in one mechanical MR after SS13. Options: (a) new + migrate · (b) new only · (c) keep strings.",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SS16",
+    "title": "Authorization lives in controllers (decided)",
+    "rule": "Authorization guards sit on controller handlers; services trust their caller. A service called from a second entry point (worker, scheduler) states its own check.",
+    "source": "SSR method-security (either layer; pick one); ASVS 8.3.1 (trusted service layer — the server is the layer here). Ours: 179/179 guards in controllers, 0 in services; SECURITY.md:219-221 claims service layer — false.",
+    "kind": "decided edge",
+    "recommend": "adopt + fix SECURITY.md:219-221. Changes: none in code.",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SS17",
+    "title": "Authorize before the side effect",
+    "rule": "Never use `@PostAuthorize` or `@PostFilter` on a method that writes; filter collections in the query, not in memory.",
+    "source": "SSR method-security (`@PostAuthorize` runs after commit unless ordered; `@PostFilter` cost). Ours: 0 uses — preventive.",
+    "kind": "rule (NIT)",
+    "recommend": "adopt as a review check only.",
+    "extra": "",
+    "drop": ""
+   }
+  ]
+ },
+ {
+  "name": "4 · Errors, headers, secrets — code/references/security.md + api.md",
+  "items": [
+   {
+    "id": "SS18",
+    "title": "One 401/403 shape from every layer",
+    "rule": "401 and 403 from the entry point, the access-denied handler, filters and controllers all return `ApiResponse.error` with the `ErrorCode` and a `WWW-Authenticate: Bearer` on 401.",
+    "source": "SSR `docs.spring.io/spring-security/reference/servlet/architecture.html` (ExceptionTranslationFilter → AuthenticationEntryPoint / AccessDeniedHandler; advice cannot see filter exceptions); pl 304 Ex7 R:214-256; SBS SKILL:75-81,148; RFC 6750 §3; ASVS 16.5.1. Ours: 5 shapes (§2 row '401/403 bodies').",
+    "kind": "rule",
+    "recommend": "adopt — closes OQ-R27-4 (§4).",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SS19",
+    "title": "Generic error text in production",
+    "rule": "Production error bodies carry a code, a fixed message and the trace id; `server.error.include-message` and binding errors stay off.",
+    "source": "ASVS 5.0 16.5.1; OWASP Error Handling CS. Ours: `aruvii-api/src/main/resources/application.yml:69-70` `include-message: always`, `include-binding-errors: always` — reaches clients through `ResponseStatusException` paths such as `WebhookController.java:90`.",
+    "kind": "rule",
+    "recommend": "adopt; the ER group (#33 G9b) owns the envelope, this owns the leak.",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SS20",
+    "title": "Keep the header set",
+    "rule": "Do not remove a Spring default security header; any change to CSP, HSTS or frame options names the threat in the MR.",
+    "source": "SSR `docs.spring.io/spring-security/reference/servlet/exploits/headers.html`; ASVS 3.4.1, 3.4.4, 3.4.6; pl 304 Ex8. Ours: SC:88-94 ✓ (CSP, DENY, nosniff, HSTS 1 y).",
+    "kind": "review check",
+    "recommend": "adopt as a review check; Good (real): SC:88-94.",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SS21",
+    "title": "Hash by secret type",
+    "rule": "Human passwords: `DelegatingPasswordEncoder` (bcrypt ≥10, ~≤1 s). Machine-generated secrets ≥128 bits: HMAC-SHA-256 with a server key, constant-time compare. Never the password encoder per request.",
+    "source": "SSR `docs.spring.io/spring-security/reference/features/authentication/password-storage.html` (adaptive hashing for passwords; exchange long-term for short-term credentials); ASVS 5.0 11.4.2 (KDF scoped to passwords), App. C (bcrypt cost ≥10, HMAC-SHA-256 approved); OWASP Password Storage CS §Work Factors; pl 304 Ex6. Ours: 4 secret types, 3 schemes (§2 row 'hashing').",
+    "kind": "rule",
+    "recommend": "adopt — closes OQ-R27-5 (§4); sharpens SE7.",
+    "extra": "",
+    "drop": ""
+   }
+  ]
+ },
+ {
+  "name": "5 · Testing security rules — testing/references/integration-tests.md + code/references/api.md",
+  "items": [
+   {
+    "id": "SS22",
+    "title": "Security ITs log in for real (decided)",
+    "rule": "Security ITs authenticate through the real login and filter chain (`bearerFor`, `RestTestClient`); `@WithMockUser` and `jwt()` only in unit specs of a guard bean.",
+    "source": "SSR `docs.spring.io/spring-security/reference/servlet/test/method.html` (test-thread only; real HTTP needs real authentication); `…/servlet/test/mockmvc/oauth2.html` (`jwt()` bypasses `JwtDecoder`); ledger IT3. Ours: 0 `@WithMockUser`/`jwt()`; `aruvii-test-support/.../AbstractIT.java:29-58` ✓.",
+    "kind": "decided edge",
+    "recommend": "adopt — records why we reject the reference's default test style (it would skip `JwtAuthFilter` and `JwtAuthentication`, where our authorities are made).",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SS23",
+    "title": "Access matrix per guarded resource",
+    "rule": "Each guarded controller has a matrix IT: every caller kind (anonymous, each role, other-workspace member, API key) × each endpoint → expected status; a refusal changes nothing.",
+    "source": "OWASP Authorization Testing Automation CS (matrix + one test per point of view with a real token); OWASP Authorization CS §Create Unit and Integration Test Cases; ledger AP3. Ours: Good `SessionAccessMatrixIT.groovy:18-45`; gaps: `ToolControllerIT`, `OpenApiImportControllerIT`, `PdfFileControllerIT`, `ToolTestCaseControllerIT` assert no 403.",
+    "kind": "rule",
+    "recommend": "adopt as the shape AP3 means (sharpen AP3, §3).",
+    "extra": "Good (real): `aruvii-api/src/integrationTest/groovy/ai/aruvii/api/controller/SessionAccessMatrixIT.groovy:18-45`.",
+    "drop": ""
+   },
+   {
+    "id": "SS24",
+    "title": "Token attacks stay tested",
+    "rule": "Keep ITs that send a forged, expired, `alg:none`, wrong-key and wrong-`typ` token and expect 401.",
+    "source": "RFC 8725 §2.1, §3.1; McLean/Auth0 2015. Ours: `security/SecurityIT.java:99-160` covers garbage, tampered, forged role, no prefix; misses expired, `alg:none`, wrong-typ.",
+    "kind": "review check",
+    "recommend": "adopt; add the three missing cases with SS7.",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SS25",
+    "title": "A public path proves its replacement check",
+    "rule": "Each `PUBLIC_PATHS` entry has an IT showing the check that replaces the JWT refuses a bad caller (wrong secret → 401, unknown job id → 404, setup done → 400).",
+    "source": "pl 304 R:288; ours CLAUDE.md:262-265 (AP4); Bad: `controller/SetupController.java:140-144` `POST /api/setup/complete` has no check and no refusal IT.",
+    "kind": "rule",
+    "recommend": "adopt as part of AP4 (sharpen, §3).",
+    "extra": "",
+    "drop": ""
+   }
+  ]
+ },
+ {
+  "name": "6 · Open questions raised by R34",
+  "items": [
+   {
+    "id": "OQ-SS-1",
+    "title": "Access-token TTL",
+    "rule": "Decide: access-token lifetime — 15 min (SBS, OWASP), 60 min, or keep 24 h?",
+    "source": "`JwtService.java:26`; SBS SKILL:132; ASVS 8.3.2, 7.4.2.",
+    "kind": "decision",
+    "recommend": "15 min. The refresh flow already exists (`AuthService.refresh`, UI interceptor retries once). Changes: revocation and role changes take effect in ≤15 min; refresh traffic ×96.",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "OQ-SS-2",
+    "title": "Refresh reuse detection",
+    "rule": "Decide: add refresh-token families that revoke the whole family when a rotated token is reused?",
+    "source": "SBS SKILL:136-138; ASVS 7.4.1.",
+    "kind": "decision",
+    "recommend": "yes, after SS10 — one column (family id) and one branch; detects theft. Not blocking.",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "OQ-SS-3",
+    "title": "Webhook secret in the URL path",
+    "rule": "Decide: keep `/api/webhooks/{agentId}/{secret}`, or move the secret to a header (`Authorization` or an HMAC signature header)?",
+    "source": "`WebhookController.java:81`; RFC 6750 §5.3; SS8.",
+    "kind": "decision",
+    "recommend": "accept a header now, keep the path form for one release, then remove it. The path leaks into nginx access logs and proxies. Changes: external callers update their URL.",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "OQ-SS-4",
+    "title": "Where API keys get workspace roles",
+    "rule": "Decide: may an API key carry a workspace role as a global authority at all, or only through `@wsAuth` with `api_keys.workspace_id` enforced?",
+    "source": "`ApiKeyAuthFilter.java:43`; `ApiKeyService.java:51-61`; REQ-055:124-130; SS13.",
+    "kind": "decision",
+    "recommend": "authority = platform role only; the key's workspace role is read by `@wsAuth` against `api_keys.workspace_id`. Closes the cross-workspace path until SS13 is complete.",
+    "extra": "",
+    "drop": ""
+   }
+  ]
+ },
+ {
+  "name": "7 · Verdicts on approved rules (SE*, AP3, AP4)",
+  "items": [
+   {
+    "id": "AP3",
+    "title": "Verdict · every role rule proven by an IT",
+    "rule": "APPROVED: Every role rule on an endpoint is enforced in code and proven by an IT for the forbidden and the unauthenticated caller.",
+    "source": "SSR test/method.html; OWASP Authorization Testing Automation CS; ours `SessionAccessMatrixIT.groovy:18-45` (Good), `ToolControllerIT` 0 × 403 (gap).",
+    "kind": "verdict",
+    "recommend": "SHARPEN — (1) 'role rule' must be workspace-aware (SS13): a test that only tries a wrong *platform* role misses the cross-workspace caller; (2) the proof is a matrix IT (SS23) that includes an other-workspace member and an API key; (3) real login, not `@WithMockUser` (SS22).",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "AP4",
+    "title": "Verdict · PUBLIC_PATHS is a security decision",
+    "rule": "APPROVED: Adding a `PUBLIC_PATHS` entry is a security decision: the MR states what replaces the JWT. Never widen a matcher or role to make a test pass.",
+    "source": "SSR authorize-http-requests (default deny; permitAll over web.ignoring); pl 304 R:293; ours SC:25-42, `SetupController.java:140-144`.",
+    "kind": "verdict",
+    "recommend": "SHARPEN — add: the replacement check is proven by an IT (SS25), and the MR names where the credential travels (never in a URL — SS8, OQ-SS-3). Agree with the rest.",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SE2",
+    "title": "Verdict · decryption failure stops the call",
+    "rule": "APPROVED: A decryption failure stops the call; never fall back to unauthenticated, cached or default credentials.",
+    "source": "ASVS 16.5.3 (fail securely); ours `service/SetupService.java:306-317` and `aruvii-worker/.../WorkerLicenseBridgeConfig.java:45` return the **ciphertext** as the JWT signing key when decryption fails; `OidcSettingsService.java:54-59` returns \"\".",
+    "kind": "verdict",
+    "recommend": "AGREE — two live Bads for the Good/Bad pass; both feed SS7's signing key, so a key-rotation mistake silently changes the JWT key to a value stored in the DB.",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SE7",
+    "title": "Verdict · encrypt credentials, BCrypt passwords",
+    "rule": "APPROVED: Encrypt a credential with AES-GCM via `CredentialEncryptor` before it is stored and mask it in every response; hash passwords with BCrypt; never MD5, SHA-1 or DES.",
+    "source": "SSR password-storage; ASVS 11.4.2, App. C; OWASP Password Storage CS.",
+    "kind": "verdict",
+    "recommend": "SHARPEN — 'hash passwords with BCrypt' becomes SS21 (by secret type; `DelegatingPasswordEncoder` for passwords; HMAC for machine secrets). AES-GCM part agrees (ASVS 11.3.2-11.3.3); add 'a key distinct from the JWT key' (OWASP JWT CS §MAC).",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SE1-SE6-SE8-SE10",
+    "title": "Verdict · the rest of SE*",
+    "rule": "APPROVED: SE1 checked fetch · SE3 SQL binds · SE4 paths · SE5 fixed DTO · SE6 innerHTML · SE8 rate limit before LLM · SE10 model output untrusted.",
+    "source": "No Spring Security source speaks to them; OWASP agrees in general.",
+    "kind": "verdict",
+    "recommend": "AGREE, no change. Note for SE1: `OidcSettingsService.java:92` fetches an admin-entered issuer URL — it is an SE1 site.",
+    "extra": "",
+    "drop": ""
+   }
+  ]
+ },
+ {
+  "name": "8 · Evidence for open decisions ND-4, OQ-R27-4, OQ-R27-5",
+  "items": [
+   {
+    "id": "ND-4",
+    "title": "Decrypt-site rule — evidence",
+    "rule": "Decide: may a credential be decrypted only inside `ToolHandler.execute()`, or at a named, wider set of sites?",
+    "source": "AP `git grep 'decrypt('` @27e3583e: 28 call lines. 9 in handlers or their mail clients (`DbToolHandler:409`, `EmailToolHandler:194`, `HttpToolHandler:290,343,350,357`, `McpToolHandler:452,459`, `EwsMailClient:522`, `GraphMailClient:569`). 17 in 14 other classes. 6 of those repeat one loop that decrypts `SENSITIVE_KEYS` of a provider config (`ProviderService:541`, `ChatOrchestrator:1145`, `DefaultLlmSummarizer:134`, `LlmMockAdapter:105`, `PromptBuilderTestHandler:149`, `TrustUpgradeCheckJob:160`). 2 fall back to ciphertext (SE2). OWASP Secrets Management CS: decrypt as close to use as possible, in as few places as possible. No Spring source covers it.",
+    "kind": "decision",
+    "recommend": "(b) named allowlist + ArchUnit gate, refined: first extract one `ProviderCredentialResolver` (6 sites → 1), then allowlist by role — tool handlers, outbound adapters that authenticate to a third party, the setup/key bootstrap — each with its reason in security.md. 'Handler only' is false for the OIDC client secret and the signing-key bootstrap.",
+    "extra": "Options: (a) handler only + refactor 17 sites · (b) allowlist + AT gate · (c) no rule. Changes: (b) costs one extraction ticket and one AT rule; it makes a new decrypt site a visible MR decision.",
+    "drop": ""
+   },
+   {
+    "id": "OQ-R27-4",
+    "title": "401 body — evidence",
+    "rule": "Decide: keep the empty-body 401 from `HttpStatusEntryPoint`, or return `ApiResponse.error` like every other error?",
+    "source": "5 shapes today: SC:62 empty 401 · `ApiKeyAuthFilter.java:38-40` hand-written JSON 403 · GEH:75-95 `ApiResponse` 403 (401 handler there is unreachable for filter errors — SSR architecture) · `WebhookController.java:89-91` `ResponseStatusException` 401 · `AuthController.java:85` `ApiResponse` 401. UI reads status only (`auth.interceptor.ts:30`). pl 304 Ex7; SBS SKILL:75-81,148; RFC 6750 §3.",
+    "kind": "decision",
+    "recommend": "return `ApiResponse.error(AUTH_REQUIRED|AUTH_FORBIDDEN, traceId)` from one `AuthenticationEntryPoint` + one `AccessDeniedHandler` bean, plus `WWW-Authenticate: Bearer`; filters call them instead of writing JSON (SS18). No security impact; consistency + RFC compliance.",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "OQ-R27-5",
+    "title": "Two BCrypt cost factors — evidence",
+    "rule": "Decide: are BCrypt cost 12 (user passwords) and 10 (trigger secrets) intended, and move to `DelegatingPasswordEncoder`?",
+    "source": "It is four secrets, three schemes: passwords BCrypt 12 (`AuthAutoConfiguration.java:18`); API keys BCrypt 12 via the same bean, checked **per request** (`ApiKeyService.java:244`); trigger secrets BCrypt 10 (`TriggerService.java:22`, 256-bit hex :176-180) on a **public** endpoint; refresh + reset tokens SHA-256 (`AuthService.java:137`, `PasswordResetService.java:71`). SSR password-storage: adaptive hashing is for passwords and is deliberately slow; exchange long-term credentials for short-term ones. ASVS App. C: bcrypt ≥10 is compliant; ASVS 11.4.2 scopes KDFs to passwords. OWASP Password Storage CS: work factor is a DoS lever.",
+    "kind": "decision",
+    "recommend": "SS21: passwords → `DelegatingPasswordEncoder` with bcrypt 12 (re-hash on login); trigger secrets and API keys → HMAC-SHA-256 with a server key + constant-time compare (they are ≥96-bit random, a slow hash adds nothing and makes `/api/webhooks/**` an anonymous CPU sink); refresh/reset keep SHA-256 (or the same HMAC). Cost 10 vs 12 is therefore moot.",
+    "extra": "Changes: migration re-hashes nothing for passwords (`{bcrypt}` prefix on read); API keys and trigger secrets need a dual-verify window or a rotation.",
+    "drop": ""
+   }
+  ]
+ }
+]
