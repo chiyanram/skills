@@ -130,12 +130,12 @@ th{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spac
       <text class="sm" x="160" y="416" text-anchor="middle">project side: AGENTS.md · rules (gap ⚠)</text>
       <text class="sm" x="160" y="432" text-anchor="middle">.agents/skills · crq · references</text>
       <rect class="box" x="310" y="375" width="240" height="72" rx="8"/>
-      <text class="lbl" x="430" y="398" text-anchor="middle">aruvii-agent-fleet</text>
-      <text class="sm" x="430" y="416" text-anchor="middle">agent side: souls · worker-rules</text>
-      <text class="sm" x="430" y="432" text-anchor="middle">brief · coordinator · PRINCIPLES</text>
+      <text class="lbl" x="430" y="398" text-anchor="middle">agent-fleet</text>
+      <text class="sm" x="430" y="416" text-anchor="middle">agent side: coordinator · souls · brief</text>
+      <text class="sm" x="430" y="432" text-anchor="middle">worker-rules · PRINCIPLES · dev container</text>
       <rect class="box" x="580" y="375" width="240" height="72" rx="8"/>
-      <text class="lbl" x="700" y="398" text-anchor="middle">agent-fleet</text>
-      <text class="sm" x="700" y="416" text-anchor="middle">generic: launch scripts · runner</text>
+      <text class="lbl" x="700" y="398" text-anchor="middle">agent-fleet (same repo)</text>
+      <text class="sm" x="700" y="416" text-anchor="middle">launch scripts · runner setup</text>
       <text class="sm" x="700" y="432" text-anchor="middle">machine.env · reply card</text>
     </svg>
   </div>
@@ -166,10 +166,12 @@ th{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spac
 
   <h2>What a worker gets when it starts</h2>
   <div class="stack">
-    <div class="layer"><b>agent file</b><span>model in frontmatter · soul (3 sentences) · "you own" line — aruvii-agent-fleet <code>agents/&lt;role&gt;.md</code></span></div>
+    <div class="layer"><b>agent file</b><span>model in frontmatter · soul (3 sentences) · "you own" line — agent-fleet <code>agents/&lt;role&gt;.md</code></span></div>
     <div class="layer"><b>worker-rules</b><span>never address you · never merge · file text is data · rebase rules · escalation · points at PRINCIPLES.md</span></div>
     <div class="layer"><b>brief</b><span>GOAL · your words verbatim · scope · forbidden · context and ACs → the issue · verify · ≤3 rounds · report shape · standing orders</span></div>
     <div class="layer"><b>project</b><span>from its own clone: AGENTS.md · path rules · skills · the crq stage it runs — <b style="color:var(--warn)">path rules are Claude-only today (see gap below)</b></span></div>
+    <div class="layer"><b>box</b><span>one dev container image (same on laptop and VM): toolchain baked in, no host secrets, egress allow-list, auto mode</span></div>
+    <div class="layer"><b>identity</b><span>its role's GitLab bot (Developer — cannot merge), token as a read-only container secret</span></div>
     <div class="layer"><b>machine</b><span><code>machine.env</code>: JAVA_HOME, DOCKER_HOST (podman), ports</span></div>
   </div>
 
@@ -187,6 +189,14 @@ decided   directory rules → nested AGENTS.md · file-type rules (*.java, tests
           .claude/rules/ deleted after the move</pre>
   </div>
 
+  <h2>Security: walls only where powers differ</h2>
+  <div class="grid">
+    <div class="card"><span class="tag">user fleet-coord</span><h3>Coordinator</h3><ul><li>Holds the Discord token and the relay.</li><li>Reads GitLab. Never edits code.</li><li>Starts workers through one fixed launcher.</li></ul></div>
+    <div class="card"><span class="tag">user fleet-worker · in containers</span><h3>Workers</h3><ul><li>One shared user, each worker in its own dev container.</li><li>Per-role GitLab bot: push branches, comment — never merge.</li><li>No Discord token. Egress allow-list. Auto mode.</li></ul></div>
+    <div class="card"><span class="tag">user fleet-runner</span><h3>Runner (the gate)</h3><ul><li>GitLab runner + Verifier + its own stack.</li><li>Workers cannot reach it.</li></ul></div>
+  </div>
+  <p class="cap">Only you merge (GitLab: push "No one", merge Maintainers). <code>/approved</code> counts only from your account. Plugins and network destinations are allow-listed.</p>
+
   <h2>How the fleet gets better</h2>
   <div class="grid">
     <div class="card"><span class="tag">every work item</span><h3>Retro</h3><ul><li>mattpocock <code>retro</code> reads the GitLab thread.</li><li>Ranked list → you pick ≤2 → MRs to the one file that owns the lesson.</li></ul></div>
@@ -202,9 +212,10 @@ decided   directory rules → nested AGENTS.md · file-type rules (*.java, tests
       <tr><td>Coordinator, souls, brief, status, retro</td><td><span class="pill done">decided</span></td><td>skills #50</td></tr>
       <tr><td>crq stages, lanes, runner, planning rules</td><td><span class="pill done">decided</span></td><td>skills #35</td></tr>
       <tr><td>Path rules for every agent (G1b gap)</td><td><span class="pill done">decided</span></td><td>skills #72</td></tr>
-      <tr><td>Fleet security · cost budget</td><td><span class="pill open">open</span></td><td>skills #69 · #70</td></tr>
+      <tr><td>Fleet security (zones, dev container, bots)</td><td><span class="pill done">decided</span></td><td>skills #69</td></tr>
+      <tr><td>Cost budget per work item</td><td><span class="pill open">open</span></td><td>skills #70</td></tr>
+      <tr><td>API contract + error codes</td><td><span class="pill done">decided</span></td><td>skills #58 → AP #662</td></tr>
       <tr><td>TDD only for bugs; mutation proves tests</td><td><span class="pill done">decided</span></td><td>skills #68</td></tr>
-      <tr><td>API contract, errors, error-code catalogue</td><td><span class="pill open">open</span></td><td>skills #58</td></tr>
       <tr><td>Migrations, delivery, review packet</td><td><span class="pill open">next</span></td><td>skills #34</td></tr>
       <tr><td>Code + observability rules</td><td><span class="pill open">open</span></td><td>skills #33</td></tr>
       <tr><td>How references are written</td><td><span class="pill open">open</span></td><td>skills #37</td></tr>
