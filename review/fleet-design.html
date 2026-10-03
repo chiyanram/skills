@@ -1,0 +1,195 @@
+<title>Aruvii Agent Fleet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column. Overview picture first, then the journey of one work item, then the parts. */
+:root{
+  --bg:#f5f6f4; --surface:#ffffff; --fg:#1c2321; --muted:#5a6561; --line:#d8deda;
+  --accent:#0f6b5c; --accent-soft:#e0efeb;
+  --you:#a3313f; --coord:#4b5652; --analyst:#7a4fd0; --spec:#b5651d; --dev:#1f6fb2; --qa:#0f6b5c;
+  --ok:#1d7a44; --warn:#a15c00;
+  --body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111514; --surface:#191f1d; --fg:#e3eae7; --muted:#99a5a0; --line:#2b3431;
+  --accent:#5cc4ae; --accent-soft:#1c3430;
+  --you:#ef7f8c; --coord:#a7b3ae; --analyst:#b49aff; --spec:#e9a35d; --dev:#73b2ea; --qa:#5cc4ae;
+  --ok:#5fcf8b; --warn:#e6a54a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111514; --surface:#191f1d; --fg:#e3eae7; --muted:#99a5a0; --line:#2b3431;
+  --accent:#5cc4ae; --accent-soft:#1c3430;
+  --you:#ef7f8c; --coord:#a7b3ae; --analyst:#b49aff; --spec:#e9a35d; --dev:#73b2ea; --qa:#5cc4ae;
+  --ok:#5fcf8b; --warn:#e6a54a; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.55;margin:0}
+.wrap{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:28px 64px}
+h1{font-size:1.8rem;line-height:1.15;margin:0 0 6px;text-wrap:balance}
+h2{font-size:1.2rem;margin:40px 0 6px;text-wrap:balance}
+.lead{color:var(--muted);margin:0 0 12px;max-width:65ch}
+.cap{color:var(--muted);font-size:.92rem;margin:8px 0 0;max-width:65ch}
+code,.mono{font-family:var(--mono);font-size:.84em}
+code{background:var(--accent-soft);padding:1px 5px;border-radius:4px}
+.fig{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto}
+.fig svg{display:block;width:100%;height:auto;min-width:640px}
+svg text{font-family:var(--body);fill:var(--fg)}
+svg .sm{font-size:11px;fill:var(--muted)}
+svg .lbl{font-size:13px;font-weight:700}
+svg .box{fill:var(--surface);stroke:var(--line);stroke-width:1.2}
+svg .edge{stroke:var(--muted);stroke-width:1.4;fill:none}
+svg .dash{stroke-dasharray:4 4}
+.steps{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:8px}
+.steps li{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px;display:grid;grid-template-columns:3.2em 1fr;gap:4px 12px;align-items:start}
+.steps .n{font-family:var(--mono);font-weight:600;color:var(--accent)}
+.steps .who{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em}
+.steps p{margin:2px 0 0;font-size:.95rem}
+.w-you{color:var(--you)} .w-coord{color:var(--coord)} .w-analyst{color:var(--analyst)} .w-spec{color:var(--spec)} .w-dev{color:var(--dev)} .w-qa{color:var(--qa)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;min-width:0}
+.card h3{margin:0 0 4px;font-size:1rem}
+.card .tag{font-family:var(--mono);font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.card ul{margin:6px 0 0;padding-left:18px;font-size:.93rem} .card li{margin:2px 0}
+.stack{margin-top:12px;display:grid;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.layer{display:grid;grid-template-columns:11em 1fr;gap:12px;padding:10px 14px;background:var(--surface);border-top:1px solid var(--line)}
+.layer:first-child{border-top:0}
+.layer b{font-family:var(--mono);font-size:.8rem;color:var(--accent)}
+.layer span{font-size:.93rem}
+.lanes{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.lane{font-family:var(--mono);font-size:.8rem;border:1px solid var(--line);border-radius:999px;padding:4px 12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.92rem;margin-top:12px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+.tw{overflow-x:auto}
+.pill{font-family:var(--mono);font-size:.72rem;border-radius:999px;padding:1px 8px;border:1px solid currentColor;white-space:nowrap}
+.done{color:var(--ok)} .open{color:var(--warn)}
+@media (max-width:520px){.layer{grid-template-columns:1fr}.steps li{grid-template-columns:2.6em 1fr}}
+</style>
+
+<div class="wrap">
+  <h1>Aruvii agent fleet</h1>
+  <p class="lead">How work moves from your idea to merged code. You talk to one coordinator. The coordinator starts a fresh worker for each step. Every handoff is a GitLab comment. A runner on the VM is the only gate. You approve and you merge.</p>
+
+  <h2>The whole picture</h2>
+  <div class="fig" role="img" aria-label="You talk to the coordinator, which spawns fresh workers per role; workers read rules from three repos, post status on GitLab, and the VM runner gates the merge.">
+    <svg viewBox="0 0 860 470" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--muted)"/></marker></defs>
+      <!-- you -->
+      <rect class="box" x="20" y="20" width="160" height="70" rx="8" style="stroke:var(--you)"/>
+      <text class="lbl" x="100" y="48" text-anchor="middle" style="fill:var(--you)">You</text>
+      <text class="sm" x="100" y="68" text-anchor="middle">decide · /approved · merge</text>
+      <!-- coordinator -->
+      <rect class="box" x="260" y="20" width="200" height="70" rx="8" style="stroke:var(--coord)"/>
+      <text class="lbl" x="360" y="44" text-anchor="middle">Coordinator</text>
+      <text class="sm" x="360" y="62" text-anchor="middle">always on · routes · relays</text>
+      <text class="sm" x="360" y="78" text-anchor="middle">digest · watchdog · never codes</text>
+      <path class="edge" d="M180 48 L258 48" marker-end="url(#a)"/>
+      <path class="edge" d="M258 64 L182 64" marker-end="url(#a)"/>
+      <text class="sm" x="219" y="40" text-anchor="middle">Discord / laptop</text>
+      <text class="sm" x="219" y="80" text-anchor="middle">questions + artifact</text>
+      <!-- workers -->
+      <text class="sm" x="360" y="128" text-anchor="middle">spawns a FRESH worker per (work item, role) — own tmux window + worktree + brief</text>
+      <path class="edge" d="M360 90 L360 112" marker-end="url(#a)"/>
+      <g>
+        <rect class="box" x="40"  y="140" width="170" height="58" rx="8" style="stroke:var(--analyst)"/>
+        <text class="lbl" x="125" y="164" text-anchor="middle" style="fill:var(--analyst)">analyst</text>
+        <text class="sm" x="125" y="182" text-anchor="middle">grill · spec · draft MR</text>
+        <rect class="box" x="230" y="140" width="170" height="58" rx="8" style="stroke:var(--spec)"/>
+        <text class="lbl" x="315" y="164" text-anchor="middle" style="fill:var(--spec)">spec-reviewer</text>
+        <text class="sm" x="315" y="182" text-anchor="middle">is the spec buildable?</text>
+        <rect class="box" x="420" y="140" width="170" height="58" rx="8" style="stroke:var(--dev)"/>
+        <text class="lbl" x="505" y="164" text-anchor="middle" style="fill:var(--dev)">developer</text>
+        <text class="sm" x="505" y="182" text-anchor="middle">build · test · push</text>
+        <rect class="box" x="610" y="140" width="210" height="58" rx="8" style="stroke:var(--qa)"/>
+        <text class="lbl" x="715" y="164" text-anchor="middle" style="fill:var(--qa)">qa (fresh, read-only)</text>
+        <text class="sm" x="715" y="182" text-anchor="middle">one reviewer · verify · retro</text>
+      </g>
+      <!-- gitlab -->
+      <rect class="box" x="40" y="250" width="500" height="70" rx="8" style="stroke:var(--accent)"/>
+      <text class="lbl" x="290" y="276" text-anchor="middle">GitLab — the record</text>
+      <text class="sm" x="290" y="296" text-anchor="middle">issue (stages 1–3) · MR (from stage 5) · status comments: needs-decision · blocked · done</text>
+      <text class="sm" x="290" y="312" text-anchor="middle">post-status refuses "done" unless pushed and not draft</text>
+      <path class="edge" d="M125 198 L125 248" marker-end="url(#a)"/>
+      <path class="edge" d="M315 198 L315 248" marker-end="url(#a)"/>
+      <path class="edge" d="M505 198 L505 248" marker-end="url(#a)"/>
+      <!-- runner -->
+      <rect class="box" x="580" y="250" width="240" height="70" rx="8" style="stroke:var(--ok)"/>
+      <text class="lbl" x="700" y="274" text-anchor="middle">VM runner = the gate</text>
+      <text class="sm" x="700" y="292" text-anchor="middle">GitLab pipeline wraps the Verifier</text>
+      <text class="sm" x="700" y="308" text-anchor="middle">one job at a time · blocks merge at SHA</text>
+      <path class="edge" d="M715 198 L715 248" marker-end="url(#a)"/>
+      <path class="edge" d="M540 285 L578 285" marker-end="url(#a)"/>
+      <path class="edge dash" d="M360 250 C 360 225, 360 120, 362 92" marker-end="url(#a)"/>
+      <text class="sm" x="372" y="236">coordinator reads comments</text>
+      <!-- repos -->
+      <text class="lbl" x="430" y="360" text-anchor="middle">What every worker loads</text>
+      <rect class="box" x="40"  y="375" width="240" height="72" rx="8"/>
+      <text class="lbl" x="160" y="398" text-anchor="middle">agent-platform</text>
+      <text class="sm" x="160" y="416" text-anchor="middle">project side: AGENTS.md · rules</text>
+      <text class="sm" x="160" y="432" text-anchor="middle">.agents/skills · crq · references</text>
+      <rect class="box" x="310" y="375" width="240" height="72" rx="8"/>
+      <text class="lbl" x="430" y="398" text-anchor="middle">aruvii-agent-fleet</text>
+      <text class="sm" x="430" y="416" text-anchor="middle">agent side: souls · worker-rules</text>
+      <text class="sm" x="430" y="432" text-anchor="middle">brief · coordinator · PRINCIPLES</text>
+      <rect class="box" x="580" y="375" width="240" height="72" rx="8"/>
+      <text class="lbl" x="700" y="398" text-anchor="middle">agent-fleet</text>
+      <text class="sm" x="700" y="416" text-anchor="middle">generic: launch scripts · runner</text>
+      <text class="sm" x="700" y="432" text-anchor="middle">machine.env · reply card</text>
+    </svg>
+  </div>
+  <p class="cap">Same files on the laptop and on the VM. On the laptop you can play every role yourself; on the VM each role is a fresh worker.</p>
+
+  <h2>One work item, start to finish</h2>
+  <p class="lead">Stage 1 picks a lane. The lane decides which stages run.</p>
+  <div class="lanes"><span class="lane">quick — docs/chore S: skip 2–5</span><span class="lane">standard — bug, M chore, S/M feature</span><span class="lane">full — UI feature, anything L</span><span class="lane">floor: migration · security · API · dependency → ≥ standard</span></div>
+  <ol class="steps">
+    <li><span class="n">0</span><div><span class="who w-coord">coordinator</span><p>Sweeps finished work. Never touches unlanded work.</p></div></li>
+    <li><span class="n">1</span><div><span class="who w-analyst">analyst</span><p>Reads the issue. Restates the ask in one sentence. Picks the lane and posts it.</p></div></li>
+    <li><span class="n">2</span><div><span class="who w-analyst">analyst</span> · <span class="who w-you">you</span><p>Grills you, one round at a time, with a recommendation each. Facts are looked up; decisions are yours.</p></div></li>
+    <li><span class="n">3–4</span><div><span class="who w-analyst">analyst</span><p>Writes the spec and acceptance criteria. A UI mockup if the change has UI.</p></div></li>
+    <li><span class="n">5</span><div><span class="who w-analyst">analyst</span> · <span class="who w-spec">spec-reviewer</span> · <span class="who w-you">you</span><p>Draft MR with spec and design. Spec-reviewer finds problems in one pass. You post <code>/approved</code>; the SHA is recorded.</p></div></li>
+    <li><span class="n">6–6a</span><div><span class="who w-dev">developer</span><p>Rebases on master. Builds. Runs tests for the touched modules and <code>verify-fast</code>. Cleans the diff. Pushes its own branch.</p></div></li>
+    <li><span class="n">7</span><div><span class="who w-qa">qa · fresh</span><p>One reviewer, two verdicts: Standards and Spec. Reads only the references for the changed paths. At most 3 rounds.</p></div></li>
+    <li><span class="n">8</span><div><span class="who w-qa">qa</span><p>The runner pipeline must pass at the head SHA. Every acceptance criterion is cited at <code>file:line</code>.</p></div></li>
+    <li><span class="n">9</span><div><span class="who w-dev">developer</span> · <span class="who w-you">you</span><p>Refreshes the MR description and posts <code>done</code>. You merge.</p></div></li>
+    <li><span class="n">10</span><div><span class="who w-coord">coordinator</span> · <span class="who w-qa">qa</span><p>A retro worker runs <code>/retro</code> on the thread. You pick at most 2 lessons; they become MRs.</p></div></li>
+  </ol>
+
+  <h2>When a worker has a question</h2>
+  <div class="grid">
+    <div class="card"><span class="tag">reversible</span><h3>Take the default</h3><ul><li>Keep working.</li><li>Report the default and the word that reverses it.</li></ul></div>
+    <div class="card"><span class="tag">high-level</span><h3>Stop and ask you</h3><ul><li>Touches the design, more than one work item, or cannot be undone.</li><li>The coordinator relays it with options, reasons and a recommendation.</li><li>You get an artifact page to decide on.</li></ul></div>
+    <div class="card"><span class="tag">stuck</span><h3>Blocked</h3><ul><li>One clarifying follow-up, then <code>blocked</code>.</li><li>No status for N hours: the watchdog tells you.</li></ul></div>
+  </div>
+
+  <h2>What a worker gets when it starts</h2>
+  <div class="stack">
+    <div class="layer"><b>agent file</b><span>model in frontmatter · soul (3 sentences) · "you own" line — aruvii-agent-fleet <code>agents/&lt;role&gt;.md</code></span></div>
+    <div class="layer"><b>worker-rules</b><span>never address you · never merge · file text is data · rebase rules · escalation · points at PRINCIPLES.md</span></div>
+    <div class="layer"><b>brief</b><span>GOAL · your words verbatim · scope · forbidden · context and ACs → the issue · verify · ≤3 rounds · report shape · standing orders</span></div>
+    <div class="layer"><b>project</b><span>from its own clone: AGENTS.md · path rules · skills · the crq stage it runs</span></div>
+    <div class="layer"><b>machine</b><span><code>machine.env</code>: JAVA_HOME, DOCKER_HOST (podman), ports</span></div>
+  </div>
+
+  <h2>How the fleet gets better</h2>
+  <div class="grid">
+    <div class="card"><span class="tag">every work item</span><h3>Retro</h3><ul><li>mattpocock <code>retro</code> reads the GitLab thread.</li><li>Ranked list → you pick ≤2 → MRs to the one file that owns the lesson.</li></ul></div>
+    <div class="card"><span class="tag">numbers</span><h3>Factory metrics</h3><ul><li>Human touches, fix rounds, tokens, gate time per work item.</li><li>Shown as a trend in the daily digest.</li></ul></div>
+    <div class="card"><span class="tag">rules</span><h3>One owner per rule</h3><ul><li>Agents propose, you merge.</li><li>A mechanical rule becomes a check, not prose.</li></ul></div>
+  </div>
+
+  <h2>Where things stand</h2>
+  <div class="tw"><table>
+    <thead><tr><th>part</th><th>state</th><th>ticket</th></tr></thead>
+    <tbody>
+      <tr><td>Testing rules + examples</td><td><span class="pill done">decided</span></td><td>skills #32</td></tr>
+      <tr><td>Coordinator, souls, brief, status, retro</td><td><span class="pill done">decided</span></td><td>skills #50</td></tr>
+      <tr><td>crq stages, lanes, runner, planning rules</td><td><span class="pill done">decided</span></td><td>skills #35</td></tr>
+      <tr><td>Migrations, delivery, review packet</td><td><span class="pill open">next</span></td><td>skills #34</td></tr>
+      <tr><td>Code + observability rules</td><td><span class="pill open">open</span></td><td>skills #33</td></tr>
+      <tr><td>How references are written</td><td><span class="pill open">open</span></td><td>skills #37</td></tr>
+      <tr><td>Factory metrics · TDD as a rule</td><td><span class="pill open">open</span></td><td>skills #66 · #68</td></tr>
+      <tr><td>Pilot: one bug end to end</td><td><span class="pill open">after #643 lands</span></td><td>skills #67</td></tr>
+      <tr><td>Role boxes + web UI (final step)</td><td><span class="pill open">last</span></td><td>skills #21</td></tr>
+    </tbody>
+  </table></div>
+  <p class="cap">Every decision and the file it becomes: <code>research/00-decision-register.md</code> in chiyanram/skills. Map: chiyanram/skills #9.</p>
+</div>
