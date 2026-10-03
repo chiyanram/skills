@@ -20,7 +20,7 @@ Repos: **AP** agent-platform (GitLab) · **AAF** aruvii-agent-fleet (new) · **A
 | reference shape: Rules · When X use Y · Good/Bad · Decided edges · Review checks | G5 #22 | every AP reference | W1 + `00-reference-format.md` |
 | upstream skills as plugins, never copies; adapted ones owned and credited (D26) | G1 · Q-5 · #587 | AP `.claude/settings.json` enabledPlugins | done (#587) |
 | doc-writing rules → `planning/references/writing-docs.md` | ND-8 | AP planning/ | W1 |
-| module `aruvii-*/CLAUDE.md` → nested AGENTS.md | ND-13 | AP, own ticket | later |
+| layer 2 agent-agnostic: directory MUSTs → `<dir>/AGENTS.md` + `CLAUDE.md`=`@AGENTS.md`; file-type MUSTs → root AGENTS.md blocks; `.claude/rules/` deleted; module CLAUDE.md → AGENTS.md (ND-13) | G1b #72 | AP nested AGENTS.md, root AGENTS.md | W1 #646 |
 
 ## The pipeline (`crq`)
 
