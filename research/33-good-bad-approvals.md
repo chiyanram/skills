@@ -17,3 +17,6 @@
 
 ## Planning (#35) — operator 2026-10-02
 Planning Good/Bad (20 rules, research/42, page https://claude.ai/artifact/JaHyxMYJLdg74ZVj4XAEDY): approve all. DG3 rule amended to exempt `+` lines in a design diff.
+
+## Good rewrites (sources rule) — operator 2026-10-04
+All 35 rewritten Goods approved (research/47-good-rewrites.md, page https://claude.ai/artifact/5bJrMoSs7Werx9P2mbP2EJ). They replace the old "real" Goods in 31a–31e-v2 and 42 for the same rule ids. NEEDS COMPILE CHECK items are compiled when the references are written (agent-platform #644 / G9 domains).
