@@ -23,7 +23,8 @@ One index so no input depends on a single session. Map: chiyanram/skills#9. Upda
 | Böckeler "TDD in the agent loop" (martinfowler.com) | TDD shows no gain for agents; use mutation testing | G12 (#68) |
 | skills repo as source of truth (idea) | common skills installable anywhere, incl. office work | #65 (after this map) |
 | reconsider TDD (idea) | — | G12 (#68) |
-| WIP limit (fleet retro) | — | map #9 fog |
+| WIP limit (fleet retro) | — | G26 #101 |
 | SOLID seams that chain; modern Java; no complex logic (idea) + rameezk/skills martin-fowler-code-smells.md | design rule for code + Fowler smell catalogue | G9b #33 (input comment) |
 | sources rule (idea) | rules from references, read; our code only as Bad; Good = rewritten Bad | 00-reference-format.md, map #9 Notes, #37 |
 | skills-analysis `/wiki` | the operator's mined reference corpus | R3, research/09 |
+| "Some mistakes you might be making" (pasted 2026-10-17, source not given) | 18-item checklist for agent setups | R39 #96 (10 covered, 7 gaps) |
