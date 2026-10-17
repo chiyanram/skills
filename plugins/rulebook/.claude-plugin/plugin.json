@@ -1,0 +1,7 @@
+{
+  "name": "rulebook",
+  "version": "0.1.0",
+  "description": "Generic skills, references with neutral-domain examples, and the /crq workflow.",
+  "author": { "name": "chiyanram" },
+  "repository": "https://github.com/chiyanram/skills"
+}
