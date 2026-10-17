@@ -1,0 +1,110 @@
+<title>Pipeline Comparison</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one column. A strip showing the two pipelines side by side, then one card per difference: theirs, ours, what the sources say and why, the switch trigger, the recommendation. */
+:root{
+ --bg:#f4f6f5; --surface:#fff; --fg:#1b2422; --muted:#56635f; --line:#d5ddd9;
+ --accent:#0f6b5c; --soft:#e2efeb; --them:#3f4fc9; --them-soft:#e8eafb; --diff:#a15c00; --diff-soft:#fbefdc;
+ --body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+ --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ --bg:#111514; --surface:#1a201e; --fg:#e3eae7; --muted:#9aa6a1; --line:#2c3532;
+ --accent:#5cc4ae; --soft:#1c3430; --them:#8f9bff; --them-soft:#20243f; --diff:#e6a54a; --diff-soft:#33281a; color-scheme:dark}}
+:root[data-theme="dark"]{
+ --bg:#111514; --surface:#1a201e; --fg:#e3eae7; --muted:#9aa6a1; --line:#2c3532;
+ --accent:#5cc4ae; --soft:#1c3430; --them:#8f9bff; --them-soft:#20243f; --diff:#e6a54a; --diff-soft:#33281a; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.55;margin:0}
+.wrap{max-width:900px;margin:0 auto;padding-inline:16px;padding-block:28px 72px}
+h1{font-size:1.8rem;line-height:1.1;margin:0 0 6px;text-wrap:balance}
+h2{font-size:1.2rem;margin:40px 0 6px;text-wrap:balance}
+.lead{color:var(--muted);margin:0 0 12px;max-width:66ch}
+code{font-family:var(--mono);font-size:.84em;background:var(--soft);padding:1px 5px;border-radius:4px}
+.tw{overflow-x:auto;margin-top:12px}
+table{border-collapse:collapse;width:100%;font-size:.92rem;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+td.st{font-family:var(--mono);font-size:.78rem;white-space:nowrap}
+.same{color:var(--accent)} .diff{color:var(--diff)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;margin-top:14px;display:grid;gap:12px}
+.card h3{margin:0;font-size:1.08rem}
+.card .num{font-family:var(--mono);color:var(--diff);margin-right:6px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.side{border-radius:8px;padding:10px 12px;min-width:0}
+.side b{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:2px}
+.side p{margin:0;font-size:.93rem}
+.them{background:var(--them-soft)} .them b{color:var(--them)}
+.ours{background:var(--soft)} .ours b{color:var(--accent)}
+.src{margin:0;padding-left:18px;font-size:.9rem} .src li{margin:3px 0}
+.src .who{font-family:var(--mono);font-size:.75rem;color:var(--muted)}
+.trig{font-size:.9rem;color:var(--muted);margin:0}
+.rec{background:var(--diff-soft);border:1px solid var(--diff);border-radius:8px;padding:10px 12px;font-size:.95rem}
+.rec b{font-family:var(--mono);font-size:.74rem;color:var(--diff);text-transform:uppercase;letter-spacing:.06em}
+@media (max-width:560px){.pair{grid-template-columns:1fr}}
+</style>
+<div class="wrap">
+<h1>Pipeline Comparison</h1>
+<p class="lead">Your factory picture next to our design (map #9, G28 #103). Three stages match. Three differ, and on each of the three the references disagree with each other. Each card gives their reasons, so you can choose on reasons rather than on who does it.</p>
+
+<div class="tw"><table>
+<tr><th>stage</th><th>factory picture</th><th>ours</th><th></th></tr>
+<tr><td>design check</td><td>AI critic grades the design, revise loop (round 3, 9/10)</td><td>analyst writes; you post <code>/approved</code></td><td class="st diff">① differs</td></tr>
+<tr><td>build</td><td>parallel packages, each Implementer + critic and Tester + critic</td><td>one developer writes code and tests</td><td class="st diff">② differs</td></tr>
+<tr><td>integrate</td><td>unit · integration · end-to-end</td><td>runner: <code>make verify-full</code> at the SHA</td><td class="st same">same</td></tr>
+<tr><td>review</td><td>hub of 7 axes plus a second AI model</td><td>one reviewer, two verdicts (Standards, Spec)</td><td class="st diff">③ differs</td></tr>
+<tr><td>fix loop</td><td>fix, then review again</td><td>fix, at most 3 rounds</td><td class="st same">same</td></tr>
+<tr><td>merge</td><td>PR ready + CI green + human merges</td><td>done read at the SHA; you merge</td><td class="st same">same</td></tr>
+</table></div>
+
+<h2>The three differences</h2>
+
+<div class="card">
+ <h3><span class="num">①</span>An AI critic grades the design before you see it</h3>
+ <div class="pair">
+  <div class="side them"><b>factory</b><p>A critic scores the design and sends it back until it passes. You see only a design that has passed.</p></div>
+  <div class="side ours"><b>ours (G3 #16)</b><p>We removed <code>spec-design-reviewer</code>. Your <code>/approved</code> plus stage 8's acceptance-criteria citing cover it. Reviews cost about $2–2.8 each (R4).</p></div>
+ </div>
+ <ul class="src">
+  <li><span class="who">humanlayer rpi</span> keeps design approval with the <b>human</b>, in two steps: System Design, then Program Design.</li>
+  <li><span class="who">Anthropic</span> says a reviewer told to find gaps "will usually report some", which leads to over-engineering. Keep it scoped.</li>
+  <li><span class="who">pstack</span> uses its two-model review on plans as well as code. A finding raised by both models independently is the strongest signal.</li>
+  <li><span class="who">your checklist</span> lists "too much human review" as a mistake.</li>
+ </ul>
+ <p class="trig">Switch when: the G11 metrics show designs you send back for reasons a checklist would have caught.</p>
+ <div class="rec"><b>recommend</b> Keep ours for now: you approve designs. Add one cheap AI pass at stage 5 only if the metrics show avoidable send-backs.</div>
+</div>
+
+<div class="card">
+ <h3><span class="num">②</span>Implementer and Tester as separate agents, in parallel packages</h3>
+ <div class="pair">
+  <div class="side them"><b>factory</b><p>The work is split into packages that run in parallel. In each package one agent writes code, a different agent writes the tests, and each has a critic.</p></div>
+  <div class="side ours"><b>ours (CP5, G6)</b><p>One developer per work item writes code and tests. Splitting the work means smaller separate work items, not parallel writers inside one item.</p></div>
+ </div>
+ <ul class="src">
+  <li><span class="who">Anthropic best practices</span> suggests one Claude writes the tests and another writes the code, so the code author can't bend the tests.</li>
+  <li><span class="who">Anthropic long-running</span>: "It is unacceptable to remove or edit tests" when an agent fixes code.</li>
+  <li><span class="who">Cognition</span>: keep writes single-threaded, because parallel writers make conflicting implicit decisions. Extra agents should only read or review.</li>
+  <li><span class="who">Anthropic multi-agent</span>: coding has fewer truly parallel tasks than research, and multi-agent costs about 15× the tokens.</li>
+  <li><span class="who">ours today</span>: a bug starts with a failing test; PIT on touched classes; the reviewer checks the tests; at most 2 builders per host (G26).</li>
+ </ul>
+ <p class="trig">Switch when: reviews or PIT keep finding tests that were bent to pass the code.</p>
+ <div class="rec"><b>recommend</b> Keep one writer and no parallel packages. Large work becomes several small work items, which matches DORA's finding on small batches. Watch for bent tests; a separate test-writer is the fix if they appear.</div>
+</div>
+
+<div class="card">
+ <h3><span class="num">③</span>A review hub: 7 axes plus a second AI model</h3>
+ <div class="pair">
+  <div class="side them"><b>factory</b><p>Alignment, correctness, testing, security, architecture and production, plus a second model (Codex). Any axis can send the work back.</p></div>
+  <div class="side ours"><b>ours (G3 amended)</b><p>One fresh reviewer gives two verdicts and reads only the references for the changed paths. The lead validates each finding. At most 3 rounds.</p></div>
+ </div>
+ <ul class="src">
+  <li><span class="who">pstack</span>: "The adversarial signal comes from model diversity, not assigned personas." It runs 2 model families, down from 3 in #511.</li>
+  <li><span class="who">industry</span> (Anthropic, Cognition, GitHub): one fresh-context reviewer, advisory. No vendor runs parallel review axes by default.</li>
+  <li><span class="who">mattpocock</span>: 2 axes, reported separately so one cannot mask the other.</li>
+  <li><span class="who">our P1 test (!230)</span>: one reviewer caught 5 of 7 real findings plus 5 new ones. It missed <code>final</code> and boundaries.</li>
+ </ul>
+ <p class="trig">Switch when: merged work keeps showing defects that a second model family would have caught.</p>
+ <div class="rec"><b>recommend</b> Keep one reviewer, and add the second model family <b>only on the floor lane</b> (migration · security · API · dependency), where a miss costs most. Axes stay as sections of the one reviewer's checklist, not as separate agents.</div>
+</div>
+</div>

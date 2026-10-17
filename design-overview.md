@@ -1,5 +1,12 @@
 # Design overview v2 — the whole picture after G1, G2, G3, G5, G6, G4-Q1 (2026-10-01)
 
+> **SUPERSEDED (2026-10-17).** This is the 2026-10-01 picture. Changed since: no aruvii-agent-fleet repo — all agent
+> side is in agent-fleet (G1 amendment skills #14, 2026-10-03); generic skills, references and crq live in
+> chiyanram/skills as a plugin, agent-platform keeps only Aruvii (G23 #93); `.claude/rules/` → nested AGENTS.md
+> (G1b skills #72); two zones and a worker container instead of one unix user (G13 #69); one reviewer with no Act-on
+> cap (G3 amendment, G17 #87); the forge thread is the record (G19 #89). Current picture: map #9 and
+> `research/00-decision-register.md`.
+
 ```
  THREE REPOS (G1 Q3, Q4)
  agent-fleet (generic tooling)      aruvii-agent-fleet (Aruvii crew)             agent-platform (the project)

@@ -5,7 +5,14 @@ No new decisions here. Consolidated 2026-10-02. Rule-level decisions (each appro
 `research/19-approved-rules.md`, whose rows already carry their target file; this register covers everything else.
 
 Repos: **AP** agent-platform (GitLab) · **AF** agent-fleet (GitHub) — holds ALL agent-side files for now (G1 amendment 2026-10-03: no separate aruvii-agent-fleet until a second project needs it) ·
-**U** user level on the laptop (`~/.claude`) · **UP** upstream plugin. Tickets (2026-10-03): **W1** agent-platform #643 #646 #644 #645 + #659 #662 #670 #671 #652 · **W2/W3** chiyanram/agent-fleet (private) #72 roles/coordinator/briefs · #73 dev container · #74 zones/runner/machine.env · #75 retro wiring.
+**SK** chiyanram/skills — generic skills, references and the crq workflow, published as a plugin marketplace (G23 #93, 2026-10-16) ·
+**U** user level on the laptop (`~/.claude`) · **UP** upstream plugin.
+
+**Location change (amended 2026-10-17, G23 #93).** Rows below that say "AP crq", "AP review" or "every AP reference"
+now split in two: the generic text (crq stages, roles, lanes, review, references) lands in **SK**; agent-platform keeps
+only the Aruvii answers — `AGENTS.md`, nested `<dir>/AGENTS.md`, `docs/agents/*.md` (incl. `docs/agents/crq.md`) and the
+Aruvii-only skills. The build ticket in the "by" column is unchanged unless a row says so.
+Build order (G24 #94): fleet first (AF), SK in parallel, AP project layer after. Tickets (2026-10-03): **W1** agent-platform #643 #646 #644 #645 + #659 #662 #670 #671 #652 · **W2/W3** chiyanram/agent-fleet (private) #72 roles/coordinator/briefs · #73 dev container · #74 zones/runner/machine.env · #75 retro wiring.
 
 Work items: **W1** agent-platform (#643 → #646 →
 #644 → #645), **W2** agent-fleet: roles, coordinator, briefs (was aruvii-agent-fleet), **W3** agent-fleet: provisioning, runner, machine file.
@@ -19,7 +26,7 @@ Work items: **W1** agent-platform (#643 → #646 →
 | one skills tree `.agents/skills/`, `.claude/skills` → symlink; commands become skills | #643 Q1 (ND-1) | AP `.agents/skills/` | W1 #643 |
 | workflows stay flat skills; knowledge goes in domain skills (router + references) | #643 hybrid | AP `.agents/skills/<domain>/` | W1 #643 |
 | `meta/` is its own domain | ND-11 | AP `.agents/skills/meta/` | W1 #643 |
-| reference shape: Rules · When X use Y · Good/Bad · Decided edges · Review checks | G5 #22 | every AP reference | W1 + `00-reference-format.md` |
+| reference shape: Rules · When X use Y · Good/Bad · Decided edges · Review checks | G5 #22 | every reference — generic ones in SK (amended 2026-10-16, G23 #93: "pinned from this repo" superseded) | W1 + `00-reference-format.md` |
 | upstream skills as plugins, never copies; adapted ones owned and credited (D26) | G1 · Q-5 · #587 | AP `.claude/settings.json` enabledPlugins | done (#587) |
 | doc-writing rules → `planning/references/writing-docs.md` | ND-8 | AP planning/ | W1 |
 | layer 2 agent-agnostic: directory MUSTs → `<dir>/AGENTS.md` + `CLAUDE.md`=`@AGENTS.md`; file-type MUSTs → root AGENTS.md blocks; `.claude/rules/` deleted; module CLAUDE.md → AGENTS.md (ND-13) | G1b #72 | AP nested AGENTS.md, root AGENTS.md | W1 #646 |
@@ -34,7 +41,7 @@ Work items: **W1** agent-platform (#643 → #646 →
 | full stage text 0–10 (approved page `review/crq-stages.html`) | #35 | AP crq | W1 #645 |
 | `/dod` deleted; stage 8 = runner pipeline + AC citing; dod items → references' Review checks | ND-5 | AP crq, references | W1 #645 |
 | `visual-pr` adapted and owned; `untouched-and-risk` folded into it; stages 5 and 9 | #50 Q18 · ND-16 | AP `.agents/skills/visual-pr/` | W1 #645 |
-| GitLab comment = handoff record; Discord only pings | G2 | AP crq · AF briefs | W1, W2 |
+| the forge thread (issue or change-request comment) = handoff record; Discord only pings (amended 2026-10-16, G19 #89: forge-neutral) | G2 · G19 #89 | crq stage text (SK per G23) · AF briefs | W1, W2 |
 | TDD only for bugs (failing test first, S4); features: any order; PIT on touched classes with decisions at 6a, every survivor dispositioned, qa checks | #68 G12 | AP crq stage 6, AGENTS.md rule 1, testing/SKILL.md | W1 #644/#645 |
 | mutation runner job for touched modules, report-only → measured baselines → operator thresholds → blocking; every module wired | #68 Q3–Q4 | AP build-logic, Makefile, runner pipeline | AP #659 |
 
@@ -43,7 +50,7 @@ Work items: **W1** agent-platform (#643 → #646 →
 | decision | from | lands in | by |
 |---|---|---|---|
 | ONE fresh read-only reviewer, two verdicts (Standards + Spec), references by changed path, inputs pushed in | G3 #16 (amended) | AP `.agents/skills/review/`, `.claude/agents/reviewer.md` | W1 #645 |
-| lead judgment: Act on ≤5 · Consider · Noted · Dismissed; 3-round cap; rounds 2–3 see the fix diff only | G3 · pstack | AP review/references/lead-judgment.md | W1 #645 |
+| lead judgment: Act on · Consider · Noted · Dismissed, the lead validates every finding; 3-round cap; rounds 2–3 see the fix diff only. No cap on Act on (amended 2026-10-16, G17 #87) | G3 · pstack · G17 #87 | review/references/lead-judgment.md (SK per G23) | W1 #645 |
 | a review counts only if it covered the head commit | #64 forge idea 1 | AP review packet | #34 → W1 |
 | delete standards-review, code-standards-reviewer, smoke-spec-reviewer, spec-design-reviewer, architecture-reviewer agents | G3 · R12 | AP | W1 #645 |
 | architecture-review A–E merges into spec-review; F-01 → Spec verdict | SR8 (ND-7) | AP planning/references/spec-review.md | W1 |
@@ -59,7 +66,7 @@ Work items: **W1** agent-platform (#643 → #646 →
 | developer minimum before qa: touched-module test-module/it-module + verify-fast + what-ran note; only the runner runs verify-full/smoke | #35 Q26 · R28 | AP crq stages 6–6a | W1 #645 |
 | runner owns its own Compose stack; agents never deploy to it | #62 note (builder.io) | AF runner · AP Makefile | W3 |
 | workers commit and push their own branch; master protected; operator merges | #50 Q19 | AF worker-rules.md | W2 |
-| rebase onto origin/master at spawn, before verify, before done; conflicts via resolving-merge-conflicts + module build; behaviour change → needs-decision; --force-with-lease own branch | #50 Q20 | AF worker-rules.md · AP crq | W1, W2 |
+| before stage 7 starts: a worker may rebase onto origin/master (--force-with-lease, own branch only). Once stage 7 has started: merge origin/master into the branch, never force-push. Conflicts via resolving-merge-conflicts + module build; behaviour change → needs-decision. Squash-on-merge keeps master linear (amended 2026-10-16, #50 amendment; replaces "rebase before verify, before done") | #50 Q20 · #50 amendment (forge ADR-0069) | AF worker-rules.md · crq stage text (SK per G23) | W1, W2 · AF #72 |
 
 ## Agent side
 
@@ -88,7 +95,7 @@ Work items: **W1** agent-platform (#643 → #646 →
 
 | decision | from | lands in | by |
 |---|---|---|---|
-| agents propose MRs to the one owning file; operator merges; ≤2 per work item | G7 #26 | AP `docs/agents/lessons.md` (routing) | W1, W2 |
+| agents propose change requests to the one owning file; operator merges; ≤2 per work item; destinations tried strongest first (amended 2026-10-16, G18 #88 — row below) | G7 #26 · G18 #88 | AP `docs/agents/lessons.md` (routing) | W1, W2 |
 | retro = mattpocock `retro` plugin as-is; thread first; operator picks from a ranked list; crq stage 10 retro worker types `/retro` | #50 Q15–Q17 · ND-12 | AP crq stage 10 · AF brief | W1, W2 |
 | cost budget: tokens + wall time per stage; report-only → p90×1.5 per lane+stage set by operator; watchdog warns at 80 %, stops at 100 % (blocked: budget); spawn pause at ~70 % of the shared window | #70 G14 | AF coordinator watchdog | AF #72 |
 | five metrics per work item in the closing comment, fingerprinted by rulebook + fleet SHA; digest compares per fingerprint, ≥5 per side | #66 G11 | AF retro worker + digest | AF #75, #72 |
@@ -119,12 +126,35 @@ Work items: **W1** agent-platform (#643 → #646 →
 
 | decision | from | lands in | by |
 |---|---|---|---|
-| 16-point writing checklist (line 6: adapted examples allowed when labelled) | #37 Q1 | research/00-reference-format.md → every AP reference | W1 #644, #646, later G9 domains |
+| 16-point writing checklist. Line 6 as amended: Good/Bad pairs are generic, in one neutral domain (same mistake, same fix); the Aruvii `path:line` that shows the mistake is ledger evidence, not reference text (amended 2026-10-17, G23 #93 Q3). History: "adapted examples allowed when labelled" (#37 Q1) was corrected 2026-10-03 on #37 to "Bad = our real path:line, Good = that Bad rewritten" — both superseded | #37 Q1 · #37 correction · G23 #93 Q3 | research/00-reference-format.md → every SK reference | W1 #644, #646, later G9 domains · skills #99 (rewrite pairs) |
+| Rule line = one sentence: imperative + "because" + the failure it prevents, ≤35 words; a rule with no statable reason is flagged for deletion. Supersedes "imperative ≤30 words" | G21 #91 | research/00-reference-format.md §five sections · ledger research/19 reason column | skills #98 |
 | proof before replace: full replay for testing refs, static + 1 MR × 3 for others | #37 Q2 | AP MR evidence | W1 #644, #645 |
 | descriptions = "Use when <observable trigger>" + what it holds, trigger-tested | #37 Q3 | AP .agents/skills/*/SKILL.md | W1 #643 onward |
 | `make lint` = plugin validate --strict + doc-drift §5 + 5-section heading check | #37 Q4 | AP Makefile, scripts | W1 #643 |
 
+## R38 follow-ups (decided 2026-10-16/17)
+
+| decision | from | lands in | by |
+|---|---|---|---|
+| keep each reference's **reason**, not its rule; method: reference change → why → true for us? → our principle → our decision; principles CP1–CP12 | R38 #86 | SK `research/64-core-design.md` (cited by every later decision) | — (this map) |
+| lesson destinations, strongest first: check → reference (rule + reason) → soul → machine file → dropped (one line in a rejected record, with the reason); the retro states why each stronger level could not hold the lesson | G18 #88 | AF retro brief · AP `docs/agents/lessons.md` | AF #75 |
+| the forge thread is the record: each stage handoff = a comment with the decision, what ran, head SHA, open questions; worker scratch stays uncommitted on its host; a long spec/design is committed in the change request; no thoughts/ folder | G19 #89 | crq stage text (SK) · AF `scripts/post-status` | AP #645 · AF #72 |
+| forge-neutral wording in rules, skills and souls (forge · issue · change request · thread); glab today / gh later live in one adapter | G19 #89 | AP `docs/agents/issue-tracker.md` (adapter) | AP #645 |
+| manual /crq plays every role and posts the same stage comments as the fleet | G19 #89 | crq stage text (SK) | AP #645 |
+| static delivery check in every `make lint`: root AGENTS.md <200 lines · root→leaf chain under Codex's 32 KiB cap · every CLAUDE.md shim is exactly `@AGENTS.md` · `.claude/skills` symlink resolves | G20 #90 | AP check-doc-drift §5 | AP #643, #646 |
+| delivery probe when any AGENTS.md or skill changes: a sentinel line per nested AGENTS.md; headless `claude -p` and `codex exec` must quote it; red if not loaded; failures fixed in #646 | G20 #90 | AP runner job | AP #671 |
+| a rule that can be a check becomes a check; prose is the fallback | G22 #92 | the concrete list | AP #696 |
+| three layers: generic skills, references (neutral-domain examples) and the crq workflow in SK as a plugin · AP = Aruvii only (AGENTS.md, nested AGENTS.md, `docs/agents/*.md` answers incl. `crq.md`, Aruvii-only skills) · AF = fleet, generic part extracted later | G23 #93 | SK plugin marketplace · AP `docs/agents/crq.md` | skills #99 · AP #645 (split the Aruvii answers out of crq) · #81 |
+| build order: fleet first, SK in parallel, AP project layer after; workers run on today's AP files until then | G24 #94 | map #9 destination | — |
+| improve chiyanram/agent-fleet beside the old scripts; install fresh into the zone users on VM and laptop; pilot #67 on it; retire old agents after the pilot passes; one update command per host (git pull + plugin update + container rebuild) | G25 #95 | AF provisioning, install + update scripts | AF #74 |
+| the forge assignee is the claim on a work item, so two fleets never take the same issue | G25 #95 | AF coordinator | AF #72 |
+| caps by resource: ≤2 workers building per host · analysts and reviewers uncapped · runner 1 gate at a time · ≤3 items waiting on the operator; over a cap = queued, not failed; tune from the G11 row | G26 #101 | AF `agents/coordinator.md` · runner | AF #72, #74 |
+| builders get a fresh worktree from the pushed branch, set up by `make worktree-setup` before the worker starts; deleted once done is accepted; a dirty tree is never deleted (flagged); reviewers get no worktree | G27 #102 | AF coordinator + launcher · AP Makefile `worktree-setup` | AF #72 · AP target: owner not named on #102 |
+| crash or hang → one fresh worker from the forge thread + pushed branch (never resume); dead worktree kept and named; second failure → blocked to the operator | G27 #102 | AF coordinator | AF #72 |
+| prevent stuck boxes: auto mode in the container, ask-the-user tool off for workers (they post needs-decision); detect: coordinator checks each worker screen every few minutes, a waiting box → "stuck on: <question>" | G27 #102 | AF managed settings · coordinator | AF #73, #72 |
+| keep ours minimal (no AI design critic, one writer, one reviewer); add a piece only when a recorded switch trigger fires | G28 #103 | `review/pipeline-comparison.html` | — |
+
 ## Open (not yet decided — do not write)
 
 G9b code+obs (#33) · G9c migrations+delivery+review packet (#34) ·
-WIP limit (map fog) · pilot (#67) · D1 role boxes (#21).
+pilot (#67) · D1 role boxes (#21) · G16 thread per ticket (#82). (WIP limit decided 2026-10-17, G26 #101.)

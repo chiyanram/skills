@@ -4,6 +4,22 @@ Ticket: `../issues/22-research-disposition-table.md` · read 2026-10-01 at `e0cc
 Feeds G9a–G9d (`../issues/23..26`). Decisions cited by ticket id (G1 Q2 = `../issues/05` Q2, G3 amend = `../issues/07`
 §Amendment, …). Learnings cited by file:line in this folder.
 
+> **SUPERSEDED IN PART (2026-10-17).** The rows below are the 2026-10-01 picture. Read these changes first; the table
+> itself is not rewritten.
+>
+> | stale in this file | now | where decided |
+> |---|---|---|
+> | column `AAF` aruvii-agent-fleet (new repo) | no separate repo; all agent side in agent-fleet (AF); split only when a trigger fires | G1 amendment skills #14 (2026-10-03) · #81 |
+> | AP holds every skill, reference and crq | generic skills, references (neutral-domain examples) and crq → chiyanram/skills plugin; AP keeps AGENTS.md, nested AGENTS.md, `docs/agents/*.md` answers, Aruvii-only skills | G23 #93 |
+> | §Proposed target tree: `.claude/rules/` kept as L2 | `.claude/rules/` deleted; directory MUSTs → `<dir>/AGENTS.md`, file-type MUSTs → root AGENTS.md blocks | G1b skills #72 |
+> | §Proposed target tree: AAF column, generic AF `skills/ retro · untouched-and-risk` | see the two ND rows below; layout per G23 | G23 #93 |
+> | ND-12 retro: "AF generic skill" | mattpocock `retro` plugin as-is; crq stage 10 retro worker types `/retro` | #50 Q15–Q17 |
+> | ND-16 `untouched-and-risk`: "AF plugin skill" | folded into the owned `visual-pr` adaptation, crq stages 5 and 9 | #50 Q18 |
+> | "1 unix user" (create-agent, agent-yaml rows, tree) | two zones: `fleet-worker` for all workers (in one dev container image), `fleet-coord`, `fleet-runner` | G13 #69 |
+> | souls rendered / SOUL companion | `claude --agent <role>` from a plugin; nothing rendered | G4 #17 |
+>
+> Current picture: `research/00-decision-register.md` and map #9.
+
 **Legend**
 
 | short | means |

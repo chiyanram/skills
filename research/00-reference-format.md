@@ -1,25 +1,34 @@
 # Reference format — the template every reference follows
 
 Draft consolidated 2026-10-02 from decisions already taken. Each line cites where it was decided. G10 (#37) owns this file; its checklist and proof method are decided there.
+Amended 2026-10-17: Rule line (G21 #91), Good/Bad examples and location (G23 #93).
 
 ## Where a reference sits
 
 ```
-.agents/skills/<domain>/                 knowledge skill (domain): testing · code · obs · migrations · delivery · planning
-├── SKILL.md                             router: frontmatter + "which reference to load" table, nothing else
-├── references/<topic>.md                ← THIS TEMPLATE
-└── scripts/                             mechanical checks the references name
-.agents/skills/<workflow>/SKILL.md       workflow skill (flat, own /name): crq · flyway-migration · deslop · …
-.claude/rules/<area>.md                  L2: MUSTs only, path-scoped — never the examples
+chiyanram/skills  (plugin marketplace — generic, installed as a plugin, never copied)
+├── <domain>/                            knowledge skill: testing · code · obs · migrations · delivery · planning
+│   ├── SKILL.md                         router: frontmatter + "which reference to load" table, nothing else
+│   ├── references/<topic>.md            ← THIS TEMPLATE (neutral-domain examples)
+│   └── scripts/                         mechanical checks the references name
+└── <workflow>/SKILL.md                  generic workflow skill (flat, own /name): crq · deslop · …
+
+agent-platform  (Aruvii only)
+├── AGENTS.md · <dir>/AGENTS.md          index + Aruvii MUSTs; CLAUDE.md = @AGENTS.md
+├── docs/agents/*.md                     Aruvii answers for generic skills: crq.md (gate, lane floor paths,
+│                                        role labels) · issue-tracker.md (forge adapter = glab) · …
+└── .agents/skills/<aruvii-skill>/       Aruvii-only skills: flyway-migration · aruvii-git · aruvii-cleanup ·
+                                         v1-status · smoke-spec
 ```
-Sources: G1 (#5, 4 layers), #643 design (hybrid: workflows flat, knowledge in domains, firstmate/openclaw/pstack),
-G5 (#13, one file per topic).
+The plugin's exact directory layout is build work (skills #99, map #9 G24). Sources: G1 (#5, 4 layers), #643 design
+(hybrid: workflows flat, knowledge in domains), G5 (#13, one file per topic), G1b skills #72 (`.claude/rules/` deleted →
+nested AGENTS.md), G23 #93 (generic vs project; crq is generic).
 
 ## The five sections, in this order
 
 | section | holds | rule for writing it | decided in |
 |---|---|---|---|
-| **Rules** | the approved rules, one line each, with their ledger id | only rules the operator approved (`research/19-approved-rules.md`); imperative; ≤30 words | G5 · map #9 Notes ("no rule enters without the operator's yes") |
+| **Rules** | the approved rules, one line each, with their ledger id | only rules the operator approved (`research/19-approved-rules.md`); one sentence = imperative + "because" + the failure it prevents, ≤35 words; a rule with no statable reason is flagged for deletion | G5 · map #9 Notes ("no rule enters without the operator's yes") · G21 #91 (supersedes "imperative; ≤30 words") |
 | **When X, use Y** | decision table for choices inside the topic | a table, situation → choice → why | G5 |
 | **Good / Bad** | one pair per rule that can be misread | see the Good/Bad rules below; omit for rules whose sentence says it all | G5 · #35 (misreadable-only) |
 | **Decided edges** | cases that look like violations but are allowed, and the reverse | pstack bugbot shape: *Skip when* · *Do not skip when* · *Confidence* | G5 post-close (pstack) |
@@ -27,13 +36,16 @@ G5 (#13, one file per topic).
 
 ## Good / Bad rules
 
+Amended 2026-10-17 (G23 #93 Q3). Rules 2–3 before this date said "Bad = real code from our repo, Good = that Bad
+rewritten" (#37 correction, 2026-10-03); that is superseded.
+
 1. A Good obeys **every** approved rule and house style, not only its own (GB1a, `31-good-bad-v2-BRIEF.md:9`).
-2. **Bad = real code from our repo**, `path:lines` at a pinned commit, labelled *real* — things that actually went wrong
-   (a ticket, an MR round, a QA finding). ≤15 lines.
-3. **Good = that same Bad rewritten to obey the rule** — never our code as-is, because our code does not reliably follow
-   the rules. Label it *rewritten from* the Bad's `path:lines`. ≤15 lines.
+2. **Bad and Good are generic, in one neutral domain** — the same mistake and the same fix as the real case, with no
+   project names, paths or business terms. ≤15 lines each. Label the pair *neutral*.
+3. **The real case is evidence, not text.** The Aruvii `path:lines` that showed the mistake (a ticket, an MR round, a QA
+   finding) goes in the ledger `research/19-approved-rules.md` as the rule's evidence, never into the reference.
 4. **A rule's source is a reference project or its internal references — read, never assumed.** Our repo supplies
-   evidence that a rule is needed (the Bad), never the rule itself.
+   evidence that a rule is needed, never the rule itself.
 5. House style in examples: test names are "should …" sentences; `final var` in Java, `def` in Groovy; one argument per
    line with the closing parenthesis on the last argument; Spock for new tests (CV1–CV6, `31e-conventions.md`).
 6. One pair per rule. A rule whose text cannot be misread gets none (#35).
@@ -52,7 +64,8 @@ One sentence: what this reference governs and when it is read.
 
 ## Rules
 
-- **V1** — A new test answers the four value questions before it is written.
+- **V1** — <imperative>, because <the failure it prevents>. Example from G21 #91: "AssertJ only, never JUnit
+  assertions — because one assertion style keeps failure messages readable across every module".
 - **V2** — …
 
 ## When X, use Y
@@ -65,17 +78,17 @@ One sentence: what this reference governs and when it is read.
 
 ### V1 — <title>
 
-**Good** (real)
+**Bad** (neutral)
 ```groovy
-…≤15 lines…
+…≤15 lines, neutral domain…
 ```
-`path/to/File.groovy:40-52` — why this is right
+What goes wrong.
 
-**Bad** (real)
+**Good** (neutral)
 ```groovy
-…
+…the same code, rewritten to the rule…
 ```
-`path/to/Other.groovy:12-20` — what went wrong (#NNN)
+Why this is right. (Real evidence: ledger row V1.)
 
 ## Decided edges
 
@@ -83,18 +96,20 @@ One sentence: what this reference governs and when it is read.
 
 ## Review checks
 
-- [ ] V1 — open the new test; can each of the four questions be answered from it? (`scripts/<check>.sh` if mechanical)
+- [ ] V1 — what to open and what to look for (`scripts/<check>.sh` if mechanical)
 ````
 
 ## Writing checklist (G10 #37, from R14 research/16 §4a)
 
 ```
 [ ] 1  ≤300 lines; >100 lines → contents line at top; links one level deep, none into another ref's body
-[ ] 2  Rules: each a checkable sentence a grep or a reader can decide (no "consider", no "prefer")
-[ ] 3  Rules: each discipline rule names the permitted alternative in the same line
+[ ] 2  Rules: one sentence = imperative + "because" + the failure it prevents, ≤35 words; a grep or a reader can
+       decide it (no "consider", no "prefer"); no statable reason → flag for deletion (G21 #91)
+[ ] 3  Rules: each discipline rule names the permitted alternative in the same sentence, inside the ≤35 words
 [ ] 4  Rules: no rule a hook/Checkstyle/ArchUnit already fails — cite the gate instead
 [ ] 5  When X, use Y: X is an observable predicate (file type, annotation, tier, path), never a judgement
-[ ] 6  Bad = real path:line from our repo (re-verified at write time); Good = that Bad rewritten to the rule, never our code as-is; the rule's source is a reference project, read
+[ ] 6  Good/Bad in one neutral domain, no project names; the real Aruvii path:line is ledger evidence (re-verified at
+       write time), never reference text; the rule's source is a reference project, read (G23 #93 Q3)
 [ ] 7  Good/Bad: one pair per rule that can be misread; none for rules whose sentence says it all
 [ ] 8  Decided edges: Skip when / Do not skip when / Confidence
 [ ] 9  Decided edges: exceptions live here as their own predicate, never inside a Rule
@@ -129,4 +144,5 @@ One sentence: what this reference governs and when it is read.
 1. Candidate rules with sources → operator approves each on a review page (`review/build-planning.py`, `template.html`).
 2. Approved rules → ledger `research/19-approved-rules.md` (id · target file · rule · source · status).
 3. Good/Bad for the rules that can be misread → review page → approved log `research/33-good-bad-approvals.md`.
-4. Work item 1 (agent-platform, via `/crq`) writes the files from the ledger and the approved examples.
+4. Generic references are written in chiyanram/skills from the ledger and the neutral examples (skills #99); Aruvii
+   answers go in agent-platform `docs/agents/*.md` (G23 #93, G24 #94).
