@@ -1,0 +1,332 @@
+[
+ {
+  "name": "1 · smells.md — Fowler smells and cures (FW)",
+  "items": [
+   {
+    "id": "FW1",
+    "title": "Long constructor = over-busy class",
+    "rule": "A constructor taking more than 7 collaborators is a finding: split the class (Extract Class) or bundle travelling values (Introduce Parameter Object).",
+    "source": "`MF-art/injection.html` §Constructor versus Setter Injection; `MF/DataClump`; ours: `ChatOrchestrator.java:133` 32 params; `Tool.java:60` 29; 57 ctors ≥7 in AP main",
+    "kind": "rule",
+    "recommend": "ADOPT (threshold is ours — D1) → smells.md",
+    "extra": "Legend: MF = martinfowler.com/bliki · RC = refactoring.com/catalog · RK = rameezk/skills@937d90d martin-fowler-code-smells.md · SF = spring-framework@69a298b8e · SB = spring-boot@f6142c9f4 · SJF = spring-javaformat@525867fe8 · AP = agent-platform origin/master@772736bf (`…/` = src/main/java/ai/aruvii/). Full notes: research/58-fowler-spring-codebase.md.",
+    "drop": ""
+   },
+   {
+    "id": "FW2",
+    "title": "No flag arguments",
+    "rule": "A boolean parameter that selects which operation runs is a finding: split into two named methods, or take a sealed/enum input.",
+    "source": "`MF/FlagArgument` §Tangled Implementation, §Deriving the flag; ours: `RagIngestionService.java:72,94` `forceReembed`; DS3 covers flows, not signatures",
+    "kind": "rule",
+    "recommend": "ADOPT → smells.md (beside DS3)",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "FW5",
+    "title": "Extract by intent, not length",
+    "rule": "Extract a fragment you must read to understand into a method named for what it does; a comment explaining *what* is the cue.",
+    "source": "`MF/FunctionLength` ¶1-3; ours: No method-level rule; `ChatOrchestrator.java` 1405 lines",
+    "kind": "rule",
+    "recommend": "ADOPT → smells.md",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "FW6",
+    "title": "Logic over one record lives on the record",
+    "rule": "When callers read two or more fields of one record to compute or check something, move that logic onto the record as a method.",
+    "source": "`MF/GetterEradicator` (Beck's rule); `MF/TellDontAsk`; `MF/AnemicDomainModel`; ours: not measured; tension with S-3 (X5)",
+    "kind": "rule",
+    "recommend": "ADOPT, scoped to records/values (not entities)",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "FW8",
+    "title": "Hide Delegate vs Remove Middle Man are inverses — SHARPEN",
+    "rule": "Hide Delegate and Remove Middle Man are inverses: fix a chain or a pass-through by whichever removes coupling at real call sites; never add a wrapper then flag it.",
+    "source": "`RC/removeMiddleMan` (\"inverse of Hide Delegate\"), `RC/hideDelegate`; ours: `RK:19-20` list both, no note; AP: 0 three-getter chains in main",
+    "kind": "rule",
+    "recommend": "SHARPEN DS11/DS4",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "FW9",
+    "title": "Complete the Fowler baseline — SHARPEN",
+    "rule": "Add Long Function, Long Parameter List and Data Class to the review smell baseline; note it is a 12-smell subset of Refactoring 2e ch. 3.",
+    "source": "§2.1; ours: SEAM1 + ADR17:221-225 cite `RK` as \"the Fowler smells baseline\"",
+    "kind": "reference text change",
+    "recommend": "SHARPEN SEAM1/DS11 text",
+    "extra": "",
+    "drop": ""
+   }
+  ]
+ },
+ {
+  "name": "2 · design.md — seam shape from Fowler (SEAM1 / S-1..S-7 sharpenings)",
+  "items": [
+   {
+    "id": "FW3",
+    "title": "Query vs modifier (CQS) — SHARPEN",
+    "rule": "A method that returns a value changes no observable state; a modifier returning its own outcome (CAS `Won`/`Lost`) or a fluent `this` is the stated exception.",
+    "source": "`MF/CommandQuerySeparation`; `RC/separateQueryFromModifier`; `MF/FluentInterface`; ours: NM3 covers names only",
+    "kind": "rule",
+    "recommend": "SHARPEN NM3",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "FW7",
+    "title": "Role interfaces, not header interfaces",
+    "rule": "An interface declares only the methods its consumer calls; a port whose consumers each use a different subset is split into role interfaces.",
+    "source": "`MF/RoleInterface`; `MF/HeaderInterface`; ours: 5 ports with 8-9 methods, e.g. `aruvii-shared/…/shared/llm/InteractionPort.java`; consumer use not checked",
+    "kind": "rule",
+    "recommend": "ADOPT as SEAM1/S-1 sharpening",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "FW4",
+    "title": "Expand–migrate–contract for published contracts",
+    "rule": "Change a published contract (stream payload, DB column, public API) by expand → migrate → contract across releases; in-repo-only APIs keep DS5 (one change).",
+    "source": "`MF/ParallelChange`; ours: DS5 forbids dual paths everywhere; no rule for wire/DB contracts",
+    "kind": "rule (scope note on DS5)",
+    "recommend": "ADOPT as DS5 scope note (X4)",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SP13",
+    "title": "Default* impl is final + package-private — SHARPEN",
+    "rule": "A seam's Spring implementation is `final` and package-private; callers get it as the interface; no `Impl` suffix.",
+    "source": "SF `DefaultRestClient.java:86`, `DefaultRestClientBuilder.java:64`, `RestClient.java:84`; ours: `DefaultAgentEvalPublisher.java:16` not final; `LlmAdapterRegistryImpl.java:15` public `Impl`",
+    "kind": "rule",
+    "recommend": "SHARPEN S-1/LY2",
+    "extra": "",
+    "drop": ""
+   }
+  ]
+ },
+ {
+  "name": "3 · Spring's own codebase — gates and conventions (SP13+, SP1-12 are testing)",
+  "items": [
+   {
+    "id": "SP22",
+    "title": "Wire complexity + nesting gates",
+    "rule": "Wire the S-6/DS9 gates: Checkstyle `CyclomaticComplexity` max 5 and `NestedIfDepth` set so DS9 (three levels) fails the build.",
+    "source": "SF checkstyle.xml:70-78; SJF :57-65; ADR17:218; ours: AP `checkstyle.xml` has neither",
+    "kind": "Checkstyle gate",
+    "recommend": "ADOPT (S-6 claims a gate that does not exist)",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SP23",
+    "title": "No @PostConstruct in main",
+    "rule": "No `@PostConstruct` in main code; startup checks go in the constructor, start-up work in `ApplicationRunner`/`SmartLifecycle` (SC19, SC20).",
+    "source": "SB checkstyle.xml:27-35; ours: 5 live uses (`ChatResponseSubscriber.java:44`, `RagIngestSubscriber.java:55`, `GlobalTrustStore.java:56`, `JdbcSslAdapter.java:36`, `KafkaTriggerManager.java:59`)",
+    "kind": "rule + Checkstyle gate",
+    "recommend": "DECIDE (X6, D2)",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SP19",
+    "title": "No System.out/err/printStackTrace in main",
+    "rule": "No `System.out`, `System.err` or `printStackTrace()` in main code, except a `main` method; gated by Checkstyle regex.",
+    "source": "SF checkstyle.xml:226-237; ours: `HashEmbeddingAdapter.java:35`",
+    "kind": "Checkstyle gate",
+    "recommend": "ADOPT as gate",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SP18",
+    "title": "Utility class final + private ctor",
+    "rule": "A static-only class is `final` with a private constructor; gate `HideUtilityClassConstructor` + `FinalClass`.",
+    "source": "SF CONTRIBUTING.md:572-587; SF checkstyle.xml:47-49; ours: `AdapterHttpHelper.java:26,30` already compliant",
+    "kind": "Checkstyle gate",
+    "recommend": "ADOPT as gate (OQ3)",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SP14",
+    "title": "Public method in package-private class only if override",
+    "rule": "In a package-private class, a method is `public` only when it overrides; gate it with SJF `SpringMethodVisibilityCheck` or ArchUnit.",
+    "source": "SJF `SpringMethodVisibilityCheck.java:53-67`; ours: AP scan: 0 violations",
+    "kind": "Checkstyle gate",
+    "recommend": "ADOPT as gate (OQ3), low priority",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SP20",
+    "title": "Precondition message names the parameter — SHARPEN",
+    "rule": "A precondition message names the parameter first: `requireNonNull(sessionId, \"sessionId must not be null\")`.",
+    "source": "SF CONTRIBUTING.md:470-492; ours: 4 `requireNonNull` without message; `RedisModelOverrideStoreAdapter.java:47` bare name",
+    "kind": "rule",
+    "recommend": "SHARPEN ER6 (optional)",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SP15",
+    "title": "@NullMarked packages + NullAway",
+    "rule": "Every main package has `package-info.java` with `@NullMarked`; a nullable type says `@Nullable` (JSpecify); NullAway checks it.",
+    "source": "SF CONTRIBUTING.md:494-560; FW null-safety §Defaults to non-null, §Configuration; ours: 0 `package-info.java` / 1020 main files; 2 files import `org.jspecify`",
+    "kind": "rule",
+    "recommend": "HOLD — fold into the OQ-R27-6 spike (D3)",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SP16",
+    "title": "*Customizer beans for a shared builder",
+    "rule": "When several modules must adjust one shared builder, each contributes a `@FunctionalInterface *Customizer` bean; the owner applies them via `orderedStream()`.",
+    "source": "SB `RestClientCustomizer.java`, `RestClientAutoConfiguration.java:85`, `RestClientBuilderConfigurer.java:63-73`; ours: 0 own customizers; no current need",
+    "kind": "rule",
+    "recommend": "HOLD (DS6: no pattern before pressure)",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "SP21",
+    "title": "Immutable builders for config objects",
+    "rule": "(proposed) Config-style objects use an immutable builder whose setters return a new instance.",
+    "source": "SB `ThreadPoolTaskExecutorBuilder.java:110-111`; ours: TY13 bans builders",
+    "kind": "rule",
+    "recommend": "DROP — TY13 stands (X2)",
+    "extra": "",
+    "drop": "DROP"
+   },
+   {
+    "id": "SP24",
+    "title": "File reads as one author",
+    "rule": "(proposed) Place a new member beside related ones; a file reads as written by one author, not as change history.",
+    "source": "SF CONTRIBUTING.md:450-462; ours: —",
+    "kind": "rule",
+    "recommend": "DROP — taste, not checkable",
+    "extra": "",
+    "drop": "DROP"
+   }
+  ]
+ },
+ {
+  "name": "4 · contradictions and decisions for R36",
+  "items": [
+   {
+    "id": "X1",
+    "title": "Contradiction: ST1 / JV5: `final var` for locals",
+    "rule": "ST1 / JV5: `final var` for locals",
+    "source": "SF CONTRIBUTING.md:596: \"`var` … is not permitted\" in main code",
+    "kind": "contradiction with approved rule",
+    "recommend": "**Keep ours.** Spring is a library read on GitHub without an IDE; ours is an app; JV5 already limits `var` to types visible on the right. Record the divergence",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "X2",
+    "title": "Contradiction: TY13: no builder classes",
+    "rule": "TY13: no builder classes",
+    "source": "Spring builds config objects with builders (SF `RestClient.java:231`, `RetryPolicy.java:123,148`; SB `ThreadPoolTaskExecutorBuilder.java`)",
+    "kind": "contradiction with approved rule",
+    "recommend": "**Keep TY13** for our values; add one line: *using* a library's builder is fine, we don't write our own",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "X3",
+    "title": "Contradiction: S-1 (each seam an interface + `Default*`) vs LY2 (interface only for a",
+    "rule": "S-1 (each seam an interface + `Default*`) vs LY2 (interface only for a faked boundary or module boundary)",
+    "source": "`MF/InterfaceImplementationPair`: dislikes one-impl interfaces in applications; Spring's pairs are published library APIs",
+    "kind": "contradiction with approved rule",
+    "recommend": "**Reconcile in S-1 text:** pure decision seams (`RecoveryPolicy`) are `final` classes with no interface; I/O seams get the interface (they are faked). 57 of 67 AP `*Port` interfaces have exactly one main impl — allowed by LY2 as module boundaries",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "X4",
+    "title": "Contradiction: DS5: migrate every caller and delete the old path in one change",
+    "rule": "DS5: migrate every caller and delete the old path in one change",
+    "source": "`MF/ParallelChange`: expand/migrate/contract \"still useful\" even with control of all usages",
+    "kind": "contradiction with approved rule",
+    "recommend": "**Scope DS5** to in-repo APIs; FW4 for published/persisted contracts",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "X5",
+    "title": "Contradiction: S-3 decide-or-do (decisions in pure policy classes over records)",
+    "rule": "S-3 decide-or-do (decisions in pure policy classes over records)",
+    "source": "`MF/AnemicDomainModel`: behaviour-less domain objects are an anti-pattern; but `MF/GetterEradicator`: \"Layering often trumps this\"",
+    "kind": "contradiction with approved rule",
+    "recommend": "**Tension, not conflict.** Keep S-3 for cross-object decisions; FW6 keeps single-record logic on the record",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "X6",
+    "title": "Contradiction: SC18: `@PostConstruct` allowed for checks / in-memory setup",
+    "rule": "SC18: `@PostConstruct` allowed for checks / in-memory setup",
+    "source": "SB bans the import in its own main code (checkstyle.xml:27-35); no reason given in the file",
+    "kind": "contradiction with approved rule",
+    "recommend": "Operator choice (D2)",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "D1",
+    "title": "Decision: FW1 threshold",
+    "rule": "a) 5 · b) 7 · c) no number, review judgement",
+    "source": "research/58 §7",
+    "kind": "open decision",
+    "recommend": "**b) 7** — no first-party number exists; 7 flags the 57 worst AP constructors and leaves ordinary services alone",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "D2",
+    "title": "Decision: `@PostConstruct` (X6)",
+    "rule": "a) keep SC18 · b) ban in main via Checkstyle, migrate 5 uses (#663-style ticket)",
+    "source": "research/58 §7",
+    "kind": "open decision",
+    "recommend": "**b)** — SC18's allowed cases fit in a constructor; Boot itself gates it; SC19/SC20 already name the replacements",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "D3",
+    "title": "Decision: JSpecify (SP15)",
+    "rule": "a) adopt now · b) fold into OQ-R27-6 spike · c) drop",
+    "source": "research/58 §7",
+    "kind": "open decision",
+    "recommend": "**b)** — the spike is already approved; add \"`@NullMarked` package-info on the spiked module\" to its scope",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "D4",
+    "title": "Decision: Id prefix for Spring-codebase rules",
+    "rule": "a) SP13+ (shares prefix with testing SP1-SP12) · b) new prefix `SX`",
+    "source": "research/58 §7",
+    "kind": "open decision",
+    "recommend": "**a)** for this review; rename to `SX` if the operator wants prefixes to mean one file",
+    "extra": "",
+    "drop": ""
+   },
+   {
+    "id": "D5",
+    "title": "Decision: Where FW rules live",
+    "rule": "a) smells.md (DS11 family) · b) design.md beside SEAM1",
+    "source": "research/58 §7",
+    "kind": "open decision",
+    "recommend": "**a)** FW1/2/5/6/8/9 → smells.md; FW3/FW7 → design.md (seam rules)",
+    "extra": "",
+    "drop": ""
+   }
+  ]
+ }
+]

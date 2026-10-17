@@ -520,3 +520,12 @@
 | MG46 | DEFERRED → #57 (Later·Persistence) | `ALTER COLUMN … TYPE` rewrites the table; use a new column (MG10) instead. | SRC1: `PG-ALT` Notes "will normally cause the entire table and its indexes to be rewritten" — `skel:review.md:146-147` | DEFERRED 2026-10-04 (dev mode; applies from first production deploy) |
 | MG47 | DEFERRED → #57 (Later·Persistence) | `SET NOT NULL` on an existing column: add `CHECK (col IS NOT NULL) NOT VALID`, validate, then `SET NOT NULL`. | SRC1: `PG-ALT` Description "if a valid `CHECK` constraint exists… then the table scan is skipped" — new; our rules are silent | DEFERRED 2026-10-04 (dev mode; applies from first production deploy) |
 | MG52 | DEFERRED → #57 (Later·Persistence) | After a schema change, deploy `api` before `worker`. | SRC1: **project decision?** — worker restart-loops on validate (`skel:rules:84-86`) | DEFERRED 2026-10-04 (dev mode; applies from first production deploy) |
+
+### Fowler + Spring codebase review (R36 #83) — operator 2026-10-04
+
+| id | reference | rule | source | status |
+|---|---|---|---|---|
+| X6 / SP23 | code/references/spring.md + checkstyle.xml | No `@PostConstruct` in main code (replaces SC18's allowance): startup checks go in the constructor; start-up work in `ApplicationRunner` / `SmartLifecycle` (SC19, SC20). Gated by a Checkstyle illegal-import rule; the 5 live uses migrate (agent-platform #663). | Spring Boot checkstyle.xml:27-35 (mainCodeIllegalImportCheck); research/58 D2 b; operator 2026-10-04 | APPROVED |
+| X2 / TY13a | code/references/types.md (amends TY13) | Simple values are records with a compact constructor. A complex object (many optional parts, staged construction) may have a builder; using a library's builder is always fine. | Spring RestClient.java:231, ThreadPoolTaskExecutorBuilder (research/58 X2); operator 2026-10-04 | APPROVED |
+| SP22 | checkstyle.xml + code/references/smells.md | Wire the gates ADR-0017 S-6 / DS9 claim: Checkstyle `CyclomaticComplexity` and `NestedIfDepth` fail the build; exact limits from R37. | Spring Framework checkstyle.xml:70-78; research/58; operator 2026-10-04 ("add checkstyle") | APPROVED |
+| X4 / DS5a | code/references/smells.md (scopes DS5) | DS5 (migrate every caller and delete the old path in one change) applies to our own in-repo APIs. Where callers are outside our control (published API, stored data, webhook URL) use ParallelChange: expand, migrate, contract (e.g. OQ-SS-3). | martinfowler.com/bliki/ParallelChange.html; research/58 X4; operator 2026-10-04 | DECIDED |
