@@ -1,0 +1,4038 @@
+{
+ "groups": [
+  {
+   "key": "testing",
+   "name": "Testing",
+   "items": [
+    {
+     "line": 7,
+     "id": "S1",
+     "reason": "because a full Spring context makes a plain service test very slow",
+     "kind": "stated",
+     "cite": "refs/plinth-pinned/321-…-unit-tests.md:115",
+     "basis": "Bad example comment: @SpringBootTest loads full ApplicationContext, very slow for a plain service test."
+    },
+    {
+     "line": 8,
+     "id": "S2",
+     "reason": "because a test of a default or its own input cannot fail for a defect",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/…/principle-test-behavior-not-implementation/SKILL.md:13,20-21",
+     "basis": "Constant pins and fixture-asserts-fixture tests cannot fail for a defect; they cost CI and review, catch nothing."
+    },
+    {
+     "line": 9,
+     "id": "S3",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "refs/plinth-pinned/130-java-testing-strategies.md:248; research/00-fleet-self-reports.md:5",
+     "basis": "Plinth says run existing tests first, names no failure; self-report lists skipped RefusalReasonSpec run without a consequence."
+    },
+    {
+     "line": 10,
+     "id": "S4",
+     "reason": "because a regression test that never failed proves the mock, not the fix",
+     "kind": "stated",
+     "cite": "refs/openclaw-openclaw/.agents/skills/test-audit/SKILL.md:37-39",
+     "basis": "Regression tests must fail on pre-fix code; one that never demonstrably failed proves the mock, not the fix."
+    },
+    {
+     "line": 11,
+     "id": "S5",
+     "reason": "because an IT for a pure error branch starts Postgres yet reaches no boundary",
+     "kind": "evidence",
+     "cite": "research/31a-v2.md:166",
+     "basis": "FeedbackServiceIT boots Postgres for a pure guard; the DB CHECK it names is never reached."
+    },
+    {
+     "line": 13,
+     "id": "C1",
+     "reason": "because a reviewer cannot tell a skipped dimension from a forgotten one",
+     "kind": "evidence",
+     "cite": "research/31a-v2.md:417,468",
+     "basis": "Bad spec shows one case with no record of other dimensions considered or skipped; decided gap looks like oversight."
+    },
+    {
+     "line": 14,
+     "id": "C2",
+     "reason": "because an untested outage path can swallow the error without any log",
+     "kind": "evidence",
+     "cite": "research/31a-v2.md:344",
+     "basis": "RedisModelOverrideStoreAdapterSpec proves only silence on outage; no WARN asserted, so swallow-without-log passes."
+    },
+    {
+     "line": 15,
+     "id": "C3",
+     "reason": "because an expected value from the code itself shares its defect and always passes",
+     "kind": "stated",
+     "cite": "refs/mattpocock-skills/skills/engineering/tdd/SKILL.md:31; plinth 130 right-bicep.md:135",
+     "basis": "Tautological expected values pass by construction and never disagree with the code; reimplementing repeats its defect."
+    },
+    {
+     "line": 16,
+     "id": "C4",
+     "reason": "because an unrecorded gap cannot be told from an oversight",
+     "kind": "evidence",
+     "cite": "research/31a-v2.md:468",
+     "basis": "MR description silent on untested cases: a reviewer cannot tell a decided gap from an oversight."
+    },
+    {
+     "line": 17,
+     "id": "B1",
+     "reason": "because with only one item a correct and an inverted offset both pass",
+     "kind": "evidence",
+     "cite": "research/31a-v2.md:501; research/21-mutation-and-property.md:36",
+     "basis": "Cardinality 1 only: offset is always zero; #505 had 7 survivors killed only by a second entity."
+    },
+    {
+     "line": 18,
+     "id": "B2",
+     "reason": "because 'consider boundaries' let -1, 1 and null inputs go untested past review",
+     "kind": "evidence",
+     "cite": "research/15-testing-content-audit.md:129,390",
+     "basis": "P1 F7 on !230: eval(-1), Pinned(1), null toolIds untried; a vague prompt to consider boundaries failed."
+    },
+    {
+     "line": 19,
+     "id": "B3",
+     "reason": "because testing only one side of an edge lets an off-by-one comparison pass",
+     "kind": "evidence",
+     "cite": "research/31a-v2.md:562",
+     "basis": "ForwardContextParserTest tests 4097 only; 4096 never shown to pass, so an off-by-one >= passes."
+    },
+    {
+     "line": 20,
+     "id": "V1",
+     "reason": "because a test with no credible regression costs upkeep and protects nothing",
+     "kind": "evidence",
+     "cite": "refs/openclaw-openclaw/.agents/skills/test-audit/SKILL.md:21-22,70-71; research/31a-v2.md:586",
+     "basis": "Tests justify maintenance cost by a credible regression; AlertTriggerTypeSpec protects no behaviour, compile fails first."
+    },
+    {
+     "line": 21,
+     "id": "V2",
+     "reason": "because it fails on a safe rename while the real output stays the same",
+     "kind": "evidence",
+     "cite": "research/31a-v2.md:621; refs/openclaw-openclaw/.agents/skills/test-audit/SKILL.md:33-35",
+     "basis": "RefusalReasonSpec pins enum member names: a rename breaks it while every emitted string is unchanged."
+    },
+    {
+     "line": 22,
+     "id": "V3",
+     "reason": "because a junk-pattern test cannot fail for a real defect",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/…/principle-test-behavior-not-implementation/SKILL.md:13",
+     "basis": "A test that cannot fail for a defect costs CI time and review attention and catches nothing."
+    },
+    {
+     "line": 23,
+     "id": "V4",
+     "reason": "because copies at mocked layers cannot see the bug and only add upkeep",
+     "kind": "evidence",
+     "cite": "research/31a-v2.md:679; refs/openclaw-openclaw/.agents/skills/test-audit/SKILL.md:39-40",
+     "basis": "Adapted #521 replay: mocked layers cannot see Redis collapse two names; they add cost, not protection."
+    },
+    {
+     "line": 24,
+     "id": "V5",
+     "reason": "because a test that looks like junk may be the only guard of a contract",
+     "kind": "stated",
+     "cite": "refs/openclaw-openclaw/.agents/skills/test-audit/SKILL.md:105-109",
+     "basis": "A resembling-implementation test may still be the independent contract; a baseline failure may be a product bug."
+    },
+    {
+     "line": 25,
+     "id": "U1",
+     "reason": "because a test tied to clock, order or shared state fails without a defect",
+     "kind": "stated",
+     "cite": "plinth 130 a-trip.md:103; research/31b-v2.md:47",
+     "basis": "Repeatable tests fail because behaviour changed, not the environment; UiModelSwapE2EIT sleep-poll depends on host speed."
+    },
+    {
+     "line": 27,
+     "id": "U3",
+     "reason": "because mocking your own classes breaks tests on refactors that keep behaviour",
+     "kind": "stated",
+     "cite": "refs/mattpocock-skills/skills/engineering/tdd/SKILL.md:30; tdd/mocking.md:3-14",
+     "basis": "Implementation-coupled tests mock internal collaborators; the tell is breaking on refactor when behaviour is unchanged."
+    },
+    {
+     "line": 28,
+     "id": "U4",
+     "reason": "because a direct Instant.now() call cannot be stubbed and makes tests flaky",
+     "kind": "stated",
+     "cite": "refs/plinth-pinned/321-…-unit-tests.md:196-200",
+     "basis": "Bad example: static time cannot be stubbed; tests become flaky or need brittle approximate-now assertions."
+    },
+    {
+     "line": 29,
+     "id": "IT1",
+     "reason": "because ITs that re-run unit-owned branches add slow copies with no new risk",
+     "kind": "evidence",
+     "cite": "research/31b-v2.md:175; refs/plinth-pinned/322-…-integration-tests.md:58,104-105",
+     "basis": "Four HTTP ITs re-test missing-field branches the unit test already owns; plinth: IT should assume the logic correct."
+    },
+    {
+     "line": 30,
+     "id": "IT2",
+     "reason": "because a cached context can outlive a per-class container that has stopped",
+     "kind": "stated",
+     "cite": "research/26-spring-testing-docs.md:21",
+     "basis": "Spring Boot testcontainers docs confirm the @Container hazard: a cached context may outlive a stopped container."
+    },
+    {
+     "line": 31,
+     "id": "IT3",
+     "reason": "because MockMvc skips the real servlet stack, filters and error pages",
+     "kind": "stated",
+     "cite": "research/26-spring-testing-docs.md:22; research/31b-v2.md:240",
+     "basis": "Boot docs: mock environment cannot test lower-level servlet concerns; standalone MockMvc had no filter chain or security."
+    },
+    {
+     "line": 32,
+     "id": "IT4",
+     "reason": "because a mock has no behaviour of its own and couples the IT to calls",
+     "kind": "stated",
+     "cite": "research/24-fakes-vs-mocks.md:31; research/31b-v2.md:273",
+     "basis": "Fowler: mockist tests are more coupled to implementation; a Mockito double has no behaviour of its own."
+    },
+    {
+     "line": 33,
+     "id": "AT1",
+     "reason": "because a .feature tier with no Gherkin runtime left an orphan copy of an IT",
+     "kind": "evidence",
+     "cite": "research/31a-v2.md:387; research/18-plinth-testing-mapping.md:15",
+     "basis": "ToolOutputSplitHarness serves a .feature not on master; orphan adapter duplicating ToolOutputSplitIT; no Gherkin runtime."
+    },
+    {
+     "line": 35,
+     "id": "TM1",
+     "reason": "because a unit spec through a mock cannot see what the real boundary does",
+     "kind": "evidence",
+     "cite": "research/31a-v2.md:187,201",
+     "basis": "Filtering lives in SQL; FeedbackServiceSpec re-proves via a mock what the Postgres IT proves on real rows."
+    },
+    {
+     "line": 36,
+     "id": "TM2",
+     "reason": "because a fake of our own code leaves its real query untested",
+     "kind": "evidence",
+     "cite": "research/31a-v2.md:242; research/24-fakes-vs-mocks.md:38",
+     "basis": "FakeActiveSessionCountPort fakes our DB-backed port in an IT; the session-count query is never exercised."
+    },
+    {
+     "line": 37,
+     "id": "TM3",
+     "reason": "because a small model will not repeat exact wording, so text checks fail falsely",
+     "kind": "evidence",
+     "cite": "research/31a-v2.md:283",
+     "basis": "Adapted Bad: ungated real-model IT asserts exact wording a 1.7B model will not reproduce."
+    },
+    {
+     "line": 38,
+     "id": "TM4",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/31a-v2.md:307; research/48-rule-source-audit.md:3 (TM4 row)",
+     "basis": "Toxiproxy docs give the capability only; no fault-injection IT exists and no failure is recorded."
+    },
+    {
+     "line": 39,
+     "id": "IT5",
+     "reason": "because an untested fake drifts from the real adapter it replaces",
+     "kind": "stated",
+     "cite": "research/24-fakes-vs-mocks.md:26,81",
+     "basis": "SWE at Google ch.13: a fake must have its own tests; an untested fake drifts like a mock."
+    },
+    {
+     "line": 41,
+     "id": "K1",
+     "reason": "because checks inside a nested closure such as every{} are never asserted",
+     "kind": "stated",
+     "cite": "research/20-spock-verification.md:17",
+     "basis": "Spock release notes: top-level closure lines are implicit assertions; nested closures like .every{} are not asserted."
+    },
+    {
+     "line": 42,
+     "id": "K2",
+     "reason": "because a given: stub plus a then: count makes the call return null",
+     "kind": "stated",
+     "cite": "research/20-spock-verification.md:45",
+     "basis": "interaction_based_testing:744-746 and probe P4: stubbing in given: with 1 * in then: returns null."
+    },
+    {
+     "line": 43,
+     "id": "K2b",
+     "reason": "because a wildcard argument lets a call with the wrong value pass",
+     "kind": "evidence",
+     "cite": "research/31b-v2.md:709",
+     "basis": "PipelineRepositoryAdapterSpec uses _ for a known id; deleting another pipeline's steps would still pass."
+    },
+    {
+     "line": 44,
+     "id": "K3",
+     "reason": "because a Stub given a call count throws InvalidSpecException",
+     "kind": "stated",
+     "cite": "research/20-spock-verification.md:35",
+     "basis": "interaction_based_testing:788-797 and probe P2: a cardinality on a Stub throws InvalidSpecException."
+    },
+    {
+     "line": 45,
+     "id": "K4",
+     "reason": "because asserting incidental calls breaks the test when someone adds a log line",
+     "kind": "stated",
+     "cite": "~/.claude/skills/synced/…/spock-best-practices/references/anti-patterns.md:11",
+     "basis": "Over-specification: the test breaks every time someone adds a log line or a metric."
+    },
+    {
+     "line": 46,
+     "id": "K5",
+     "reason": "because a counted retry breaks the test when the retry policy changes",
+     "kind": "stated",
+     "cite": "~/.claude/skills/synced/…/spock-best-practices/references/anti-patterns.md:97",
+     "basis": "Brittle counts: bumping retries from 2 to 3 breaks the test though behaviour is correct."
+    },
+    {
+     "line": 47,
+     "id": "K6",
+     "reason": "because without #var every iteration reports the same name",
+     "kind": "evidence",
+     "cite": "research/31a-v2.md:489",
+     "basis": "Master's data-driven name ignored the scenario column, so every iteration reported the same title."
+    },
+    {
+     "line": 48,
+     "id": "K7",
+     "reason": "because where: cannot read instance fields or mocks; Spock rejects the spec",
+     "kind": "stated",
+     "cite": "research/20-spock-verification.md:53",
+     "basis": "data_driven_testing:100 and probe P5: compile error, only @Shared and static fields accessible in where:."
+    },
+    {
+     "line": 49,
+     "id": "K8",
+     "reason": "because a branch on a where: column hides two rules and a failure names neither",
+     "kind": "stated",
+     "cite": "~/.claude/skills/synced/…/spock-best-practices/references/data-driven-testing.md:229; research/31b-v2.md:882",
+     "basis": "An if on a where: column conflates throws and returns: two behaviours masquerading as one."
+    },
+    {
+     "line": 50,
+     "id": "K9",
+     "reason": "because shared mutable state makes features pass alone and fail together",
+     "kind": "stated",
+     "cite": "~/.claude/skills/synced/…/spock-best-practices/references/anti-patterns.md:201",
+     "basis": "@Shared mutable state: test order becomes significant; tests pass individually and fail when run together."
+    },
+    {
+     "line": 51,
+     "id": "K10",
+     "reason": "because a helper's hidden interaction makes an empty then: block still assert",
+     "kind": "stated",
+     "cite": "~/.claude/skills/synced/…/spock-best-practices/references/anti-patterns.md:231",
+     "basis": "Interactions in helpers: the then: block looks empty but the test still passes because the helper asserts."
+    },
+    {
+     "line": 52,
+     "id": "K11",
+     "reason": "because then: interactions run before when:, so a variable set there is unset",
+     "kind": "stated",
+     "cite": "research/20-spock-verification.md:34,104; research/31b-v2.md:982",
+     "basis": "interaction_based_testing:402-425: then: interactions are hoisted before when:, so a when:-assigned variable is not set."
+    },
+    {
+     "line": 53,
+     "id": "K12",
+     "reason": "because Groovy obj.with{} gives one opaque condition, not one check per field",
+     "kind": "evidence",
+     "cite": "research/31b-v2.md:1014",
+     "basis": "TokenUsageSpec .with{}: only the &&-chained return value is checked, one opaque condition."
+    },
+    {
+     "line": 54,
+     "id": "K13",
+     "reason": "because and: imposes no order, so calls in the wrong order still pass",
+     "kind": "stated",
+     "cite": "research/20-spock-verification.md:46; research/31b-v2.md:1042",
+     "basis": "interaction_based_testing:513-536: order holds only across then: blocks; and: adds none, reversed code passes."
+    },
+    {
+     "line": 55,
+     "id": "K14",
+     "reason": "because Spock ignores Jupiter isolation, so a global-state spec runs unprotected",
+     "kind": "stated",
+     "cite": "research/20-spock-verification.md:26; research/31b-v2.md:1050,1064",
+     "basis": "parallel_execution:11-35: Spock ignores junit.jupiter parallel config; Jupiter @Isolated would be ignored."
+    },
+    {
+     "line": 56,
+     "id": "K15",
+     "reason": "because each @SpringBean forks a new uncached Spring context",
+     "kind": "stated",
+     "cite": "research/20-spock-verification.md:61,83",
+     "basis": "module_spring CAUTION: @SpringBean creates a unique, uncached ApplicationContext."
+    },
+    {
+     "line": 57,
+     "id": "K16",
+     "reason": "because cleanup: runs after any failure, when variables may still be null",
+     "kind": "stated",
+     "cite": "research/20-spock-verification.md:64; research/31b-v2.md:1105",
+     "basis": "spock_primer:466-475: cleanup runs on failure, locals may hold defaults; an NPE there masks the real failure."
+    },
+    {
+     "line": 58,
+     "id": "K17",
+     "reason": "because a spied subject has its own methods faked and verified, not run",
+     "kind": "evidence",
+     "cite": "research/31b-v2.md:1134; ~/.claude/skills/synced/…/spock-best-practices/references/anti-patterns.md:170",
+     "basis": "SetupServiceTest partial-mocks the subject and verifies its own methods; skill: overriding one method hides mixed concerns."
+    },
+    {
+     "line": 59,
+     "id": "K18",
+     "reason": "because a mocked value object can lie about equals, hashCode and toString",
+     "kind": "stated",
+     "cite": "~/.claude/skills/synced/…/spock-best-practices/references/anti-patterns.md:48",
+     "basis": "Mocking value objects adds setup and the mock can lie about equals, hashCode, toString."
+    },
+    {
+     "line": 60,
+     "id": "K19",
+     "reason": "because an unbound thrown() passes for any exception, even an unrelated one",
+     "kind": "evidence",
+     "cite": "research/31b-v2.md:1187",
+     "basis": "AgentCountByToolQueryIT: any exception passes, including one unrelated to the key constraint."
+    },
+    {
+     "line": 61,
+     "id": "K20",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/20-spock-verification.md:20",
+     "basis": "R16: report-output rationale UNSUPPORTED by Spock docs; rule kept on readability only, no failure stated."
+    },
+    {
+     "line": 67,
+     "id": "GT1",
+     "reason": "because a reworded name makes a search for the scenario title find no test",
+     "kind": "evidence",
+     "cite": "research/31c-v2.md:621,631",
+     "basis": "LoginBackoffPolicySpec rewords the scenario; a title search finds nothing; 1 of 9 sampled titles matched."
+    },
+    {
+     "line": 68,
+     "id": "GT2",
+     "reason": "because Given/When/Then kept in comments never appears in the test report",
+     "kind": "evidence",
+     "cite": "research/31d-v2.md:571; research/28-smoke-e2e-disposition.md:70",
+     "basis": "smoke-06 keeps GWT in comments the report never shows; test.step is shown in the report."
+    },
+    {
+     "line": 69,
+     "id": "GT3",
+     "reason": "because a renamed column hid that the test fed counts, not the scenario's seconds",
+     "kind": "evidence",
+     "cite": "research/31c-v2.md:697",
+     "basis": "LoginBackoffPolicySpec renamed backoff to expected; elsewhere fed failure counts where REQ-500 columns are seconds."
+    },
+    {
+     "line": 70,
+     "id": "GT4",
+     "reason": "because a javadoc mention gives no work-item number a search can find",
+     "kind": "evidence",
+     "cite": "research/31c-v2.md:720,735",
+     "basis": "Traceability only as free javadoc; no work-item number or scenario id on any feature; 0 @Issue."
+    },
+    {
+     "line": 71,
+     "id": "GT5",
+     "reason": "because a second-tier copy re-asserts what the owner proves and catches nothing new",
+     "kind": "evidence",
+     "cite": "research/31c-v2.md:767; refs/openclaw-openclaw/.agents/skills/test-audit/SKILL.md:23-26",
+     "basis": "LoginThrottleServiceIT re-asserts a cap the unit spec owns and names no new risk."
+    },
+    {
+     "line": 72,
+     "id": "GT6",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/25-gherkin-to-every-tier.md:129; research/31c-v2.md:789",
+     "basis": "Process decision (G3 Spec buckets); Bad shows no scenario-to-test table, but no failure recorded."
+    },
+    {
+     "line": 73,
+     "id": "SP1",
+     "reason": "because a different field name creates a different cached context",
+     "kind": "stated",
+     "cite": "research/26-spring-testing-docs.md:24,37",
+     "basis": "Spring @TestBean docs: field name is part of the cache key; name consistently to avoid unnecessary contexts."
+    },
+    {
+     "line": 74,
+     "id": "SP2",
+     "reason": "because the override is a bare object without transaction, cache or security advice",
+     "kind": "stated",
+     "cite": "research/26-spring-testing-docs.md:38",
+     "basis": "Spring bean-overriding §AOP proxies: the override instance is a bare object."
+    },
+    {
+     "line": 75,
+     "id": "SP3",
+     "reason": "because server work commits in another thread and never rolls back",
+     "kind": "stated",
+     "cite": "research/26-spring-testing-docs.md:39; research/31b-v2.md:412",
+     "basis": "Boot with-running-server: any transaction initiated on the server does not roll back; rows leak."
+    },
+    {
+     "line": 76,
+     "id": "SP4",
+     "reason": "because unflushed changes skip the database check and give false positives",
+     "kind": "stated",
+     "cite": "research/26-spring-testing-docs.md:40",
+     "basis": "Spring tx.html: failing to flush the ORM session can produce false positives."
+    },
+    {
+     "line": 77,
+     "id": "SP5",
+     "reason": "because Boot otherwise swaps in an embedded database unlike production Postgres",
+     "kind": "stated",
+     "cite": "research/31b-v2.md:466; refs/plinth-pinned/322-…-integration-tests.md:513",
+     "basis": "Without replace = NONE Boot uses an embedded DB; plinth: H2 may diverge from PostgreSQL dialect."
+    },
+    {
+     "line": 78,
+     "id": "SP6",
+     "reason": "because it closes the context and rebuilds it for every later test",
+     "kind": "stated",
+     "cite": "research/26-spring-testing-docs.md:42",
+     "basis": "Spring @DirtiesContext docs: context removed from the cache and closed, then rebuilt."
+    },
+    {
+     "line": 79,
+     "id": "SP7",
+     "reason": "because each cached context holds its own pool, so connections grow per context",
+     "kind": "evidence",
+     "cite": "research/26-spring-testing-docs.md:43; research/31b-v2.md:499",
+     "basis": "Initializer comment cites ~23 contexts × Hikari 5; limit raised on an approximate count, no cache logging."
+    },
+    {
+     "line": 80,
+     "id": "SP8",
+     "reason": "because each @DynamicPropertySource enters the cache key and forks a context",
+     "kind": "stated",
+     "cite": "research/26-spring-testing-docs.md:44",
+     "basis": "Spring caching docs: contextCustomizers in the cache key include @DynamicPropertySource methods."
+    },
+    {
+     "line": 81,
+     "id": "SP9",
+     "reason": "because an unpaused cached context keeps consuming during other classes' tests",
+     "kind": "stated",
+     "cite": "research/26-spring-testing-docs.md:45; research/31b-v2.md:563",
+     "basis": "Spring context-pausing: idle contexts stop Lifecycle beans; ChatStreamConsumer keeps consuming until JVM exit."
+    },
+    {
+     "line": 82,
+     "id": "SP10",
+     "reason": "because the timed body runs in another thread and its writes commit",
+     "kind": "stated",
+     "cite": "research/26-spring-testing-docs.md:46",
+     "basis": "Spring tx.html §Preemptive Timeouts: body runs in another thread and is not rolled back."
+    },
+    {
+     "line": 83,
+     "id": "SP11",
+     "reason": "because an explicit @ComponentScan disables slice filters, so slices load every bean",
+     "kind": "stated",
+     "cite": "research/26-spring-testing-docs.md:47; research/31b-v2.md:616",
+     "basis": "Boot user-configuration-and-slicing: explicit @ComponentScan disables slice exclude filters."
+    },
+    {
+     "line": 85,
+     "id": "M1",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "spring-skills mutation-testing/references/configuration.md:113-114; research/31c-v2.md:16-25",
+     "basis": "Source says no gate until a real score exists; gives no failure; #456 reason not stated in text read."
+    },
+    {
+     "line": 86,
+     "id": "M2",
+     "reason": "because a test aimed at one mutant's line lets the next mutant there survive",
+     "kind": "evidence",
+     "cite": "research/31c-v2.md:54",
+     "basis": "Bad kill test names a line, not a case, asserts non-null; next mutant on that line survives."
+    },
+    {
+     "line": 87,
+     "id": "M3",
+     "reason": "because one number mixes unreached code with unasserted code",
+     "kind": "evidence",
+     "cite": "research/31c-v2.md:70",
+     "basis": "A single score mixes NO_COVERAGE and SURVIVED; the reader cannot tell which fix is needed."
+    },
+    {
+     "line": 88,
+     "id": "M4",
+     "reason": "because excluding decision code hides its missing tests from the report",
+     "kind": "stated",
+     "cite": "spring-skills mutation-testing/references/exclusions.md:3-5",
+     "basis": "Keep anything with a decision, even untested: a missing test must stay visible in the report."
+    },
+    {
+     "line": 89,
+     "id": "M5",
+     "reason": "because an over-matching glob looks exactly like a successful exclusion",
+     "kind": "stated",
+     "cite": "spring-skills mutation-testing/references/add-exclusion.md:132",
+     "basis": "A glob that over-matches looks exactly like a successful exclusion; #505 avoidCallsTo added 14 survivors."
+    },
+    {
+     "line": 90,
+     "id": "M6",
+     "reason": "because non-default mutators are unstable and flood the report with equivalent mutants",
+     "kind": "stated",
+     "cite": "jvm-skills .claude/skills/mutation-testing/SKILL.md:362",
+     "basis": "Do not use ALL: docs flag those operators fairly unstable, equivalent-prone, false survivor noise."
+    },
+    {
+     "line": 91,
+     "id": "M7",
+     "reason": "because targets are hard-coded to one module, so other modules mutate nothing",
+     "kind": "stated",
+     "cite": "research/21-mutation-and-property.md:90",
+     "basis": "targetClasses hard-coded to guardrails; applying it elsewhere mutates nothing and failWhenNoMutations fails."
+    },
+    {
+     "line": 92,
+     "id": "M8",
+     "reason": "because a mutant marked equivalent without a reason can hide a real gap",
+     "kind": "stated",
+     "cite": "jvm-skills .claude/skills/mutation-testing/SKILL.md:235",
+     "basis": "Bias toward ambiguity, not equivalence, so real gaps don't get silently excluded."
+    },
+    {
+     "line": 93,
+     "id": "M9",
+     "reason": "because a stale history cache can silently report wrong results",
+     "kind": "stated",
+     "cite": "jvm-skills .claude/skills/mutation-testing/SKILL.md:361; research/21-mutation-and-property.md:70",
+     "basis": "Dependency changes are invisible to pitest's graph, so a stale cache silently reports wrong results; PIT says unproven."
+    },
+    {
+     "line": 94,
+     "id": "M10",
+     "reason": "because a kill test passes on correct code; only a mutation shows it can fail",
+     "kind": "stated",
+     "cite": "jvm-skills .claude/skills/mutation-testing/SKILL.md:282",
+     "basis": "Kill test is written against correct code and passes first run; red proof comes from the mutant flip."
+    },
+    {
+     "line": 95,
+     "id": "P5",
+     "reason": "because jqwik 1.10+ writes an instruction aimed at AI agents into every test log",
+     "kind": "stated",
+     "cite": "research/27-jqwik.md:11,122",
+     "basis": "The agent-directed line cannot be disabled, only hidden on a terminal; 1.9.3 unverified on Platform 6."
+    },
+    {
+     "line": 96,
+     "id": "P1",
+     "reason": "because one example leaves a 'for any input' rule unchecked for other inputs",
+     "kind": "evidence",
+     "cite": "research/31c-v2.md:252",
+     "basis": "REQ says 'any number'; LoginBackoffPolicySpec checks only Integer.MAX_VALUE."
+    },
+    {
+     "line": 97,
+     "id": "P2",
+     "reason": "because the property's generators may never produce the named edge, such as null",
+     "kind": "evidence",
+     "cite": "research/31c-v2.md:265",
+     "basis": "Existence cases null and \"\" kept as examples; the property generators never produce null."
+    },
+    {
+     "line": 98,
+     "id": "P3",
+     "reason": "because a conditional property passed 1000 runs without once reaching its branch",
+     "kind": "evidence",
+     "cite": "research/31c-v2.md:288; research/21-mutation-and-property.md:48",
+     "basis": "ToolOutputSanitizerPropertyTest javadoc: a version passed a thousand times having never reached the branch."
+    },
+    {
+     "line": 99,
+     "id": "P4",
+     "reason": "because a fixed seed explores the same cases on every run",
+     "kind": "evidence",
+     "cite": "research/31c-v2.md:331; research/21-mutation-and-property.md:93",
+     "basis": "UI harness default seed 0x5eed: every run explores the same 200 cases."
+    },
+    {
+     "line": 100,
+     "id": "P6",
+     "reason": "because random draws rarely hit edges; an empty string appears about 1 in 81",
+     "kind": "evidence",
+     "cite": "research/31c-v2.md:363",
+     "basis": "Gen.java gives up edge-case injection; \"\" and max length appear only by chance (~1 in 81)."
+    },
+    {
+     "line": 101,
+     "id": "P7",
+     "reason": "because tagged-out properties left security invariants unrun by the main gate",
+     "kind": "evidence",
+     "cite": "research/31c-v2.md:369-371",
+     "basis": "ToolOutputSanitizerPropertyTest javadoc: tagged and excluded, so security-defect invariants were not run by the gate (#440)."
+    },
+    {
+     "line": 102,
+     "id": "P8",
+     "reason": "because a heavy filter discards most cases and the property passes vacuously",
+     "kind": "stated",
+     "cite": "research/27-jqwik.md:80; research/31c-v2.md:411",
+     "basis": "jqwik fails past maxDiscardRatio, Hypothesis ends Unsatisfiable; Bad filter discards nearly every case."
+    },
+    {
+     "line": 103,
+     "id": "P10",
+     "reason": "because without the printed seed a failing run cannot be replayed",
+     "kind": "stated",
+     "cite": "research/48-rule-source-audit.md:61 (P10 row)",
+     "basis": "fast-check read-test-reports: the failure report gives the seed needed to reproduce."
+    },
+    {
+     "line": 104,
+     "id": "EA1",
+     "reason": "because a poll returns silently on timeout, so the test passes without the feature",
+     "kind": "evidence",
+     "cite": "research/31d-v2.md:44,55",
+     "basis": "pollHistory returns silently on deadline; smoke-56 treats the poll as proof and asserts nothing."
+    },
+    {
+     "line": 105,
+     "id": "EA2",
+     "reason": "because chrome or a shared CSS class renders on every page and proves nothing",
+     "kind": "evidence",
+     "cite": "research/31d-v2.md:80",
+     "basis": "smoke-09 asserts .toggle-wrap, a class every settings page renders; proves no guardrail control rendered."
+    },
+    {
+     "line": 106,
+     "id": "EA3",
+     "reason": "because a catch or ?? [] default turns an error into a pass",
+     "kind": "evidence",
+     "cite": "research/31d-v2.md:116",
+     "basis": "smoke-07: ?? [] before a check, so an error body yields [] and 'it disappeared' passes."
+    },
+    {
+     "line": 107,
+     "id": "EA4",
+     "reason": "because a reply or process success does not show the tool ran",
+     "kind": "stated",
+     "cite": "refs/openclaw-openclaw/.agents/skills/openclaw-docker-e2e-authoring/SKILL.md:25-26",
+     "basis": "Fake servers log boundary requests; clients assert the real dependency payload, not just process success."
+    },
+    {
+     "line": 108,
+     "id": "EA5",
+     "reason": "because a fake success frame for a dead dependency would stay green",
+     "kind": "evidence",
+     "cite": "research/31d-v2.md:181",
+     "basis": "Adapted smoke-65 N08: reply-only check; a regression returning a fake success frame stays green."
+    },
+    {
+     "line": 109,
+     "id": "EA6",
+     "reason": "because a swallowed setup failure makes later tests fail or skip for hidden reasons",
+     "kind": "evidence",
+     "cite": "research/31d-v2.md:217",
+     "basis": "smoke-41 fixture swallows setup failure; later tests fail or skip for a reason the report never shows."
+    },
+    {
+     "line": 110,
+     "id": "EB1",
+     "reason": "because data[0] returns the newest workspace, often another worker's",
+     "kind": "evidence",
+     "cite": "research/28-smoke-e2e-disposition.md:294; research/31d-v2.md:254",
+     "basis": "api-helpers: data[0] is the newest workspace, the #309 flake; defaultWorkspaceId exists."
+    },
+    {
+     "line": 111,
+     "id": "EB2",
+     "reason": "because in a serial chain one failure skips every later test",
+     "kind": "evidence",
+     "cite": "research/31d-v2.md:274",
+     "basis": "smoke-69 serial header admits: a failure in one skips the rest of the chain."
+    },
+    {
+     "line": 112,
+     "id": "EB3",
+     "reason": "because a failed or mutated beforeAll surfaces later as an unrelated wrong status",
+     "kind": "evidence",
+     "cite": "research/31d-v2.md:313; research/28-smoke-e2e-disposition.md:61",
+     "basis": "smoke-06 setup status unchecked; failure surfaces later as wrong 401/403; beforeAll reruns per worker."
+    },
+    {
+     "line": 113,
+     "id": "EB4",
+     "reason": "because a third-party site then decides whether the test passes",
+     "kind": "evidence",
+     "cite": "research/31d-v2.md:349",
+     "basis": "smoke-59 hits public httpbin.org in a @core block with no skip; the internet decides the branch."
+    },
+    {
+     "line": 114,
+     "id": "EC1",
+     "reason": "because tests that wait on time are flaky, as the Playwright docs warn",
+     "kind": "stated",
+     "cite": "research/22-playwright-frontend-testing.md:50 (K-07 row)",
+     "basis": "Playwright: tests that wait for time are inherently flaky; networkidle DISCOURAGED for testing."
+    },
+    {
+     "line": 115,
+     "id": "EC2",
+     "reason": "because a one-shot read checks the page once, before it may settle",
+     "kind": "stated",
+     "cite": "research/48-rule-source-audit.md:73 (EC2 row); research/31d-v2.md:417",
+     "basis": "Playwright best-practices: use auto-retrying web-first assertions, not expect(await ...isVisible())."
+    },
+    {
+     "line": 116,
+     "id": "EC3",
+     "reason": "because .first() picks whichever match comes first, which changes with the page",
+     "kind": "evidence",
+     "cite": "research/31d-v2.md:447",
+     "basis": "smoke-04: .first() silences strictness; 'first menu item' happens to be Edit today."
+    },
+    {
+     "line": 117,
+     "id": "EC4",
+     "reason": "because an un-awaited expect can end the test green before it checks",
+     "kind": "evidence",
+     "cite": "research/31d-v2.md:473",
+     "basis": "Adapted smoke-17: un-awaited toBeVisible returns an unread promise; the test ends green before the check."
+    },
+    {
+     "line": 118,
+     "id": "EC5",
+     "reason": "because a poll that outlasts the test timeout dies without its failure message",
+     "kind": "evidence",
+     "cite": "research/31d-v2.md:495,502",
+     "basis": "840 s poll ends before 900 s timeout, so the poll's message reports; smoke-78 10-minute timeout has no reason."
+    },
+    {
+     "line": 119,
+     "id": "EC6",
+     "reason": "because retries and longer timeouts hide the real cause of a flake",
+     "kind": "stated",
+     "cite": "research/28-smoke-e2e-disposition.md:34; research/31d-v2.md:527",
+     "basis": "Micco 2016: reruns hide real problems; smoke-69 timeout raised for contention hides the queueing."
+    },
+    {
+     "line": 121,
+     "id": "ED2",
+     "reason": "because the scripted reply is the test's own input, so checking it proves nothing",
+     "kind": "stated",
+     "cite": "refs/openclaw-openclaw/.agents/skills/openclaw-docker-e2e-authoring/SKILL.md:25-26; research/31d-v2.md:591",
+     "basis": "Fakes log requests and tests assert the payload; asserting scripted text is fixture-asserts-fixture."
+    },
+    {
+     "line": 122,
+     "id": "ED3",
+     "reason": "because a spec that never drives the route passes while the screen is broken",
+     "kind": "evidence",
+     "cite": "research/31d-v2.md:639",
+     "basis": "smoke-24 'Test Run' spec types into the first input; the test-run route is never driven."
+    },
+    {
+     "line": 123,
+     "id": "ED4",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/48-rule-source-audit.md:81 (ED4 row); research/28-smoke-e2e-disposition.md:333",
+     "basis": "Project tier decision (K-13); tag mechanism only, no failure stated."
+    },
+    {
+     "line": 124,
+     "id": "ED5",
+     "reason": "because a run without a fresh deploy can test stale containers",
+     "kind": "evidence",
+     "cite": "research/31d-v2.md:675; research/28-smoke-e2e-disposition.md:38",
+     "basis": "npm run smoke does not deploy, so it can test stale containers; superpowers: stale-server run gave wrong results."
+    },
+    {
+     "line": 129,
+     "id": "SRC1",
+     "reason": "because our own code does not follow the rules correctly",
+     "kind": "stated",
+     "cite": "research/19-approved-rules.md:127 (source cell)",
+     "basis": "Operator: never take reference from our code for a rule because it is not followed correctly."
+    },
+    {
+     "line": 130,
+     "id": "GB2",
+     "reason": "because our real code does not follow the rules correctly",
+     "kind": "stated",
+     "cite": "research/19-approved-rules.md:127 (SRC1 operator quote, same #33 session)",
+     "basis": "Same 2026-10-03 operator decision: our code is not followed correctly, so it is only Bad evidence."
+    },
+    {
+     "line": 131,
+     "id": "SEAM1",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "agent-platform docs/adr/0017-turn-journal-and-replay.md:239-242 (docs+593 worktree)",
+     "basis": "ADR lists seam rules (review F10) with no stated failure; #679 not readable here."
+    },
+    {
+     "line": 132,
+     "id": "U2a",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/48-rule-source-audit.md:88 (U2a row)",
+     "basis": "Operator decision; refs show 'should' as an option only; no failure stated."
+    },
+    {
+     "line": 134,
+     "id": "ST1",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/48-rule-source-audit.md:89 (ST1 row)",
+     "basis": "House style, operator 2026-10-02; no source or failure found."
+    },
+    {
+     "line": 135,
+     "id": "ST2",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/48-rule-source-audit.md:90 (ST2 row)",
+     "basis": "House style, operator 2026-10-02; no source or failure found."
+    },
+    {
+     "line": 137,
+     "id": "CV2",
+     "reason": "because a comment naming the AC is not reported by Spock and drifts",
+     "kind": "stated",
+     "cite": "research/31e-conventions.md:33",
+     "basis": "Proposal text: a comment is not reported by Spock and is easy to drift from."
+    },
+    {
+     "line": 138,
+     "id": "CV3",
+     "reason": "because ST2's paren rule would fight Prettier's own TypeScript output",
+     "kind": "stated",
+     "cite": "research/31e-conventions.md:42",
+     "basis": "Prettier's output puts the paren apart; ST2's closing-paren rule would fight the formatter."
+    },
+    {
+     "line": 139,
+     "id": "CV4",
+     "reason": "because a bare expression in that closure is discarded, so the property always passes",
+     "kind": "stated",
+     "cite": "research/31e-conventions.md:53,60",
+     "basis": "Implicit assertions do not apply in our harness closure; the boolean is discarded and always passes."
+    },
+    {
+     "line": 140,
+     "id": "CV5",
+     "reason": "because the setup wizard only runs on a database no test has seeded",
+     "kind": "evidence",
+     "cite": "research/31e-conventions.md:70",
+     "basis": "SetupControllerIT javadoc: wizard only runs on an empty database the shared seeded singleton cannot give."
+    }
+   ]
+  },
+  {
+   "key": "planning",
+   "name": "Planning",
+   "items": [
+    {
+     "line": 62,
+     "id": "GA1",
+     "reason": "because a .feature file is a second source of truth",
+     "kind": "stated",
+     "cite": "research/25-gherkin-to-every-tier.md:26; W/.agents/skills/planning/references/acceptance-criteria.md:13-18",
+     "basis": "option B .feature files = second source of truth beside REQ; removed Gherkin engine gave no assertion-strength guarantee"
+    },
+    {
+     "line": 63,
+     "id": "GA2",
+     "reason": "because rewording a title-only scenario breaks every reference to it",
+     "kind": "evidence",
+     "cite": "research/31c-v2.md:485 (REQ-500:303-307 Bad)",
+     "basis": "REQ-500 has no ids; title is only handle, so rewording breaks every reference"
+    },
+    {
+     "line": 64,
+     "id": "GA3",
+     "reason": "because a tier tag decides the test tier before the developer can",
+     "kind": "evidence",
+     "cite": "research/31c-v2.md:509; research/25-gherkin-to-every-tier.md:13",
+     "basis": "REQ-500 @api pre-decides tier on all 24 scenarios, contradicting analyst-does-not-pre-tag rule"
+    },
+    {
+     "line": 65,
+     "id": "GA4",
+     "reason": "because no Gherkin parser catches a header that misses a placeholder",
+     "kind": "stated",
+     "cite": "research/31c-v2.md:551",
+     "basis": "with no Gherkin parser (GA1) a header naming no placeholder goes uncaught"
+    },
+    {
+     "line": 66,
+     "id": "GA5",
+     "reason": "because a Then that no running test can check proves nothing",
+     "kind": "evidence",
+     "cite": "research/31c-v2.md:585 (REQ-500:394-403 Bad); research/15 R13 :34",
+     "basis": "REQ-500 Then claims code structure, no test can check it; audit asks every AC to name failure path"
+    },
+    {
+     "line": 133,
+     "id": "GA6",
+     "reason": "because a statement title cannot become the test name without rewording",
+     "kind": "evidence",
+     "cite": "research/31c-v2.md:605 (REQ-500:454-455 Bad)",
+     "basis": "statement titles force test to break U2a or reword title, breaking GT1"
+    },
+    {
+     "line": 136,
+     "id": "CV1",
+     "reason": "because an id tag breaks GA3 and an id title breaks GT1",
+     "kind": "stated",
+     "cite": "research/31e-conventions.md:13,19",
+     "basis": "tag clashes with GA3 (tags = concerns); title must equal test name (GT1)"
+    },
+    {
+     "line": 147,
+     "id": "SR1",
+     "reason": "because findings raised one per round stretched one review to three rounds",
+     "kind": "evidence",
+     "cite": "research/00-fleet-self-reports.md:7-8",
+     "basis": "#576 spec review took 3 rounds; analyst got 4 gaps one per round"
+    },
+    {
+     "line": 148,
+     "id": "SR2",
+     "reason": "because an uncited false claim about the build once settled a decision",
+     "kind": "evidence",
+     "cite": "research/42-planning-good-bad.md:37-39",
+     "basis": "#585 uncited build-cache claim was false (gradle.properties:9) and had already settled a DoD decision"
+    },
+    {
+     "line": 149,
+     "id": "SR3",
+     "reason": "because three drifted cites in one story were found only by chance",
+     "kind": "evidence",
+     "cite": "research/42-planning-good-bad.md:66-67",
+     "basis": "#636 three drifted cites found only because reviewer happened to open each file"
+    },
+    {
+     "line": 150,
+     "id": "SR4",
+     "reason": "because an open question with no decider stays pending after the build",
+     "kind": "evidence",
+     "cite": "research/42-planning-good-bad.md:98-99",
+     "basis": "DESIGN-S6 questions still 'pending' on master long after built; nobody named to decide"
+    },
+    {
+     "line": 152,
+     "id": "SR6",
+     "reason": "because a cross-module story arrived with checkbox criteria and no Escalation",
+     "kind": "evidence",
+     "cite": "research/42-planning-good-bad.md:132-134; research/00-fleet-self-reports.md:7",
+     "basis": "#622 story: no story line, checkbox ACs, no Escalation on cross-module change (reviewer G4)"
+    },
+    {
+     "line": 153,
+     "id": "SR7",
+     "reason": "because a negative gate puts Dockerfile changes in the cheap tier",
+     "kind": "evidence",
+     "cite": "research/42-planning-good-bad.md:163-164; W/.agents/skills/architecture-review/SKILL.md:49-50",
+     "basis": "negative gate lets docker-compose/Dockerfile (customer start-up path) fall into cheap tier; two gates disagree"
+    },
+    {
+     "line": 154,
+     "id": "SR8",
+     "reason": "because two stage-5 rubrics duplicate eight criteria and already disagree",
+     "kind": "stated",
+     "cite": "research/41-planning-candidate-rules.md:67-75",
+     "basis": "8 overlap pairs checked; option B keeps two rubrics that already disagree on tier gate"
+    },
+    {
+     "line": 155,
+     "id": "AC7",
+     "reason": "because a scenario on new rows tests the default, not the migration",
+     "kind": "evidence",
+     "cite": "research/42-planning-good-bad.md:191-200 (!230 QA round 1 F2)",
+     "basis": "IT inserted a new row, exercising default not UPDATE; shipped green until review round 1"
+    },
+    {
+     "line": 156,
+     "id": "AC8",
+     "reason": "because a constant column is noise that is copied into test tables",
+     "kind": "stated",
+     "cite": "W/.agents/skills/planning/references/acceptance-criteria.md:56-60; research/42-planning-good-bad.md:237-238",
+     "basis": "never-varying column is noise reader must check; GT3 carries dead column into Spock where: table"
+    },
+    {
+     "line": 157,
+     "id": "AC9",
+     "reason": "because the title becomes the test name, so wrong words reach code",
+     "kind": "stated",
+     "cite": "research/41-planning-candidate-rules.md:105; research/42-planning-good-bad.md:270-271",
+     "basis": "GT1 makes title the test name, so an undeclared or wrong word lands in code"
+    },
+    {
+     "line": 158,
+     "id": "AC10",
+     "reason": "because an approval covers only the text as it stood when approved",
+     "kind": "stated",
+     "cite": "W/.agents/skills/crq/SKILL.md:249-252",
+     "basis": "after a material spec change the approval no longer covers it; ask fresh /approved"
+    },
+    {
+     "line": 160,
+     "id": "PD1",
+     "reason": "because an unshown call change gets decided in costly code review",
+     "kind": "stated",
+     "cite": "refs/humanlayer-advanced-context-engineering-for-coding-agents/wsff.md:491,536",
+     "basis": "call-stack diffs; else each decision is made implicitly at code review, most expensive time"
+    },
+    {
+     "line": 161,
+     "id": "PD2",
+     "reason": "because a plan with no test file gave the reviewer nothing to grade",
+     "kind": "evidence",
+     "cite": "research/42-planning-good-bad.md:328-329",
+     "basis": "#636 plan: no purposes, new file unnamed, test had no file; F-01 had nothing to grade"
+    },
+    {
+     "line": 162,
+     "id": "PD3",
+     "reason": "because a type left out gets settled ad hoc in code",
+     "kind": "evidence",
+     "cite": "research/42-planning-good-bad.md:364-365; wsff.md:517",
+     "basis": "REQ-075 sketch left reason's type out; settled later in code (!230); ACE: agent might get it wrong"
+    },
+    {
+     "line": 163,
+     "id": "PD4",
+     "reason": "because a layer-only step hid a defect through three QA rounds",
+     "kind": "evidence",
+     "cite": "research/42-planning-good-bad.md:385-387",
+     "basis": "#554 horizontal layer, defect showed in no running path; 3 QA rounds, 2 days"
+    },
+    {
+     "line": 164,
+     "id": "PD5",
+     "reason": "because a check with no named command was never run",
+     "kind": "evidence",
+     "cite": "research/42-planning-good-bad.md:405-406",
+     "basis": "#622 '10/10 runs' named no command; !238 says it has not been run"
+    },
+    {
+     "line": 165,
+     "id": "PD6",
+     "reason": "because file paths and code snippets in a REQ go stale quickly",
+     "kind": "stated",
+     "cite": "refs/mattpocock-skills/skills/engineering/to-spec/SKILL.md:55",
+     "basis": "do not include file paths or code snippets; they may be outdated very quickly"
+    },
+    {
+     "line": 166,
+     "id": "PD7",
+     "reason": "because an unrecorded deviation leaves the design check judging against a guess",
+     "kind": "stated",
+     "cite": "research/41-planning-candidate-rules.md:172; W/.agents/skills/architecture-review/SKILL.md:351; refs/cursor-plugins/pstack/skills/architect/SKILL.md:57",
+     "basis": "deviations are signal, not absorbed silently; F-01 needs recorded baseline, unrecorded baseline is a finding"
+    },
+    {
+     "line": 168,
+     "id": "DG1",
+     "reason": "because the old guides gave opposite Mermaid-or-ASCII answers",
+     "kind": "evidence",
+     "cite": "research/14-disposition-table.md:136,160,277",
+     "basis": "R1:90 recorded Mermaid vs ASCII contradiction between show-me copies and diagrams guide; ND-10 settled it"
+    },
+    {
+     "line": 169,
+     "id": "DG2",
+     "reason": "because boxes and arrows cannot mark which calls are new or removed",
+     "kind": "evidence",
+     "cite": "research/42-planning-good-bad.md:438-439; wsff.md:479",
+     "basis": "26-line flowchart call order: nothing to diff, cannot mark what is new; Mermaid gives false alignment"
+    },
+    {
+     "line": 170,
+     "id": "DG3",
+     "reason": "because a node naming deleted code still teaches the replaced behaviour",
+     "kind": "evidence",
+     "cite": "research/42-planning-good-bad.md:470-472; W/.agents/skills/planning/references/diagrams.md:31-32",
+     "basis": "isBlocked deleted by #117 yet node still describes replaced check; ungreppable labels mislead"
+    },
+    {
+     "line": 171,
+     "id": "DG4",
+     "reason": "because a diagram answering several questions serves none of its readers",
+     "kind": "stated",
+     "cite": "W/.agents/skills/planning/references/diagrams.md:29-30",
+     "basis": "diagram showing call order, ownership and data shape at once serves none of three readers"
+    },
+    {
+     "line": 172,
+     "id": "DG5",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "refs/mattpocock-skills/skills/engineering/improve-codebase-architecture/HTML-REPORT.md:55; research/42-planning-good-bad.md:501-503",
+     "basis": "source only instructs redraw; Bad shows diagram plus two paragraphs but names no resulting failure"
+    },
+    {
+     "line": 173,
+     "id": "DG6",
+     "reason": "because a separate diagrams file is not linked from the decision it shows",
+     "kind": "stated",
+     "cite": "W/.agents/skills/planning/references/diagrams.md:33-34",
+     "basis": "separate diagrams file nobody links to from the decision it illustrates"
+    },
+    {
+     "line": 174,
+     "id": "WD1",
+     "reason": "because stamps decay, and a stamped claim tells readers not to check",
+     "kind": "stated",
+     "cite": "W/AGENTS.md:434-437",
+     "basis": "65 stamps; 3 sampled all defective; decayed stamp tells reader not to bother checking"
+    },
+    {
+     "line": 175,
+     "id": "WD2",
+     "reason": "because such counts go stale when unrelated work changes them",
+     "kind": "stated",
+     "cite": "W/AGENTS.md:434,439; research/42-planning-good-bad.md:528-530",
+     "basis": "counts tried and decayed; 'modules' tally stale after build moved, PUBLIC_PATHS 17 was 20"
+    },
+    {
+     "line": 176,
+     "id": "WD3",
+     "reason": "because a silent stale claim keeps teaching code that was replaced",
+     "kind": "evidence",
+     "cite": "research/42-planning-good-bad.md:554-558",
+     "basis": "ARCHITECTURE.md still teaches deleted isBlocked, §9 silent; REQ-107 bracket strike-through as other wrong form"
+    },
+    {
+     "line": 177,
+     "id": "WD4",
+     "reason": "because a doc said only the API runs migrations, and that was false",
+     "kind": "evidence",
+     "cite": "W/AGENTS.md:442-443",
+     "basis": "worst ARCHITECTURE.md line: only the api runs migrations — reassuring and false"
+    },
+    {
+     "line": 178,
+     "id": "WD5",
+     "reason": "because a bug-fix REQ splits one policy across two specs",
+     "kind": "evidence",
+     "cite": "research/42-planning-good-bad.md:578-580; W/AGENTS.md:446-448",
+     "basis": "REQ-028 bug fix written as second spec beside REQ-071 'the same policy'"
+    },
+    {
+     "line": 179,
+     "id": "WD6",
+     "reason": "because next-free numbering let two branches take the same number",
+     "kind": "stated",
+     "cite": "W/AGENTS.md:449-451; research/42-planning-good-bad.md:602-604",
+     "basis": "two branches took same slot three times; both REQ-073s on master; ADR 0012 claimed three times"
+    },
+    {
+     "line": 180,
+     "id": "WD7",
+     "reason": "because every restated copy must also change, costing upkeep and tokens",
+     "kind": "stated",
+     "cite": "refs/mattpocock-skills/skills/*/writing-for-agents/SKILL.md:78",
+     "basis": "single source of truth = one-place edit; duplication costs maintenance and tokens"
+    }
+   ]
+  },
+  {
+   "key": "code",
+   "name": "Code (Java, types, errors, design)",
+   "items": [
+    {
+     "line": 187,
+     "id": "JV1",
+     "reason": "because a shared `SimpleDateFormat` corrupts dates under concurrent use",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/modern-java.md:48-50",
+     "basis": "SimpleDateFormat is not thread-safe; a shared instance corrupts under concurrency like data corruption"
+    },
+    {
+     "line": 188,
+     "id": "JV2",
+     "reason": "because a blocking call in a parallel stream parks a JVM-wide shared thread",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/modern-java.md:69-73",
+     "basis": "parallelStream uses the common ForkJoinPool; blocking inside parks a shared thread; latency appears under load"
+    },
+    {
+     "line": 189,
+     "id": "JV3",
+     "reason": "because an effect inside `map` or `filter` makes the pipeline hard to test",
+     "kind": "stated",
+     "cite": "refs/plinth-java-skills/142-java-functional-programming/references/142-java-functional-programming.md:737-739; refs/mattpocock-skills/skills/engineering/codebase-design/SKILL.md:86-94",
+     "basis": "isolate side effects for testability; code that produces side effects is hard to test"
+    },
+    {
+     "line": 190,
+     "id": "JV4",
+     "reason": "because `toMap` throws `IllegalStateException` at runtime on a duplicate key",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/functional-java.md:58-61",
+     "basis": "two-argument toMap has no merge function; a duplicate key throws IllegalStateException on the request that hits it"
+    },
+    {
+     "line": 191,
+     "id": "JV5",
+     "reason": "because the reader cannot see the type; `new ArrayList<>()` infers `ArrayList<Object>`",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/modern-java.md:105-118; refs/plinth-java-skills/141-java-refactoring-with-modern-features/references/141-java-refactoring-with-modern-features.md:498-506",
+     "basis": "var on an unrevealing call hides the type; literal decides int/long; diamond infers ArrayList<Object>"
+    },
+    {
+     "line": 192,
+     "id": "JV6",
+     "reason": "because an `Optional` parameter still accepts `null` and an `Optional` field cannot serialise",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/modern-java.md:122-127",
+     "basis": "Optional is not serialisable; as a parameter null is still passable, so it adds ceremony without removing a case"
+    },
+    {
+     "line": 193,
+     "id": "JV7",
+     "reason": "because escaped multi-line strings hide the shape and one-line edits touch three",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/modern-java.md:94-95",
+     "basis": "concatenated \\n strings hide the query shape in escapes; a one-line diff touches three lines"
+    },
+    {
+     "line": 194,
+     "id": "JV8",
+     "reason": "because a resource not closed when an exception fires leaks",
+     "kind": "stated",
+     "cite": "refs/plinth-java-skills/126-java-exception-handling/references/126-java-exception-handling.md:192-195; stephanj extraction:91",
+     "basis": "try-with-resources closes resources even on exceptions, preventing leaks; resource leaks cause production issues"
+    },
+    {
+     "line": 195,
+     "id": "JV9",
+     "reason": "because agents copy nearby code, and a brace-less `if` sat in a 'copy this' example",
+     "kind": "evidence",
+     "cite": "refs/cursor-plugins/pstack/skills/principle-encode-lessons-in-structure/SKILL.md:19; research/29-java-standards.md:122; research/49-g9b-candidates.md:35",
+     "basis": "agents copy surrounding code; the tracing 'pattern to copy' (AgentTaskController:139) has a brace-less if; no gate exists"
+    },
+    {
+     "line": 196,
+     "id": "JV10",
+     "reason": "because Spring reflection needs `opens` almost everywhere, which cancels JPMS encapsulation",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/modern-java.md:228-232",
+     "basis": "ArchUnit allowlist already enforces boundaries; JPMS duplicates it and Spring needs opens everywhere, giving up encapsulation"
+    },
+    {
+     "line": 198,
+     "id": "OQ3",
+     "reason": "because a review check depends on someone noticing; a build gate does not",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/pstack/skills/principle-encode-lessons-in-structure/SKILL.md:11,19",
+     "basis": "textual instructions are easy to miss and need cooperation; lint/CI mechanisms enforce without it"
+    },
+    {
+     "line": 204,
+     "id": "JV12",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "",
+     "basis": ""
+    },
+    {
+     "line": 205,
+     "id": "TY1",
+     "reason": "because nullable fields let contradictory field combinations compile",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/pstack/skills/principle-type-system-discipline/SKILL.md:9,15",
+     "basis": "a bag of optional fields lets contradictory combinations compile; a case the types allow ignoring fails at runtime"
+    },
+    {
+     "line": 206,
+     "id": "TY2",
+     "reason": "because a `default` arm lets a new case compile and be silently mishandled",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/functional-java.md:119-127; refs/cursor-plugins/pstack/skills/principle-type-system-discipline/SKILL.md:20",
+     "basis": "with default, a new ChatResponseEvent subtype compiles and silently emits \"event\" instead of failing the build"
+    },
+    {
+     "line": 207,
+     "id": "TY3",
+     "reason": "because a record that admits forbidden combinations leaves every caller guessing which are legal",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/types-and-null.md:29-36",
+     "basis": "erased=false with non-null id is meaningless yet constructible; every caller must know legal combinations"
+    },
+    {
+     "line": 208,
+     "id": "TY7",
+     "reason": "because a `null` collection forces every caller to null-check and causes bugs",
+     "kind": "stated",
+     "cite": "refs/plinth-java-skills/121-java-object-oriented-design/references/121-java-object-oriented-design-methods.md:231-233",
+     "basis": "returning null forces clients to handle null checks and is a common source of bugs"
+    },
+    {
+     "line": 209,
+     "id": "TY9",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "",
+     "basis": ""
+    },
+    {
+     "line": 210,
+     "id": "TY12",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "",
+     "basis": ""
+    },
+    {
+     "line": 211,
+     "id": "TY8",
+     "reason": "because two same-typed ids can swap places at a call site and still compile",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/pstack/skills/principle-type-system-discipline/SKILL.md:17,27",
+     "basis": "UserId and OrderId are strings but must not be interchangeable; brand arguments sharing a primitive type"
+    },
+    {
+     "line": 212,
+     "id": "TY4",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "",
+     "basis": ""
+    },
+    {
+     "line": 213,
+     "id": "TY5",
+     "reason": "because `double` arithmetic adds binary rounding errors to money",
+     "kind": "stated",
+     "cite": "refs/plinth-java-skills/122-java-type-design/references/122-java-type-design.md:669-671",
+     "basis": "BigDecimal where binary floating-point rounding errors from float/double are unacceptable, e.g. money"
+    },
+    {
+     "line": 214,
+     "id": "TY6",
+     "reason": "because a status compared as a string literal compiled and never matched (#622)",
+     "kind": "evidence",
+     "cite": "research/49-g9b-candidates.md:62-63 (fleet retro #61 row 14, #622)",
+     "basis": "#622: a status compared via .equals(\"SUCCESS\") compiled and never matched; ToolExecutionResult.status is a String"
+    },
+    {
+     "line": 215,
+     "id": "TY11",
+     "reason": "because an enum `.equals(\"SUCCESS\")` compiled, passed review and never matched (#622)",
+     "kind": "evidence",
+     "cite": "research/49-g9b-candidates.md:63 (fleet retro #61 row 14, #622)",
+     "basis": "#622: enum .equals(\"SUCCESS\") compiled and never matched; only a tool catches it"
+    },
+    {
+     "line": 216,
+     "id": "TY10",
+     "reason": "because a raw type bypasses generic checks and throws `ClassCastException` at runtime",
+     "kind": "stated",
+     "cite": "refs/plinth-java-skills/128-java-generics/references/128-java-generics.md:61-63,1504-1506",
+     "basis": "raw types bypass type checking and can lead to ClassCastException at runtime; unchecked warnings mean heap pollution"
+    },
+    {
+     "line": 217,
+     "id": "TY13",
+     "reason": "because a builder is a second construction API to maintain",
+     "kind": "stated",
+     "cite": "refs/plinth-java-skills/123-java-design-patterns/references/123-java-design-patterns.md:110-112",
+     "basis": "Builder cost: extra ceremony and another construction API to maintain; prefer record ctor or static factory"
+    },
+    {
+     "line": 218,
+     "id": "ER1",
+     "reason": "because an expected case that is thrown lets callers ignore it until runtime",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/pstack/skills/principle-type-system-discipline/SKILL.md:9",
+     "basis": "a case the types let you ignore becomes a runtime failure the compiler could have stopped"
+    },
+    {
+     "line": 219,
+     "id": "ER2",
+     "reason": "because a bare `ResponseEntity…build()` returns an empty body with no `traceId`",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/error-handling.md:82-84",
+     "basis": "ResponseEntity.status(...).build() gives an empty body, no traceId, and bypasses the central handler"
+    },
+    {
+     "line": 220,
+     "id": "ER7",
+     "reason": "because an `Either` left never reaches the handler, so the error loses its `traceId`",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/error-handling.md:176",
+     "basis": "Either.left returned up the stack never reaches GlobalExceptionHandler; the caller that forgets yields an untraceable error"
+    },
+    {
+     "line": 221,
+     "id": "ER9",
+     "reason": "because the doc says errors are ProblemDetail, which no code produces",
+     "kind": "evidence",
+     "cite": "research/29-java-standards.md:115",
+     "basis": "CLAUDE.md claims RFC 9457 ProblemDetail; ADR-0008 records it used nowhere; GEH builds ApiResponse.error"
+    },
+    {
+     "line": 222,
+     "id": "ER10",
+     "reason": "because a driver's `getMessage()` in the body leaked database text to clients",
+     "kind": "evidence",
+     "cite": "research/49-g9b-candidates.md:75; research/56a-g9b-good-bad-java-errors.md:543-545",
+     "basis": "AgentController:186-190 returns the DB driver's constraint message to the client (verified live leak)"
+    },
+    {
+     "line": 223,
+     "id": "ER11",
+     "reason": "because a per-controller handler leaked database driver text to the client",
+     "kind": "evidence",
+     "cite": "research/49-g9b-candidates.md:76-77",
+     "basis": "AgentController:162-190 local @ExceptionHandler is also the ER10 leak of driver text"
+    },
+    {
+     "line": 224,
+     "id": "ER3",
+     "reason": "because a dropped cause ends the stack trace, and an empty catch hides the bug",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/error-handling.md:117-123; refs/plinth-java-skills/121-java-object-oriented-design/references/121-java-object-oriented-design-exceptions.md:329-331",
+     "basis": "without the cause the stack trace stops; ignoring exceptions hides bugs and makes debugging very hard"
+    },
+    {
+     "line": 225,
+     "id": "ER4",
+     "reason": "because a broad catch hides failures; `Throwable` even swallows `OutOfMemoryError`",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/error-handling.md:139-146; refs/plinth-java-skills/126-java-exception-handling/references/126-java-exception-handling.md:2371-2373",
+     "basis": "same handling for every type is hiding; catching Throwable takes OutOfMemoryError and masks a dying JVM"
+    },
+    {
+     "line": 226,
+     "id": "ER5",
+     "reason": "because a swallowed interrupt causes a quiet hang",
+     "kind": "stated",
+     "cite": "research/29-java-standards.md:134; research/49-g9b-candidates.md:85",
+     "basis": "not restoring InterruptedException is a quiet hang class; 10 sites, 8 restore"
+    },
+    {
+     "line": 227,
+     "id": "ER6",
+     "reason": "because a service re-validating what the boundary checked is duplicated logic that drifts",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/error-handling.md:162-164",
+     "basis": "a service that re-validates what the boundary guaranteed is duplicated logic that will drift"
+    },
+    {
+     "line": 228,
+     "id": "ER8",
+     "reason": "because a failure logged at DEBUG or not at all is invisible in production",
+     "kind": "stated",
+     "cite": "research/49-g9b-candidates.md:88; refs/addyosmani-agent-skills/skills/observability-and-instrumentation/SKILL.md:75",
+     "basis": "DEBUG is off in production, so a broken metric path is invisible to the on-call customer"
+    },
+    {
+     "line": 229,
+     "id": "CM1",
+     "reason": "because a divider stays after the section it labelled is split or moved",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/comments.md:40-41",
+     "basis": "banners carry no information and survive long after their section is split or moved"
+    },
+    {
+     "line": 230,
+     "id": "CM2",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "",
+     "basis": ""
+    },
+    {
+     "line": 231,
+     "id": "CM3",
+     "reason": "because a why-comment about our own code rots into a false claim",
+     "kind": "evidence",
+     "cite": "research/49-g9b-candidates.md:97 (P1 F3, V106)",
+     "basis": "X1: our P1 F3 false header comment (V106) shows why-comments rot"
+    },
+    {
+     "line": 232,
+     "id": "CM4",
+     "reason": "because a false comment gets believed, and a 'keep in sync' note never fails",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/comments.md:137-151; research/56a-g9b-good-bad-java-errors.md:625-626",
+     "basis": "a false comment is worse than none because it is believed; a sync note does not fail when copies drift"
+    },
+    {
+     "line": 233,
+     "id": "CM5",
+     "reason": "because Javadoc on the implementation is a second copy that goes stale",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/services.md:60-61",
+     "basis": "implementation javadoc restating the interface is two places to update and one to go stale"
+    },
+    {
+     "line": 234,
+     "id": "CM7",
+     "reason": "because a suppressed correctness rule stops catching the real bugs it targets",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/pstack/agents/comment-sicko.md:24",
+     "basis": "if the suppressed rule catches real bugs or protects correctness or safety, kill the suppression"
+    },
+    {
+     "line": 235,
+     "id": "NM1",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "",
+     "basis": ""
+    },
+    {
+     "line": 236,
+     "id": "NM2",
+     "reason": "because a name that will not come signals a murky design",
+     "kind": "stated",
+     "cite": "refs/mattpocock-skills/skills/engineering/code-review/SKILL.md:45",
+     "basis": "Mysterious Name: rename; if no honest name comes, the design is murky"
+    },
+    {
+     "line": 237,
+     "id": "NM3",
+     "reason": "because a `get`-shaped name that also writes misleads the caller",
+     "kind": "stated",
+     "cite": "refs/addyosmani-agent-skills/skills/code-simplification/SKILL.md:143",
+     "basis": "misleading names: a function named get that also mutates state; rename to reflect behaviour"
+    },
+    {
+     "line": 238,
+     "id": "NM4",
+     "reason": "because inconsistent names in one family cost the reader a lookup each time",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/type-design.md:106",
+     "basis": "related types should read as one family; inconsistency costs a reader a lookup every time"
+    },
+    {
+     "line": 239,
+     "id": "DS1",
+     "reason": "because a branch moved, not deleted, stayed duplicated and the preview lied (#349)",
+     "kind": "evidence",
+     "cite": "research/56b-g9b-good-bad-shape-spring.md:23,40-42",
+     "basis": "#349: retention rule written twice so the preview could lie; the fix moved the branch, each caller still switches"
+    },
+    {
+     "line": 240,
+     "id": "DS2",
+     "reason": "because reviewers missed one divergence three times in a 1,199-line class",
+     "kind": "evidence",
+     "cite": "agent-platform issue #128 (glab issue view 128)",
+     "basis": "ChatOrchestrator 1199 lines: three passes missed main/resume path divergences; size hides that two paths should agree"
+    },
+    {
+     "line": 241,
+     "id": "DS3",
+     "reason": "because a second boolean must be kept in sync by hand and drifts",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/pstack/skills/principle-model-the-domain/SKILL.md:11,26; research/56b-g9b-good-bad-shape-spring.md:105",
+     "basis": "scattered booleans are accidental complexity; a second boolean must stay in sync with the first"
+    },
+    {
+     "line": 242,
+     "id": "DS4",
+     "reason": "because a pass-through adds a layer to trace and hides nothing",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/pstack/skills/architect/references/design-red-flags.md:29-31; refs/mattpocock-skills/skills/engineering/codebase-design/DEEPENING.md:29",
+     "basis": "a pass-through adds a layer without hiding complexity; a single-adapter seam is just indirection"
+    },
+    {
+     "line": 243,
+     "id": "DS6",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "",
+     "basis": ""
+    },
+    {
+     "line": 244,
+     "id": "DS11",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "",
+     "basis": ""
+    },
+    {
+     "line": 245,
+     "id": "DS12",
+     "reason": "because copied prefix checks drifted and cleanup missed `smoke77-` data (#636)",
+     "kind": "evidence",
+     "cite": "research/56b-g9b-good-bad-shape-spring.md:197-210",
+     "basis": "four startsWith('smoke-') copies already disagreed; numbered prefixes leaked every run until #636"
+    },
+    {
+     "line": 246,
+     "id": "DS14",
+     "reason": "because a shared helper for unrelated callers grows a mode flag per caller",
+     "kind": "stated",
+     "cite": "research/56b-g9b-good-bad-shape-spring.md:250-251,271-273",
+     "basis": "a 'shared' factory for callers sharing no rule needs a mode argument, and each new caller adds an arm"
+    },
+    {
+     "line": 247,
+     "id": "DS13",
+     "reason": "because deslop checks style only; correctness and safety need the review",
+     "kind": "stated",
+     "cite": "refs/openclaw-openclaw/.agents/skills/deslop/SKILL.md:20,24",
+     "basis": "run deslop before autoreview, never instead; autoreview remains the required correctness and safety gate"
+    },
+    {
+     "line": 248,
+     "id": "DS5",
+     "reason": "because a kept old path becomes a permanent dual-path compatibility layer",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/pstack/skills/interrogate/references/rubric.md:41; refs/cursor-plugins/pstack/skills/principle-migrate-callers-then-delete-legacy-apis/SKILL.md:22",
+     "basis": "compatibility layers become permanent; keeping both APIs creates dual-path complexity and slows cleanup"
+    },
+    {
+     "line": 249,
+     "id": "DS7",
+     "reason": "because dead code confuses future readers and agents",
+     "kind": "stated",
+     "cite": "refs/addyosmani-agent-skills/skills/code-review-and-quality/SKILL.md:239",
+     "basis": "don't leave dead code lying around; it confuses future readers and agents"
+    },
+    {
+     "line": 250,
+     "id": "DS8",
+     "reason": "because a silencing guard leaves the real bug in place",
+     "kind": "evidence",
+     "cite": "refs/cursor-plugins/pstack/skills/principle-fix-root-causes/SKILL.md:11,16; research/56b-g9b-good-bad-shape-spring.md:166-168",
+     "basis": "symptom fixes leave the real bug; OpenApiSpecImporter null guard made group placement silently do nothing"
+    },
+    {
+     "line": 251,
+     "id": "DS9",
+     "reason": "because deep nesting and nested ternaries hide the control flow",
+     "kind": "stated",
+     "cite": "refs/addyosmani-agent-skills/skills/code-simplification/SKILL.md:131-133",
+     "basis": "deep nesting: hard to follow control flow; nested ternaries require a mental stack to parse"
+    },
+    {
+     "line": 252,
+     "id": "DS15",
+     "reason": "because the copy in deslop already contradicts CV6 and U2",
+     "kind": "evidence",
+     "cite": "research/49-g9b-candidates.md:135",
+     "basis": "deslop:117-120 restates final/AssertJ/shouldXxx; two rules in two files drift, this one already has"
+    },
+    {
+     "line": 253,
+     "id": "LY1",
+     "reason": "because logic in a controller cannot be tested without the web framework",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/pstack/skills/principle-boundary-discipline/SKILL.md:9,11",
+     "basis": "thin shell; keep logic out of framework wiring so it can be tested without the framework"
+    },
+    {
+     "line": 254,
+     "id": "LY2",
+     "reason": "because a one-implementation interface is indirection with no real seam",
+     "kind": "stated",
+     "cite": "refs/mattpocock-skills/skills/engineering/codebase-design/DEEPENING.md:29; research/49-g9b-candidates.md:144",
+     "basis": "a single-adapter seam is just indirection; an interface only to fake our own class serves a forbidden test"
+    },
+    {
+     "line": 255,
+     "id": "LY3",
+     "reason": "because two separate calls let one be dropped, shipping an unaudited lookup (#150)",
+     "kind": "evidence",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/services.md:86-88; refs/plinth-java-skills/123-java-design-patterns/references/123-database-persistence-patterns.md:117",
+     "basis": "answer and audit as two statements could be deleted apart: an unaudited re-identification oracle ships (#150)"
+    },
+    {
+     "line": 256,
+     "id": "LY4",
+     "reason": "because framework types in the core stop it being tested without the framework",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/pstack/skills/principle-boundary-discipline/SKILL.md:11,27",
+     "basis": "keep logic out of framework wiring so it is testable without the framework; business logic has no framework deps"
+    },
+    {
+     "line": 257,
+     "id": "LY5",
+     "reason": "because the doc calls these ungated while ArchUnit already gates them",
+     "kind": "evidence",
+     "cite": "research/29-java-standards.md:116; research/49-g9b-candidates.md:148",
+     "basis": "CLAUDE.md:167-170,180-182 say semgrep deletion left them ungated; AT:72,92,104,146,163 enforce all five"
+    },
+    {
+     "line": 258,
+     "id": "LY6",
+     "reason": "because a null optional collaborator silently skipped a feature that was ON",
+     "kind": "evidence",
+     "cite": "research/56a-g9b-good-bad-java-errors.md:128-130; research/56b-g9b-good-bad-shape-spring.md:404-405",
+     "basis": "GuardrailPipeline nullable tier: ON with no NER bean skipped silently; resolving at creation baked in a throwing stub"
+    },
+    {
+     "line": 259,
+     "id": "LY7",
+     "reason": "because per-class `@Value` gave one key two defaults, 5000 and 1500 ms",
+     "kind": "evidence",
+     "cite": "research/56b-g9b-good-bad-shape-spring.md:442-443",
+     "basis": "timeout-ms read in two classes with defaults 5000 vs 1500; api and worker run different timeouts"
+    },
+    {
+     "line": 260,
+     "id": "AP1",
+     "reason": "because an error outside the envelope loses the `traceId` operators paste into tickets",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/error-handling.md:92-97",
+     "basis": "ApiResponse carries traceId, the self-hosted operator's only incident handle; channels skipping the handler lose it"
+    },
+    {
+     "line": 261,
+     "id": "AP2",
+     "reason": "because exposed storage types make every schema change a coordinated edit",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/pstack/skills/architect/references/design-red-flags.md:19-21; refs/cursor-plugins/pstack/skills/principle-boundary-discipline/SKILL.md:23",
+     "basis": "leakage makes modules depend on one internal decision, so changing it needs coordinated edits; keep storage private"
+    },
+    {
+     "line": 262,
+     "id": "AP3",
+     "reason": "because an untested role rule let another workspace's editor get 200",
+     "kind": "evidence",
+     "cite": "research/56c-g9b-good-bad-api-security.md:20-30,53-57; research/52-spring-security-rules.md:148",
+     "basis": "ToolControllerIT has zero 403/401 asserts; on master EDITOR_OF_B gets 200 on PATCH /api/tools (BOLA)"
+    },
+    {
+     "line": 263,
+     "id": "AP4",
+     "reason": "because an unguarded public path let an anonymous call complete setup",
+     "kind": "evidence",
+     "cite": "research/52-spring-security-rules.md:133,175",
+     "basis": "POST /api/setup/complete is public with no check; anonymous call finishes setup before an admin exists, locking the install"
+    },
+    {
+     "line": 264,
+     "id": "AP5",
+     "reason": "because an unbounded query causes memory exhaustion and timeouts",
+     "kind": "stated",
+     "cite": "refs/addyosmani-agent-skills/references/performance-checklist.md:224",
+     "basis": "unbounded queries: impact memory exhaustion, timeouts; fix: always paginate, add LIMIT"
+    },
+    {
+     "line": 265,
+     "id": "TT1",
+     "reason": "because without them the dry-run gate has nothing to return, and review misses them",
+     "kind": "stated",
+     "cite": "agent-platform CLAUDE.md@8f7bf163:406-420",
+     "basis": "each tool owes outputSchemaJson, sampleResponseJson, dry-run test or the gate has nothing to return; review has missed them"
+    },
+    {
+     "line": 266,
+     "id": "TT2",
+     "reason": "because a schema stricter than its handler stops a working tool on upgrade",
+     "kind": "stated",
+     "cite": "agent-platform CLAUDE.md@8f7bf163:423-427",
+     "basis": "a declared schema stricter than its handler stops a working tool on a self-hosted upgrade"
+    },
+    {
+     "line": 277,
+     "id": "SE1",
+     "reason": "because a user-influenced URL can be aimed at internal services",
+     "kind": "stated",
+     "cite": "refs/addyosmani-agent-skills/skills/security-and-hardening/SKILL.md:111; agent-platform/.claude/skills/aruvii-standards/references/secure-coding.md:13-19 (#527)",
+     "basis": "any URL the user influences can target internal services; allowlist, reject private IPs, forbid redirects"
+    },
+    {
+     "line": 278,
+     "id": "SE2",
+     "reason": "because a fallback sends the call unauthenticated or with a cached credential (#118)",
+     "kind": "evidence",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/secure-coding.md:21-27",
+     "basis": "#118: handlers fail closed on an undecryptable credential instead of an unauthenticated call or cached value"
+    },
+    {
+     "line": 279,
+     "id": "SE3",
+     "reason": "because input concatenated into SQL is an injection surface",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/secure-coding.md:38-43; refs/plinth-java-skills/124-java-secure-coding/references/124-java-secure-coding.md:134-136",
+     "basis": "string-built query around user input is SQL injection; bound params cannot carry identifiers, so allowlist them"
+    },
+    {
+     "line": 280,
+     "id": "SE4",
+     "reason": "because `normalize()` and a `..` check let a symlink escape the base",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/secure-coding.md:47-51; refs/addyosmani-agent-skills/references/security-checklist.md:66,80-84",
+     "basis": "path traversal via user input; encoding and symlink tricks defeat string checks; resolve symlinks before the check"
+    },
+    {
+     "line": 281,
+     "id": "SE5",
+     "reason": "because payload-chosen types let the attacker pick what gets instantiated (RCE)",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/secure-coding.md:55-58; refs/plinth-java-skills/124-java-secure-coding/references/124-java-secure-coding.md:709-711",
+     "basis": "default typing or a @class hint lets the payload choose what is instantiated — a well-known RCE class"
+    },
+    {
+     "line": 282,
+     "id": "SE6",
+     "reason": "because user or model text bound raw into the page enables XSS",
+     "kind": "stated",
+     "cite": "refs/plinth-java-skills/124-java-secure-coding/references/124-java-secure-coding.md:758-760; refs/addyosmani-agent-skills/skills/security-and-hardening/SKILL.md:71",
+     "basis": "encode user-controlled output to prevent XSS; never innerHTML with user-provided data"
+    },
+    {
+     "line": 283,
+     "id": "SE10",
+     "reason": "because injected text can hijack the prompt; the prompt is no security boundary",
+     "kind": "stated",
+     "cite": "refs/addyosmani-agent-skills/skills/security-and-hardening/SKILL.md:158-160",
+     "basis": "model output is untrusted (LLM05); untrusted context can carry instructions (LLM01); enforce permissions in code"
+    },
+    {
+     "line": 284,
+     "id": "SE7",
+     "reason": "because MD5, SHA-1 and DES are weak algorithms that fail to protect secrets",
+     "kind": "stated",
+     "cite": "refs/plinth-java-skills/124-java-secure-coding/references/124-java-secure-coding.md:352-355,460-483",
+     "basis": "avoid deprecated or weak algorithms (MD5, SHA1 for passwords, DES); Bad examples hash/encrypt with them"
+    },
+    {
+     "line": 285,
+     "id": "SE8",
+     "reason": "because uncapped LLM calls cause unbounded consumption (OWASP LLM10)",
+     "kind": "stated",
+     "cite": "refs/addyosmani-agent-skills/references/security-checklist.md:250; research/19-approved-rules.md:283",
+     "basis": "LLM10 Unbounded Consumption: cap tokens, request rate and loop depth"
+    },
+    {
+     "line": 377,
+     "id": "OQ2",
+     "reason": "because `FinalParameters` would flag every existing method signature",
+     "kind": "stated",
+     "cite": "research/49-g9b-candidates.md:60",
+     "basis": "leave FinalParameters off: it would flag every old signature; FinalLocalVariable gates locals per OQ3"
+    },
+    {
+     "line": 381,
+     "id": "OQ1",
+     "reason": "because four files gave four different precedence answers",
+     "kind": "evidence",
+     "cite": "research/29-java-standards.md:117",
+     "basis": "precedence: AS/SKILL:12 CLAUDE.md wins, RJ:10 rules win, SR:27 reference wins, SR:69 CLAUDE.md first"
+    },
+    {
+     "line": 386,
+     "id": "CM6",
+     "reason": "because a long justification usually defends a branch that should be deleted",
+     "kind": "stated",
+     "cite": "agent-platform/.claude/skills/aruvii-standards/references/comments.md:110-135; refs/cursor-plugins/pstack/agents/comment-sicko.md:28",
+     "basis": "six lines defending one branch means the branch is the problem; !27 review deleted the speculative branch"
+    },
+    {
+     "line": 393,
+     "id": "OQ-R27-3",
+     "reason": "because a `Map` with casts fails three calls later, not at parse",
+     "kind": "evidence",
+     "cite": "research/56c-g9b-good-bad-api-security.md:293-297",
+     "basis": "OIDC discovery Map plus casts: a typed record makes a bad document fail at parse with one error, not three calls later"
+    }
+   ]
+  },
+  {
+   "key": "obs-messaging",
+   "name": "Observability + messaging",
+   "items": [
+    {
+     "line": 267,
+     "id": "CC1",
+     "reason": "because a class initialiser that blocks still pins its carrier thread",
+     "kind": "stated",
+     "cite": "research/29-java-standards.md:120 (JEP 491 quote)",
+     "basis": "JEP 491 removed synchronized pinning; pinning remains in native frames and class initialisers."
+    },
+    {
+     "line": 268,
+     "id": "CC2",
+     "reason": "because no-arg `supplyAsync` puts blocking I/O on the common pool and starves it",
+     "kind": "stated",
+     "cite": "research/49-g9b-candidates.md:172; agent-platform@71b5deb4:.agents/skills/code/references/java-functional.md:222-223",
+     "basis": "Blocking HTTP on common ForkJoinPool starves every other async user in the JVM; no-arg form uses common pool."
+    },
+    {
+     "line": 269,
+     "id": "CC3",
+     "reason": "because a call with no stopping timeout can hang forever and keep running",
+     "kind": "stated",
+     "cite": "refs/jabrena-plinth/skills/126 ref:2286-2322 (Ex16); research/29-java-standards.md:137",
+     "basis": "Bad example 'no timeout, no cancellation … could hang forever'; orTimeout leaves underlying I/O running."
+    },
+    {
+     "line": 270,
+     "id": "CC9",
+     "reason": "because a timed-out effect may have applied; retries then duplicate it",
+     "kind": "stated",
+     "cite": "refs/addyosmani-agent-skills/skills/api-and-interface-design/SKILL.md:163,171,213",
+     "basis": "Timeout says nothing about effect; record intent so a crash is not a silently retried charge; per-attempt key duplicates."
+    },
+    {
+     "line": 271,
+     "id": "CC8",
+     "reason": "because retrying a non-idempotent call repeats its side effect",
+     "kind": "stated",
+     "cite": "refs/jabrena-plinth/skills/125-java-concurrency/references/125-java-concurrency.md:40; plinth-java-skills/126 ref:2267-2281",
+     "basis": "Idempotency avoids duplicate side effects under retries; bad example blindly retries a non-idempotent POST."
+    },
+    {
+     "line": 272,
+     "id": "CC4",
+     "reason": "because an unbounded queue never rejects; it grows memory until the process fails",
+     "kind": "stated",
+     "cite": "agent-platform@71b5deb4:.agents/skills/code/references/concurrency.md:42-47; refs/jabrena-plinth/skills/125 ref:1603",
+     "basis": "Unbounded queue in front of fixed pool accepts work, grows memory until process falls over."
+    },
+    {
+     "line": 273,
+     "id": "CC5",
+     "reason": "because shared writes race intermittently, and opposite lock order deadlocks",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/pstack/skills/principle-separate-before-serializing-shared-state/SKILL.md:11; agent-platform@71b5deb4:.agents/skills/code/references/concurrency.md:51",
+     "basis": "Shared writes race intermittently, hard to reproduce; two locks taken in opposite order deadlock."
+    },
+    {
+     "line": 274,
+     "id": "CC6",
+     "reason": "because a mid-pipeline `join()` blocks a thread and undoes the reason for async",
+     "kind": "stated",
+     "cite": "agent-platform@71b5deb4:.agents/skills/code/references/java-functional.md:219-221; refs/jabrena-plinth/skills/125 ref:694-715",
+     "basis": "join()/get() mid-pipeline blocks a thread, defeats the async purpose, serialises parallel work."
+    },
+    {
+     "line": 275,
+     "id": "CC7",
+     "reason": "because a ThreadLocal does not reach an async thread unless copied by hand",
+     "kind": "evidence",
+     "cite": "agent-platform aruvii-tools AgentToolHandler.java:76-84; AgentNestingContext.java:12",
+     "basis": "Nesting depth ThreadLocal must be read and re-set by hand inside supplyAsync to survive the hop."
+    },
+    {
+     "line": 276,
+     "id": "CC10",
+     "reason": "because unbounded caches leak memory; extra pools exhaust database connections",
+     "kind": "stated",
+     "cite": "refs/addyosmani-agent-skills/references/performance-checklist.md:114-116,181,228-230",
+     "basis": "Unbounded cache is a memory leak; pool per request exhausts max_connections; timeout so exhaustion fails fast."
+    },
+    {
+     "line": 286,
+     "id": "MS1",
+     "reason": "because a lost request is a lost run, so requests need a durable stream",
+     "kind": "stated",
+     "cite": "agent-platform@71b5deb4:.agents/skills/code/references/messaging.md:45-53; agent-platform docs/adr/0002-redis-streams-pubsub-transport.md",
+     "basis": "Requests durable on Streams, tokens best-effort on Pub/Sub; Kafka internally contradicts ADR-0002."
+    },
+    {
+     "line": 287,
+     "id": "MS2",
+     "reason": "because `@KafkaListener` binds topics at startup, so each settings edit needs a restart",
+     "kind": "stated",
+     "cite": "agent-platform@71b5deb4:.agents/skills/code/references/messaging.md:98-103",
+     "basis": "@KafkaListener binds topics and brokers at startup; operator edits settings in UI and needs restart."
+    },
+    {
+     "line": 288,
+     "id": "MS3",
+     "reason": "because auto-commit with no dedup can lose a trigger or run an agent twice",
+     "kind": "stated",
+     "cite": "agent-platform@71b5deb4:.agents/skills/code/references/messaging.md:129-144",
+     "basis": "Auto-commit on a timer: crash after commit loses a trigger; crash before or rebalance replays it."
+    },
+    {
+     "line": 289,
+     "id": "MS6",
+     "reason": "because a rerun on leftover partial state gives a different result",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/pstack/skills/principle-make-operations-idempotent/SKILL.md:9-11,24; research/49-g9b-candidates.md:207",
+     "basis": "Crashes, restarts, retries are normal; partial state changing the next run makes each restart a debugging session."
+    },
+    {
+     "line": 290,
+     "id": "MS4",
+     "reason": "because a retried malformed message fails again and blocks the partition",
+     "kind": "stated",
+     "cite": "agent-platform@71b5deb4:.agents/skills/code/references/messaging.md:165-171",
+     "basis": "Retrying malformed bytes fails identically and blocks partition; our own timeout is not poison, must not be skipped."
+    },
+    {
+     "line": 291,
+     "id": "MS5",
+     "reason": "because an unbounded stream grows until Redis evicts other keys",
+     "kind": "stated",
+     "cite": "agent-platform aruvii-architecture-tests/.../ArchitectureRulesTest.java:133-147",
+     "basis": "No add site passed MAXLEN; only consequence is a Redis that evicts someone else's keys months later."
+    },
+    {
+     "line": 292,
+     "id": "MS7",
+     "reason": "because the cited `aruvii-worker/pom.xml` is stale; the build is Gradle",
+     "kind": "evidence",
+     "cite": "research/29-java-standards.md:89,122; agent-platform@71b5deb4:.agents/skills/code/references/messaging.md:108",
+     "basis": "messaging.md cites aruvii-worker/pom.xml; build moved to Gradle libs.versions.toml (stale build fact)."
+    },
+    {
+     "line": 293,
+     "id": "LG1",
+     "reason": "because without the ids, one request cannot be rebuilt from interleaved logs",
+     "kind": "stated",
+     "cite": "refs/addyosmani-agent-skills/skills/observability-and-instrumentation/SKILL.md:79",
+     "basis": "Correlation IDs mandatory; without them you cannot reconstruct a single request from interleaved logs."
+    },
+    {
+     "line": 294,
+     "id": "LG2",
+     "reason": "because logging before a rethrow writes the same failure twice, once per layer",
+     "kind": "stated",
+     "cite": "refs/plinth-java-skills/126-java-exception-handling/references/126-java-exception-handling.md:2151-2178",
+     "basis": "Bad example: service logs then rethrows, controller logs again — duplicate logging across layers."
+    },
+    {
+     "line": 295,
+     "id": "LG3",
+     "reason": "because a placeholder throwable prints no stack, and WARN stacks get skimmed",
+     "kind": "stated",
+     "cite": "agent-platform@71b5deb4:.agents/skills/obs/references/logging.md:57-80",
+     "basis": "Exception filling a {} prints no stack trace; a WARN with a stack trains operators to skim stacks."
+    },
+    {
+     "line": 296,
+     "id": "LG4",
+     "reason": "because logs are a common data-leak path",
+     "kind": "stated",
+     "cite": "refs/addyosmani-agent-skills/skills/observability-and-instrumentation/SKILL.md:106",
+     "basis": "Never log secrets, tokens, PII; telemetry pipelines are a classic data-leak path; allowlist fields."
+    },
+    {
+     "line": 297,
+     "id": "LG5",
+     "reason": "because a newline in untrusted text can forge a log line nobody wrote",
+     "kind": "stated",
+     "cite": "agent-platform@71b5deb4:.agents/skills/obs/references/logging.md:105-118; refs/jabrena-plinth/skills/181 ref:296",
+     "basis": "A newline in a model-supplied toolName ends the line and starts a forged entry (log injection)."
+    },
+    {
+     "line": 298,
+     "id": "LG6",
+     "reason": "because concatenation builds the string even when the level is off, and breaks grep",
+     "kind": "stated",
+     "cite": "agent-platform@71b5deb4:.agents/skills/obs/references/logging.md:35,40-48",
+     "basis": "Concatenation is paid whether or not written; messages drift between call sites, aggregator sees one message per value."
+    },
+    {
+     "line": 299,
+     "id": "LG7",
+     "reason": "because the operator first asks 'is it slow?', and a silent job cannot be found",
+     "kind": "stated",
+     "cite": "agent-platform@71b5deb4:.claude/rules/observability.md:29-31,44-45",
+     "basis": "Customer's first question is 'is it slow?'; a silent cron job is an unfindable cron job."
+    },
+    {
+     "line": 300,
+     "id": "LG8",
+     "reason": "because a logger keyed on a string or parent cannot be toggled by name",
+     "kind": "stated",
+     "cite": "agent-platform@71b5deb4:.agents/skills/obs/references/logging.md:144-149",
+     "basis": "Actuator toggles a logger by name; a string- or parent-keyed logger cannot be raised on its own."
+    },
+    {
+     "line": 301,
+     "id": "LG9",
+     "reason": "because without it, attributing a line needs outside records that may be gone",
+     "kind": "stated",
+     "cite": "refs/addyosmani-agent-skills/skills/observability-and-instrumentation/SKILL.md:91",
+     "basis": "Same job from scheduler, replay, CLI writes interchangeable lines; attribution relies on external records that may not exist."
+    },
+    {
+     "line": 302,
+     "id": "LG10",
+     "reason": "because untagged debug logs survive cleanup and ship",
+     "kind": "stated",
+     "cite": "refs/mattpocock-skills/skills/engineering/diagnosing-bugs/SKILL.md:110,136",
+     "basis": "Tag every debug log so cleanup is one grep; untagged logs survive, tagged logs die."
+    },
+    {
+     "line": 303,
+     "id": "MX7",
+     "reason": "because telemetry without a question is noise: you log everything and learn nothing",
+     "kind": "stated",
+     "cite": "refs/addyosmani-agent-skills/skills/observability-and-instrumentation/SKILL.md:29,40",
+     "basis": "Telemetry without a question is noise; without named questions you log everything and learn nothing."
+    },
+    {
+     "line": 304,
+     "id": "MX1",
+     "reason": "because each unbounded tag value makes a new time series and overloads the backend",
+     "kind": "stated",
+     "cite": "refs/addyosmani-agent-skills/skills/observability-and-instrumentation/SKILL.md:125,208",
+     "basis": "Cardinality is the failure mode: each label combination is a series; user ID labels make the backend fall over."
+    },
+    {
+     "line": 305,
+     "id": "MX2",
+     "reason": "because averages hide slow requests, and a weakly held Gauge reports NaN",
+     "kind": "stated",
+     "cite": "refs/addyosmani-agent-skills/skills/observability-and-instrumentation/SKILL.md:132; agent-platform@71b5deb4:.agents/skills/obs/references/metrics.md:103-104",
+     "basis": "Average hides the 1% with terrible latency; Gauge holds weak reference and reports NaN after GC."
+    },
+    {
+     "line": 306,
+     "id": "MX3",
+     "reason": "because a renamed meter silently breaks the dashboards and alerts built on it",
+     "kind": "stated",
+     "cite": "agent-platform@71b5deb4:.agents/skills/obs/references/metrics.md:18-20",
+     "basis": "Meter name/tag is a contract; renaming breaks a graph silently and nothing in the build tells you."
+    },
+    {
+     "line": 307,
+     "id": "MX4",
+     "reason": "because a renamed tag does not fail the build; it silently empties a graph",
+     "kind": "stated",
+     "cite": "agent-platform@71b5deb4:.agents/skills/obs/references/metrics.md:179,201; refs/jabrena-plinth/skills/182 ref:234",
+     "basis": "Instrumentation breaks silently — renamed tag empties a graph; no metric assertions lets it silently break."
+    },
+    {
+     "line": 308,
+     "id": "MX5",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "refs/addyosmani-agent-skills/references/observability-checklist.md:38-39,44; refs/addyosmani-agent-skills/skills/observability-and-instrumentation/SKILL.md:110",
+     "basis": "States RED/USE coverage as a checklist item; names no failure that missing coverage caused."
+    },
+    {
+     "line": 309,
+     "id": "MX6",
+     "reason": "because instrumentation is code and can log fields as `[object Object]`",
+     "kind": "stated",
+     "cite": "refs/addyosmani-agent-skills/skills/observability-and-instrumentation/SKILL.md:192-194; refs/addyosmani-agent-skills/references/observability-checklist.md:75",
+     "basis": "Instrumentation is code, it can be wrong; force an error, check fields are not [object Object]."
+    },
+    {
+     "line": 310,
+     "id": "MX8",
+     "reason": "because the scrape endpoint's access gating is undecided, and scrapers usually cannot authenticate",
+     "kind": "stated",
+     "cite": "agent-platform@71b5deb4:.agents/skills/obs/references/metrics.md:206-217",
+     "basis": "No prometheus registry; whether a scrape endpoint is RBAC-gated is #160's decision; a scraper usually cannot authenticate."
+    },
+    {
+     "line": 311,
+     "id": "MX9",
+     "reason": "because those claims are false today, and one blesses a swallowed exception",
+     "kind": "evidence",
+     "cite": "research/49-g9b-candidates.md:249; research/29-java-standards.md:100,121",
+     "basis": "'Four meters, all in worker' false (ToolService meter); line moved; catch (Exception ignored) is ER3 Bad."
+    },
+    {
+     "line": 312,
+     "id": "TR1",
+     "reason": "because an async hop breaks thread-local tracing context, so the trace id is lost",
+     "kind": "stated",
+     "cite": "agent-platform@71b5deb4:.agents/skills/obs/references/tracing.md:88-99; refs/addyosmani-agent-skills/skills/observability-and-instrumentation/SKILL.md:150",
+     "basis": "Redis hop breaks thread-local tracing context; propagate across async boundaries or the trace dies at the gap."
+    },
+    {
+     "line": 313,
+     "id": "TR2",
+     "reason": "because tracing is not always configured, so a required `Tracer` may not exist",
+     "kind": "stated",
+     "cite": "agent-platform@71b5deb4:.agents/skills/obs/references/tracing.md:112-114",
+     "basis": "Tracer injected through ObjectProvider because tracing is not guaranteed to be configured."
+    },
+    {
+     "line": 314,
+     "id": "TR3",
+     "reason": "because sensitive span attributes leak data, and unbounded values explode cardinality",
+     "kind": "stated",
+     "cite": "refs/jabrena-plinth/skills/183-java-observability-tracing-opentelemetry/references/183-java-observability-tracing-opentelemetry.md:123,131,166",
+     "basis": "Bad: high-cardinality and sensitive span attributes; sensitive values leak when naive attributes are added."
+    },
+    {
+     "line": 315,
+     "id": "TR4",
+     "reason": "because OpenTelemetry API code does not compile against the Brave-only classpath",
+     "kind": "stated",
+     "cite": "agent-platform@71b5deb4:.agents/skills/obs/references/tracing.md:36-54",
+     "basis": "Zero io.opentelemetry on classpath; OTel examples do not compile; swapping bridges is an ADR-level change."
+    },
+    {
+     "line": 316,
+     "id": "TR5",
+     "reason": "because a lower rate makes log correlation inconsistent and saves nothing without an exporter",
+     "kind": "stated",
+     "cite": "agent-platform@71b5deb4:.agents/skills/obs/references/tracing.md:60-77; research/49-g9b-candidates.md:260",
+     "basis": "No traces exported; sampling 5% leaves most error traceIds in no trace, inconsistent log correlation for no saving."
+    },
+    {
+     "line": 388,
+     "id": "OQ4",
+     "reason": "because WARN on every 400 floods the on-call WARN channel with user typos",
+     "kind": "stated",
+     "cite": "research/49-g9b-candidates.md:227",
+     "basis": "Decision: INFO for validation/auth, WARN for access denied (probing); WARN for every 400 floods the WARN channel."
+    },
+    {
+     "line": 389,
+     "id": "X2",
+     "reason": "because no exporter exists, so a lower rate only makes log correlation inconsistent",
+     "kind": "stated",
+     "cite": "research/49-g9b-candidates.md:260; agent-platform@71b5deb4:.agents/skills/obs/references/tracing.md:76-80",
+     "basis": "Operator: no exporter so sampling saves nothing; skel says lower rate makes log correlation inconsistent for no saving."
+    },
+    {
+     "line": 390,
+     "id": "TR4a",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "refs/addyosmani-agent-skills/skills/observability-and-instrumentation/SKILL.md:136; review/g9b-decisions-1.txt",
+     "basis": "Operator 'OpenTelemetry ok'; addy calls OTel the vendor-neutral standard — a preference, no failure named."
+    }
+   ]
+  },
+  {
+   "key": "ui",
+   "name": "Angular UI",
+   "items": [
+    {
+     "line": 317,
+     "id": "NGA1",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "refs/Jeffallan-claude-skills angular-architect/SKILL.md MUST DO; typescript-pro/SKILL.md MUST NOT; research/30:110 E19",
+     "basis": "jf lists strict config as a MUST with no failure; tsconfig = CLI defaults; no failure stated"
+    },
+    {
+     "line": 318,
+     "id": "NGA2",
+     "reason": "because `any` switches off the compiler's check on every property access",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/pstack/skills/typescript-best-practices/references/patterns.md:110-126",
+     "basis": "Don't: any input.foo.bar unchecked; Do: unknown, narrowed, compiler verifies access"
+    },
+    {
+     "line": 319,
+     "id": "NGA3",
+     "reason": "because each `!` or `as` hides a runtime crash the compiler could catch",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/pstack/skills/typescript-best-practices/SKILL.md:17,20; patterns.md:94-106,151-153",
+     "basis": "every as is a runtime crash waiting; ! smuggles partiality past the compiler"
+    },
+    {
+     "line": 320,
+     "id": "NGA4",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "refs/Jeffallan-claude-skills typescript-pro/SKILL.md MUST NOT (enums); research/30:155-156",
+     "basis": "jf says prefer const objects, no failure; Google allows both; ours 0 enums"
+    },
+    {
+     "line": 321,
+     "id": "NGA5",
+     "reason": "because without it a new variant compiles with no case to handle it",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/pstack/skills/typescript-best-practices/SKILL.md:23",
+     "basis": "never-typed local in default arm makes compiler error when a new variant is added"
+    },
+    {
+     "line": 322,
+     "id": "NGA6",
+     "reason": "because a guard that lies hides its bug behind a name that says safe",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/pstack/skills/typescript-best-practices/SKILL.md:22,24; patterns.md:196-198",
+     "basis": "lying guard worse than as: bug hides behind safe-sounding name; satisfies keeps literal types"
+    },
+    {
+     "line": 323,
+     "id": "NGA7",
+     "reason": "because a hand-written copy of the shape drifts when the schema changes",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/pstack/skills/typescript-best-practices/references/patterns.md:267-286",
+     "basis": "Don't: duplicate shape, drifts when the schema changes; derive from generated type"
+    },
+    {
+     "line": 324,
+     "id": "NGB1",
+     "reason": "because agents copy the redundant `standalone: true` flag into new files",
+     "kind": "stated",
+     "cite": "research/30-ts-angular-standards.md:130",
+     "basis": "68/68 components write standalone:true; v21 default; harmless but noise an agent copies"
+    },
+    {
+     "line": 325,
+     "id": "NGB2",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/30-ts-angular-standards.md:30,173-174; Jeffallan angular-architect/SKILL.md MUST DO",
+     "basis": "v21 best-practices:29 says set OnPush; zoneless guide 'recommended step'; no failure quoted"
+    },
+    {
+     "line": 326,
+     "id": "NGB3",
+     "reason": "because a hand-synced copy stays stale when its source loads later",
+     "kind": "evidence",
+     "cite": "research/56b-g9b-good-bad-shape-spring.md:730-755",
+     "basis": "pipeline-builder copied filtered agents via .set; pipeline loaded first, dropdowns stayed empty"
+    },
+    {
+     "line": 327,
+     "id": "NGB4",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/30-ts-angular-standards.md:184-185,203; research/53:166",
+     "basis": "best-practices.md:15,28 prefer signal APIs; Bad @HostListener shown with no failure"
+    },
+    {
+     "line": 328,
+     "id": "NGB5",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "refs/cursor-plugins/pstack/skills/principle-boundary-discipline/SKILL.md:27; refs/cursor-plugins/pstack/skills/interrogate/references/code-quality-review.md:23",
+     "basis": "logic in pure functions; 1000-line crossing is a 'strong smell'; no failure named"
+    },
+    {
+     "line": 329,
+     "id": "NGC1",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/30-ts-angular-standards.md:204-205",
+     "basis": "style guide §DI and best-practices.md:55 cited, not quoted; code already 233/0; no failure"
+    },
+    {
+     "line": 330,
+     "id": "NGC2",
+     "reason": "because a generic HTTP call forces conditional logic inside each test mock",
+     "kind": "stated",
+     "cite": "refs/mattpocock-skills/skills/engineering/tdd/mocking.md:37-58",
+     "basis": "one SDK-style function per endpoint; generic fetcher BAD: mocking needs conditional logic"
+    },
+    {
+     "line": 331,
+     "id": "NGC3",
+     "reason": "because an unbound subscription leaks memory until the page crashes",
+     "kind": "stated",
+     "cite": "refs/addyosmani-agent-skills/references/performance-checklist.md:236",
+     "basis": "memory leaks: growing memory, eventual crash; clean up listeners, intervals"
+    },
+    {
+     "line": 332,
+     "id": "NGC4",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "refs/cursor-plugins/pstack/skills/interrogate/references/rubric.md:10; addy frontend-ui-engineering/SKILL.md:324; research/30:240-245",
+     "basis": "review question 'silently swallowed?' and red flag 'missing error states'; Bad shown, no failure described"
+    },
+    {
+     "line": 333,
+     "id": "NGD1",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/30-ts-angular-standards.md:254-255; research/53:190",
+     "basis": "best-practices.md:35-37,50 cited, not quoted; 0 violations; no failure"
+    },
+    {
+     "line": 334,
+     "id": "NGD2",
+     "reason": "because a clickable `div` cannot take focus, so keyboard users cannot use it",
+     "kind": "stated",
+     "cite": "refs/addyosmani-agent-skills/skills/frontend-ui-engineering/SKILL.md:180-185; references/accessibility-checklist.md:66-67",
+     "basis": "every interactive element must be keyboard accessible; div onClick marked 'Not focusable'"
+    },
+    {
+     "line": 335,
+     "id": "NGD3",
+     "reason": "because a screen reader has no name to read for an icon-only button",
+     "kind": "stated",
+     "cite": "refs/addyosmani-agent-skills/references/accessibility-checklist.md:24-28; frontend-ui-engineering/SKILL.md:198-202",
+     "basis": "Screen Readers checklist: icon-only buttons have aria-label; label elements lacking visible text"
+    },
+    {
+     "line": 336,
+     "id": "NGE1",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/57-resourcing-ours-only-rules.md:17",
+     "basis": "SRC1 found no source; project decision; Bad 🗑 button shown without a stated failure"
+    },
+    {
+     "line": 337,
+     "id": "NGE2",
+     "reason": "because a native `<option>` allows text only, so it cannot show an icon",
+     "kind": "stated",
+     "cite": "research/57-resourcing-ours-only-rules.md:18 (MDN <option> Permitted content)",
+     "basis": "MDN: traditional select options permit text content only; app-select choice is project decision"
+    },
+    {
+     "line": 338,
+     "id": "NGE3",
+     "reason": "because `app-icon` strokes with `currentColor`, so only the parent's colour reaches it",
+     "kind": "evidence",
+     "cite": "research/30-ts-angular-standards.md:275-276 (shared/icon.component.ts:104)",
+     "basis": "icon.component.ts:104 sets stroke=currentColor; no stroke input exists"
+    },
+    {
+     "line": 339,
+     "id": "NGE4",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/49-g9b-candidates.md:315; research/30:300",
+     "basis": "exemption is an operator decision; no failure or why recorded"
+    },
+    {
+     "line": 340,
+     "id": "NGF1",
+     "reason": "because without the processor no inline template is linted at all",
+     "kind": "evidence",
+     "cite": "research/30-ts-angular-standards.md:125",
+     "basis": "template block has rules:{} and no inline processor: zero linting on 68 inline templates"
+    },
+    {
+     "line": 341,
+     "id": "NGF2",
+     "reason": "because the header claimed two enforced rules that the config never set",
+     "kind": "evidence",
+     "cite": "research/30-ts-angular-standards.md:124",
+     "basis": "eslint.config.js:13-14 claims standalone-only and lazy routes enforced; neither configured (#147)"
+    },
+    {
+     "line": 342,
+     "id": "NGF3",
+     "reason": "because hand-written zones guarded only 4 of 20 features",
+     "kind": "evidence",
+     "cite": "research/30-ts-angular-standards.md:110-112; research/49:325",
+     "basis": "boundary zones name 4 of 20 feature targets; rest unguarded"
+    },
+    {
+     "line": 343,
+     "id": "NGF4",
+     "reason": "because a warn-level rule never fails the build, and agents copy weak guards",
+     "kind": "stated",
+     "cite": "refs/cursor-plugins/pstack/skills/principle-encode-lessons-in-structure/SKILL.md:19; research/30:108",
+     "basis": "pick mechanism that fails CI; weaker guard becomes next template; max-lines warn: 11 files over"
+    },
+    {
+     "line": 391,
+     "id": "X3",
+     "reason": "because the 600-line limit was cited to a source that says 200",
+     "kind": "evidence",
+     "cite": "research/49-g9b-candidates.md:286",
+     "basis": "addy frontend-ui-engineering:322 says 200, not 600; pstack and addy review say 1000"
+    },
+    {
+     "line": 394,
+     "id": "OQ-NG1",
+     "reason": "because v21 docs say Reactive forms but v22 docs say Signal Forms",
+     "kind": "stated",
+     "cite": "research/30-ts-angular-standards.md:30,336",
+     "basis": "version trap: best-practices.md v21 prefers Reactive, main (v22) prefers Signal Forms"
+    },
+    {
+     "line": 395,
+     "id": "OQ-NG2",
+     "reason": "because a warn-level rule never fails the build, so hits stay",
+     "kind": "evidence",
+     "cite": "research/30-ts-angular-standards.md:108,337; research/49:306",
+     "basis": "max-lines warn never fails the build; 11 files stayed over"
+    },
+    {
+     "line": 397,
+     "id": "OQ-NG7",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/49-g9b-candidates.md:327; research/30:342",
+     "basis": "why recorded is categorisation only: checked once per change, not per line; no failure"
+    }
+   ]
+  },
+  {
+   "key": "spring-security-migrations",
+   "name": "Spring, Security, migrations",
+   "items": [
+    {
+     "line": 404,
+     "id": "SC1",
+     "reason": "because a test-only constructor passing null made a production wiring mistake silent",
+     "kind": "evidence",
+     "cite": "research/56b-g9b-good-bad-shape-spring.md:166-168",
+     "basis": "test-only ctor passed null; guard added so test passes; prod wiring mistake would silently skip group placement"
+    },
+    {
+     "line": 405,
+     "id": "SC4",
+     "reason": "because `@Primary` hid a load-order race that shipped a PKIX failure",
+     "kind": "evidence",
+     "cite": "research/51-spring-core-rules.md:141,172",
+     "basis": "@Primary added as S5.6 fix after a stub occasionally won by load order, causing PKIX failures"
+    },
+    {
+     "line": 406,
+     "id": "LY6",
+     "reason": "because a setter-injected collaborator may be null at every use",
+     "kind": "stated",
+     "cite": "research/51-spring-core-rules.md:59-61,326",
+     "basis": "FW: setter deps without defaults need not-null checks everywhere; GuardrailPipeline holds three nullable tiers"
+    },
+    {
+     "line": 407,
+     "id": "LY7",
+     "reason": "because split `@Value` reads gave one key two different defaults",
+     "kind": "evidence",
+     "cite": "research/51-spring-core-rules.md:211,327",
+     "basis": "timeout-ms default 5000 in one class, 1500 in another; master key read four ways"
+    },
+    {
+     "line": 408,
+     "id": "SC2",
+     "reason": "because a constructor cycle fails startup with `BeanCurrentlyInCreationException`",
+     "kind": "stated",
+     "cite": "research/51-spring-core-rules.md:61,69",
+     "basis": "FW: circular constructor deps fail with BeanCurrentlyInCreationException; AOT context will fail to start"
+    },
+    {
+     "line": 409,
+     "id": "SC3",
+     "reason": "because a missing bean then fails at first request, not at startup",
+     "kind": "stated",
+     "cite": "research/51-spring-core-rules.md:140,164",
+     "basis": "BOOT: lazy init can delay discovery of a problem; Bad turns missing bean into runtime-failing stub"
+    },
+    {
+     "line": 410,
+     "id": "SC5",
+     "reason": "because CGLIB proxying of every configuration class costs measured startup time",
+     "kind": "evidence",
+     "cite": "research/51-spring-core-rules.md:74-79",
+     "basis": "spring-boot#9068: proxying is expensive and unnecessary; Wilkinson measured 0.2-0.4 s startup gain"
+    },
+    {
+     "line": 411,
+     "id": "SC6",
+     "reason": "because before creation, the container and type-based conditions see only the declared type",
+     "kind": "stated",
+     "cite": "research/56b-g9b-good-bad-shape-spring.md:477-479",
+     "basis": "FW AOT: declared port hides built type from container, AOT and type-based conditions until creation"
+    },
+    {
+     "line": 412,
+     "id": "SC8",
+     "reason": "because every slice test loads the main class and so enables scheduling and async",
+     "kind": "stated",
+     "cite": "research/51-spring-core-rules.md:49-50,179",
+     "basis": "BOOT: @SpringBootApplication class is each slice test's configuration; Bad enables scheduling+async everywhere"
+    },
+    {
+     "line": 413,
+     "id": "SC10",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/51-spring-core-rules.md:175",
+     "basis": "BOOT asks for a unique namespace and canonical form; no failure named for this rule"
+    },
+    {
+     "line": 414,
+     "id": "SC11",
+     "reason": "because constructor binding does not apply to a record created as `@Component` or `@Bean`",
+     "kind": "stated",
+     "cite": "research/51-spring-core-rules.md:210",
+     "basis": "BOOT: cannot use constructor binding with beans created by regular Spring mechanisms; SBS gotcha: never registered"
+    },
+    {
+     "line": 415,
+     "id": "SC12",
+     "reason": "because one key read in two classes ended up with two defaults",
+     "kind": "evidence",
+     "cite": "research/51-spring-core-rules.md:211,219-225",
+     "basis": "aruvii.activity.ollama.timeout-ms defaults 5000 and 1500 in two classes"
+    },
+    {
+     "line": 416,
+     "id": "SC13",
+     "reason": "because `System.getenv` skips configtree secrets and tests cannot override it",
+     "kind": "stated",
+     "cite": "research/51-spring-core-rules.md:212,246",
+     "basis": "System.getenv bypasses configtree:/run/secrets import and property overrides in tests"
+    },
+    {
+     "line": 417,
+     "id": "SC14",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/51-spring-core-rules.md:213; SBS spring-boot-4/configuration-properties/SKILL.md:21,52",
+     "basis": "BOOT/SBS say use Duration and explicit units; no failure named"
+    },
+    {
+     "line": 418,
+     "id": "SC15",
+     "reason": "because a missing key otherwise crashes with a bare NullPointerException naming nothing",
+     "kind": "evidence",
+     "cite": "research/56b-g9b-good-bad-shape-spring.md:566-567",
+     "basis": "compact constructor dereferences null when key unset; startup fails with NPE naming no key"
+    },
+    {
+     "line": 419,
+     "id": "SC16",
+     "reason": "because a blank master-key default silently stored credentials in plaintext",
+     "kind": "evidence",
+     "cite": "research/51-spring-core-rules.md:215",
+     "basis": "empty aruvii.master-key default makes CredentialEncryptor pass plaintext through silently"
+    },
+    {
+     "line": 420,
+     "id": "SC17",
+     "reason": "because the record's generated `toString` exposes the secret",
+     "kind": "stated",
+     "cite": "research/51-spring-core-rules.md:118,216",
+     "basis": "SBS: generated record toString can expose secrets; Bad masterKey component"
+    },
+    {
+     "line": 421,
+     "id": "SC18",
+     "reason": "because `@PostConstruct` runs inside the singleton creation lock and can deadlock",
+     "kind": "stated",
+     "cite": "research/51-spring-core-rules.md:62-64,255",
+     "basis": "FW: @PostConstruct runs in creation lock; risk of initialization deadlock"
+    },
+    {
+     "line": 422,
+     "id": "SC19",
+     "reason": "because Boot warns that event listeners must not run lengthy tasks",
+     "kind": "stated",
+     "cite": "research/51-spring-core-rules.md:104,256",
+     "basis": "BOOT: event listeners should not run potentially lengthy tasks; use runners instead"
+    },
+    {
+     "line": 423,
+     "id": "SC20",
+     "reason": "because a hand-started container is hidden from the context's lifecycle and graceful-shutdown phases",
+     "kind": "evidence",
+     "cite": "research/51-spring-core-rules.md:257",
+     "basis": "Bad new-ed RedisMessageListenerContainer hidden from context; graceful shutdown runs in SmartLifecycle phase"
+    },
+    {
+     "line": 424,
+     "id": "SC21",
+     "reason": "because a `this` call bypasses the proxy, so the transaction never starts",
+     "kind": "stated",
+     "cite": "research/51-spring-core-rules.md:65-66,286",
+     "basis": "FW: self invocation bypasses advice; signing-key read-check-write ran without a transaction"
+    },
+    {
+     "line": 425,
+     "id": "SC22",
+     "reason": "because a retry inside the failed transaction re-runs work in a doomed transaction",
+     "kind": "stated",
+     "cite": "SBS spring-boot-4/transactional-patterns/SKILL.md:154-155,220",
+     "basis": "retry must wrap the TX; stacked on same method, retry re-runs inside the doomed TX"
+    },
+    {
+     "line": 426,
+     "id": "SC7",
+     "reason": "because load-order stubs once won over real beans and broke TLS",
+     "kind": "evidence",
+     "cite": "research/51-spring-core-rules.md:172,203",
+     "basis": "15 scanned @ConditionalOnMissingBean stubs; S5.6 fallbacks occasionally won, shipping PKIX failures"
+    },
+    {
+     "line": 427,
+     "id": "SC9",
+     "reason": "because a wrong bean choice shipped once with no test covering the choice",
+     "kind": "evidence",
+     "cite": "research/51-spring-core-rules.md:172,174",
+     "basis": "S5.6 load-order bug shipped; no runner spec for the 15 defaults or property conditions"
+    },
+    {
+     "line": 428,
+     "id": "OQ-SC1",
+     "reason": "because those stubs resolve by parse order and once beat the real bean",
+     "kind": "evidence",
+     "cite": "research/51-spring-core-rules.md:172,335",
+     "basis": "BOOT: bean conditions safe only on auto-config; scanned stubs order-dependent; S5.6 shipped bug"
+    },
+    {
+     "line": 430,
+     "id": "OQ-SC5",
+     "reason": "because compact-constructor checks alone crash on a missing key with an unnamed NullPointerException",
+     "kind": "evidence",
+     "cite": "research/56b-g9b-good-bad-shape-spring.md:566-567,587-591",
+     "basis": "constructor-only record fails with NPE naming no key when field unset; annotations name the property"
+    },
+    {
+     "line": 431,
+     "id": "OQ-SC4",
+     "reason": "because a blank master key silently switched credential storage to plaintext",
+     "kind": "evidence",
+     "cite": "research/51-spring-core-rules.md:215,338",
+     "basis": "CredentialEncryptor switches to plaintext passthrough on empty key, silently"
+    },
+    {
+     "line": 433,
+     "id": "OQ-SC3",
+     "reason": "because profile configuration leaks test doubles",
+     "kind": "stated",
+     "cite": "research/51-spring-core-rules.md:106,337",
+     "basis": "pl 301 Ex 15 itself warns profiles leak test doubles"
+    },
+    {
+     "line": 434,
+     "id": "SS1",
+     "reason": "because a forgotten path stays open to any authenticated caller",
+     "kind": "stated",
+     "cite": "research/52-spring-security-rules.md:28,89",
+     "basis": "SSR: forgetting a rule leaves URL open; anyRequest().authenticated() fails open on forgotten path"
+    },
+    {
+     "line": 435,
+     "id": "SS2",
+     "reason": "because Spring authorizes error and async dispatches too, so SSE and error pages break",
+     "kind": "stated",
+     "cite": "research/52-spring-security-rules.md:28,90",
+     "basis": "SSR: all dispatch types are authorized; SC permits ERROR/ASYNC for SSE and error page"
+    },
+    {
+     "line": 436,
+     "id": "SS3",
+     "reason": "because a `Filter` bean runs twice: once in the chain, once out of order",
+     "kind": "stated",
+     "cite": "research/52-spring-security-rules.md:27,91",
+     "basis": "SSR architecture: Filter bean also registered by Boot with container, runs twice out of order"
+    },
+    {
+     "line": 437,
+     "id": "SS4",
+     "reason": "because a swallowed token error turns a bad credential into anonymous access",
+     "kind": "evidence",
+     "cite": "research/52-spring-security-rules.md:58,92",
+     "basis": "JwtAuthFilter catches JwtException and continues as anonymous; SBS: reject invalid tokens even on public paths"
+    },
+    {
+     "line": 438,
+     "id": "SS5",
+     "reason": "because a reflected origin with credentials lets any site read a refreshed token",
+     "kind": "evidence",
+     "cite": "research/52-spring-security-rules.md:93,170",
+     "basis": "allowedOriginPatterns(*) + credentials: cross-site page can read new access token from refresh"
+    },
+    {
+     "line": 439,
+     "id": "SS6",
+     "reason": "because a removed or deactivated user keeps role access for the token's life",
+     "kind": "evidence",
+     "cite": "research/52-spring-security-rules.md:99,171",
+     "basis": "24 h token with workspace roles; removed member keeps role access up to 24 h"
+    },
+    {
+     "line": 440,
+     "id": "SS7",
+     "reason": "because a shared key lets a token made for one purpose pass as another",
+     "kind": "stated",
+     "cite": "research/52-spring-security-rules.md:41,100",
+     "basis": "RFC 8725 §3.12 mutually exclusive validation; OWASP: MAC key never reused; one secret signs three things"
+    },
+    {
+     "line": 441,
+     "id": "SS8",
+     "reason": "because a token in a URL leaks into access logs, browser history and Referer",
+     "kind": "stated",
+     "cite": "research/52-spring-security-rules.md:101,173",
+     "basis": "RFC 6750 §5.3: no bearer token in URI; leaks via access logs, history, Referer"
+    },
+    {
+     "line": 442,
+     "id": "SS9",
+     "reason": "because a stateless API is still open to CSRF when a cookie authenticates",
+     "kind": "stated",
+     "cite": "research/52-spring-security-rules.md:30,102",
+     "basis": "SSR CSRF: stateless is no protection when a custom auth cookie is used"
+    },
+    {
+     "line": 443,
+     "id": "SS10",
+     "reason": "because a stolen refresh token survives the victim's password reset for 30 days",
+     "kind": "evidence",
+     "cite": "research/52-spring-security-rules.md:103",
+     "basis": "PasswordResetService does not revoke refresh tokens; stolen token lives 30 days"
+    },
+    {
+     "line": 444,
+     "id": "SS11",
+     "reason": "because a timestamp-only check and unbound `state` allow login CSRF",
+     "kind": "evidence",
+     "cite": "research/52-spring-security-rules.md:104,174",
+     "basis": "OidcController default decoder checks timestamps only; state not browser-bound -> login CSRF"
+    },
+    {
+     "line": 445,
+     "id": "SS12",
+     "reason": "because an unannotated handler method is not secured by method security",
+     "kind": "stated",
+     "cite": "research/52-spring-security-rules.md:29,110",
+     "basis": "SSR method-security: unannotated methods are not secured"
+    },
+    {
+     "line": 446,
+     "id": "SS13",
+     "reason": "because a role-name guard let an API key edit another workspace's resource",
+     "kind": "evidence",
+     "cite": "research/52-spring-security-rules.md:111,169",
+     "basis": "probable BOLA: key with workspace role passes hasAnyRole on resource in other workspace (no exploit run)"
+    },
+    {
+     "line": 447,
+     "id": "SS14",
+     "reason": "because guards named roles that no enum defines, so they never match",
+     "kind": "evidence",
+     "cite": "research/52-spring-security-rules.md:68,112",
+     "basis": "WORKSPACE_ADMIN, PROJECT_ADMIN in guards; in neither enum, never granted"
+    },
+    {
+     "line": 448,
+     "id": "SS15",
+     "reason": "because one guard is spelled many ways, and a tool parses the string",
+     "kind": "evidence",
+     "cite": "research/52-spring-security-rules.md:113",
+     "basis": "same admin set spelled with different order/spacing; ApiKeyScopeInterceptor parses @PreAuthorize string"
+    },
+    {
+     "line": 449,
+     "id": "SS16",
+     "reason": "because the docs claimed service-layer checks that the code never had",
+     "kind": "evidence",
+     "cite": "research/52-spring-security-rules.md:79,114",
+     "basis": "179/179 guards in controllers, 0 in services; SECURITY.md claims service layer - false"
+    },
+    {
+     "line": 450,
+     "id": "SS17",
+     "reason": "because `@PostAuthorize` runs after the write commits, so a denial undoes nothing",
+     "kind": "stated",
+     "cite": "research/52-spring-security-rules.md:29,115",
+     "basis": "SSR: @PostAuthorize runs after commit unless ordered; unsafe on writes"
+    },
+    {
+     "line": 451,
+     "id": "SS18",
+     "reason": "because filter-chain errors bypass controller advice, producing five different 401/403 shapes",
+     "kind": "evidence",
+     "cite": "research/52-spring-security-rules.md:27,74,121",
+     "basis": "SSR: advice cannot see filter exceptions; five 401/403 body shapes today"
+    },
+    {
+     "line": 452,
+     "id": "SS19",
+     "reason": "because `include-message: always` sends internal exception text to clients",
+     "kind": "evidence",
+     "cite": "research/52-spring-security-rules.md:75,122",
+     "basis": "include-message/binding-errors always reach clients via ResponseStatusException paths"
+    },
+    {
+     "line": 453,
+     "id": "SS20",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/52-spring-security-rules.md:123",
+     "basis": "cites SSR headers + ASVS; code complies; no failure stated in research"
+    },
+    {
+     "line": 454,
+     "id": "SS21",
+     "reason": "because a per-request slow hash makes a public endpoint a CPU sink",
+     "kind": "evidence",
+     "cite": "research/52-spring-security-rules.md:124,160",
+     "basis": "BCrypt on per-request secrets makes /api/webhooks/** anonymous CPU sink; OWASP: work factor is DoS lever"
+    },
+    {
+     "line": 455,
+     "id": "SS22",
+     "reason": "because mock users skip the real filter, where authorities are built",
+     "kind": "stated",
+     "cite": "research/52-spring-security-rules.md:34,130",
+     "basis": "SSR: test support fakes context on test thread; jwt() bypasses JwtDecoder; skips JwtAuthFilter"
+    },
+    {
+     "line": 456,
+     "id": "SS23",
+     "reason": "because a single wrong-role test misses the other-workspace caller and API key",
+     "kind": "stated",
+     "cite": "research/52-spring-security-rules.md:131,148",
+     "basis": "AP3 verdict: wrong platform-role test misses cross-workspace caller; ITs with zero 403 assertions"
+    },
+    {
+     "line": 457,
+     "id": "SS24",
+     "reason": "because JWT libraries have shipped critical flaws that accepted forged tokens",
+     "kind": "stated",
+     "cite": "research/52-spring-security-rules.md:41-42,132",
+     "basis": "McLean/Auth0 2015 critical JWT library vulnerabilities; CVEs are reason to test security"
+    },
+    {
+     "line": 458,
+     "id": "SS25",
+     "reason": "because an untested public setup endpoint had no check, so anyone could finish setup",
+     "kind": "evidence",
+     "cite": "research/52-spring-security-rules.md:133,175",
+     "basis": "POST /api/setup/complete unchecked, no refusal IT; anonymous call can lock the install"
+    },
+    {
+     "line": 459,
+     "id": "AP3a",
+     "reason": "because a wrong-platform-role test misses the other-workspace caller and API key",
+     "kind": "stated",
+     "cite": "research/52-spring-security-rules.md:148",
+     "basis": "AP3 verdict: test trying only a wrong platform role misses cross-workspace caller"
+    },
+    {
+     "line": 460,
+     "id": "AP4a",
+     "reason": "because one public endpoint shipped with no check, and URLs leak secrets to logs",
+     "kind": "evidence",
+     "cite": "research/52-spring-security-rules.md:149,173,175",
+     "basis": "setup/complete unchecked; secrets in URL leak to logs/history/Referer"
+    },
+    {
+     "line": 461,
+     "id": "SE7a",
+     "reason": "because a slow hash on machine secrets turns public endpoints into CPU sinks",
+     "kind": "evidence",
+     "cite": "research/52-spring-security-rules.md:151,160",
+     "basis": "BCrypt on random API keys/trigger secrets adds nothing, makes webhooks a CPU sink"
+    },
+    {
+     "line": 465,
+     "id": "SS26",
+     "reason": "because hand-rolled OIDC skipped the issuer, audience and nonce checks the framework does",
+     "kind": "evidence",
+     "cite": "research/52-spring-security-rules.md:104,174",
+     "basis": "hand-rolled OIDC: no iss/aud/nonce, state unbound; oauth2Login fixes all four"
+    },
+    {
+     "line": 466,
+     "id": "OQ-SS-1",
+     "reason": "because a 24-hour token keeps a removed user's access for a day",
+     "kind": "evidence",
+     "cite": "research/52-spring-security-rules.md:139,171",
+     "basis": "24 h TTL: removed member or deactivated user keeps role access up to 24 h"
+    },
+    {
+     "line": 467,
+     "id": "OQ-SS-2",
+     "reason": "because without families, reuse of a stolen rotated token goes undetected",
+     "kind": "stated",
+     "cite": "research/52-spring-security-rules.md:140",
+     "basis": "refresh family revokes on reuse of rotated token; detects theft"
+    },
+    {
+     "line": 468,
+     "id": "OQ-SS-3",
+     "reason": "because a secret in the path leaks into nginx access logs and proxies",
+     "kind": "stated",
+     "cite": "research/52-spring-security-rules.md:141",
+     "basis": "webhook path secret leaks into nginx access logs and proxies"
+    },
+    {
+     "line": 469,
+     "id": "OQ-SS-4",
+     "reason": "because a key holding a workspace role passed guards in every workspace",
+     "kind": "evidence",
+     "cite": "research/52-spring-security-rules.md:69,142",
+     "basis": "API key with workspace role matches hasAnyRole guards in any workspace"
+    },
+    {
+     "line": 470,
+     "id": "ND-4",
+     "reason": "because scattered decrypt sites already include two that return ciphertext on failure",
+     "kind": "evidence",
+     "cite": "research/52-spring-security-rules.md:158",
+     "basis": "28 decrypt lines in 14+ classes; six copy one loop; two fall back to ciphertext"
+    },
+    {
+     "line": 476,
+     "id": "MG1",
+     "reason": "because Flyway checksums fail startup when an applied migration changes",
+     "kind": "stated",
+     "cite": "agent-platform 71b5deb4:.agents/skills/migrations/references/review.md:11-13",
+     "basis": "Flyway validates checksums on migrate; a changed file fails startup"
+    },
+    {
+     "line": 477,
+     "id": "MG2",
+     "reason": "because branches taking the same next number collide at merge and fail startup",
+     "kind": "evidence",
+     "cite": "agent-platform 71b5deb4:.claude/rules/migrations.md:42-46; research/60a-g9c-migrations.md:34",
+     "basis": "two branches taking n+1 collide at merge, fail at startup (#161); #502/#496 both took V104"
+    },
+    {
+     "line": 478,
+     "id": "MG4",
+     "reason": "because a header saying expand-only hid a rewrite of every row",
+     "kind": "evidence",
+     "cite": "research/60a-g9c-migrations.md:35",
+     "basis": "P1 F3: V106 header said Expand-only yet rewrote every agents row"
+    },
+    {
+     "line": 479,
+     "id": "MG3",
+     "reason": "because a Java migration's required class name broke the Checkstyle `TypeName` rule",
+     "kind": "evidence",
+     "cite": "agent-platform 71b5deb4:.agents/skills/migrations/references/review.md:59-62",
+     "basis": "REQ-024 Java migration discarded: Flyway naming fights Checkstyle TypeName"
+    },
+    {
+     "line": 480,
+     "id": "MG17",
+     "reason": "because a changed checksum reruns a repeatable script, repeating its deletes",
+     "kind": "stated",
+     "cite": "plinth 313 antipatterns.md:25",
+     "basis": "repeatable scripts rerun on checksum change; review for destructive operations"
+    },
+    {
+     "line": 481,
+     "id": "MG18",
+     "reason": "because out-of-order applies migrations in different orders, so environments diverge",
+     "kind": "stated",
+     "cite": "agent-platform 71b5deb4:.agents/skills/migrations/references/review.md:238-241",
+     "basis": "out-of-order hides error; same-version migrations applied in different orders; dev and prod diverge"
+    },
+    {
+     "line": 482,
+     "id": "MG21",
+     "reason": "because a started context proves nothing about preserved existing data",
+     "kind": "stated",
+     "cite": "plinth 313 antipatterns.md:154-160; agent-platform 71b5deb4:.agents/skills/migrations/references/review.md:263-268",
+     "basis": "passing Spring context test is not enough; must assert preserved business data"
+    },
+    {
+     "line": 483,
+     "id": "MG20",
+     "reason": "because past reviews show humans dismissing security and data-flow findings",
+     "kind": "stated",
+     "cite": "pstack bugbot-triage.md:77-83",
+     "basis": "do not auto-skip migration findings; history shows humans dismiss security/data-flow comments"
+    },
+    {
+     "line": 484,
+     "id": "MG30",
+     "reason": "because mixing `timestamp` and `timestamptz` silently dropped rows from `BETWEEN` queries",
+     "kind": "evidence",
+     "cite": "agent-platform 71b5deb4:.agents/skills/migrations/references/review.md:161-163",
+     "basis": "V25 exists because the mixture silently dropped rows from BETWEEN comparisons"
+    },
+    {
+     "line": 485,
+     "id": "MG31",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/60a-g9c-migrations.md:60",
+     "basis": "PG: no performance difference; wiki says avoid varchar(n); no failure stated"
+    },
+    {
+     "line": 486,
+     "id": "MG32",
+     "reason": "because the default `NO ACTION` is a delete behaviour nobody chose",
+     "kind": "stated",
+     "cite": "research/60a-g9c-migrations.md:61; agent-platform 71b5deb4:.claude/rules/migrations.md:94-95",
+     "basis": "PG default ON DELETE NO ACTION is silent; skel: a decision nobody made"
+    },
+    {
+     "line": 487,
+     "id": "MG33",
+     "reason": "because an unindexed FK makes each parent delete scan the child under locks",
+     "kind": "stated",
+     "cite": "agent-platform 71b5deb4:.claude/rules/migrations.md:35-36",
+     "basis": "PG does not index FK; unindexed FK makes parent delete scan child holding locks"
+    },
+    {
+     "line": 488,
+     "id": "MG34",
+     "reason": "because a CHECK passes when the value is null",
+     "kind": "stated",
+     "cite": "research/60a-g9c-migrations.md:63",
+     "basis": "PG-CON 5.5.1: check satisfied if expression is true or null"
+    },
+    {
+     "line": 489,
+     "id": "MG35",
+     "reason": "because a nullable `UNIQUE` column still accepts duplicate null rows",
+     "kind": "stated",
+     "cite": "research/60a-g9c-migrations.md:64",
+     "basis": "PG-CON 5.5.3: possible to store duplicate rows containing null"
+    },
+    {
+     "line": 490,
+     "id": "MG36",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/60a-g9c-migrations.md:65",
+     "basis": "PG wiki 'don't use' headings quoted only; no failure stated"
+    },
+    {
+     "line": 491,
+     "id": "MG37",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/60a-g9c-migrations.md:66",
+     "basis": "PG docs prefer jsonb and describe GIN; no failure stated"
+    },
+    {
+     "line": 492,
+     "id": "MG38",
+     "reason": "because generated names cannot be reviewed or asserted in tests",
+     "kind": "stated",
+     "cite": "agent-platform 71b5deb4:.claude/rules/migrations.md:33-34",
+     "basis": "generated names are unreviewable and unassertable"
+    },
+    {
+     "line": 493,
+     "id": "MG42",
+     "reason": "because the invented marker cost a day, and a `.conf` sidecar changes nothing",
+     "kind": "evidence",
+     "cite": "agent-platform 71b5deb4:.claude/rules/migrations.md:20-27",
+     "basis": "nonTransactional marker exists in no Flyway edition, #109 lost a day; .conf measured no-op #154"
+    },
+    {
+     "line": 494,
+     "id": "MG50",
+     "reason": "because two migrators race for the lock and already caused a startup hang",
+     "kind": "evidence",
+     "cite": "agent-platform 71b5deb4:.claude/rules/migrations.md:77-79",
+     "basis": "two migrators: non-deterministic lock race; cost one production-shaped hang (#154, #222)"
+    },
+    {
+     "line": 495,
+     "id": "MG51",
+     "reason": "because baseline-on-migrate lets a partly migrated database silently skip versions",
+     "kind": "stated",
+     "cite": "agent-platform 71b5deb4:.agents/skills/migrations/references/review.md:39-42",
+     "basis": "baseline true lets partly migrated DB baseline itself and skip versions below"
+    },
+    {
+     "line": 496,
+     "id": "MG53",
+     "reason": "because renumbering writes a local dev-volume accident into permanent history",
+     "kind": "stated",
+     "cite": "agent-platform 71b5deb4:.claude/rules/migrations.md:53-56",
+     "basis": "renumbering stranded migrations writes a local accident into permanent history"
+    },
+    {
+     "line": 497,
+     "id": "MG54",
+     "reason": "because `validate` passes a forgotten `NOT NULL`, dropped index or missing FK",
+     "kind": "stated",
+     "cite": "agent-platform 71b5deb4:.claude/rules/migrations.md:88-90,105-109",
+     "basis": "Hibernate validate checks existence/type only; misses NOT NULL, indexes, FKs, checks"
+    },
+    {
+     "line": 498,
+     "id": "MG55",
+     "reason": "because a missing entry makes integration tests give intermittent false results",
+     "kind": "stated",
+     "cite": "agent-platform 71b5deb4:.claude/rules/migrations.md:91-92",
+     "basis": "missing PRESERVE entry turns the whole suite into an intermittent liar"
+    },
+    {
+     "line": 499,
+     "id": "MG56",
+     "reason": "because the line is a measurement that goes stale and changes no behaviour",
+     "kind": "stated",
+     "cite": "research/00-reference-format.md:119,121",
+     "basis": "checklist 13: no counts that rot; 15: delete lines that change no behaviour"
+    },
+    {
+     "line": 500,
+     "id": "MG60",
+     "reason": "because a one-time hand check missed sibling branches, and two changes took one version",
+     "kind": "evidence",
+     "cite": "agent-platform 71b5deb4:.claude/rules/migrations.md:44-46",
+     "basis": "query run once cannot see sibling worktree; #502 and #496 both took V104 after a correct check"
+    },
+    {
+     "line": 501,
+     "id": "MG61",
+     "reason": "because the old steps sent agents to a deleted `/dod` command",
+     "kind": "evidence",
+     "cite": "research/60a-g9c-migrations.md:23,89",
+     "basis": "skel flyway-migration:10 names deleted /dod"
+    },
+    {
+     "line": 502,
+     "id": "MG62",
+     "reason": "because `IF NOT EXISTS` skips an invalid index left by a failed build",
+     "kind": "stated",
+     "cite": "research/60a-g9c-migrations.md:70",
+     "basis": "PG-IDX: IF NOT EXISTS gives no guarantee existing index is anything like the one requested"
+    },
+    {
+     "line": 503,
+     "id": "MG70",
+     "reason": "because DDL safety had no gate, so these defects reached review",
+     "kind": "evidence",
+     "cite": "research/60a-g9c-migrations.md:94,173",
+     "basis": "semgrep deleted, migration DDL safety ungated; P1 found F3/N2 only by review"
+    },
+    {
+     "line": 504,
+     "id": "MG71",
+     "reason": "because duplicate versions from two branches merged cleanly, then failed at startup",
+     "kind": "evidence",
+     "cite": "research/60a-g9c-migrations.md:95; agent-platform 71b5deb4:.claude/rules/migrations.md:42-44",
+     "basis": "#500, #161 merged cleanly; collisions fail at container startup"
+    },
+    {
+     "line": 505,
+     "id": "MG72",
+     "reason": "because two worktrees took one version after each ran a correct check",
+     "kind": "evidence",
+     "cite": "research/60a-g9c-migrations.md:96",
+     "basis": "hook reads git branch -r only; #502/#496 collided after a correct check"
+    }
+   ]
+  },
+  {
+   "key": "fowler-checkstyle",
+   "name": "Fowler smells + Checkstyle gates",
+   "items": [
+    {
+     "line": 532,
+     "id": "SP22",
+     "reason": "because S-6 claims a complexity gate that master's Checkstyle config does not have",
+     "kind": "evidence",
+     "cite": "research/58:93,135",
+     "basis": "AP checkstyle.xml has neither CyclomaticComplexity nor Nested*Depth; S-6 'checked by' untrue"
+    },
+    {
+     "line": 534,
+     "id": "X1",
+     "reason": "because JV5 already stops `var` from hiding a type",
+     "kind": "stated",
+     "cite": "research/58:143 (X1)",
+     "basis": "Spring bans var as a library read without IDE; ours is an app and JV5 limits var"
+    },
+    {
+     "line": 535,
+     "id": "X3",
+     "reason": "because an interface with only one implementation is extra effort with no substitution",
+     "kind": "stated",
+     "cite": "research/58:69 (MF/InterfaceImplementationPair)",
+     "basis": "Fowler: interfaces without multiple implementations are extra effort in applications"
+    },
+    {
+     "line": 536,
+     "id": "X5",
+     "reason": "because putting all logic in services leaves an anemic, behaviour-less domain model",
+     "kind": "stated",
+     "cite": "research/58:105,147 (MF/AnemicDomainModel)",
+     "basis": "Fowler warns behaviour-less domain objects are an anti-pattern"
+    },
+    {
+     "line": 537,
+     "id": "FW1",
+     "reason": "because a long constructor often signals an over-busy object; one has 32 parameters",
+     "kind": "stated",
+     "cite": "research/58:40,60 (MF-art/injection.html)",
+     "basis": "Fowler: long constructor signals over-busy object to split; AP ctor with 32 params"
+    },
+    {
+     "line": 538,
+     "id": "FW2",
+     "reason": "because callers cannot tell what true or false means at the call site",
+     "kind": "stated",
+     "cite": "MF/FlagArgument (fetched)",
+     "basis": "flag obscures caller intent; flag logic tangles through the method"
+    },
+    {
+     "line": 539,
+     "id": "FW5",
+     "reason": "because a reader must work through the fragment to learn what it does",
+     "kind": "stated",
+     "cite": "MF/FunctionLength ¶1-3 (fetched); research/58:59",
+     "basis": "effort to figure out a fragment's purpose is the cue to extract and name it"
+    },
+    {
+     "line": 540,
+     "id": "FW6",
+     "reason": "because callers that pull fields out and decide put the record's behaviour elsewhere",
+     "kind": "stated",
+     "cite": "MF/GetterEradicator (fetched); research/58:73",
+     "basis": "Beck's rule: code calling several methods of one object; behaviour belongs in the object (Tell Don't Ask)"
+    },
+    {
+     "line": 541,
+     "id": "FW8",
+     "reason": "because each cure creates the other smell, so a reviewer can flag both",
+     "kind": "stated",
+     "cite": "research/58:41,56 (RC/removeMiddleMan)",
+     "basis": "Remove Middle Man is the inverse of Hide Delegate; baseline gives no warning"
+    },
+    {
+     "line": 542,
+     "id": "FW9",
+     "reason": "because the cited baseline lists only 12 smells and misses Long Function",
+     "kind": "stated",
+     "cite": "research/58:24,34,40",
+     "basis": "RK claims Fowler's catalogue but is a 12-smell subset missing Long Function, Long Parameter List, Data Class"
+    },
+    {
+     "line": 543,
+     "id": "R36-D1",
+     "reason": "because no first-party number exists; 7 flags only the 57 worst constructors",
+     "kind": "evidence",
+     "cite": "research/58:154 (D1)",
+     "basis": "no Fowler number; 7 flags 57 worst AP constructors, leaves ordinary services alone"
+    },
+    {
+     "line": 544,
+     "id": "FW3",
+     "reason": "because only side-effect-free queries are safe to call in any order",
+     "kind": "stated",
+     "cite": "MF/CommandQuerySeparation (fetched)",
+     "basis": "queries without side effects can be called anywhere in any order; modifiers need care"
+    },
+    {
+     "line": 545,
+     "id": "FW7",
+     "reason": "because a header interface forces implementations to carry methods consumers never use",
+     "kind": "stated",
+     "cite": "MF/RoleInterface (fetched); research/58:70",
+     "basis": "header interfaces force implementing every method; role interfaces hold only what consumer needs"
+    },
+    {
+     "line": 546,
+     "id": "SP13",
+     "reason": "because a public, non-final implementation can be named or subclassed past its interface",
+     "kind": "stated",
+     "cite": "research/58:81",
+     "basis": "Spring final package-private Default* means impl cannot be named or subclassed"
+    },
+    {
+     "line": 559,
+     "id": "R37-D1",
+     "reason": "because a warning-count ratchet lets a new violation hide behind a fixed one",
+     "kind": "stated",
+     "cite": "research/59:139-145,475",
+     "basis": "maxWarnings is one number per task; new hit can replace a fixed one"
+    },
+    {
+     "line": 560,
+     "id": "R37-D2",
+     "reason": "because counting each case would flag the exhaustive switches S-4 requires",
+     "kind": "stated",
+     "cite": "research/59:476 (D2)",
+     "basis": "switch-counts-once keeps S-6 and does not punish S-4 exhaustive switches"
+    },
+    {
+     "line": 561,
+     "id": "R37-D3",
+     "reason": "because two modules run no Checkstyle, so an unused import survives on master",
+     "kind": "evidence",
+     "cite": "research/59:74-79",
+     "basis": "aruvii-shared, aruvii-test-support unchecked; UnusedImports hit survives at AruviiTestCodeRulesBase.java:3"
+    },
+    {
+     "line": 562,
+     "id": "R37-D4",
+     "reason": "because one sweep across 192+ files conflicts with every open MR touching them",
+     "kind": "stated",
+     "cite": "research/59:478 (D4)",
+     "basis": "sweep MR conflicts with every open MR touching those files"
+    },
+    {
+     "line": 563,
+     "id": "R37-D5",
+     "reason": "because a 100 limit flags 2278 lines on master; 120 flags 186",
+     "kind": "evidence",
+     "cite": "research/59:479 (D5)",
+     "basis": "measured: 120 gives 186 gated hits, Google's 100 gives 2278"
+    },
+    {
+     "line": 564,
+     "id": "R37-D6",
+     "reason": "because 3397 test locals break ST1's final rule with no gate today",
+     "kind": "evidence",
+     "cite": "research/59:90,480 (D6)",
+     "basis": "FinalLocalVariable probe on tests: 3397 hits; ST1 already requires final on every local"
+    },
+    {
+     "line": 565,
+     "id": "R37-D7",
+     "reason": "because the default comment exemption lets 19 of 27 empty catches pass",
+     "kind": "evidence",
+     "cite": "research/59:98,481 (D7)",
+     "basis": "27 empty catches strict; only 8 with default comment exemption"
+    },
+    {
+     "line": 566,
+     "id": "R37-D8",
+     "reason": "because the linked list has 12 of 24 smells and sits in a zero-star repo",
+     "kind": "stated",
+     "cite": "research/59:66,421,482 (D8)",
+     "basis": "rameezk ★0 lists 12 of Fowler's 24; own list gives one owner"
+    },
+    {
+     "line": 567,
+     "id": "G-SP22",
+     "reason": "because S-6 claims a complexity gate master lacks; 204 methods exceed 5",
+     "kind": "evidence",
+     "cite": "research/58:93; research/59:86",
+     "basis": "no CyclomaticComplexity module on master; 204 gated hits at max 5"
+    },
+    {
+     "line": 569,
+     "id": "G-DS9",
+     "reason": "because nesting of three or more levels makes control flow hard to follow",
+     "kind": "stated",
+     "cite": "addyosmani-agent-skills/skills/code-simplification/SKILL.md:131",
+     "basis": "deep nesting (3+ levels) signals hard-to-follow control flow; use guard clauses"
+    },
+    {
+     "line": 570,
+     "id": "G-JV9",
+     "reason": "because review alone left 666 brace-less statements on master",
+     "kind": "evidence",
+     "cite": "research/59:89",
+     "basis": "NeedBraces measured 666 hits in 178 files"
+    },
+    {
+     "line": 571,
+     "id": "G-OQ2",
+     "reason": "because 2612 never-reassigned locals on master lack final despite TY4",
+     "kind": "evidence",
+     "cite": "research/59:90",
+     "basis": "FinalLocalVariable measured 2612 hits in 254 files"
+    },
+    {
+     "line": 572,
+     "id": "G-X6",
+     "reason": "because @PostConstruct runs inside the singleton creation lock and risks initialization deadlock",
+     "kind": "stated",
+     "cite": "research/51:62-64 (FW factory-nature.html)",
+     "basis": "Spring: @PostConstruct runs in singleton creation lock; else risk of initialization deadlock"
+    },
+    {
+     "line": 573,
+     "id": "G-SC1",
+     "reason": "because a dependency injected outside the constructor needs not-null checks everywhere",
+     "kind": "stated",
+     "cite": "research/51:59-60 (FW DI reference)",
+     "basis": "Spring: non-constructor deps without defaults force not-null checks everywhere"
+    },
+    {
+     "line": 574,
+     "id": "G-UnusedImports",
+     "reason": "because an unused import survives on master in a module Checkstyle skips",
+     "kind": "evidence",
+     "cite": "research/59:78-79,93",
+     "basis": "AruviiTestCodeRulesBase.java:3 unused import in ungated aruvii-test-support"
+    },
+    {
+     "line": 575,
+     "id": "G-CK1",
+     "reason": "because the config claims IDE enforcement, yet 269 lines exceed 120",
+     "kind": "evidence",
+     "cite": "research/59:94",
+     "basis": "master header says LineLength enforced by IDE; 269 lines over 120"
+    },
+    {
+     "line": 576,
+     "id": "G-DS2",
+     "reason": "because one file on master has already grown to 1405 lines",
+     "kind": "evidence",
+     "cite": "research/59:95",
+     "basis": "FileLength 1000: ChatOrchestrator.java at 1405 lines"
+    },
+    {
+     "line": 577,
+     "id": "G-FW1",
+     "reason": "because a long constructor signals an over-busy object; 41 constructors exceed 7",
+     "kind": "stated",
+     "cite": "research/58:40; research/59:96",
+     "basis": "Fowler: long constructor = over-busy object; 41 gated ctor hits at max 7"
+    },
+    {
+     "line": 578,
+     "id": "G-CK4",
+     "reason": "because long parameter lists are confusing; 12 methods on master exceed 7",
+     "kind": "stated",
+     "cite": "InformIT p=2952392 seqNum=4 (fetched); research/59:97",
+     "basis": "Fowler 2e: long parameter lists confusing; 12 gated method hits"
+    },
+    {
+     "line": 579,
+     "id": "G-ER3",
+     "reason": "because an empty catch silently swallows the exception; 27 exist on master",
+     "kind": "stated",
+     "cite": "cursor-plugins ps/skills/interrogate/references/rubric.md:10; research/59:98",
+     "basis": "rubric asks if errors are silently swallowed; 27 empty catches measured"
+    },
+    {
+     "line": 580,
+     "id": "G-ER4",
+     "reason": "because catching Throwable or Error traps fatal JVM errors that must propagate",
+     "kind": "stated",
+     "cite": "jabrena-plinth skill-references/126-java-exception-handling.xml:38",
+     "basis": "do not catch Throwable/Error; let fatal JVM errors propagate"
+    },
+    {
+     "line": 581,
+     "id": "G-JV6",
+     "reason": "because an Optional parameter still accepts null and forces callers to wrap",
+     "kind": "stated",
+     "cite": "agent-platform .claude/skills/aruvii-standards/references/modern-java.md:120-127",
+     "basis": "caller must construct Optional, null still passable; ceremony without removing a case"
+    },
+    {
+     "line": 582,
+     "id": "G-JV2",
+     "reason": "because parallel streams share the common pool, so one blocking call stalls requests",
+     "kind": "stated",
+     "cite": "agent-platform .claude/skills/aruvii-standards/references/modern-java.md:69-73",
+     "basis": "common ForkJoinPool shared process-wide; blocking parks a thread; latency under load"
+    },
+    {
+     "line": 583,
+     "id": "G-SP19",
+     "reason": "because main code on master still prints errors to System.err",
+     "kind": "evidence",
+     "cite": "research/58:94; research/59:102",
+     "basis": "HashEmbeddingAdapter.java:35 System.err.println; Spring bans console output, no reason given"
+    },
+    {
+     "line": 584,
+     "id": "G-SP18",
+     "reason": "because two static-only classes on master lack a private constructor or final",
+     "kind": "evidence",
+     "cite": "research/59:103",
+     "basis": "HideUtilityClassConstructor and FinalClass: 1 hit each (LicenseGenerator, JwtAuthentication)"
+    },
+    {
+     "line": 585,
+     "id": "G-LG6",
+     "reason": "because a concatenated log message cannot be queried as structured fields",
+     "kind": "stated",
+     "cite": "addyosmani-agent-skills/skills/observability-and-instrumentation/SKILL.md:57-58",
+     "basis": "BAD: string interpolation in log message, unqueryable and inconsistent"
+    },
+    {
+     "line": 586,
+     "id": "G-CK5",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "CS/unusedlocalvariable (fetched); research/59:105",
+     "basis": "doc states no rationale; 59 counts 60 hits, mostly 'ignored' names, no failure"
+    },
+    {
+     "line": 587,
+     "id": "G-CK3",
+     "reason": "because too many conditions make code hard to read and debug",
+     "kind": "stated",
+     "cite": "CS/booleanexpressioncomplexity §Description (fetched)",
+     "basis": "too many conditions: code difficult to read, debug and maintain"
+    },
+    {
+     "line": 588,
+     "id": "G-CK2",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/59:107; SF checkstyle.xml lines cited",
+     "basis": "only Spring's config and zero hits ('free'); no failure stated"
+    },
+    {
+     "line": 590,
+     "id": "CK2",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "research/59:107,455",
+     "basis": "Spring gates the set; 0 hits; no failure stated"
+    },
+    {
+     "line": 591,
+     "id": "CK3",
+     "reason": "because too many conditions make code hard to read and debug",
+     "kind": "stated",
+     "cite": "CS/booleanexpressioncomplexity §Description (fetched)",
+     "basis": "too many conditions: code difficult to read, debug and maintain"
+    },
+    {
+     "line": 592,
+     "id": "CK4",
+     "reason": "because long parameter lists are confusing in their own right",
+     "kind": "stated",
+     "cite": "InformIT p=2952392 seqNum=4 (fetched)",
+     "basis": "Fowler 2e: long parameter lists are often confusing in their own right"
+    },
+    {
+     "line": 593,
+     "id": "CK5",
+     "reason": "NO-REASON",
+     "kind": "none",
+     "cite": "CS/unusedlocalvariable (fetched); research/59:458",
+     "basis": "doc only defines the check; no failure stated"
+    },
+    {
+     "line": 594,
+     "id": "CK1",
+     "reason": "because IDE-only enforcement left 269 lines over 120 on master",
+     "kind": "evidence",
+     "cite": "research/59:94,454",
+     "basis": "header claims IDE enforces it; 269 main lines over 120"
+    },
+    {
+     "line": 595,
+     "id": "CK6",
+     "reason": "because about 4000 existing hits would otherwise block every gate on a sweep",
+     "kind": "stated",
+     "cite": "research/59:475 (D1 option c)",
+     "basis": "fixing all first (~4000 hits) blocks every gate on a sweep TY4 forbids"
+    },
+    {
+     "line": 596,
+     "id": "CK7",
+     "reason": "because 184 files in two modules run no Checkstyle today",
+     "kind": "evidence",
+     "cite": "research/59:74-79,460",
+     "basis": "aruvii-shared 162 + aruvii-test-support 22 files unchecked; 1 live UnusedImports"
+    },
+    {
+     "line": 597,
+     "id": "CK8",
+     "reason": "because an import-only gate misses fully-qualified annotations; two @Autowired uses escape",
+     "kind": "stated",
+     "cite": "research/59:49,92,461 (CS/illegalimport)",
+     "basis": "IllegalImport checks imports only; ToolService.java:153, ChatOrchestrator.java:128 pass it"
+    },
+    {
+     "line": 598,
+     "id": "CK9",
+     "reason": "because each rejected module conflicts with an approved rule, e.g. MissingSwitchDefault with S-4",
+     "kind": "stated",
+     "cite": "research/59:126-137",
+     "basis": "MissingSwitchDefault fights S-4, ReturnCount DS9, FinalParameters OQ2, IllegalCatch-Exception ER4"
+    },
+    {
+     "line": 599,
+     "id": "SM1",
+     "reason": "because the current 12-smell list misses half of Fowler's 24 smells",
+     "kind": "stated",
+     "cite": "research/59:421,463",
+     "basis": "rameezk has 12 of Fowler 2e's 24; missing 12 listed"
+    },
+    {
+     "line": 600,
+     "id": "SM2",
+     "reason": "because Fowler's 24 smells do not name these three",
+     "kind": "stated",
+     "cite": "research/59:60,437-439",
+     "basis": "Kerievsky adds smells Fowler lacks; these three map to our code"
+    },
+    {
+     "line": 601,
+     "id": "SM3",
+     "reason": "because no gate or rule covers unused private members today",
+     "kind": "stated",
+     "cite": "research/59:442,465",
+     "basis": "Dead Code: our cover none; CK5 gates locals only"
+    },
+    {
+     "line": 603,
+     "id": "SM5",
+     "reason": "because Sonar's source-available licence does not permit vendoring its rule text",
+     "kind": "stated",
+     "cite": "research/59:62,467",
+     "basis": "SONAR Source-Available Licence v1.0: read, don't vendor"
+    }
+   ]
+  }
+ ],
+ "excluded": [
+  {
+   "line": 126,
+   "id": "CUT-smoke",
+   "why": "placement / process decision"
+  },
+  {
+   "line": 127,
+   "id": "WIRE-smoke",
+   "why": "placement / process decision"
+  },
+  {
+   "line": 344,
+   "id": "FL1",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 345,
+   "id": "FL2",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 346,
+   "id": "FL3",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 347,
+   "id": "FL4",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 348,
+   "id": "FL5",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 349,
+   "id": "FL6",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 350,
+   "id": "FL7",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 351,
+   "id": "FL8",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 352,
+   "id": "FL9",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 353,
+   "id": "FL10",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 354,
+   "id": "FL11",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 355,
+   "id": "FL12",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 356,
+   "id": "FL13",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 357,
+   "id": "FL14",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 358,
+   "id": "FL15",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 359,
+   "id": "FL16",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 360,
+   "id": "FL17",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 361,
+   "id": "FL18",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 362,
+   "id": "FL19",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 363,
+   "id": "FL20",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 364,
+   "id": "FL21",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 365,
+   "id": "FL22",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 366,
+   "id": "FL23",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 367,
+   "id": "FL24",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 368,
+   "id": "FL25",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 369,
+   "id": "FL26",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 370,
+   "id": "FL27",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 371,
+   "id": "X4",
+   "why": "pointer to another rule"
+  },
+  {
+   "line": 372,
+   "id": "X5",
+   "why": "pointer to another rule"
+  },
+  {
+   "line": 373,
+   "id": "X8",
+   "why": "pointer to another rule"
+  },
+  {
+   "line": 374,
+   "id": "OQ5",
+   "why": "placement / process decision"
+  },
+  {
+   "line": 375,
+   "id": "X6",
+   "why": "pointer to another rule"
+  },
+  {
+   "line": 376,
+   "id": "X1",
+   "why": "pointer to another rule"
+  },
+  {
+   "line": 378,
+   "id": "ND-2",
+   "why": "placement / process decision"
+  },
+  {
+   "line": 379,
+   "id": "ND-3",
+   "why": "placement / process decision"
+  },
+  {
+   "line": 387,
+   "id": "X7",
+   "why": "pointer to another rule"
+  },
+  {
+   "line": 392,
+   "id": "OQ-R27-6",
+   "why": "placement / process decision"
+  },
+  {
+   "line": 396,
+   "id": "OQ-NG3",
+   "why": "placement / process decision"
+  },
+  {
+   "line": 429,
+   "id": "OQ-SC2",
+   "why": "placement / process decision"
+  },
+  {
+   "line": 432,
+   "id": "OQ-SC6",
+   "why": "placement / process decision"
+  },
+  {
+   "line": 462,
+   "id": "SE-verdict",
+   "why": "placement / process decision"
+  },
+  {
+   "line": 463,
+   "id": "OQ-R27-4",
+   "why": "pointer to another rule"
+  },
+  {
+   "line": 464,
+   "id": "OQ-R27-5",
+   "why": "pointer to another rule"
+  },
+  {
+   "line": 471,
+   "id": "G9c-MG-F1",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 472,
+   "id": "G9c-MG-F2",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 473,
+   "id": "G9c-MG-F3",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 474,
+   "id": "G9c-MG-F4",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 475,
+   "id": "G9c-MG-F5",
+   "why": "file fate (where a file goes)"
+  },
+  {
+   "line": 547,
+   "id": "FW4",
+   "why": "pointer to another rule"
+  },
+  {
+   "line": 556,
+   "id": "R36-D3",
+   "why": "placement / process decision"
+  },
+  {
+   "line": 557,
+   "id": "R36-D4",
+   "why": "placement / process decision"
+  },
+  {
+   "line": 558,
+   "id": "R36-D5",
+   "why": "placement / process decision"
+  }
+ ]
+}
