@@ -31,18 +31,18 @@ GitLab facts: docs.gitlab.com (primary), fetched 2026-10-02, plus a live `glab a
 ### firstmate + no-mistakes
 
 - **Implementer before handoff:** commits on the ship branch, then hands over to the pipeline —
-  "Firstmate will then instruct you to run /no-mistakes" (`bin/fm-dod-lib.sh:441`). The
+  "Firstmate will then instruct you to run /no-mistakes" (`bin/fm-dod-lib.sh:589 @5f2b81b`). The
   pipeline steps are `review`, `test`, `document`, `lint`, plus `push`, `pr`, `ci`
   (`docs/gerrit-forge-integration.md:262`); "skip nothing else: `review`, `test`, `document`, and
-  `lint` are the whole point" (`bin/fm-dod-lib.sh:379`). Lint is pinned to the same script CI runs
+  `lint` are the whole point" (`bin/fm-dod-lib.sh:497 @5f2b81b`). Lint is pinned to the same script CI runs
   (`.no-mistakes.yaml:34` `lint: 'bin/fm-lint.sh'`).
 - **Verifier:** forge CI on GitHub-hosted runners (`.github/workflows/ci.yml:32` `runs-on: ubuntu-latest`).
   A second workflow refuses any PR not raised through the pipeline — "PR must be raised via
   no-mistakes" (`no-mistakes-required.yml:24`). VISION states the split: "validation belongs to no-mistakes, CI belongs to the forge"
   (`VISION.md:71`).
-- **SHA tie:** the ready report is `done: PR {url} checks green` (`fm-dod-lib.sh:450`), "accepted
+- **SHA tie:** the ready report is `done: PR {url} checks green` (`fm-dod-lib.sh:598 @5f2b81b`), "accepted
   only when this copy's HEAD … is one the /no-mistakes run pushed" (`:451`). GitLab merge path
-  needs "a successful pipeline at the current head" (`docs/architecture.md:399`).
+  needs "a successful pipeline at the current head" (`docs/architecture.md:404 @5f2b81b`).
 - **Serialisation:** per-PR concurrency group with `cancel-in-progress` on PRs (`ci.yml:23`), so a newer push replaces older runs.
 - **Posted back:** natively. The forge check on the PR is the result.
 
@@ -70,9 +70,9 @@ GitLab facts: docs.gitlab.com (primary), fetched 2026-10-02, plus a live `glab a
   host)" (`AGENTS.md:91`). The contributor baseline is `pnpm build && pnpm check && pnpm test`
   (`CONTRIBUTING.md:93`). Each test states its measured CI cost (`AGENTS.md:93`).
 - **Verifier:** GitHub CI with the required `openclaw/ci-gate`. Merge "requires completed review, the exact
-  prepared head, and the enforced `openclaw/ci-gate`" (`scripts/AGENTS.md:30`). Heavy suites can run off-host:
+  prepared head, and the enforced `openclaw/ci-gate`" (`scripts/AGENTS.md:30` [drift 2026-10-17: cited lines rewritten at d8faf8876, see research/64d]). Heavy suites can run off-host:
   `OPENCLAW_PR_GATES_REMOTE=testbox` runs full `pnpm test` on a Blacksmith Testbox, and the lease id and run URL are recorded
-  (`scripts/AGENTS.md:40`).
+  (`scripts/AGENTS.md:40` [drift 2026-10-17: cited lines rewritten at d8faf8876, see research/64d]).
 - **SHA tie:** "Prior-head CI remains prior-head evidence" (`AGENTS.md:38`).
 - **Serialisation:** concurrency groups per PR number (`.github/workflows/ci.yml:90`).
 - **Stance:** "CI is expensive; do not spend it on proof" (`AGENTS.md:91`). There are no reruns to get green
@@ -104,21 +104,21 @@ GitLab facts: docs.gitlab.com (primary), fetched 2026-10-02, plus a live `glab a
 
 ### chiyanram-agent-fleet — the Verifier (ours, already built)
 
-- **Implementer:** "targeted tests in your own checkout are fine" (`scripts/create-agent.sh:341-342`).
+- **Implementer:** "targeted tests in your own checkout are fine" (`scripts/create-agent.sh:361-362 @080aabb`).
   The agent must not bring up the full stack itself (`:340-341`). Before any heavy step it checks memory: `free -m`, with 3500 MB
   free as the floor (`:325-327`).
 - **Verifier:** the `fleet-verifier` unix user runs the full verification "one job at a time, on a clean checkout of a pushed
-  commit" (`create-agent.sh:339-340`). Mechanics in `verifier/fleet-verify`:
+  commit" (`create-agent.sh:359-360 @080aabb`). Mechanics in `verifier/fleet-verify`:
   - a fresh detached clone at the exact SHA (`:241-261`)
   - a per-job `TMPDIR` and `-Djava.io.tmpdir` (`:305-311`, `:471-475`)
   - memory gating: the oldest job waits if it doesn't fit (`:661-675`)
   - an OOM-kill count from the cgroup, written into the result (`:409-420`, `:519-522`)
   - SUPERSEDED for still-queued older jobs on the same branch (`:14`)
 - **SHA tie:** `summary.json` carries `status, sha, branch` (`fleet-verify:24`). "'Verified' or 'green' always names a Verification result and the commit"
-  (`create-agent.sh:353`). In ADR 0002: "Done" means "a PASS Verification result at the MR head"
+  (`create-agent.sh:373 @080aabb`). In ADR 0002: "Done" means "a PASS Verification result at the MR head"
   (`docs/adr/0002-machine-wide-verifier.md:31`).
 - **Posted back:** **by the agent, by hand.** "Post `result.md` from the job folder to the MR as is"
-  (`create-agent.sh:348`). The Verifier itself posts nothing — "the Verifier never posts anywhere" (`CONTEXT.md:78`).
+  (`create-agent.sh:368 @080aabb`). The Verifier itself posts nothing — "the Verifier never posts anywhere" (`CONTEXT.md:78`).
 - **The ADR deferred a CI runner,** because "registering a runner needs Maintainer rights, and the Verifier becomes the runner
   later" (`0002…:23-25`). Measured: ~1h45 per job, ~13 jobs/day (`:29-30`).
 
@@ -160,7 +160,7 @@ Every reference treats one machine-run gate as the truth. The only one that does
 | # | failure | evidence | root cause |
 |---|---|---|---|
 | F1 | 100 pipelines, 98 failed, 0 succeeded, `ci_quota_exceeded` at 0s | AGENTS.md:145-148 (#440) | jobs went to GitLab instance runners; Free = "400 compute minutes per month" (docs, below) |
-| F2 | `make verify` OOM on the VM | 00-fleet-self-reports.md:5 (developer) | ~8 GB VM shared by every agent (create-agent.sh:324-325); Gradle daemon `-Xmx4g` (gradle.properties:7) + IT fork `maxHeapSize = "2g"` (integration-test-conventions:34) + Testcontainers |
+| F2 | `make verify` OOM on the VM | 00-fleet-self-reports.md:5 (developer) | ~8 GB VM shared by every agent (create-agent.sh:344-345 @080aabb); Gradle daemon `-Xmx4g` (gradle.properties:7) + IT fork `maxHeapSize = "2g"` (integration-test-conventions:34) + Testcontainers |
 | F3 | unset `JAVA_HOME` / `DOCKER_HOST` / locale in agent sessions | 00-fleet-self-reports.md:5-6 | per-unix-user env. Partly fixed in agent-fleet `28979bc` (`DOCKER_HOST` → podman socket) |
 | F4 | `/tmp/spring.log` owned by another user | 00-fleet-self-reports.md:6 (qa) | single-user dev tooling across several unix users (ADR 0002:5-8) |
 | F5 | whole-module IT failure, "Could not connect to Ryuk" | `.claude/hooks/guard-concurrent-build.sh:4-7` ("71 tests failed … none of them real"), AGENTS.md:160-164 | concurrent IT suites on one container daemon. The hook only advises (`exit 0`, `:26`) |
@@ -216,7 +216,7 @@ Mark the job `interruptible: true` so a newer push cancels a stale pipeline. Tur
 | fixes | **F8** (native pipeline status at `CI_COMMIT_SHA`, merge-blocking); **F1** if instance runners are disabled; F2–F7 as A; superseded pushes via `interruptible` |
 | doesn't fix | shell-executor trust (any branch's code runs as the runner user — acceptable only on a private repo with trusted pushers); F3 must be set in the runner's own `environment` (`JAVA_HOME`, `DOCKER_HOST`, `TESTCONTAINERS_RYUK_DISABLED`); F9 throughput; a VM outage = no gate |
 | result reaches MR | GitLab pipeline widget on the MR, tied to the head SHA; job log + artifacts (`result.md`, report) on the pipeline |
-| backed by | firstmate (`VISION.md:71`, `architecture.md:399`), openclaw (`scripts/AGENTS.md:30`), addy (`ci-cd…/SKILL.md:305`), humanlayer (`main.yml:93,167`), retro (`SKILL.md:18`) |
+| backed by | firstmate (`VISION.md:71`, `architecture.md:404 @5f2b81b`), openclaw (`scripts/AGENTS.md:30` [drift 2026-10-17: cited lines rewritten at d8faf8876, see research/64d]), addy (`ci-cd…/SKILL.md:305`), humanlayer (`main.yml:93,167`), retro (`SKILL.md:18`) |
 
 ### Option C — laptop as runner
 
@@ -251,11 +251,11 @@ B's job runs A's Verifier, so nothing already built is thrown away. Do it in thi
 
 | step | ours | backed by |
 |---|---|---|
-| targeted tests on touched modules | `make test-module` / `make it-module MOD=… TEST=…` | agent-fleet `create-agent.sh:341-342`; openclaw `AGENTS.md:91`; firstmate `test` step |
+| targeted tests on touched modules | `make test-module` / `make it-module MOD=… TEST=…` | agent-fleet `create-agent.sh:361-362 @080aabb`; openclaw `AGENTS.md:91` [drift 2026-10-17: cited lines rewritten at d8faf8876, see research/64d]; firstmate `test` step |
 | fast whole-repo checks | `make verify-fast` (units + lint + UI units, no ITs, no smoke) | humanlayer pre-push `Makefile:114`; addy `SKILL.md:178` |
 | evidence level stated honestly | what ran, what did not, and "blocked" rather than a thinner pass | pstack `worker.md:55`, `verifier.md:26` |
-| push, then hand to the one gate | Verifier / runner at the MR head | firstmate `fm-dod-lib.sh:451`; ADR 0002:31 |
-| "green" always names a result and a SHA | — | `create-agent.sh:353`; openclaw `AGENTS.md:38` |
+| push, then hand to the one gate | Verifier / runner at the MR head | firstmate `fm-dod-lib.sh:599 @5f2b81b`; ADR 0002:31 |
+| "green" always names a result and a SHA | — | `create-agent.sh:373 @080aabb`; openclaw `AGENTS.md:38` [drift 2026-10-17: cited lines rewritten at d8faf8876, see research/64d] |
 
 The developer does not run `verify-full` or `smoke` on the shared VM. That is already DEVELOPING.md:567 ("Give unattended agents `make verify-fast`").
 QA starts after a PASS at the head SHA, not before.

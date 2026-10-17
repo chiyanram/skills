@@ -10,7 +10,7 @@ Bytes from `wc -c`; tokens ≈ bytes/4.
 |---|---|---|---|
 | `CLAUDE.md` | 4,685 | 31,615 | startup (every session, every subagent) |
 | `.claude/always-on/agent-output.md` | 880 | 5,656 | startup + resume/clear/compact — `SessionStart` hook `always-on-output-rules.sh` (`settings.json`) |
-| `~CM` (user global) | 806 | 4,445 | startup, laptop only — fleet overwrites `~/.claude/CLAUDE.md` with the role file (`agent-fleet/scripts/create-agent.sh:500`) |
+| `~CM` (user global) | 806 | 4,445 | startup, laptop only — fleet overwrites `~/.claude/CLAUDE.md` with the role file (`agent-fleet/scripts/create-agent.sh:548 @080aabb`) |
 | skill + agent + command `description:` (model-invocable, repo only) | — | 11,406 | startup (listing); plugin/global skill descriptions extra, not counted |
 | `rules/java-standards.md` + `rules/observability.md` | 741 + 563 | 5,133 + 3,738 | path-scoped, first read of `**/*.java` |
 | `rules/it-testing.md` | 856 | 5,546 | read of `*IT.java`/`*IT.groovy`/`*Spec.groovy` |
@@ -23,7 +23,7 @@ Bytes from `wc -c`; tokens ≈ bytes/4.
 | `agents/spec-design-reviewer.md` + `sk/spec-review` | 983 + 3,870 | 6,046 + 24,758 | subagent start |
 | `agents/smoke-spec-reviewer.md` + `sk/smoke-spec` | 873 + 3,546 | 6,142 + 23,988 | subagent start |
 | `docs/agents/personas/{analyst,developer,qa,spec-reviewer}.md` | 819 / 1,107 / 751 / 690 | 4.3–6.9 K | never by Claude Code; source text for fleet `SOUL.md` (REQ-535) |
-| fleet role `~/.claude/CLAUDE.md` | — | ~13–15 K | fleet startup; = header + Discord + toolchains + `purpose` + `SOUL.md` + `guardrails` + app/verifier/skills (`create-agent.sh:355-390`) |
+| fleet role `~/.claude/CLAUDE.md` | — | ~13–15 K | fleet startup; = header + Discord + toolchains + `purpose` + `SOUL.md` + `guardrails` + app/verifier/skills (`create-agent.sh:355-390` [drift 2026-10-17: lines added inside the cited range at 080aabb; cited lines now span :375-426, see refs/README.md]) |
 
 Skills (34) — on invoke; SKILL.md words / all .md words: `aruvii-standards` 1,146 / **23,405** (161 KB, references loaded one at a time) ·
 `standards-review` 7,511 · `architecture-review` 5,243 · `aruvii-git` 3,028 / 4,297 · `spec-review` 3,870 / 4,008 · `smoke-spec` 3,546 ·

@@ -57,7 +57,7 @@ Every "evidence" cell is `git -C ROOT show origin/master:<path>` or `git grep �
 
 | gap | source |
 |---|---|
-| candidate-evidence fields before deleting (name, what it detects, non-test callers, stronger owner proof, history, unlock, risk) | oc `test-audit/SKILL.md:111-122` — needed for G9a `workflows/audit.md` |
+| candidate-evidence fields before deleting (name, what it detects, non-test callers, stronger owner proof, history, unlock, risk) | oc `test-audit/SKILL.md:111-122` [drift 2026-10-17: test-audit cut to 57 lines at d8faf8876, detail moved to `references/audit.md`, see research/64d] — needed for G9a `workflows/audit.md` |
 | "read the full test + owner + callers + siblings before judging" | oc `:75-79` |
 | junk: "self-comparisons and identity copiers", "provider-local replays of shared helpers" | oc `:48`, `:53` |
 | **no change detectors** — a test only an intentional decision can fail (constant value, name list) | sp `writing-good-tests.md:41-45`, gate `:65-79` |

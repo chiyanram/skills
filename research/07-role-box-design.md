@@ -62,16 +62,16 @@ GitLab stays the system of record for issues, MRs, `/approved` and merge. The we
 
 | Concern | Ask Me box (fact) | Role box (proposal) |
 |---|---|---|
-| Rules loaded | `settingSources: []`, so no CLAUDE.md (`ML/.../session.ts:90`) | `settingSources: ['project']`, with `cwd` set to the clone. That loads CLAUDE.md, `.claude/rules`, skills, agents and hooks (`cc:agent-sdk/claude-code-features`) |
+| Rules loaded | `settingSources: []`, so no CLAUDE.md (`ML/.../session.ts:94 @8f61e5ea`) | `settingSources: ['project']`, with `cwd` set to the clone. That loads CLAUDE.md, `.claude/rules`, skills, agents and hooks (`cc:agent-sdk/claude-code-features`) |
 | Leaving out `'user'` | n/a | This is deliberate: the laptop's `~/.claude` is never mounted, so the box does not drift with it. The cost: the operator's global reply rules do not load (OQ 4) |
 | Plugins (G4 marketplace) | none | Managed `enabledPlugins` + `CLAUDE_CODE_PLUGIN_SEED_DIR` baked into the image (R5, `cc:plugins/org`), or `plugins: [{type:'local', path}]` (`cc:agent-sdk/typescript`) |
 | System prompt | custom string from `persona.md` | `{type:'preset', preset:'claude_code', append: <persona>}`. The persona is read from the **clone's** `docs/agents/personas/<role>.md`, the same file the laptop reads. A spec-reviewer file does not exist yet |
-| Built-in tools | `tools: []`, only 2 MCP tools (`session.ts:84`) | Claude Code preset tools, narrowed per role (table below) |
-| Permission | `default` + `canUseTool` allow-list (`session.ts:78-82`) | The same shape. The fleet today runs `bypassPermissions` (`AF/scripts/create-agent.sh:153`) |
-| Auto memory | disabled (`session.ts:67`) | **On**, on the config volume. This is the fleet's "project knowledge" (`AF/CONTEXT.md:60`) |
+| Built-in tools | `tools: []`, only 2 MCP tools (`session.ts:88 @8f61e5ea`) | Claude Code preset tools, narrowed per role (table below) |
+| Permission | `default` + `canUseTool` allow-list (`session.ts:78-82` [drift 2026-10-17: lines added inside the cited range at 8f61e5ea; cited lines now span :80-86, see refs/README.md]) | The same shape. The fleet today runs `bypassPermissions` (`AF/scripts/create-agent.sh:167 @080aabb`) |
+| Auto memory | disabled (`session.ts:69 @8f61e5ea`) | **On**, on the config volume. This is the fleet's "project knowledge" (`AF/CONTEXT.md:63 @080aabb`) |
 | Session persistence | `persistSession: false` | `true`, on the volume, so resume survives a restart (§5) |
 | Spend caps | `maxTurns: 8`, `maxBudgetUsd: 0.5` | Set per role, per run. R4 measured about $2–2.8 per review |
-| Env hygiene | `subprocessEnv` passes an allow-list of variables (`session.ts:58`) | Same pattern, plus `JAVA_HOME`, `DOCKER_HOST` and `LANG`. These are the fleet's env failures (`research/00`) |
+| Env hygiene | `subprocessEnv` passes an allow-list of variables (`session.ts:60 @8f61e5ea`) | Same pattern, plus `JAVA_HOME`, `DOCKER_HOST` and `LANG`. These are the fleet's env failures (`research/00`) |
 
 ### Tools per role and the `canUseTool` policy
 
@@ -102,7 +102,7 @@ Two notes on this flow:
 
 ### Sandbox and egress
 
-The box copies Ask Me's three pieces: an `internal` network, a one-shot `firewall` container with `NET_ADMIN` (`ML/docker/ask-me/firewall.sh`), and a CONNECT `egress` proxy (`ML/docker/ask-me/egress.mjs`). The box runs `read_only`, with `cap_drop: [ALL]` and `no-new-privileges` (`ML/.../docker-compose.yml:152-157`).
+The box copies Ask Me's three pieces: an `internal` network, a one-shot `firewall` container with `NET_ADMIN` (`ML/docker/ask-me/firewall.sh`), and a CONNECT `egress` proxy (`ML/docker/ask-me/egress.mjs`). The box runs `read_only`, with `cap_drop: [ALL]` and `no-new-privileges` (`ML/.../docker-compose.yml:163-168 @8f61e5ea`).
 
 The egress allowlist (`ASK_ME_EGRESS_ALLOW`-style):
 
@@ -124,7 +124,7 @@ Three caveats:
 
 | secret | today (fleet) | role box |
 |---|---|---|
-| Claude | one OAuth token per fleet (`AF/docs/adr/0001-…`) | The same token, kept in a compose `secret` file and passed only into the CLI subprocess env (`session.ts:60`). A `setup-token` token "can only make model requests" (`cc:agent-sdk/claude-code-features`) |
+| Claude | one OAuth token per fleet (`AF/docs/adr/0001-…`) | The same token, kept in a compose `secret` file and passed only into the CLI subprocess env (`session.ts:62 @8f61e5ea`). A `setup-token` token "can only make model requests" (`cc:agent-sdk/claude-code-features`) |
 | GitLab | a per-recipe PAT in `~/.git-credentials` (`AF/README.md:91-93`) | A per-role PAT as a compose secret, read by a git credential helper and by `glab`. **The agent can read it.** The alternative is a git/glab MCP tool whose request is made outside the box (`cc:agent-sdk/secure-deployment` "Custom tools"). That costs a rewrite of every skill that shells out to `glab` (OQ 6) |
 | Operator (for gates) | Discord DM allowlist | Only the gateway holds it, never a box |
 
@@ -148,7 +148,7 @@ fleet/compose.yml   (COMPOSE_PROJECT_NAME=fleet — never aruvii's project name)
 |---|---|---|---|---|---|
 | A · host socket ("wormhole") | mount `/var/run/docker.sock` and the repo **at the same path** (`TC:`) | none: the socket is root on the host, so the sandbox is void | The box's `make smoke` redeploys **the operator's own** aruvii stack. "Last-deployed-branch wins" gets worse | host | reject |
 | B · dind sidecar per box | `docker:dind` privileged sidecar, `DOCKER_HOST=tcp://dind-dev:2376`, its own volume | The box is unprivileged; only the sidecar is privileged | Each box gets its own daemon, so its own aruvii stack. This fixes the shared-stack problem | its own limit, plus the image cache per box | **pick, for targeted ITs and smoke** |
-| C · rootless podman inside the box | the fleet's current model (`AF/scripts/create-agent.sh:407-430`) | needs user namespaces in the container, close to privileged | own | in the box | a fallback if B is blocked |
+| C · rootless podman inside the box | the fleet's current model (`AF/scripts/create-agent.sh:407-430` [drift 2026-10-17: cited lines rewritten at 080aabb, see refs/README.md]) | needs user namespaces in the container, close to privileged | own | in the box | a fallback if B is blocked |
 | D · machine-wide Verifier only | the box runs no containers; it submits a SHA (`AF/docs/adr/0002-…`) | best | n/a | Verifier only | **pick, for the DoD gate** |
 
 Testcontainers calls DinD "an instrument of last resort" (`TC:`). The reason here is that the socket alternative destroys the sandbox.
@@ -164,9 +164,9 @@ The fleet's OOM on `make verify` (`research/00`) comes from three things stacked
 
 | service | `mem_limit` (starting guess, to be measured) |
 |---|---|
-| analyst, spec-reviewer | 2g (Ask Me's figure, `docker-compose.yml:162`; `cc:` floor is 1 GiB) |
+| analyst, spec-reviewer | 2g (Ask Me's figure, `docker-compose.yml:173 @8f61e5ea`; `cc:` floor is 1 GiB) |
 | developer, qa | 6g box + 4g dind |
-| verifier | 12g box+dind, one job at a time (`AF/CONTEXT.md:63-68`) |
+| verifier | 12g box+dind, one job at a time (`AF/CONTEXT.md:66-71 @080aabb`) |
 
 With every profile on, that adds up to about 34g. That fits the VM, not a 16 GB laptop, which is why the profiles exist (OQ 3).
 
@@ -238,7 +238,7 @@ Today's bot-to-bot rate cap (`AF/README.md:95-99`) becomes a counter in the gate
         cap    : lifetime / budget hit ─► end; the next turn starts fresh from the MR thread
 ```
 
-The trade-off: per-task sessions keep context small (12-factor F10, `research/05`). Long-lived *containers* keep the warm Gradle cache and the toolchain. The SDK has "no top-level session timeout" and memory grows over long sessions (`cc:agent-sdk/hosting` "Known limitations"), so the idle and lifetime sweep is ours to write, as in `ML/.../session.ts:269-273`.
+The trade-off: per-task sessions keep context small (12-factor F10, `research/05`). Long-lived *containers* keep the warm Gradle cache and the toolchain. The SDK has "no top-level session timeout" and memory grows over long sessions (`cc:agent-sdk/hosting` "Known limitations"), so the idle and lifetime sweep is ours to write, as in `ML/.../session.ts:279-283 @8f61e5ea`.
 
 What survives a restart:
 
@@ -292,7 +292,7 @@ Each step is reversible: the step before it keeps running until the step is prov
 2. **Docker for developer and qa**: B (a privileged dind sidecar per box) + D (Verifier), or C (rootless podman, the fleet's current model)? A (host socket) is rejected.
 3. **Laptop scope**: which profiles run on the laptop? Does the Verifier run there, or only on the VM?
 4. **Your global `~/.claude/CLAUDE.md`** (ADHD reply rules): move it into project or managed settings so the boxes load it, or leave the boxes without it?
-5. **The persona file**: is the source `docs/agents/personas/<role>.md` (aruvii) or the fleet's `SOUL.md` (`AF/scripts/create-agent.sh:52-55`)? spec-reviewer has no aruvii persona yet.
+5. **The persona file**: is the source `docs/agents/personas/<role>.md` (aruvii) or the fleet's `SOUL.md` (`AF/scripts/create-agent.sh:70-73 @080aabb`)? spec-reviewer has no aruvii persona yet.
 6. **GitLab identity**: one bot PAT per role (four GitLab users) or your PAT shared? Accept the PAT being inside the box, or invest in an outside-the-box git/glab tool?
 7. **AG-UI adapter**: adopt `@ag-ui/claude-agent-sdk`, or write our own mapper?
 8. **Session durability**: is a volume enough (lost on `down -v`), or do you want a `SessionStore` (e.g. the aruvii postgres)?

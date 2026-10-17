@@ -16,9 +16,9 @@ vanish under G4 unless replaced.
 
 | credential | per agent / shared | stored at (on the VM) | mode / owner | provisioned by | readable by the agent's own session? |
 |---|---|---|---|---|---|
-| Claude OAuth token (`claude setup-token`, ~1 yr, model requests only) | **shared per fleet** (opt-in split `claude-token-<suffix>`) | master: `<fleet>/secrets/claude-token` (dir 700, `create-agent.sh:61-62`; file 0600, `setup-claude-token.sh:74`); copy: `~agent/.claude/claude-token` | copy **0400 agent-owned** (`create-agent.sh:594`) | `setup-claude-token.sh`, root, interactive; injected as `CLAUDE_CODE_OAUTH_TOKEN=$(cat …)` at launch (`create-agent.sh:714`) | **yes** (by design; it's in the session env) |
+| Claude OAuth token (`claude setup-token`, ~1 yr, model requests only) | **shared per fleet** (opt-in split `claude-token-<suffix>`) | master: `<fleet>/secrets/claude-token` (dir 700, `create-agent.sh:61-62`; file 0600, `setup-claude-token.sh:74`); copy: `~agent/.claude/claude-token` | copy **0400 agent-owned** (`create-agent.sh:596 @080aabb`) | `setup-claude-token.sh`, root, interactive; injected as `CLAUDE_CODE_OAUTH_TOKEN=$(cat …)` at launch (`create-agent.sh:720 @080aabb`) | **yes** (by design; it's in the session env) |
 | GitLab PAT, scopes `api` + `write_repository` | per recipe (#5: 3 of 4 agents used the **operator's own** `chiyanram` PAT; bot users now exist, see §1c) | `agent.yaml` `gitlab.token`; `~/.git-credentials` (0600 agent, `create-agent.sh:529`); glab config (via `glab auth login --stdin`, `:526`) | 0600 agent | `create-agent.sh:524-531`, token never on argv | **yes** |
-| Discord bot token | per agent | `~/.claude/channels/discord/.env` | **0600 agent-owned** — must be, plugin chmods it (`create-agent.sh:598-601`) | rendered from `discord.bot_token` (`:308-310`) | **yes** |
+| Discord bot token | per agent | `~/.claude/channels/discord/.env` | **0600 agent-owned** — must be, plugin chmods it (`create-agent.sh:600-603 @080aabb`) | rendered from `discord.bot_token` (`:308-310`) | **yes** |
 | Discord allowlist `access.json` | per agent | same dir | **0444 root** (`:602`), `DISCORD_ACCESS_MODE=static` | — | read only |
 | Recipe `agent.yaml` (holds PAT + bot token) | per agent | `<fleet>/agents/<name>/agent.yaml` 0600 (`:69`); archive copy `~agent/agent.yaml` | archive **0400 root** (`:550`) | — | **no** (root 0400) |
 | Verifier repo read token (GitLab deploy token, read-only by convention) | one per fleet, copied to every slot | `<fleet>/secrets/verifier-repo-token` → `/home/fleet-verifier-N/.git-credentials` | 0600 slot user (`setup-verifier.sh:335-342`) | `setup-verifier.sh --register` | n/a — but **any job's code** runs as that slot user and can read it |
@@ -30,13 +30,13 @@ vanish under G4 unless replaced.
 | layer | file | what it does | limit |
 |---|---|---|---|
 | managed settings | `/etc/claude-code/managed-settings.json` ← AF `enforcement/managed-settings.json:1-27` (root 0644, `install-enforcement.sh:32`) | wires **only two hooks**: PreToolUse `fleet-guard.py`, SessionStart(compact) `fleet-identity.sh` | **no** `permissions.deny`, no `disableBypassPermissionsMode`, no sandbox, no `allowManagedHooksOnly`, no network rules |
-| fleet-guard | AF `enforcement/fleet-guard.py` | per-user regex deny list from `/etc/claude-code/fleet-policy/<unix-user>.json` (root 0644, `create-agent.sh:583-586`); fires even under `--dangerously-skip-permissions` (`:3-8`) | keyed on **unix user name starting `agent-`** (`:127-131`) — no-op for anyone else; **fail-open** (`:34-35,141-143`); regex only, "a skeleton is a best-effort parse, not a sandbox" (`:30`); policy only has what each recipe's `enforced:` lists (example: just `sudo`, `agent-yaml.md:54-57`); known bypass `-m "$(cat f)"`, `glab api` (AF #5 comment) |
-| permission mode | `create-agent.sh:167-171,701-705` | default **`--dangerously-skip-permissions`**; `settings.json` = `skipDangerousModePermissionPrompt: true` (`:261-262`) | docs: bypass "offers no protection against prompt injection or unintended actions" (permission-modes) |
+| fleet-guard | AF `enforcement/fleet-guard.py` | per-user regex deny list from `/etc/claude-code/fleet-policy/<unix-user>.json` (root 0644, `create-agent.sh:585-588 @080aabb`); fires even under `--dangerously-skip-permissions` (`:3-8`) | keyed on **unix user name starting `agent-`** (`:127-131`) — no-op for anyone else; **fail-open** (`:34-35,141-143`); regex only, "a skeleton is a best-effort parse, not a sandbox" (`:30`); policy only has what each recipe's `enforced:` lists (example: just `sudo`, `agent-yaml.md:54-57`); known bypass `-m "$(cat f)"`, `glab api` (AF #5 comment) |
+| permission mode | `create-agent.sh:167-171,707-711 @080aabb` | default **`--dangerously-skip-permissions`**; `settings.json` = `skipDangerousModePermissionPrompt: true` (`:261-262`) | docs: bypass "offers no protection against prompt injection or unintended actions" (permission-modes) |
 | identity files | `create-agent.sh:548-551` | `CLAUDE.md`, `settings.json` root 0444 | `~/.claude/` is **agent-owned** (`:481`), so the agent can replace them by rename — the script itself relies on this (`:554-557`). "Cannot rewrite who it is" (`README.md:34-36`) holds only for `/etc` |
 | sudo | `useradd` with no sudoers (`create-agent.sh:443`) + optional fleet-guard regex | real control | — |
 | homes | `chmod 750 $HOME` (`create-agent.sh:446`), own group | agents can't read each other's homes/worktrees/tokens | **this is the isolation that G4 removes** |
 | memory | per-user systemd slice caps (`create-agent.sh:462-467`) | resource, not security | — |
-| containers | rootless podman per user, socket `/run/user/<uid>/podman/podman.sock` (`fleet-lib.sh:183`) | each agent can only touch its own containers | under one user: one socket, all containers |
+| containers | rootless podman per user, socket `/run/user/<uid>/podman/podman.sock` (`fleet-lib.sh:190 @080aabb`) | each agent can only touch its own containers | under one user: one socket, all containers |
 | network | — | **nothing**: no egress filter, no sandbox, WebFetch/curl free | — |
 | Discord inbound | `access.json` allowlist = operator only + peer bots by mention, rate cap (`README.md:94-99`, `patch-discord-plugin.py:6-37`) | limits who can instruct | peer bots are agents → agent text can wake other agents |
 | operator relay | `fleet-say.sh` (root, tmux into the session, prefixed `[<who>, relayed via the fleet terminal]`, `:1-12`) | root only | — |
@@ -89,7 +89,7 @@ plain user accounts with PATs (365-day max lifetime, docs).
 
 | ref | security mechanism | cite |
 |---|---|---|
-| firstmate | 5 hard rules (never write a project, never merge without captain, never tear down unlanded work…); workers default `--dangerously-skip-permissions`, opt-in `config/claude-permission-mode=auto`; account pin only captain edits; spawn env "is an exec environment boundary, not a sandbox" | `AGENTS.md:28-42,92`; `bin/fm-spawn.sh:305-316` |
+| firstmate | 5 hard rules (never write a project, never merge without captain, never tear down unlanded work…); workers default `--dangerously-skip-permissions`, opt-in `config/claude-permission-mode=auto`; account pin only captain edits; spawn env "is an exec environment boundary, not a sandbox" | `AGENTS.md:28-42,92`; `bin/fm-spawn.sh:305-316` [drift 2026-10-17: lines added inside the cited range at 5f2b81b; cited lines now span :360-401, see research/64b] |
 | openclaw | three separate controls: **sandbox** (where tools run; container, **no network by default**, `network: host` blocked), **tool policy** (allow/deny), **elevated** (exec escape hatch); exec approvals "are **not** a per-user auth boundary"; own ATLAS threat model with P0 = skill sandboxing + output validation | `docs/gateway/sandbox-vs-tool-policy-vs-elevated.md:8-12`; `docs/gateway/sandboxing/images-and-setup.md:83,125`; `docs/tools/exec-approvals.md:44-49`; `docs/security/THREAT-MODEL-ATLAS.md:159-211` |
 | openclaw coordinator | "another agent's assertions are evidence, not approval" | research/36 `:47` |
 | pstack | untrusted transcript/review-comment text treated as data; coordinator is the only Slack poster, children forbidden Slack writes | research/repos/pstack.md:138,155 |
@@ -142,7 +142,7 @@ Recommend **A** (B if per-role attribution in GitLab matters more than G4's simp
 | option | effect |
 |---|---|
 | A. keep `--dangerously-skip-permissions` + fleet-guard | today; docs: no prompt-injection protection; protected paths unchecked |
-| **B. `--permission-mode auto` + managed `disableBypassPermissionsMode`** | classifier never sees tool results (docs); firstmate supports it as opt-in (`fm-spawn.sh:309-316`); cost: some denials, classifier usage |
+| **B. `--permission-mode auto` + managed `disableBypassPermissionsMode`** | classifier never sees tool results (docs); firstmate supports it as opt-in (`fm-spawn.sh:394-401 @5f2b81b`); cost: some denials, classifier usage |
 | C. `dontAsk` + explicit allow list | strictest, most breakage |
 Recommend **B**, measured on one pilot work item before rollout.
 

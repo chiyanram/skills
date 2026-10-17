@@ -8,7 +8,7 @@ checks) + the R14 writing checklist (`16-skill-writing-standards.md`). Operator 
 | strategy.md (tier choice) | addy test-driven-development | refs/addyosmani-agent-skills/skills/test-driven-development/SKILL.md:144-187 | test pyramid, decision guide |
 | strategy.md | plinth 130 test-layer split | ~/workspace/claude/analysis/skills-analysis/docs/extractions/plinth-java-testing-strategies-and-the-test-layer-split.md | Java test layers |
 | strategy.md | gherkin-to-test (ours, fixes per R13) | .claude/skills/gherkin-to-test/SKILL.md | scenario → tier |
-| value-bar.md | openclaw test-audit | refs/openclaw-openclaw/.agents/skills/test-audit/SKILL.md:18-66 | 4-question gate, junk patterns |
+| value-bar.md | openclaw test-audit | refs/openclaw-openclaw/.agents/skills/test-audit/SKILL.md:18-66 [drift 2026-10-17: test-audit cut to 57 lines at d8faf8876, detail moved to `references/audit.md`, see research/64d] | 4-question gate, junk patterns |
 | value-bar.md | ours test-value-bar (needs fixes) | .claude/skills/aruvii-standards/references/test-value-bar.md | retention bar |
 | coverage-design.md | plinth 130 RIGHT-BICEP | corpus extraction above (130-…-right-bicep) | the correct 6 dimensions |
 | boundaries.md | ours boundaries-correct (needs fixes) | .claude/skills/aruvii-standards/references/boundaries-correct.md | CORRECT |
@@ -18,7 +18,7 @@ checks) + the R14 writing checklist (`16-skill-writing-standards.md`). Operator 
 | unit-tests.md / spock.md | anthropic-skills:spock-best-practices (installed) | ~/.claude/skills/synced/…/spock-best-practices/ (+ references/anti-patterns.md) | Spock idiom, Mock vs Stub |
 | integration-tests.md | ours it-testing (rewrite) + ADR-0009 | .claude/skills/it-testing/SKILL.md · docs/adr/0009-* | facts only, re-verified on master |
 | smoke-specs.md | ours smoke-spec (needs fixes) + playwright-rubric | .claude/skills/smoke-spec/SKILL.md · docs/guides/playwright-rubric.md | K-* rubric |
-| workflows/audit.md | openclaw test-audit modes | refs/openclaw-openclaw/.agents/skills/test-audit/SKILL.md:8-14, :111-122 | audit mode |
+| workflows/audit.md | openclaw test-audit modes | refs/openclaw-openclaw/.agents/skills/test-audit/SKILL.md:8-14, :111-122 [drift 2026-10-17: test-audit cut to 57 lines at d8faf8876, detail moved to `references/audit.md`, see research/64d] | audit mode |
 | all (Good/Bad) | R13 real samples on master | research/15-testing-content-audit.md (11 samples) | pinned examples |
 | all (writing) | superpowers "Match the Form to the Failure" | scratchpad/r9/obra_superpowers/skills/writing-skills/SKILL.md:461 | prohibition vs Good/Bad |
 

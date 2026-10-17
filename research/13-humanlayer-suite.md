@@ -60,7 +60,7 @@ HumanLayer moved **away from wrapping Claude Code** (hld, deprecated) **to its o
 
 | repo | approach |
 |---|---|
-| fold | The `implementation-reviewer` subagent compares the plan to `git diff main...HEAD` and sorts findings into four buckets: **as planned · deviations · additions not in plan · planned but not implemented**. Empty sections are written as "None", never dropped, and it does not judge good/bad (`Rpi.ts:437-509`). It is read+bash, `fast` model. |
+| fold | The `implementation-reviewer` subagent compares the plan to `git diff main...HEAD` and sorts findings into four buckets: **as planned · deviations · additions not in plan · planned but not implemented**. Empty sections are written as "None", never dropped, and it does not judge good/bad (`Rpi.ts:441-513 @4bd8c58`). It is read+bash, `fast` model. |
 | agentlayer | `docs-agent`: the diff is **pushed into** the prompt, tools are read-only, the run is capped at `maxSteps(12)`, and the output has fixed sections (Verdict / Recommended Updates / Files). It runs **one upserted PR comment per agent**, keyed by `<!-- name:sha=… -->` (`agents/docs-agent/src/reviewer.ts`, `github.ts:29`). The editor gets a path-scoped approval hook. |
 | skills | `visual-pr`: "Why" is exactly one sentence, plus 1–3 special notes, plus a `/show-me`-style change outline (call-tree / file-tree / type diffs). Saved under `.humanlayer/tasks/<slug>/` (`hls/visual-pr/skills/visual-pr/SKILL.md`) |
 | ACE | Code review is for **mental alignment** (`ace-fca.md:335-360`). Tests do not catch design rot, which shows up "measured in weeks, months" (`wsff.md:359-370`). Remedy: review the program design before the code |
@@ -82,7 +82,7 @@ C = confirms · X = contradicts · N = new idea
 
 | # | idea | shown in | lands in |
 |---|---|---|---|
-| 1 | **Spec axis output = four fixed buckets**: as planned · deviations · additions · planned-not-done. Write "None", never omit, and no good/bad verdict (the lead judges) | `fold/packages/fold-agent/src/Mode/Rpi.ts:437-509` | G3 Spec packet template |
+| 1 | **Spec axis output = four fixed buckets**: as planned · deviations · additions · planned-not-done. Write "None", never omit, and no good/bad verdict (the lead judges) | `fold/packages/fold-agent/src/Mode/Rpi.ts:441-513 @4bd8c58` | G3 Spec packet template |
 | 2 | **Phases carry Automated vs Manual success criteria. The worker pauses after automated checks pass** and the coordinator relays the manual ones | `hl/.claude/commands/create_plan.md:225-240`, `implement_plan.md` | stage-5 design template, stage 6, G6 relay |
 | 3 | **Coordinator rules enforced by toolset**: the orchestrator simply has no bash/edit, so "never edits code" cannot break | `fold/packages/fold-agent/src/Mode/Rlm.ts` | coordinator `agents/*.md` `tools:` / `disallowedTools` (G4 Q3) |
 | 4 | **One upserted MR comment per (role, head sha)** via a hidden marker, so the record does not spam and stays findable | `agl/agents/docs-agent/src/github.ts:29-33` | G2 handoff record |

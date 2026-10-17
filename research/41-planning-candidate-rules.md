@@ -143,7 +143,7 @@ Recommend: adopt — also the input F-01 grades against.
 
 ### PD3 — Types and signatures, bodies left out
 Rule: New records, sealed interfaces, ports and public method signatures are written in Java with no bodies; usage by the caller is written first.
-Source: ACE `wsff.md:517` ("too internal for an architecture doc but that an agent might still get wrong"); pstack `R/cursor-plugins/pstack/skills/architect/SKILL.md:9,83` ("caller's usage is written first").
+Source: ACE `wsff.md:517` ("too internal for an architecture doc but that an agent might still get wrong"); pstack `R/cursor-plugins/pstack/skills/architect/SKILL.md:9,83` [drift 2026-10-17: cited lines rewritten at f713f14; quoted text now at :79, see research/64a] ("caller's usage is written first").
 Kind: reference rule.
 Recommend: adopt.
 
@@ -167,17 +167,17 @@ Recommend: adopt — keeps the REQ stable after merge while the design is dispos
 
 ### PD7 — Deviation from the sketch is surfaced
 Rule: During stage 6, a needed change to an approved type, signature or file placement is posted on the MR before coding past it.
-Source: pstack `architect/SKILL.md:57` ("Deviations from the sketch are signal worth surfacing"); `AR/:348-353` F-01.
+Source: pstack `architect/SKILL.md:57` [drift 2026-10-17: cited lines rewritten at f713f14, see research/64a] ("Deviations from the sketch are signal worth surfacing"); `AR/:348-353` F-01.
 Kind: reference rule (stage 6 side).
 Recommend: adopt — gives F-01 a recorded baseline instead of a guess.
 
 ### PD8 — Two shapes before one, for a new seam
 Rule: A new module, port or cross-module contract is sketched in two structurally different shapes before one is chosen; the rejected shape gets one line.
-Source: pstack `architect/SKILL.md:35` ("Design it twice"); mattpocock `codebase-design/DESIGN-IT-TWICE.md:3`.
+Source: pstack `architect/SKILL.md:33 @f713f14` ("Design it twice"); mattpocock `codebase-design/DESIGN-IT-TWICE.md:3`.
 Kind: reference rule.
 Recommend: hold — real cost per design; limit to new seams only if adopted.
 
-**DROP** — nothing (new file). Reject: pstack `architect/SKILL.md:33-45` multi-model arena and opt-out human checkpoint — our stage 5 is a mandatory human gate.
+**DROP** — nothing (new file). Reject: pstack `architect/SKILL.md:33-45` [drift 2026-10-17: cited lines rewritten at f713f14, see research/64a] multi-model arena and opt-out human checkpoint — our stage 5 is a mandatory human gate.
 
 ---
 
@@ -269,7 +269,7 @@ Recommend: adopt — and note the vendored ADR-FORMAT must carry our override (d
 
 ### WD7 — One owner per fact
 Rule: Each fact lives in one file; other docs link to it rather than restate it, and generated docs are never hand-edited.
-Source: mattpocock `writing-for-agents/SKILL.md:78` (single source of truth); kunchenguid-firstmate `AGENTS.md:55` ("single owner of the top-level ... layout"); openclaw `docs/AGENTS.md:38` ("Generated docs, never hand-edit").
+Source: mattpocock `writing-for-agents/SKILL.md:78` (single source of truth); kunchenguid-firstmate `AGENTS.md:58 @5f2b81b` ("single owner of the top-level ... layout"); openclaw `docs/AGENTS.md:38` [drift 2026-10-17: cited lines rewritten at d8faf8876, see research/64d] ("Generated docs, never hand-edit").
 Kind: reference rule.
 Recommend: adopt — it is the principle the whole one-rulebook move rests on.
 
