@@ -153,8 +153,13 @@ Work items: **W1** agent-platform (#643 → #646 →
 | crash or hang → one fresh worker from the forge thread + pushed branch (never resume); dead worktree kept and named; second failure → blocked to the operator | G27 #102 | AF coordinator | AF #72 |
 | prevent stuck boxes: auto mode in the container, ask-the-user tool off for workers (they post needs-decision); detect: coordinator checks each worker screen every few minutes, a waiting box → "stuck on: <question>" | G27 #102 | AF managed settings · coordinator | AF #73, #72 |
 | keep ours minimal (no AI design critic, one writer, one reviewer); add a piece only when a recorded switch trigger fires | G28 #103 | `review/pipeline-comparison.html` | — |
+| the forge thread is the conversation too: every human answer is a comment on the work item's issue or change request; Discord/any notifier never holds an answer | G16 #82 | AF coordinator · souls | AF #72 |
+| a relay @mentions the assignee; optional link-only push per host (machine.env: Discord webhook / ntfy / none) carrying "#NNN — <status>" + link | G16 #82 | AF coordinator · machine.env | AF #72 |
+| the assignee decides: the coordinator acts only on comments authored by the assignee (author checked); others' comments are input folded into the next relay; hand over = reassign | G16 #82 | AF coordinator | AF #72 |
+| control verbs in the thread, assignee only: `stop` · `steer: <text>` · `respawn`; coordinator acts and posts an ack; local tmux action by the host owner is posted to the thread | G16 #82 | AF coordinator · worker inbox | AF #72 |
+| lands as the first fleet upgrade with tmux workers; forge UI = developer UI, tmux attach = live view on the host; no shared gateway or new UI until D1 #21, where UIs become clients of the same thread | G16 #82 | AF coordinator | AF #72 · D1 #21 |
 
 ## Open (not yet decided — do not write)
 
 G9b code+obs (#33) · G9c migrations+delivery+review packet (#34) ·
-pilot (#67) · D1 role boxes (#21) · G16 thread per ticket (#82). (WIP limit decided 2026-10-17, G26 #101.)
+pilot (#67) · D1 role boxes (#21). (WIP limit decided 2026-10-17, G26 #101; thread per ticket decided 2026-10-17, G16 #82.)
