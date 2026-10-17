@@ -1,0 +1,12 @@
+{
+  "name": "chiyanram",
+  "owner": { "name": "chiyanram" },
+  "description": "Generic engineering skills, references and the /crq workflow (chiyanram/skills#93).",
+  "plugins": [
+    {
+      "name": "rulebook",
+      "source": "./plugins/rulebook",
+      "description": "Generic skills, references with neutral-domain examples, and the /crq workflow."
+    }
+  ]
+}
