@@ -15,7 +15,8 @@ for n, line in enumerate((ROOT / "research/19-approved-rules.md").read_text().sp
     if not m or m.group(1) == "id":
         continue
     cells = [c.strip().replace("\\|", "|") for c in re.split(r"(?<!\\)\|", m.group(2))]
-    has_reason = len(cells) == 5  # id · reference · rule · reason · source · status
+    # id · reference · rule · reason · source · evidence · status (older: no reason, no evidence)
+    has_reason = len(cells) >= 5
     ledger[(m.group(1), n)] = {
         "ref": cells[0],
         "rule": cells[1],
