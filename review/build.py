@@ -1,6 +1,7 @@
 import re, json, html, sys
 from pathlib import Path
-R = Path("/Users/chiyanram/workspace/skills/research")
+ROOT = Path(__file__).resolve().parent.parent
+R = ROOT / "research"
 ledger = {}
 for line in (R/"19-approved-rules.md").read_text().splitlines():
     m = re.match(r'^\|\s*([A-Za-z0-9-]+)\s*\|\s*([^|]*)\|\s*(.*?)\s*\|\s*([^|]*)\|\s*([^|]*)\|\s*$', line)
@@ -47,6 +48,6 @@ def parse(path, ids):
 
 groups = json.loads(sys.argv[1])
 data = [{"key": g["key"], "name": g["name"], "items": parse(g["file"], g["ids"])} for g in groups]
-tpl = Path("/Users/chiyanram/workspace/skills/review/template.html").read_text()
-Path("/Users/chiyanram/workspace/skills/review/rule-review.html").write_text(tpl.replace("/*DATA*/[]", json.dumps(data)))
+tpl = (ROOT / "review/template.html").read_text()
+(ROOT / "review/rule-review.html").write_text(tpl.replace("/*DATA*/[]", json.dumps(data)))
 print({d["key"]: len(d["items"]) for d in data})
