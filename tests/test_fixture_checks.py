@@ -6,7 +6,8 @@ from tests.support import FIXTURES, run_check
 CASES = {
     "versions": (["good"], ["mismatch", "missing"]),
     "links": (["good"], ["broken", "broken-after-nested-fence"]),
-    "sizes": (["good"], ["root-too-long", "chain-over-32k", "rule-too-long"]),
+    "sizes": (["good", "good-template"],
+              ["root-too-long", "chain-over-32k", "rule-too-long", "rules-heading-variant", "no-rules-section"]),
     "plugin": (["good"], ["source-is-root", "root-is-a-plugin", "no-readme", "no-icon", "no-license"]),
 }
 
