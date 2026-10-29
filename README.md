@@ -1,22 +1,15 @@
-# skills — one-rulebook working repo
+# skills — the generic rulebook
 
-Decisions, research and the approved-rules ledger for redesigning how rules, roles and review work across the laptop
-`/crq` pipeline and the agent fleet. Planning only: nothing here is wired into a project yet. Once the design is done,
-the result is split into the three projects (agent-platform, aruvii-agent-fleet, agent-fleet).
+This repo holds the generic engineering rules that every project shares. They ship as skills in one plugin,
+[`rulebook`](plugins/rulebook/). Claude Code reaches them as a plugin. Other agent tools reach them with
+`npx skills add`. Rules that belong to one project stay in that project's own `AGENTS.md` files.
 
-Start at [map.md](map.md) · requirements in [requirements.md](requirements.md) · whole picture in
-[design-overview.md](design-overview.md) · every approved rule in [research/19-approved-rules.md](research/19-approved-rules.md).
-Tickets are markdown files in [issues/](issues/) (local wayfinder tracker). Third-party reference repos are not copied —
-[refs/README.md](refs/README.md) lists each with its URL and pinned commit.
+## Install
 
-## Install the plugin
+The repo is private, so git needs credentials first. A `GH_TOKEN` alone is not enough; it has to go through a
+credential helper.
 
-This repo is a Claude Code plugin marketplace (`chiyanram`) with one plugin, `rulebook`: generic skills, references
-and the `/crq` workflow (decision G23, [#93](https://github.com/chiyanram/skills/issues/93)). The plugin lives in
-[plugins/rulebook/](plugins/rulebook/); `research/`, `review/` and `issues/` are not part of it.
-
-**Laptop.** The repo is private, so git needs credentials first (a `GH_TOKEN` alone is not enough; it has to go
-through a credential helper):
+**Claude Code**
 
 ```bash
 gh auth setup-git
@@ -24,20 +17,36 @@ claude plugin marketplace add chiyanram/skills
 claude plugin install rulebook@chiyanram
 ```
 
-Update: `claude plugin marketplace update chiyanram`. Auto-update is off for third-party marketplaces unless you turn it on.
+Update with `claude plugin marketplace update chiyanram`. Auto-update is off for third-party marketplaces unless you
+turn it on.
 
-**Worker container** ([agent-fleet#79](https://github.com/chiyanram/agent-fleet/pull/79)). The managed settings
-already allow-list this repo; to bake the plugin, add it to `extraKnownMarketplaces` and `enabledPlugins`:
+**Other agent tools**
+
+```bash
+npx skills add chiyanram/skills
+```
+
+**Worker container.** Add the marketplace and the plugin to the managed settings:
 
 ```json
 "extraKnownMarketplaces": { "chiyanram": { "source": { "source": "github", "repo": "chiyanram/skills" } } },
 "enabledPlugins": { "rulebook@chiyanram": true }
 ```
 
-`bake-plugins.sh` reads the BuildKit secret `skills_token` for the clone. Note that the whole repo is cloned
-(including `research/`), but only `plugins/rulebook/` is copied into the plugin cache.
+`bake-plugins.sh` reads the BuildKit secret `skills_token` for the clone. The whole repo is cloned, but only
+`plugins/rulebook/` is copied into the plugin cache.
 
-**Codex.** Codex is not documented to read Claude Code plugins. Until the G20 delivery probe
-([#90](https://github.com/chiyanram/skills/issues/90)) shows that `codex exec` sees these skills, treat them as Claude-only.
+## Layout
 
-**Check before pushing:** `make lint` (runs `claude plugin validate --strict` on the marketplace and the plugin).
+| path | what it holds |
+|---|---|
+| [`plugins/rulebook/`](plugins/rulebook/) | the plugin: the only folder that ships |
+| [`scripts/`](scripts/), [`tests/`](tests/) | the checks behind `make lint`, and their tests |
+| [`research/`](research/), [`review/`](review/), [`issues/`](issues/), [`p1/`](p1/), [`refs/`](refs/) | the design work behind the rules |
+
+Every approved rule is in [research/19-approved-rules.md](research/19-approved-rules.md). Issues are tracked in GitHub
+issues.
+
+## Contribute
+
+Read [AGENTS.md](AGENTS.md). Run `make lint` and `make test` before you push.
