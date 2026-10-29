@@ -1,6 +1,6 @@
 # 68a — Neutral Good/Bad pairs: strategy · coverage-design · boundaries · value-bar (#99, map #9)
 
-Source: research/31a-v2.md; research/47-good-rewrites.md (replaces the pair for S2, S3, C1, C4, B2, B3, V1, V3). Domain: ordering + billing (#99 brief). Stand-ins: `make test-module MOD=<m> TEST=<p>` → `make test MOD=<m> TEST=<p>` (S3) · real-LLM opt-in tier (local Ollama, `-Dollama.it=true`) → PaymentGateway sandbox, `-Dgateway.sandbox=true`; exact model wording → gateway `receiptText` (TM3) · scripted fake LLM provider turns → PaymentGateway HTTP API stubbed at the wire with a WireMock scenario; third-party HTTP tool → fraud-check HTTP service (TM2) · Redis-backed store behind Toxiproxy → PaymentGateway HTTP behind Toxiproxy, `gatewayProxy` supplied by the shared container initializer (`@EnableSharedContainers`, IT2) (TM4) · provider startup check that never gets an answer → OverdueReminder job against a mail HTTP endpoint behind EmailSender (C2) · tool-output injection REQ scenario → order-cancellation AC on `/api/orders` (AT1) · stream consumer-group identity bug → same bug on stream `orders.placed`, groups of the billing and notifications modules (S4, V4) · entity version default tied to a migration → OrderEntity status default tied to migration V12 (C1, V5) · alert trigger enum → OrderStatus (V1, V3) · legacy exit-status strings → ErrorCode problem types (V2) · forwarded-header parser → OrderImportParser (B2, B3) · redaction offsets → payment allocation across invoices (B1) · Unicode NFC normaliser → CustomerEmail.normalise (C3). Added terms: OrderEntity (JPA entity of Order) · migration V12 · OrdersRepositoryIT (repository-slice base class) · OrderStatus.REFUNDED (new constant, V1 Bad only) · OrderImportParser (CSV of order lines) · PaymentAllocator · CustomerEmail.normalise · FakeInvoiceRepository + Resettable (own-code fake, TM2 Bad only) · BillingConsumer / NotificationsConsumer (consumers of `orders.placed`) · ErrorCode.problemType() + PUBLISHED_PROBLEM_TYPES · OrderCancellationHarness (AT1 Bad only) · gateway `receiptText`.
+Source: research/31a-v2.md; research/47-good-rewrites.md (replaces the pair for S2, S3, C1, C4, B2, B3, V1, V3). Domain: ordering + billing (#99 brief). Stand-ins: `make test-module MOD=<m> TEST=<p>` → `./gradlew :<m>:test --tests '<p>'` (S3) · real-LLM opt-in tier (local Ollama, `-Dollama.it=true`) → PaymentGateway sandbox, `-Dgateway.sandbox=true`; exact model wording → gateway `receiptText` (TM3) · scripted fake LLM provider turns → PaymentGateway HTTP API stubbed at the wire with a WireMock scenario; third-party HTTP tool → fraud-check HTTP service (TM2) · Redis-backed store behind Toxiproxy → PaymentGateway HTTP behind Toxiproxy, `gatewayProxy` supplied by the shared container initializer (`@EnableSharedContainers`, IT2) (TM4) · provider startup check that never gets an answer → OverdueReminder job against a mail HTTP endpoint behind EmailSender (C2) · tool-output injection REQ scenario → order-cancellation AC on `/api/orders` (AT1) · stream consumer-group identity bug → same bug on stream `orders.placed`, groups of the billing and notifications modules (S4, V4) · entity version default tied to a migration → OrderEntity status default tied to migration V12 (C1, V5) · alert trigger enum → OrderStatus (V1, V3) · legacy exit-status strings → ErrorCode problem types (V2) · forwarded-header parser → OrderImportParser (B2, B3) · redaction offsets → payment allocation across invoices (B1) · Unicode NFC normaliser → CustomerEmail.normalise (C3). Added terms: OrderEntity (JPA entity of Order) · migration V12 · OrdersRepositoryIT (repository-slice base class) · OrderStatus.REFUNDED (new constant, V1 Bad only) · OrderImportParser (CSV of order lines) · PaymentAllocator · CustomerEmail.normalise · FakeInvoiceRepository + Resettable (own-code fake, TM2 Bad only) · BillingConsumer / NotificationsConsumer (consumers of `orders.placed`) · ErrorCode.problemType() + PUBLISHED_PROBLEM_TYPES · OrderCancellationHarness (AT1 Bad only) · gateway `receiptText`.
 Skipped: none.
 
 ### S1 — Pick the tier by dependency; never start Spring to test plain service logic
@@ -95,14 +95,14 @@ What goes wrong: a hand-rolled baseline run whose filter matched nothing; nothin
 
 **Good** (neutral)
 ```text
-make test MOD=orders-api TEST='*InvoiceServiceTest*'
-make test MOD=orders-api TEST='*OrderServiceTest*'
+./gradlew :orders-api:test --tests '*InvoiceServiceTest*'
+./gradlew :orders-api:test --tests '*OrderServiceTest*'
 
 Baseline before editing InvoiceService, at main <sha>:
   InvoiceServiceTest   <n> tests, 0 failed
   OrderServiceTest     <n> tests, 0 failed
 ```
-Why: it goes through `make`, one pattern per run so an empty match fails, and the note records counts proving tests ran.
+Why: it goes through the build's own test task, one pattern per run so an empty match fails, and the note records counts proving tests ran.
 
 Evidence: `.claude/skills/aruvii-standards/references/verification.md:27-31` @772736bf (Bad, real) · source 31a-v2.md:81 (31a's own Bad, adapted, was replaced by 47's pair) · fix from research/47-good-rewrites.md:66-75
 
@@ -253,7 +253,7 @@ Evidence: `aruvii-api/src/integrationTest/java/ai/aruvii/api/support/FakeActiveS
 **Bad** (neutral)
 ```groovy
     def "should pay an open invoice"() {
-        given: "an open invoice on the gateway sandbox — no @Requires, so it runs inside make verify"
+        given: "an open invoice on the gateway sandbox — no @Requires, so it runs inside ./gradlew check"
         def customerId = seedCustomer("sandbox-pay", CustomerTier.STANDARD)
         def invoiceId = seedInvoice(customerId, new Money(new BigDecimal("25.50"), "EUR"))
         def events = subscribePayments(invoiceId)
@@ -393,7 +393,7 @@ What goes wrong: a separate `.feature` tier with its own Node runtime duplicates
         orderRepository.findById(orderId).get().status() == OrderStatus.PAID
     }
 ```
-Why: the AC of REQ-123-order-cancellation is an ordinary IT on the real API; its name reads as the scenario.
+Why: the AC of issue #123 is an ordinary IT on the real API; its name reads as the scenario.
 
 Evidence: `aruvii-worker/src/test/java/ai/aruvii/worker/acceptance/ToolOutputSplitHarness.java:92-106` @origin/master 2026-10-02, no sha in source (Bad, real) · source 31a-v2.md:347 · fix from 31a-v2.md:349-367
 
@@ -411,7 +411,7 @@ What goes wrong: one Right case, and nothing shows which other dimensions were c
 **Good** (neutral)
 ```groovy
 /**
- * REQ-123-order-cancellation AC-2: an order created through the app starts as a draft.
+ * #123 AC-2: an order created through the app starts as a draft.
  * R: a saved new order reads back DRAFT. B: DRAFT is the first status — nothing comes before it.
  * I, C, E, P: skip — no inverse operation, no second source, no error path, one INSERT.
  */
@@ -461,7 +461,7 @@ Evidence: `aruvii-guardrails/src/test/java/ai/aruvii/guardrails/pii/InputNormali
 ```markdown
 ## Verification
 
-`make verify`: 412 tests passed, smoke 88 passed / 0 failed / 0 skipped.
+`./gradlew check`: 412 tests passed, smoke 88 passed / 0 failed / 0 skipped.
 
 Each of the new assertions was mutation-tested rather than assumed: removing the
 paid-invoice guard and letting a SHIPPED order cancel each turn the expected case red.
@@ -472,7 +472,7 @@ What goes wrong: it lists what ran and nothing about what was not tested, so a d
 ```markdown
 ## Verification
 
-`make verify`: 412 tests passed, smoke 88 passed / 0 failed / 0 skipped.
+`./gradlew check`: 412 tests passed, smoke 88 passed / 0 failed / 0 skipped.
 
 ## Not tested, by decision
 

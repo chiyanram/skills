@@ -59,7 +59,7 @@ What goes wrong: one number mixes unreached code with unasserted code, so the re
 
 **Good** (neutral)
 ```text
-make mutation · billing · PIT DEFAULTS
+./gradlew pitest · billing · PIT DEFAULTS
 mutation score 71% (142/200) · test strength 89% (142 killed ÷ 160 killed+survived)
 NO_COVERAGE 40 → not reached by any test (coverage gap: add a test that runs it)
 SURVIVED 18 → reached, not asserted (missing case: name its letter, add the example)
@@ -138,17 +138,17 @@ Evidence: Bad adapted (no `mutators` ever committed, research/47:661) · `build-
 
 **Bad** (neutral)
 ```text
-`make mutation` runs PIT against `billing` (`gradlew :billing:pitest`) — a report, not a gate,
+`./gradlew pitest` runs PIT against `billing` (`gradlew :billing:pitest`) — a report, not a gate,
 because a mutation score needs a human reading it, not a threshold. It exists for one failure: a
 unit test that passes today but would still pass if the logic it covers were deleted. Run it on
 any module you've added meaningful branching logic to, even outside `billing` — wiring a second
 module in is a `build.gradle.kts` change away, not a redesign.
 ```
-What goes wrong: "run it on any module" reads as if `make mutation` covers them, but it only runs `billing`.
+What goes wrong: "run it on any module" reads as if `./gradlew pitest` covers them, but it only runs `billing`.
 
 **Good** (neutral)
 ```text
-6. **Mutation-test what you just wrote.** `make mutation` runs PIT against `billing` only.
+6. **Mutation-test what you just wrote.** `./gradlew pitest` runs PIT against `billing` only.
    If you added real branching logic to another module, wire it in there first (a `build.gradle.kts`
    change, not a redesign), run it, and say in the MR description that you wired it in.
 ```
@@ -391,7 +391,7 @@ Evidence: `aruvii-guardrails/src/test/java/ai/aruvii/guardrails/property/Propert
 
 **Good** (neutral)
 ```groovy
-/** No tag: a unit test, so `make test` runs it and coverage counts it (#123). */
+/** No tag: a unit test, so `./gradlew test` runs it and coverage counts it (#123). */
 class DiscountPolicyPropertySpec extends Specification {
 
     def discountPolicy = new DiscountPolicy()
@@ -743,7 +743,7 @@ Evidence: `aruvii-shared/src/test/groovy/ai/aruvii/shared/security/LoginBackoffP
 **Bad** (neutral)
 ```groovy
 /**
- * REQ-123 §Acceptance criteria. Every figure asserted here is the discount table's, and the
+ * #123 §Acceptance criteria. Every figure asserted here is the discount table's, and the
  * table cites where each one comes from.
  *
  * <p>The tier tables run against a policy with no seasonal offer. Seasonal offers are a separate
