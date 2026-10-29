@@ -2,6 +2,7 @@
 
 Draft consolidated 2026-10-02 from decisions already taken. Each line cites where it was decided. G10 (#37) owns this file; its checklist and proof method are decided there.
 Amended 2026-10-17: Rule line (G21 #91), Good/Bad examples and location (G23 #93).
+Amended 2026-10-29: `references/examples/<topic>.md` holds every approved pair when a reference cannot (operator, #31).
 
 ## Where a reference sits
 
@@ -10,6 +11,7 @@ chiyanram/skills  (plugin marketplace — generic, installed as a plugin, never 
 ├── <domain>/                            knowledge skill: testing · code · obs · migrations · delivery · planning
 │   ├── SKILL.md                         router: frontmatter + "which reference to load" table, nothing else
 │   ├── references/<topic>.md            ← THIS TEMPLATE (neutral-domain examples)
+│   ├── references/examples/<topic>.md   every approved Good/Bad pair, when the reference cannot hold them all
 │   └── scripts/                         mechanical checks the references name
 └── <workflow>/SKILL.md                  generic workflow skill (flat, own /name): crq · deslop · …
 
@@ -102,7 +104,9 @@ Why this is right. (Real evidence: ledger row V1.)
 ## Writing checklist (G10 #37, from R14 research/16 §4a)
 
 ```
-[ ] 1  ≤300 lines; >100 lines → contents line at top; links one level deep, none into another ref's body
+[ ] 1  ≤300 lines; >100 lines → contents line at top; links one level deep, none into another ref's body; a
+       reference that cannot hold every approved Good/Bad pair in 300 lines keeps its most telling pairs and links
+       `references/examples/<topic>.md`, which holds them all (operator, 2026-10-29)
 [ ] 2  Rules: one sentence = imperative + "because" + the failure it prevents, ≤35 words; a grep or a reader can
        decide it (no "consider", no "prefer"); no statable reason → flag for deletion (G21 #91)
 [ ] 3  Rules: each discipline rule names the permitted alternative in the same sentence, inside the ≤35 words
