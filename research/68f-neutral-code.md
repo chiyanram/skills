@@ -9,20 +9,17 @@ Source: research/56a, 56b, 56c (selection research/54). Domain: ordering + billi
 
 **Bad** (neutral)
 ```java
-long t0 = System.currentTimeMillis();
-// …
-ChargeReply resp;
-try {
-    resp = paymentGateway.charge(new ChargeRequest(invoice.id(), null, invoice.total(), customerId));
-} catch (Exception e) {
-    long ms = System.currentTimeMillis() - t0;
-    // …
-}
-long ms = System.currentTimeMillis() - t0;
-log.info("action=invoice.charge.ok invoiceId={} orderId={} customerId={} durationMs={}",
-        invoice.id(), invoice.orderId(), customerId, ms);
+final long chargeStartMillis = clock.millis();
+final ChargeReply reply = paymentGateway.charge(chargeRequest(invoice, customerId));
+final long elapsedMillis = clock.millis() - chargeStartMillis;
+log.info(
+        "action=invoice.charge.ok invoiceId={} orderId={} customerId={} durationMs={}",
+        invoice.id(),
+        invoice.orderId(),
+        customerId,
+        elapsedMillis);
 ```
-What goes wrong: elapsed time is raw `long` subtraction from the wall clock read twice, so no test can pin how long the charge took.
+What goes wrong: elapsed time is raw `long` subtraction of epoch millis, so the span is a bare number and not a `Duration`.
 
 **Good** (neutral)
 ```java
@@ -44,23 +41,20 @@ Evidence: `aruvii-agents/…/application/PipelineExecutionService.java:49,54-58,
 
 **Bad** (neutral)
 ```java
-final var customerId = principal != null ? tryParseUUID(principal.getName()) : null;
-final var result = orderService.place(id, customerId).orThrow(ErrorCode.ORDER_NOT_FOUND);
-audit.logOrderPlaced(customerId, result.id(), result.status(), servletReq.getRemoteAddr());
-return ApiResponse.ok(result);
+final var customerId = UUID.fromString(principal.getName());
+final var placed = orderService.place(id, customerId).orThrow(ErrorCode.ORDER_NOT_FOUND);
+return ApiResponse.ok(placed);
 ```
-What goes wrong: neither `place` nor `orThrow` tells the reader the value is an `OrderResponse`, and `customerId` hides that it may be `null`.
+What goes wrong: neither `place` nor `orThrow` tells the reader the value is an `OrderResponse`, so `var` hides the type.
 
 **Good** (neutral)
 ```java
 public ApiResponse<OrderResponse> place(
         @PathVariable final UUID id,
-        final Principal principal,
-        final HttpServletRequest servletReq) {
+        final Principal principal) {
     final var customerId = UUID.fromString(principal.getName());
     final OrderResponse placed = orderService.place(id, customerId)
             .orThrow(ErrorCode.ORDER_NOT_FOUND);
-    audit.logOrderPlaced(customerId, placed.id(), placed.status(), servletReq.getRemoteAddr());
     return ApiResponse.ok(placed);
 }
 ```
@@ -72,16 +66,15 @@ Evidence: `aruvii-api/…/controller/ProviderController.java:58-61` @772736bf (B
 
 **Bad** (neutral)
 ```java
-private FraudCheck fraudCheck;
+private final FraudCheck fraudCheck;
 
-@Autowired(required = false)
-void setFraudCheck(FraudCheck fraudCheck) { this.fraudCheck = fraudCheck; }
+OrderScreening(@Autowired(required = false) final FraudCheck fraudCheck) { this.fraudCheck = fraudCheck; }
 // …
-private Screening screen(Order order, boolean fraudCheckEnabled) {
-    RuleVerdict rules = orderRules.assess(order);
+private Screening screen(final Order order, final boolean fraudCheckEnabled) {
+    final RuleVerdict rules = orderRules.assess(order);
     // …
     if (fraudCheckEnabled && fraudCheck != null) {
-        List<FraudSignal> signals = fraudCheck.signalsFor(order);
+        final List<FraudSignal> signals = fraudCheck.signalsFor(order);
         // … merge, return
     }
     return new Screening(rules, List.of());
@@ -113,11 +106,11 @@ Evidence: `aruvii-guardrails/…/application/GuardrailPipeline.java:35,43-44,113
 
 **Bad** (neutral)
 ```java
-if (req.pickupPointId() != null && !req.pickupPointId().isBlank()) {
-    saved = service.shipToPickupPoint(req.orderId(), req.pickupPointId(), req.note(), userId);
-} else if (req.street() != null && req.postcode() != null) {
-    saved = service.shipToAddress(req.orderId(), req.street(), req.postcode(),
-        req.note(), userId);
+if (request.pickupPointId() != null && !request.pickupPointId().isBlank()) {
+    saved = service.shipToPickupPoint(request.orderId(), request.pickupPointId(), request.note(), userId);
+} else if (request.street() != null && request.postcode() != null) {
+    saved = service.shipToAddress(request.orderId(), request.street(), request.postcode(),
+        request.note(), userId);
 } else {
     throw new IllegalArgumentException("Either 'pickupPointId' or both 'street' + 'postcode' must be supplied");
 }
@@ -126,8 +119,6 @@ What goes wrong: the request record has nullable fields, so every reader re-deri
 
 **Good** (neutral)
 ```java
-@JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION)
-@JsonSubTypes({@JsonSubTypes.Type(Pickup.class), @JsonSubTypes.Type(Address.class)})
 public sealed interface ShippingRequest {
     record Pickup(
             @NotNull UUID orderId,
@@ -148,16 +139,16 @@ Evidence: `aruvii-api/…/controller/TrustedCertificateController.java:54-61` @7
 
 **Bad** (neutral)
 ```java
-public Invoice issue(UUID orderId, UUID customerId, UUID issuedBy,
-                     String note, String notifyEmail) {
+public Invoice issue(final long orderId, final long customerId, final long issuedBy,
+                     final String note, final String notifyEmail) {
 ```
-What goes wrong: three `UUID`s and two `String`s in one signature; any two can be swapped at the caller and the build stays green.
+What goes wrong: three `long` ids and two `String`s in one signature; any two ids can be swapped at the caller and the build stays green.
 
 **Good** (neutral)
 ```java
-public record OrderId(UUID value) {}
-public record CustomerId(UUID value) {}
-public record UserId(UUID value) {}
+public record OrderId(long value) {}
+public record CustomerId(long value) {}
+public record UserId(long value) {}
 public sealed interface NotifyTarget {
     record None() implements NotifyTarget {}
     record Email(String address) implements NotifyTarget {}
@@ -178,18 +169,18 @@ Evidence: `aruvii-agents/…/application/TaskService.java:29-30` @772736bf (Bad,
 **Bad** (neutral)
 ```java
 private int appendBetween(final List<String> whereParts,
-                            final List<String> paramOrder,
-                            final Map<String, Object> paramValues,
+                            final List<String> placeholderOrder,
+                            final Map<String, Object> placeholderValues,
                             final int index,
-                            final String quotedCol,
+                            final String quotedColumn,
                             final Object value) {
     if (!(value instanceof List<?> bounds) || bounds.size() != 2) {
         throw new IllegalArgumentException(
-            "BETWEEN operator on " + quotedCol + " requires a 2-tuple value");
+            "BETWEEN operator on " + quotedColumn + " requires a 2-tuple value");
     }
     // … two placeholder names, the BETWEEN fragment …
-    paramValues.put(lo, bounds.get(0));
-    paramValues.put(hi, bounds.get(1));
+    placeholderValues.put(lowPlaceholder, bounds.get(0));
+    placeholderValues.put(highPlaceholder, bounds.get(1));
     return index + 2;
 }
 ```
@@ -202,13 +193,13 @@ record BetweenBounds(Object low, Object high) {}
 private int appendBetween(
         final WhereClause where,
         final int index,
-        final String quotedCol,
+        final String quotedColumn,
         final BetweenBounds bounds) {
-    final String lowParam = FILTER_PARAM_PREFIX + index;
-    final String highParam = FILTER_PARAM_PREFIX + (index + 1);
-    where.add(quotedCol + " BETWEEN :" + lowParam + " AND :" + highParam);
-    where.bind(lowParam, bounds.low());
-    where.bind(highParam, bounds.high());
+    final String lowPlaceholder = FILTER_PLACEHOLDER_PREFIX + index;
+    final String highPlaceholder = FILTER_PLACEHOLDER_PREFIX + (index + 1);
+    where.add(quotedColumn + " BETWEEN :" + lowPlaceholder + " AND :" + highPlaceholder);
+    where.bind(lowPlaceholder, bounds.low());
+    where.bind(highPlaceholder, bounds.high());
     return index + 2;
 }
 ```
@@ -221,20 +212,20 @@ Evidence: `aruvii-tools/…/infrastructure/compiler/PickerCompiler.java:260-277`
 **Bad** (neutral)
 ```java
 @Bean
-public PaymentGateway paymentGateway(GatewayCredentials credentials) {
+public HttpPaymentGateway paymentGateway(GatewayCredentials credentials) {
     RestClient restClient = RestClient.builder().build();
     return new HttpPaymentGateway(credentials, restClient);
 }
 // InvoiceService.pay:
-return CompletableFuture.supplyAsync(() -> paymentGateway.charge(request))
-    .orTimeout(limits.timeoutMs(), TimeUnit.MILLISECONDS)
+return CompletableFuture.supplyAsync(() -> paymentGateway.charge(request), chargeExecutor)
+    .orTimeout(limits.timeout().toMillis(), TimeUnit.MILLISECONDS)
 ```
 What goes wrong: the gateway `RestClient` has no connect or read timeout, so after `orTimeout` fires the charge request keeps running on a pool thread.
 
 **Good** (neutral)
 ```java
 @Bean
-public PaymentGateway paymentGateway(
+public HttpPaymentGateway paymentGateway(
         final GatewayCredentials credentials,
         final GatewayHttpProperties gatewayHttp) {
     final HttpClient httpClient = HttpClient.newBuilder()
@@ -257,7 +248,7 @@ Evidence: `aruvii-tools/…/ToolsAutoConfiguration.java:211-218` + `aruvii-tools
 @Bean(destroyMethod = "shutdownNow")
 ScheduledExecutorService orderStreamHeartbeatScheduler() {
     return Executors.newScheduledThreadPool(4,
-        Thread.ofVirtual().name("order-stream-heartbeat-", 0).factory());
+        Thread.ofPlatform().name("order-stream-heartbeat-", 0).factory());
 }
 ```
 What goes wrong: four threads look bounded, but every open order-status stream adds its own periodic task, and nothing says what happens past capacity.
@@ -265,8 +256,8 @@ What goes wrong: four threads look bounded, but every open order-status stream a
 **Good** (neutral)
 ```java
 @Bean
-SseHeartbeats sseHeartbeats(final SseProperties sse) {
-    return new SseHeartbeats(new ArrayBlockingQueue<>(sse.maxOpenStreams()));
+SseHeartbeats sseHeartbeats(final SseProperties sseProperties) {
+    return new SseHeartbeats(new ArrayBlockingQueue<>(sseProperties.maxOpenStreams()));
 }
 
 @Bean(destroyMethod = "shutdownNow")
@@ -291,12 +282,12 @@ for (int attempt = 0; attempt < MAX_RETRIES; attempt++) {
         HttpRequest request = HttpRequest.newBuilder()
             // … gateway url, signature, Idempotency-Key = payment id, timeout(15 s), POST body …
             .build();
-        HttpResponse<Void> resp = HTTP.send(request, HttpResponse.BodyHandlers.discarding());
-        int status = resp.statusCode();
+        HttpResponse<Void> response = HTTP.send(request, HttpResponse.BodyHandlers.discarding());
+        int status = response.statusCode();
         // … 2xx → return; 4xx → return; 5xx → retry …
-    } catch (Exception e) {
-        log.warn("PaymentGateway charge failed paymentId={} attempt={}: {}",
-            payment.id(), attempt + 1, e.getMessage());
+    } catch (IOException failure) {
+        log.warn("PaymentGateway charge failed paymentId={} attempt={}: {}: {}",
+            payment.id(), attempt + 1, failure.getClass().getSimpleName(), failure.getMessage());
     }
     // … sleep, next attempt …
 }
@@ -328,8 +319,7 @@ Evidence: `aruvii-worker/…/webhook/WebhookCallbackSender.java:69-97` @772736bf
 
 **Bad** (neutral)
 ```java
-public Invoice issue(final UUID orderId, final IssueCommand cmd) {
-    final long start = System.currentTimeMillis();
+public Invoice issue(final UUID orderId, final IssueCommand command) {
     LOG.info("action=invoice_issue orderId={}", orderId);
 
     invoiceRepository.findByOrderId(orderId).ifPresent(existing -> {
@@ -337,23 +327,21 @@ public Invoice issue(final UUID orderId, final IssueCommand cmd) {
             "orderId=" + orderId + " invoiceId=" + existing.id());
     });
 
-    final Invoice toSave = new Invoice(
-        null, orderId, cmd.total(), cmd.dueDate(), null);
-    final Invoice saved = invoiceRepository.save(toSave);
+    final Invoice saved = invoiceRepository.save(Invoice.open(orderId, command.total(), command.dueDate()));
 ```
 What goes wrong: "this order already has an invoice" is a normal answer, yet it leaves as an exception from a lambda; the signature promises an `Invoice`.
 
 **Good** (neutral)
 ```java
-public InsertionResult<Invoice> issue(final UUID orderId, final IssueCommand cmd) {
+public InsertionResult<Invoice> issue(final UUID orderId, final IssueCommand command) {
     log.info("action=invoice_issue orderId={}", orderId);
     if (invoiceRepository.findByOrderId(orderId).isPresent()) {
         return new InsertionResult.Duplicate<>(orderId.toString());
     }
     final Invoice saved = invoiceRepository.save(Invoice.open(
             orderId,
-            cmd.total(),
-            cmd.dueDate()));
+            command.total(),
+            command.dueDate()));
     log.info("action=invoice_issue_ok orderId={} invoiceId={}", orderId, saved.id());
     return new InsertionResult.Created<>(saved);
 }
@@ -370,19 +358,22 @@ try {
     JsonNode root = MAPPER.readTree(body);
     JsonNode currencies = root.path("currencies");
     if (currencies.isArray()) {
-        for (JsonNode c : currencies) {
-            String code = c.path("code").asString();
+        for (JsonNode currencyNode : currencies) {
+            String code = currencyNode.path("code").asString();
             if (currency.equals(code)) {
                 currencySupported = true;
                 break;
             }
         }
     }
-} catch (Exception ignored) {
-    // gateway /status returned but JSON unexpected — still reachable, just downgrade detail.
+} catch (Exception failure) {
+    log.warn(
+            "action=gateway.health.status_unreadable cause={} message={}",
+            failure.getClass().getSimpleName(),
+            failure.getMessage());
 }
 ```
-What goes wrong: only the JSON parse can fail here, yet the catch takes every exception and drops it; a loop bug reads as "currency not supported".
+What goes wrong: only the JSON parse can fail here, yet the catch takes every exception; a loop bug reads as "currency not supported".
 
 **Good** (neutral)
 ```java
@@ -395,26 +386,25 @@ private boolean supportsCurrency(final String statusBody) {
         }
         return false;
     } catch (final JacksonException unexpectedShape) {
-        log.warn("action=gateway.health.status_unreadable cause={}", unexpectedShape.getClass().getSimpleName());
+        log.warn(
+                "action=gateway.health.status_unreadable cause={} message={}",
+                unexpectedShape.getClass().getSimpleName(),
+                unexpectedShape.getMessage());
         return false;
     }
 }
 ```
-Why: `JacksonException` is the one failure the parse can raise, so it is the one caught, and logged; any other exception now surfaces.
+Why: `JacksonException` is the one failure the parse can raise, so it is the one caught, and logged with class and message; any other exception now surfaces.
 
 Evidence: `aruvii-api/…/activity/AdminActivityClient.java:74-88` @772736bf (Bad, real; flag declared `:73`) · source 56a-g9b-good-bad-java-errors.md:430-474 · fix from 56a:454-474
 
-### ER8 — A best-effort metric or audit call may catch and continue; WARN with the exception class
+### ER8 — A best-effort metric or audit call may catch and continue; WARN with the exception class and message
 
 **Bad** (neutral)
 ```java
-private void logStatusChange(String action, UUID orderId, OrderStatus fromStatus, OrderStatus toStatus,
-                             UUID actorUserId, String reason) {
-    if (auditLog == null) return;  // graceful degradation if no port wired
+private void logStatusChange(final OrderStatusChange change) {
     try {
-        auditLog.record(new OrderAuditEntry(
-            null, orderId, fromStatus, toStatus,
-            actorUserId, action, reason, Instant.now(), null));
+        auditLog.record(OrderAuditEntry.of(change, clock.instant()));
     } catch (Exception ignored) { /* never block the order on audit failures */ }
 }
 ```
@@ -427,14 +417,15 @@ private void logStatusChange(final OrderStatusChange change) {
         auditLog.record(OrderAuditEntry.of(change, clock.instant()));
     } catch (final RuntimeException auditFailure) {
         log.warn(
-                "action=order.status.audit_failed orderId={} statusAction={} cause={}",
+                "action=order.status.audit_failed orderId={} statusAction={} cause={} message={}",
                 change.orderId(),
                 change.action(),
-                auditFailure.getClass().getSimpleName());
+                auditFailure.getClass().getSimpleName(),
+                auditFailure.getMessage());
     }
 }
 ```
-Why: the order change still never blocks, but each lost audit row leaves one WARN line naming the exception class, with no stack.
+Why: the order change still never blocks, but each lost audit row leaves one WARN line naming the exception class and message, with no stack.
 
 Evidence: `aruvii-agents/…/application/AgentService.java:62-70` @772736bf (Bad, real) · source 56a-g9b-good-bad-java-errors.md:476-511 · fix from 56a:494-511
 
@@ -444,11 +435,11 @@ Evidence: `aruvii-agents/…/application/AgentService.java:62-70` @772736bf (Bad
 ```java
 @ExceptionHandler(DataIntegrityViolationException.class)
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public ApiResponse<Void> handleDataIntegrity(DataIntegrityViolationException ex) {
-    return ApiResponse.error("Invalid reference: " + ex.getMostSpecificCause().getMessage());
+public ApiResponse<Void> handleDataIntegrity(DataIntegrityViolationException violation) {
+    return ApiResponse.error("Invalid reference: " + violation.getMostSpecificCause().getMessage());
 }
 ```
-What goes wrong: `OrderController` sends the JDBC driver's message to the client: constraint names, column names, sometimes the offending value.
+What goes wrong: the handler sends the JDBC driver's message to the client: constraint names, column names, sometimes the offending value.
 
 **Good** (neutral)
 ```java
@@ -457,16 +448,17 @@ What goes wrong: `OrderController` sends the JDBC driver's message to the client
 public ApiResponse<Void> handleDataIntegrity(final DataIntegrityViolationException violation) {
     final String traceId = currentTraceId();
     log.warn(
-            "action=api.data_integrity traceId={} cause={}",
+            "action=api.data_integrity traceId={} cause={} message={}",
             traceId,
-            violation.getMostSpecificCause().getClass().getSimpleName());
+            violation.getMostSpecificCause().getClass().getSimpleName(),
+            violation.getMostSpecificCause().getMessage());
     return ApiResponse.error(
             ErrorCode.VALIDATION_FAILED.code(),
             ErrorCode.VALIDATION_FAILED.defaultMessage(),
             traceId);
 }
 ```
-Why: the body says only what the error catalogue says; the operator gets trace id and cause class in the log; it lives in `GlobalExceptionHandler`.
+Why: the body says only what the error catalogue says; the operator gets trace id, cause class and message in the log; it lives in the one central exception handler (ER11).
 
 Evidence: `aruvii-api/…/controller/AgentController.java:186-190` @772736bf (Bad, real) · source 56a-g9b-good-bad-java-errors.md:513-545 · fix from 56a:527-545
 
@@ -477,13 +469,16 @@ Evidence: `aruvii-api/…/controller/AgentController.java:186-190` @772736bf (Ba
 // Metric: payment.charge.duration tagged by method + status. Bounded cardinality —
 // payment methods are an enum, statuses are a small fixed set. Operators get a graph
 // of "is the gateway getting slower?" and "is the PAID rate dropping?"
-if (meters != null) {
-    try {
-        meters.timer("payment.charge.duration",
-            "method", method == null ? "UNKNOWN" : method,
-            "status", status == null ? "UNKNOWN" : status.toString())
-            .record(java.time.Duration.ofMillis(Math.max(0L, latencyMs)));
-    } catch (Exception ignored) { /* metric failure must never affect checkout */ }
+try {
+    meters.timer("payment.charge.duration",
+        "method", method,
+        "status", status.toString())
+        .record(latency);
+} catch (RuntimeException meterFailure) {
+    log.warn(
+            "action=payment.charge.metric_failed cause={} message={}",
+            meterFailure.getClass().getSimpleName(),
+            meterFailure.getMessage());
 }
 ```
 What goes wrong: the comment defends our own tag choice instead of the code showing it, and it is false: `method` is a `String`.
@@ -499,9 +494,10 @@ private void recordChargeDuration(
                 .record(latency);
     } catch (final RuntimeException meterFailure) {
         log.warn(
-                "action=payment.charge.metric_failed method={} cause={}",
+                "action=payment.charge.metric_failed method={} cause={} message={}",
                 method,
-                meterFailure.getClass().getSimpleName());
+                meterFailure.getClass().getSimpleName(),
+                meterFailure.getMessage());
     }
 }
 ```
@@ -523,6 +519,9 @@ What goes wrong: the doc section has no header text, so the claim is false, and 
 **Good** (neutral)
 ```java
 final class SseHeaders {
+    private SseHeaders() {
+    }
+
     // nginx and corporate proxies hold text/event-stream frames unless these two headers are set
     static void disableProxyBuffering(final HttpServletResponse response) {
         response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-transform");
@@ -532,12 +531,13 @@ final class SseHeaders {
 ```
 ```groovy
 def "should tell proxies not to buffer the order event stream"() {
-    given: "a servlet response"
+    given: "a response for an order event stream, before any frame is written"
     def response = new MockHttpServletResponse()
-    when: "the stream headers are applied"
+    when: "the endpoint prepares the stream"
     SseHeaders.disableProxyBuffering(response)
-    then: "nginx passes each frame straight through"
+    then: "nginx and caching proxies pass each frame on at once instead of holding it"
     response.getHeader("X-Accel-Buffering") == "no"
+    response.getHeader(HttpHeaders.CACHE_CONTROL) == "no-cache, no-transform"
 }
 ```
 Why: every stream endpoint calls one helper and a spec pins the headers, so the sync note goes; the proxy sentence stays, an outside constraint.
@@ -609,9 +609,9 @@ What goes wrong: the controller decides whether an invoice may be paid and in wh
 @PreAuthorize("@invoiceAuth.canPay(#id)")
 public ApiResponse<PaymentResponse> pay(
         @PathVariable final UUID id,
-        @RequestBody final PayInvoiceRequest req,
-        final Authentication auth) {
-    final PayOutcome outcome = invoicePayer.pay(id, callerOf(auth), req);
+        @RequestBody final PayInvoiceRequest request,
+        final Authentication authentication) {
+    final PayOutcome outcome = invoicePayer.pay(id, callerOf(authentication), request);
     return switch (outcome) {
         case PayOutcome.Paid paid -> ApiResponse.ok(PaymentResponse.of(paid));
         case PayOutcome.AlreadyPaid already ->
@@ -639,8 +639,10 @@ public class PaymentGatewayRegistryImpl implements PaymentGatewayRegistry {
 
     @Override
     public PaymentGateway forMethod(String method) {
-        for (PaymentGateway g : gateways) {
-            if (g.supports(method)) return g;
+        for (PaymentGateway gateway : gateways) {
+            if (gateway.supports(method)) {
+                return gateway;
+            }
         }
         throw new UnsupportedPaymentMethodException(method);
     }
@@ -717,7 +719,7 @@ Evidence: `DataRetentionJob.java:69-74` + `DataErasureController.java:117-122` @
 ```java
 private void recordPaymentSafely(UUID paymentId, Customer customer,
                                  UUID orderId, UUID invoiceId, String method,
-                                 String requestJson, String responseJson, long latencyMs,
+                                 String requestJson, String responseJson, long latencyMillis,
                                  PaymentStatus status, ErrorCode errorCode,
                                  boolean requiresReview, UUID reviewId,
                                  String traceId, boolean sandbox, String sandboxSource) {
@@ -790,17 +792,13 @@ Evidence: `TriggerService.java:135-147` @772736bf (Bad, real; caller `ScheduledT
 
 **Bad** (neutral)
 ```java
-/** Back-compat constructor (pre-billing callers without invoice support). */
-public OrderImporter(OrderRepository orderRepository, TaxCalculator taxCalculator,
-                     ObjectMapper mapper) {
-    this(orderRepository, taxCalculator, mapper, null, null);
-}
-…
-private void applyInvoicing(ImportOrdersRequest req, List<Order> created, UUID createdBy) {
-    InvoiceDestination dest = req.invoicing();
-    if (dest == null || invoiceService == null) return;
+private void applyInvoicing(ImportOrdersRequest request, List<Order> created, UUID createdBy) {
+    InvoiceDestination destination = request.invoicing();
+    if (destination == null || invoiceService == null) {
+        return;
+    }
 ```
-What goes wrong: a test-only constructor passes null, the trusted path grows a null guard, and a wiring mistake silently skips invoicing.
+What goes wrong: `invoiceService` is a constructor-injected final field that a test-only constructor sets to null, so the trusted path grows a null guard, and a wiring mistake silently skips invoicing.
 
 **Good** (neutral)
 ```java
@@ -828,9 +826,9 @@ Evidence: `OpenApiSpecImporter.java:86-90,197-199` @772736bf (Bad, real; only us
 
 **Bad** (neutral)
 ```ts
-const smokeOrders = orders.filter(o => o.reference?.startsWith('smoke-') || o.reference?.startsWith('rate-limit-smoke-'));
-const staleInvoices = invoices.filter(i => i.reference.startsWith('smoke-'));
-const smoke = customers.filter(c => (c.email ?? '').startsWith('smoke-') || (c.name ?? '').startsWith('smoke-'));
+const smokeOrders = orders.filter(order => order.reference?.startsWith('smoke-') || order.reference?.startsWith('rate-limit-smoke-'));
+const staleInvoices = invoices.filter(invoice => invoice.reference.startsWith('smoke-'));
+const smoke = customers.filter(customer => (customer.email ?? '').startsWith('smoke-') || (customer.name ?? '').startsWith('smoke-'));
 ```
 What goes wrong: "what counts as smoke data" lives in three lambdas that already disagree, so numbered prefixes like `smoke77-` leak every run.
 
@@ -900,18 +898,18 @@ Evidence: no Bad in Aruvii code @772736bf; both sides adapted from https://refac
 ```java
 @Override
 @Transactional
-public OrderCancellation cancel(UUID orderId, UUID requestedBy, String reason) {
+public CancelOutcome cancel(final UUID orderId, final UUID requestedBy, final String reason) {
 
-    // 409 guard — idempotency
-    cancellationPort.findCompletedByOrderId(orderId).ifPresent(existing -> {
-        throw new OrderAlreadyCancelledException(orderId);
-    });
+    final Optional<OrderCancellation> completed = cancellationPort.findCompletedByOrderId(orderId);
+    if (completed.isPresent()) {
+        return new CancelOutcome.AlreadyCancelled(completed.orElseThrow());
+    }
     … // PENDING cancellation row, audit row, void the invoice, order CANCELLED, row COMPLETED
-    } catch (Exception ex) {
-        log.error("order_cancel FAILED orderId={} cancellationId={}: {}: {}", …, ex);
-        cancellationEntity.setStatus("FAILED");
-        cancellationRepo.save(cancellationEntity);
-        throw ex;
+    } catch (RuntimeException failure) {
+        log.error("order_cancel FAILED orderId={} cancellationId={}: {}: {}", …, failure);
+        cancellationEntity.setStatus(CancellationStatus.FAILED);
+        cancellationRepository.save(cancellationEntity);
+        throw failure;
     }
 ```
 What goes wrong: two concurrent cancels both pass the check-then-act guard, and the FAILED row is rolled back with the transaction it lives in.
@@ -1000,7 +998,7 @@ Evidence: `SessionMessageController.java:302-303,318-321` @772736bf (Bad, real) 
 @Bean
 public OverdueReminder overdueReminder(
         InvoiceRepository invoiceRepository,
-        @Lazy ObjectProvider<EmailSender> emailSenderProvider) {
+        ObjectProvider<EmailSender> emailSenderProvider) {
     EmailSender emailSender = emailSenderProvider.getIfAvailable(
             () -> email -> { throw new UnsupportedOperationException("EmailSender not available in this context"); });
     return new OverdueReminder(invoiceRepository, emailSender);
@@ -1031,14 +1029,14 @@ Evidence: `AgentsAutoConfiguration.java:142-149` @772736bf (Bad, real; resolved 
 ```java
 // orders-api — CheckoutFraudClient
 public CheckoutFraudClient(
-        @Value("${example.fraud-check.base-url:http://localhost:8089}") String baseUrl,
+        @Value("${example.fraud-check.base-url}") String baseUrl,
         @Value("${example.fraud-check.ruleset:default}") String ruleset,
-        @Value("${example.fraud-check.timeout-ms:5000}") long timeoutMs) {
+        @Value("${example.fraud-check.timeout:5s}") Duration timeout) {
 // billing — PaymentFraudClient
 public PaymentFraudClient(
-        @Value("${example.fraud-check.base-url:http://localhost:8089}") String baseUrl,
+        @Value("${example.fraud-check.base-url}") String baseUrl,
         @Value("${example.fraud-check.ruleset:default}") String ruleset,
-        @Value("${example.fraud-check.timeout-ms:1500}") long timeoutMs) {
+        @Value("${example.fraud-check.timeout:1500ms}") Duration timeout) {
 ```
 What goes wrong: one key has two defaults, 5000 and 1500 ms, so unset, the two modules run "the same" setting differently.
 
@@ -1066,8 +1064,8 @@ Evidence: `AdminActivityClient.java:43-46` + `OllamaActivityClient.java:42-45` @
 **Bad** (neutral)
 ```java
 @Bean
-public OrderRepository orderRepository(OrderJpaRepository repo) {
-    return new OrderRepositoryAdapter(repo);
+public OrderRepository orderRepository(OrderJpaRepository jpaRepository) {
+    return new OrderRepositoryAdapter(jpaRepository);
 }
 ```
 What goes wrong: the method builds the adapter but declares the port, so before creation the container and type conditions see only the port.
@@ -1075,8 +1073,8 @@ What goes wrong: the method builds the adapter but declares the port, so before 
 **Good** (neutral)
 ```java
 @Bean
-OrderRepositoryAdapter orderRepository(final OrderJpaRepository repo) {
-    return new OrderRepositoryAdapter(repo);
+OrderRepositoryAdapter orderRepository(final OrderJpaRepository jpaRepository) {
+    return new OrderRepositoryAdapter(jpaRepository);
 }
 ```
 Why: the declared type is what is built; callers still inject `OrderRepository`, because Spring matches every type the bean has.
@@ -1089,15 +1087,14 @@ Evidence: `AgentsAutoConfiguration.java:52-55` @772736bf (Bad, real) · source 5
 ```java
 @Bean
 @ConditionalOnMissingBean(TaxCalculator.class)
-public TaxCalculator taxCalculator(
-        @Value("${example.tax.rates-path:/rates/vat-rates.csv}") String ratesPath,
-        @Value("${example.tax.regions-path:/rates/regions.csv}") String regionsPath) {
-    Path rPath = Path.of(ratesPath);
-    Path gPath = Path.of(regionsPath);
-    if (Files.exists(rPath) && Files.exists(gPath)) {
+public TaxCalculator taxCalculator(TaxProperties tax) {
+    Path ratesPath = Path.of(tax.rateTable().ratesPath());
+    Path regionsPath = Path.of(tax.rateTable().regionsPath());
+    if (Files.exists(ratesPath) && Files.exists(regionsPath)) {
         … // load RateTableTaxCalculator
-        } catch (Exception e) {
-            log.warn("rate table init failed ({}), falling back to a flat rate", e.getMessage());
+        } catch (Exception failure) {
+            log.warn("rate table init failed ({}: {}), falling back to a flat rate",
+                    failure.getClass().getSimpleName(), failure.getMessage());
         }
     } … // else: WARN "using flat-rate tax"
     return new FlatRateTaxCalculator();
@@ -1214,7 +1211,6 @@ Evidence: `ProvidersAutoConfiguration.java:31-33` + `CredentialEncryptor.java:21
 **Bad** (neutral)
 ```java
 @Service
-@Primary
 public class TaxRateTable implements TaxCalculator {
     …
     @PostConstruct
@@ -1246,7 +1242,9 @@ Evidence: `GlobalTrustStore.java:37-39,56-59` @772736bf (Bad, real) · source 56
 @Transactional
 public String getOrGenerateWebhookSecret() {
     String stored = settings.get(KEY_WEBHOOK_SECRET);
-    if (!stored.isBlank()) return decryptSafe(stored);
+    if (!stored.isBlank()) {
+        return decryptSafe(stored);
+    }
     String generated = generateSecureKey();
     settings.set(KEY_WEBHOOK_SECRET, encryptor.encrypt(generated));
     return generated;
@@ -1255,8 +1253,10 @@ public String getOrGenerateWebhookSecret() {
 /** WebhookSecretPort implementation — env var takes precedence over DB. */
 @Override
 public String getEffectiveWebhookSecret() {
-    String fromEnv = System.getenv("EXAMPLE_WEBHOOK_SECRET");
-    if (fromEnv != null && !fromEnv.isBlank()) return fromEnv;
+    String fromEnvironment = environment.getProperty("example.webhook-secret");
+    if (fromEnvironment != null && !fromEnvironment.isBlank()) {
+        return fromEnvironment;
+    }
     return getOrGenerateWebhookSecret();
 ```
 What goes wrong: the port method reaches the `@Transactional` method through `this`, so the proxy is bypassed and the read-then-write has no transaction.
@@ -1291,16 +1291,16 @@ customerId = '';
 allInvoices = signal<InvoiceResponse[]>([]);
 customerInvoices = signal<InvoiceResponse[]>([]);
 …
-        this.customerId = p.customerId;
-        this.filterInvoices(p.customerId);
+        this.customerId = payment.customerId;
+        this.filterInvoices(payment.customerId);
 …
-onCustomerChange(cId: string) {
-  this.filterInvoices(cId);
-  this.allocations.update((rs) => rs.map((r) => ({ ...r, invoiceId: '' })));
+onCustomerChange(customerId: string) {
+  this.filterInvoices(customerId);
+  this.allocations.update((allocations) => allocations.map((allocation) => ({ ...allocation, invoiceId: '' })));
 }
 
-private filterInvoices(cId: string) {
-  this.customerInvoices.set(this.allInvoices().filter((i) => i.customerId === cId && i.status === 'OPEN'));
+private filterInvoices(customerId: string) {
+  this.customerInvoices.set(this.allInvoices().filter((invoice) => invoice.customerId === customerId && invoice.status === 'OPEN'));
 }
 ```
 What goes wrong: the open-invoice list is a hand-synced copy; if the payment loads before the invoices, it filters an empty list and stays empty.
@@ -1520,7 +1520,7 @@ Evidence: `aruvii-tools/src/main/java/ai/aruvii/tools/infrastructure/handlers/Fi
 
 **Bad** (neutral)
 ```java
-final Map<String, Object> body = restClient.get()
+final Map<String, Object> body = noRedirectRestClient.get()
         .uri(checked.value())
         .retrieve()
         .body(Map.class);
@@ -1537,7 +1537,7 @@ What goes wrong: a typed record exists, yet the reply is cast field by field; a 
 
 **Good** (neutral)
 ```java
-final GatewayDiscovery discovery = restClient.get()
+final GatewayDiscovery discovery = noRedirectRestClient.get()
         .uri(checked.value())
         .retrieve()
         .body(GatewayDiscovery.class);
@@ -1609,9 +1609,9 @@ public PasswordEncoder passwordEncoder() {
 ApiKeyEntity found = null;
 if (rawKey != null && rawKey.startsWith("ok_")) {
     String prefix = rawKey.substring(0, Math.min(8, rawKey.length()));
-    found = apiKeyRepo.findByKeyPrefix(prefix).stream()
+    found = apiKeyRepository.findByKeyPrefix(prefix).stream()
         .filter(ApiKeyEntity::isValid)
-        .filter(k -> passwordEncoder.matches(rawKey, k.getKeyHash()))
+        .filter(key -> passwordEncoder.matches(rawKey, key.getKeyHash()))
         .findFirst()
         .orElse(null);
 }
@@ -1627,7 +1627,7 @@ public PasswordEncoder passwordEncoder() {
 // ApiKeyService
 public Optional<ApiKeyEntity> authenticateKey(final ApiKeyCandidate candidate) {
     final byte[] presented = apiKeyMac.digest(candidate.rawKey());
-    return apiKeyRepo.findByKeyPrefix(candidate.prefix()).stream()
+    return apiKeyRepository.findByKeyPrefix(candidate.prefix()).stream()
             .filter(ApiKeyEntity::isValid)
             .filter(key -> MessageDigest.isEqual(presented, key.getKeyHmac()))
             .findFirst();
