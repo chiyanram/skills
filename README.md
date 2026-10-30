@@ -1,12 +1,35 @@
-# skills — the generic rulebook
+# skills: the generic rulebook
 
-This repo holds the generic engineering rules that every project shares. They ship as skills in one plugin,
-[`rulebook`](plugins/rulebook/). Claude Code reaches them as a plugin. Other agent tools reach them with
-`npx skills add`. Rules that belong to one project stay in that project's own `AGENTS.md` files.
+[![ci](https://github.com/chiyanram/skills/actions/workflows/ci.yml/badge.svg)](https://github.com/chiyanram/skills/actions/workflows/ci.yml)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+The engineering rules every project shares, written once and shipped as one plugin,
+[`rulebook`](plugins/rulebook/). The agent that writes the code and the agent that reviews it load the same file, so
+they cannot drift apart. Rules that belong to one project stay in that project's own `AGENTS.md`.
+
+**Status:** `0.1.0`. The `testing` references are in. The skill router, the other
+domains (code, obs, migrations, delivery, planning) and the `/crq` workflow are still to come. See the
+[open issues](https://github.com/chiyanram/skills/issues).
+
+## How the rules reach an agent
+
+```mermaid
+flowchart LR
+    subgraph repo["chiyanram/skills"]
+        direction TB
+        D["research/ · review/<br/>design work"] -->|"operator says yes"| P["plugins/rulebook/<br/>the only folder that ships"]
+    end
+    P -->|"claude plugin install"| CC["Claude Code<br/>laptop"]
+    P -->|"managed settings,<br/>baked into the image"| W["worker container<br/>fleet"]
+    P -->|"npx skills add"| O["Codex, Cursor,<br/>other agents"]
+    PR["each project's AGENTS.md<br/>project-only rules and values"] -.->|"loaded next to the rulebook"| CC & W & O
+```
+
+One source and no copies: a rule changes in one file, and every agent sees the change in its next session.
 
 ## Install
 
-The repo is private, so git needs credentials first. A `GH_TOKEN` alone is not enough; it has to go through a
+The repo is private, so git needs credentials first. A bare `GH_TOKEN` is not enough; git has to use it through a
 credential helper.
 
 **Claude Code**
@@ -36,17 +59,34 @@ npx skills add chiyanram/skills
 `bake-plugins.sh` reads the BuildKit secret `skills_token` for the clone. The whole repo is cloned, but only
 `plugins/rulebook/` is copied into the plugin cache.
 
-## Layout
+## What is inside
 
-| path | what it holds |
-|---|---|
-| [`plugins/rulebook/`](plugins/rulebook/) | the plugin: the only folder that ships |
-| [`scripts/`](scripts/), [`tests/`](tests/) | the checks behind `make lint`, and their tests |
-| [`research/`](research/), [`review/`](review/), [`issues/`](issues/), [`p1/`](p1/), [`refs/`](refs/) | the design work behind the rules |
+The [plugin README](plugins/rulebook/README.md) lists every reference and when to read it. Each reference follows
+one shape: **Rules · When X, use Y · Good / Bad · Decided edges · Review checks**
+([format](research/00-reference-format.md)).
 
-Every approved rule is in [research/19-approved-rules.md](research/19-approved-rules.md). Issues are tracked in GitHub
-issues.
+## Repo map
+
+| path | status | what it holds |
+|---|---|---|
+| [`plugins/rulebook/`](plugins/rulebook/) | **ships** | the plugin: skills, references and examples |
+| [`.claude-plugin/`](.claude-plugin/) | **ships** | the marketplace manifest that points at the plugin |
+| [`scripts/`](scripts/), [`tests/`](tests/), [`Makefile`](Makefile) | live | the checks behind `make lint`, and their tests |
+| [`research/`](research/) | live | the evidence behind each rule, plus the [rule ledger](research/19-approved-rules.md) and the [decision register](research/00-decision-register.md) |
+| [`review/`](review/) | live | builders that turn research into the HTML pages the operator approves rules on |
+| [`docs/agents/`](docs/agents/) | live | the answers upstream skills need: issue tracker, labels, domain docs |
+| [`requirements.md`](requirements.md) | live | what the design must deliver, and the scenarios every decision is checked against |
+| [`refs/`](refs/) | live | the reference repos and the commits that research citations are pinned to |
+| [`issues/`](issues/), [`map.md`](map.md) | archive | the first local wayfinder map and its tickets; the map moved to [#9](https://github.com/chiyanram/skills/issues/9) |
+| [`p1/`](p1/), [`design-overview.md`](design-overview.md) | archive | the scoped-reviewer prototype, and the design picture as of 2026-10-01 |
+
+Archive files stay at their paths because research files and other repos cite them by path and line.
 
 ## Contribute
 
-Read [AGENTS.md](AGENTS.md). Run `make lint` and `make test` before you push.
+Read [CONTRIBUTING.md](CONTRIBUTING.md). In short: no rule goes in without the operator's yes, and `make lint` and
+`make test` must pass before you push. Agents also read [AGENTS.md](AGENTS.md).
+
+## License
+
+[MIT](LICENSE)

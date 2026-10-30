@@ -1,0 +1,23 @@
+name: Check or CI bug
+description: A make lint or make test check is wrong, or CI fails for a reason that is not the change.
+labels: ["needs-triage"]
+body:
+  - type: input
+    id: check
+    attributes:
+      label: Check
+      placeholder: scripts/check_sizes.py
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output
+      description: The command you ran and what it printed.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected

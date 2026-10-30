@@ -1,0 +1,22 @@
+name: Grilling
+description: A decision taken by question and answer with the operator.
+title: "G · "
+labels: ["wayfinder:grilling"]
+body:
+  - type: textarea
+    id: decision
+    attributes:
+      label: Decision needed
+      description: What must be decided, and why now.
+    validations:
+      required: true
+  - type: textarea
+    id: options
+    attributes:
+      label: Options and the reference backing for each
+      description: What pstack, mattpocock and the other reference repos do for each option.
+  - type: textarea
+    id: blocks
+    attributes:
+      label: Blocks
+      description: The issues that wait on this decision.

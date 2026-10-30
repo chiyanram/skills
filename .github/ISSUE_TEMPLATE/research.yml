@@ -1,0 +1,22 @@
+name: Research
+description: Find out what reference projects and docs do before anything is decided.
+title: "R · "
+labels: ["wayfinder:research"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: The one question this research answers.
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources to read
+      description: Reference repos (see refs/README.md), official docs, real evidence as path:lines @sha.
+  - type: textarea
+    id: informs
+    attributes:
+      label: Informs
+      description: Which decision or reference waits on this answer.
