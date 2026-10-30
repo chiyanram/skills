@@ -55,6 +55,12 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 
 `make lint` fails when a reference is missing from this table.
 
+## Code references
+
+| reference | rule IDs | read it when |
+|---|---|---|
+| [errors](skills/code/references/errors.md) | ER | you write or review a `throw`, a `catch`, an exception handler or request validation |
+
 ## Where a rule comes from
 
 Each rule has a source. A rule goes in only after the operator says yes; the
