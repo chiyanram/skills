@@ -106,6 +106,11 @@ every shipped change has to be a `feat` or a `fix`. The tag `rulebook--v<version
 To preview the next release locally, run `npm ci` and then `GITHUB_TOKEN=<token> npm run release:preview` on
 `main`. It needs Node `^22.22.2` or `>=24.15`.
 
+**A release that did not run.** GitHub skips every workflow for a push whose commit message contains the skip-ci
+marker (`[skip ci]` and its variants) anywhere, in the title or the body. The release's own commit uses it on purpose;
+never quote it in a pull request title or description, since the squash commit carries both. If a merge was
+skipped, open **Actions → ci → Run workflow** on `main`: the release job runs from a manual run too.
+
 **Branch protection.** The release job pushes a commit to `main` with the workflow's `github.token`. If a ruleset
 blocks that push, add a repository secret `RELEASE_TOKEN`: a fine-grained token, or a GitHub App token, with
 Contents read and write that is allowed to bypass the rule. The workflow uses it when it is set.

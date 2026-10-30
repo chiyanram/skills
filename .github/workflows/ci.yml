@@ -49,9 +49,29 @@ jobs:
             exit 1
           fi
 
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      # The squash commit carries the title, the description or the commit messages, depending on the repo's merge
+      # setting. A skip-ci marker in any of them would skip the push to main, and with it the release.
+      - name: No skip-ci marker that would reach main
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+          BODY: ${{ github.event.pull_request.body }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          marker='\[(skip ci|ci skip|no ci|skip actions|actions skip)\]|skip-checks: *true'
+          if printf '%s\n%s\n' "$TITLE" "$BODY" | grep -qiE "$marker" || git log --format=%B "$BASE..HEAD" | grep -qiE "$marker"; then
+            echo "::error::The title, description or a commit message contains a skip-ci marker. The squash merge would carry it to main and skip the release. Reword it."
+            exit 1
+          fi
+
+  # Runs on a push to main, or from "Run workflow" on main when a push was skipped. GitHub skips every workflow for
+  # a push whose commit message contains the skip-ci marker anywhere, title or body, so never quote that marker.
   release:
     needs: check
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
