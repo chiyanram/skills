@@ -58,14 +58,9 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 | reference | rule IDs | read it when |
 |---|---|---|
 | [design](skills/code/references/design.md) | SEAM | you write or review an interface a caller depends on, or a method that implements one |
+| [errors](skills/code/references/errors.md) | ER | you write or review a `throw`, a `catch`, an exception handler or request validation |
 
 `make lint` fails when a reference is missing from these tables.
-
-## Code references
-
-| reference | rule IDs | read it when |
-|---|---|---|
-| [errors](skills/code/references/errors.md) | ER | you write or review a `throw`, a `catch`, an exception handler or request validation |
 
 ## Where a rule comes from
 
