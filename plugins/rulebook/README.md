@@ -57,9 +57,13 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 
 | reference | rule IDs | read it when |
 |---|---|---|
-| [security](skills/code/references/security.md) | SE, SS | code takes outside input, stores or checks a secret, or touches the security filter chain, a guard, a token or a security test |
 
 `make lint` fails when a reference is missing from this table.
+||||||| 6221d7f
+`make lint` fails when a reference is missing from this table.
+`make lint` fails when a reference is missing from these tables.
+| [design](skills/code/references/design.md) | SEAM | you write or review an interface a caller depends on, or a method that implements one |
+| [security](skills/code/references/security.md) | SE, SS | code takes outside input, stores or checks a secret, or touches the security filter chain, a guard, a token or a security test |
 
 ## Where a rule comes from
 
