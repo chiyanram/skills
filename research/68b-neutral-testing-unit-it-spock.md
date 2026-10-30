@@ -111,9 +111,6 @@ Evidence: `aruvii-providers/src/test/groovy/ai/aruvii/providers/application/Rota
 
 **Bad** (neutral)
 ```java
-        if (invoice.status() == InvoiceStatus.PAID) {
-            throw new OrderException(ErrorCode.INVOICE_ALREADY_PAID);
-        }
         if (invoice.dueDate().isBefore(LocalDate.now())) {
             invoiceRepository.save(invoice.withStatus(InvoiceStatus.OVERDUE));
         }
@@ -125,7 +122,7 @@ What goes wrong: the due-date check reads the wall clock, so a test cannot pin "
     public List<Invoice> overdueInvoices(final int graceDays) {
         log.info("action=invoice_overdue_scan graceDays={}", graceDays);
         final var today = LocalDate.now(clock);
-        final var cutoff = today.minusDays(graceDays);
+        final LocalDate cutoff = today.minusDays(graceDays);
         return invoiceRepository.findOpen().stream()
                 .filter(invoice -> invoice.dueDate().isBefore(cutoff))
                 .toList();
