@@ -121,22 +121,32 @@ Only 100 is tried. 99 is never shown to pass, so an off-by-one `>=` passes too.
 
 **Good** (neutral)
 ```groovy
-    def "should accept an import line with a quantity of exactly 99"() {
-        expect: "the limit itself is inside the range"
-        OrderImportParser.parse(importLine("SKU-1", 99)).first().quantity() == 99
+    def "should accept an import line with a quantity of #quantity, at an edge of 1..99"() {
+        expect: "each limit itself is inside the range"
+        OrderImportParser.parse(importLine("SKU-1", quantity)).first().quantity() == parsed
+
+        where:
+        quantity || parsed
+        1        || 1
+        99       || 99
     }
 
-    def "should refuse an import line with a quantity of 100"() {
-        when: "the quantity is one past the per-line limit"
-        OrderImportParser.parse(importLine("SKU-1", 100))
+    def "should refuse an import line with a quantity of #quantity, one past an edge"() {
+        when: "the quantity is one past a per-line limit"
+        OrderImportParser.parse(importLine("SKU-1", quantity))
 
         then: "the refusal names the limit it broke"
         def e = thrown(OrderException)
-        e.message.contains("max 99 per line")
+        e.message.contains(limit)
+
+        where:
+        quantity || limit
+        0        || "min 1 per line"
+        100      || "max 99 per line"
     }
 ```
-The edge (99, accepted) and one past it (100, refused) each get a case, so `>` versus `>=` is decided. (Real
-evidence: ledger row B3.)
+Each edge (1 and 99, accepted) and one past it (0 and 100, refused) gets a case, so `>` versus `>=` is decided at both
+ends. (Real evidence: ledger row B3.)
 
 ## Decided edges
 

@@ -57,7 +57,7 @@ The result depends on wall-clock time and host speed, and an interrupt returns s
         new FakeEmailSender(),
         Clock.fixed(NOW, ZoneOffset.UTC))
 
-    def "should remind an invoice one day past due, and not one due today"() {
+    def "should treat an invoice one day past due as overdue, and not one due today"() {
         given: "two open invoices, one due exactly today and one due yesterday"
         invoiceRepository.findOpen() >> [invoice("due-today", TODAY), invoice("due-yesterday", TODAY.minusDays(1))]
         when: "the reminder looks for overdue invoices"

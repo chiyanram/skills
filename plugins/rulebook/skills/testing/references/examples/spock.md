@@ -95,15 +95,17 @@ The order id is known, but the wildcard lets a delete of another order's lines p
 **Good** (neutral)
 ```groovy
     def "should replace the lines of this order only"() {
+        given: "a repository that hands back the order it stores"
+        orderRepository.save(_) >> { Order o -> o }
+
         when: "the clerk replaces the lines of a draft order"
         orderService.replaceLines(orderId, [line("SKU-1", 2), line("SKU-2", 1)])
 
         then: "a delete scoped to any other order would empty a customer's cart"
         1 * orderRepository.deleteLinesOf(orderId)
-        1 * orderRepository.save(_) >> { Order o -> o }
     }
 ```
-The scope is the promise, so it is matched by its real value; the saved order's content belongs to another feature, so _ stays. (Real evidence: ledger row K2b.)
+The scope is the promise, so it is matched by its real value; the save belongs to another feature, so it is a stub in given:, never counted. (Real evidence: ledger row K2b.)
 
 ### K3 — A Stub() never gets a call count; a verified call needs a Mock()
 
@@ -232,10 +234,10 @@ The read is only stubbed; the count stays on the one email, because exactly one 
 
 **Good** (neutral)
 ```groovy
-    @Shared UUID invoiceId = UUID.randomUUID()
+    static final UUID INVOICE_ID = UUID.fromString("3f2a9c4e-7b1d-4e8a-9f60-2c5d8e1b7a43")
     def "should refuse #entryPoint on an invoice that is already paid"() {
         given: "the invoice on file is paid"
-        invoiceRepository.findById(invoiceId) >> Optional.of(paidInvoice)
+        invoiceRepository.findById(INVOICE_ID) >> Optional.of(paidInvoice)
 
         when: "the entry point is called"
         call(invoiceService)
@@ -246,9 +248,9 @@ The read is only stubbed; the count stays on the one email, because exactly one 
 
         where: "every method that guards on the invoice status"
         entryPoint << ["pay", "remind"]
-        call << [{ it.pay(invoiceId) }, { it.remind(invoiceId) }]
+        call << [{ it.pay(INVOICE_ID) }, { it.remind(INVOICE_ID) }]
 ```
-The table reads only the @Shared id and plain values; the mock stays an instance field, stubbed in given:. (Real evidence: ledger row K7.)
+The table reads only the static id and plain values; the mock stays an instance field, stubbed in given:. (Real evidence: ledger row K7.)
 
 ### K8 — A data-driven feature tests one rule: no branch on a where: column
 
@@ -337,8 +339,9 @@ The stubs the feature depends on are hidden in a helper, so the reader cannot se
 **Good** (neutral)
 ```groovy
     def "should remind only the invoice that is overdue on the clock's date"() {
-        given: "two open invoices, one due yesterday and one due tomorrow"
-        clock.instant() >> Instant.parse("2026-11-01T09:00:00Z")
+        given: "two open invoices, one due yesterday and one due tomorrow, and a clock fixed on the day"
+        def overdueReminder = new OverdueReminder(
+            invoiceRepository, emailSender, Clock.fixed(Instant.parse("2026-11-01T09:00:00Z"), ZoneOffset.UTC))
         invoiceRepository.findOpen() >> [dueYesterday, dueTomorrow]
 
         when: "the morning reminder run starts"
@@ -349,7 +352,7 @@ The stubs the feature depends on are hidden in a helper, so the reader cannot se
         0 * emailSender.sendReminder(dueTomorrow)
     }
 ```
-Every stub and count the feature relies on is visible in its own given: and then: blocks. (Real evidence: ledger row K10.)
+Every stub, count and the fixed clock the feature relies on is visible in its own given: and then: blocks. (Real evidence: ledger row K10.)
 
 ### K11 — Variables an interaction uses are set before when:, never in when:
 
@@ -573,11 +576,9 @@ OrderService runs for real; the doubles sit at its outbound ports, which is wher
 
 **Bad** (neutral)
 ```groovy
-    private Customer customer() {
-        def customer = Spy(Customer)
-        customer.getId() >> UUID.randomUUID()
-        customer
-    }
+        given: "the customer who owns the order"
+        def owner = Spy(Customer)
+        owner.getId() >> UUID.randomUUID()
 ```
 A plain data holder is doubled to fake one getter, so its equals, hashCode and toString can lie.
 

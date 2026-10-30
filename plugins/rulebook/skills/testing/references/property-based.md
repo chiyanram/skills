@@ -40,7 +40,7 @@ Contents: Rules · When X, use Y · Good / Bad (P1, P2, P3, P4, P6, P7, P8, P10)
 
 Each pair is copied from `research/68c-neutral-testing-mutation-property-scenarios.md`; `:N` is its heading line.
 
-### P1 — Property when the requirement says "for any input"; otherwise examples (`68c:232`)
+### P1 — Property when the requirement says "for any input"; otherwise examples (`68c:234`)
 
 **Bad** (neutral)
 ```gherkin
@@ -60,19 +60,17 @@ The requirement says "any order", but the test checks one value.
 **Good** (neutral)
 ```groovy
 def "should leave merged order lines unchanged when they are merged again"() {
-    when: "merging runs twice over any list of order lines"
+    expect: "a second merge over any list of order lines returns the first merge unchanged"
     Property.forAll(Gen.orderLines()) { lines ->
         def once = orderService.mergeLines(lines)
         assert orderService.mergeLines(once) == once
     }
-
-    then: "every second merge returned the first merge unchanged"
-    noExceptionThrown()
 }
 ```
-Idempotence is a law for any input, so a property states it. (Real evidence: ledger row P1.)
+Idempotence is a law for any input, so a property states it under `expect:`. The harness injects edge cases (P6)
+and prints a replayable seed (P4). (Real evidence: ledger row P1.)
 
-### P2 — A property complements its examples; boundary cases stay beside it (`68c:266`)
+### P2 — A property complements its examples; boundary cases stay beside it (`68c:265`)
 
 **Bad** (n/a) — every property has example siblings to show.
 
@@ -89,7 +87,7 @@ def "should give a zero total for absent order lines — #lines"() {
 CORRECT · Existence cases stay as examples beside the property, because its generators never produce `null`. (Real
 evidence: ledger row P2.)
 
-### P3 — A conditional property counts branch hits; fails if a branch is never reached (`68c:284`)
+### P3 — A conditional property counts branch hits; fails if a branch is never reached (`68c:283`)
 
 **Bad** (neutral)
 ```java
@@ -110,24 +108,29 @@ If no case ever reaches `Discount.Applied`, the property passes having checked n
 **Good** (neutral)
 ```groovy
 def "should keep an applied discount within ten percent of the order total"() {
-    given: "a count of cases that reach the Applied branch"
+    given: "a count of cases that reach each branch"
     def applied = 0
+    def none = 0
     when: "any order is priced for any tier"
     Property.forAll(Gen.orders(), Gen.tiers()) { order, tier ->
         def result = discountPolicy.decide(order, tier)
         if (result instanceof Discount.Applied) {
             applied++
             assert result.saving().amount() <= order.total().amount() * 0.10
+        } else {
+            none++
         }
     }
 
-    then: "the Applied branch was reached at least once"
+    then: "both the Applied and the None branch were reached"
     applied > 0
+    none > 0
 }
 ```
-The branch is counted, so the feature fails when no case reached it. (Real evidence: ledger row P3.)
+Both branches are counted, so the feature fails when no case reached either one. The harness injects edge cases
+(P6) and prints a replayable seed (P4). (Real evidence: ledger row P3.)
 
-### P4 — Seed random per run, printed on failure, replayable; never fixed, never retried (`68c:324`)
+### P4 — Seed random per run, printed on failure, replayable; never fixed, never retried (`68c:327`)
 
 **Bad** (neutral)
 ```ts
@@ -156,7 +159,7 @@ export function check<T>(
 With no seed given, fast-check draws one per run and prints it on failure; passing it back replays the case. (Real
 evidence: ledger row P4.)
 
-### P6 — Generators include edge cases (0, 1, min, max, empty) by default (`68c:354`)
+### P6 — Generators include edge cases (0, 1, min, max, empty) by default (`68c:357`)
 
 **Bad** (neutral)
 ```java
@@ -189,7 +192,7 @@ const LINES = fc.array(LINE, { maxLength: 10 });
 Every alphabet starts with its edge value, which fast-check shrinks toward, and the array also draws length 0. (Real
 evidence: ledger row P6.)
 
-### P7 — A JVM property is a unit test: runs in the main unit-test target, counts toward coverage (`68c:388`)
+### P7 — A JVM property is a unit test: runs in the main unit-test target, counts toward coverage (`68c:391`)
 
 **Bad** (n/a) — no property is tagged out of the gate to show.
 
@@ -209,9 +212,10 @@ class DiscountPolicyPropertySpec extends Specification {
     }
 }
 ```
-It carries no tag, so the main gate runs it and coverage counts it like any unit test. (Real evidence: ledger row P7.)
+It carries no tag, so the main gate runs it and coverage counts it like any unit test. The harness injects edge
+cases (P6) and prints a replayable seed (P4). (Real evidence: ledger row P7.)
 
-### P8 — Build generators by mapping/combining, not filtering; never loosen discards to pass (`68c:412`)
+### P8 — Build generators by mapping/combining, not filtering; never loosen discards to pass (`68c:415`)
 
 **Bad** (neutral)
 ```groovy
@@ -229,16 +233,18 @@ Random ASCII almost never has the SKU shape, so nearly every case is discarded a
     private static Gen<String> skus() {
         final var families = Gen.oneOf("BOOK", "FOOD", "TOOL", "GIFT");
         final var numbers = Gen.integers(0, 9999);
+        final var edges = Gen.oneOf(0, 9999);
         return new Gen<>() {
             @Override public String generate(final Random random) {
-                return sku(families.generate(random), numbers.generate(random));
+                final var number = random.nextInt(10) == 0 ? edges.generate(random) : numbers.generate(random);
+                return sku(families.generate(random), number);
             }
             // shrink(...) unchanged
 ```
-Each SKU is composed from family and number generators, so every case has the shape and none is rejected. (Real
-evidence: ledger row P8.)
+Each SKU is composed from family and number generators, with the 0 and 9999 edges mixed into one draw in ten. So
+every case has the shape, the edges come up, and none is rejected. (Real evidence: ledger row P8.)
 
-### P10 — UI properties: fast-check, seed printed, numRuns explicit, no retries (`68c:440`)
+### P10 — UI properties: fast-check, seed printed, numRuns explicit, no retries (`68c:445`)
 
 **Bad** (neutral)
 ```ts

@@ -13,8 +13,8 @@ Contents: Rules · When X, use Y · Good / Bad (S1, S2, TM1, TM2, S3, S5) · Dec
   default or its own input cannot fail for a defect.
 - **TM1** — At a boundary, make the IT the primary test and add unit specs only for branching it cannot reach cheaply,
   because a unit spec through a mock cannot see what the real boundary does.
-- **TM2** — In ITs and smoke specs, fake only what we do not own (LLM: scripted fake model; third-party HTTP: WireMock
-  at the wire), because a fake of our own code leaves its real query untested.
+- **TM2** — In ITs and smoke specs, fake only what others own (LLM: scripted model; third-party HTTP: WireMock at the
+  wire, unless the vendor ships a container sandbox (IT5)), because faking our code leaves its query untested.
 - **TM3** — Run key end-to-end scenarios in a small opt-in real-model tier outside the gate, asserting structure, never
   exact wording, because a small model will not repeat exact wording, so text checks fail falsely.
 - **AT1** — Prove an acceptance criterion with an IT (API) or a smoke spec (UI), never a separate acceptance tier,
@@ -36,7 +36,7 @@ Contents: Rules · When X, use Y · Good / Bad (S1, S2, TM1, TM2, S3, S5) · Dec
 | an acceptance criterion is reached through the API | an IT | a `.feature` tier with no Gherkin runtime left an orphan copy of an IT (AT1) · ledger :35 |
 | an acceptance criterion is reached through the UI | a smoke spec | AT1 · ledger :35 · tier choice: `scenario-to-tests.md` |
 | an IT or smoke spec reaches the LLM | a scripted fake model | we do not own it (TM2) · ledger :38 |
-| an IT or smoke spec reaches third-party HTTP | WireMock at the wire | we do not own it (TM2) · ledger :38 |
+| an IT or smoke spec reaches third-party HTTP | WireMock at the wire, or the vendor's container sandbox when it ships one (IT5) | we do not own it (TM2) · ledger :38 |
 | an IT or smoke spec reaches our own service, repository or Redis consumer | the real one | a fake of our own code leaves its real query untested (TM2) · ledger :38 |
 
 Ledger is `research/19-approved-rules.md` in this repo; plinth `321`, `322` and `058` are the pinned plinth-java-skills
@@ -70,7 +70,7 @@ A Spring context whose every bean is a mock wires plain logic, crosses no bounda
 **Good** (neutral)
 ```groovy
     OrderRepository orderRepository = Stub()
-    PaymentGateway paymentGateway = Stub()
+    FakePaymentGateway paymentGateway = new FakePaymentGateway()
     OrderService service
 
     def setup() {
@@ -82,7 +82,7 @@ A Spring context whose every bean is a mock wires plain logic, crosses no bounda
             Clock.fixed(NOW, ZoneOffset.UTC))
     }
 ```
-The service is built with `new`, only outbound ports are doubled, our own TaxCalculator is real, and the clock is fixed. (Real evidence: ledger row S1.)
+The service is built with `new`, only outbound ports are replaced (the gateway by its fake), our own TaxCalculator is real, and the clock is fixed. (Real evidence: ledger row S1.)
 
 ### S2 — Assert observable behaviour
 
@@ -146,10 +146,15 @@ It re-proves through a mock what the IT already proves on real rows; the SQL tha
         insertInvoice(customerId, InvoiceStatus.OPEN)
         insertInvoice(customerId, InvoiceStatus.PAID)
 
-        expect: "a filter that ignored the status would report every invoice as open"
-        invoiceService.listByCustomer(customerId, InvoiceStatus.OPEN, 0, 10).size() == 2
-        invoiceService.listByCustomer(customerId, InvoiceStatus.PAID, 0, 10).size() == 1
-        invoiceService.listByCustomer(customerId, null, 0, 10).size() == 3
+        when: "the invoices are listed by each status and with no filter"
+        def open = invoiceService.listByCustomer(customerId, InvoiceStatus.OPEN, 0, 10)
+        def paid = invoiceService.listByCustomer(customerId, InvoiceStatus.PAID, 0, 10)
+        def all = invoiceService.listByCustomer(customerId, null, 0, 10)
+
+        then: "a filter that ignored the status would report every invoice as open"
+        open.size() == 2
+        paid.size() == 1
+        all.size() == 3
     }
 ```
 The filter lives in the SQL, so the IT against real Postgres is the primary proof, with `null` meaning unfiltered. (Real evidence: ledger row TM1.)
@@ -225,7 +230,8 @@ S3's reason comes from agent-factory research/31:19, approved by the operator; t
         orderService.addLine(orderId, "SKU-1", quantity)
 
         then: "the service guard fires before the CHECK constraint does, with a readable message"
-        thrown(IllegalArgumentException)
+        def e = thrown(IllegalArgumentException)
+        e.message.contains("quantity must be")
 
         and: "and nothing is written"
         orderService.lineCount(orderId) == 0L
@@ -238,6 +244,8 @@ A pure `if` guard boots Postgres in an IT; the CHECK constraint it names is neve
 
 **Good** (neutral)
 ```groovy
+    OrderRepository orderRepository = Mock()
+
     def "should refuse quantity #quantity before anything is written"() {
         when: "a quantity the column would reject is added"
         service.addLine(orderId, "SKU-1", quantity)
@@ -253,7 +261,7 @@ A pure `if` guard boots Postgres in an IT; the CHECK constraint it names is neve
         quantity << [0, -1, 100, Integer.MIN_VALUE]
     }
 ```
-The error comes from pure logic, so it is a unit spec; `0 *` is the behaviour here because nothing may be reached. (Real evidence: ledger row S5.)
+The error comes from pure logic, so it is a unit spec; `0 *` on the `Mock()` repository is the behaviour here because nothing may be reached. (Real evidence: ledger row S5.)
 
 ## Decided edges
 
@@ -278,8 +286,8 @@ Walk every changed test file, and the MR that carries it.
 - [ ] TM1 — For each unit spec beside an IT on the same boundary, check that it covers only branching the IT cannot
   reach cheaply. A unit spec that re-proves what the IT proves is a finding.
 - [ ] TM2 — In each changed IT and smoke spec, list every fake. A fake is allowed only for the LLM (a scripted fake
-  model) and for third-party HTTP (WireMock at the wire). A fake of our own service, repository or Redis consumer is
-  a finding.
+  model) and for third-party HTTP (WireMock at the wire). Where the vendor ships a container sandbox, the IT uses it
+  and WireMock is not required (IT5). A fake of our own service, repository or Redis consumer is a finding.
 - [ ] TM3 — For each real-model test, check that it is opt-in, runs outside the gate, and asserts structure only.
   An exact-wording assertion is a finding. If the change touches prompt or provider code, or is a release, find the
   real-model tier's passing result. No such result is a finding.

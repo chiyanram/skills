@@ -19,8 +19,8 @@ Contents: Rules · When X, use Y · Good / Bad (K1, K2, K11, K13, K19) · Decide
   incidental calls breaks the test when someone adds a log line.
 - **K5** — Count a call exactly (`N *`) only when N is the contract, and never count logging, metrics or retries,
   because a counted retry breaks the test when the retry policy changes.
-- **K6** — Write a data-driven feature as a `where:` table (`|` between inputs, `||` before expected values), named
-  with `#var` and without `@Unroll`, because without `#var` every iteration reports the same name.
+- **K6** — Write a data-driven feature as a `where:` table (`|` between inputs, `||` before expected values) or a `<<`
+  pipe for a single column, named with `#var`, no `@Unroll`, because otherwise iterations share one name.
 - **K7** — In `where:`, read only `@Shared` or static fields; put a plain discriminator in the table and build mocks in
   `given:`, because Spock rejects a `where:` that reads an instance field or a mock.
 - **K8** — Test one rule per data-driven feature: no `if` on a `where:` column, and throws-cases in another feature
@@ -264,8 +264,8 @@ Walk every changed Spock spec, unit and integration (`grep -l "extends Specifica
 - [ ] K4 — For each counted interaction, the feature name promises it. A count on an incidental call is a finding.
 - [ ] K5 — An `N *` on a logging, metrics or retry call is a finding, and so is an exact count where N is not the
   contract.
-- [ ] K6 — For each `where:` table, find `|` between inputs, `||` before expected values and `#var` in the name.
-  `@Unroll` (`grep -n "@Unroll"`) is a finding.
+- [ ] K6 — For each `where:` block, find a table with `|` between inputs and `||` before expected values, or a `<<`
+  pipe for a single column, and `#var` in the name. `@Unroll` (`grep -n "@Unroll"`) is a finding.
 - [ ] K7 — A `where:` that reads an instance field or a mock is a finding.
 - [ ] K8 — An `if` on a `where:` column, or throws-cases and returns-cases in one feature, is a finding.
 - [ ] K9 — For each `@Shared` field (`grep -n "@Shared"`), it is expensive and read-only. A mock or mutable state is

@@ -64,10 +64,8 @@ row's why is V3's: it cannot fail for a real defect.
 **Bad** (neutral)
 ```groovy
     def "a refunded order has its own status"() {
-        expect: "REFUNDED is named, and the existing five are unchanged"
+        expect: "REFUNDED is named"
         OrderStatus.valueOf("REFUNDED") != null
-        ["DRAFT", "PLACED", "PAID", "SHIPPED", "CANCELLED"]
-                .every { OrderStatus.valueOf(it) != null }
     }
 ```
 No realistic regression fails it. Removing a constant breaks compilation first, and nothing sets REFUNDED yet.
@@ -95,25 +93,19 @@ All four answers are written down. The constant with no answer to Q2 gets no tes
 
 **Bad** (neutral)
 ```groovy
-    def "the error codes are the three the order API lists"() {
-        expect: "no more and no fewer"
-        ErrorCode.values()*.name() as Set == [
-            'ORDER_NOT_FOUND',
-            'INVOICE_ALREADY_PAID',
-            'PAYMENT_DECLINED',
-        ] as Set
+    def "the declined-payment code carries its problem type"() {
+        expect: "the member found by its Java name"
+        ErrorCode.valueOf('PAYMENT_DECLINED').problemType() == "https://example.com/errors/PAYMENT_DECLINED"
     }
 ```
-It pins Java enum member names. Renaming a member breaks it while every problem type a client sees stays the same.
+It reaches the problem type through a Java enum member name. Renaming the member breaks it while every problem type a
+client sees stays the same.
 
 **Good** (neutral)
 ```groovy
     def "should still produce every problem type clients already handle after the refactor"() {
-        when: "the problem types the error codes produce are collected"
-        def producible = ErrorCode.values()*.problemType() as Set
-
-        then: "nothing a client already switches on has been lost"
-        (PUBLISHED_PROBLEM_TYPES - producible).isEmpty()
+        expect: "nothing a client already switches on has been lost"
+        (PUBLISHED_PROBLEM_TYPES - ErrorCode.values()*.problemType()).isEmpty()
     }
 ```
 It asserts the problem-type strings clients see. A rename that keeps them passes, and a lost one is named. (Real

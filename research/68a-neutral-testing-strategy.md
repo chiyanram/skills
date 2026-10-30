@@ -1,6 +1,6 @@
 # 68a — Neutral Good/Bad pairs: strategy · coverage-design · boundaries · value-bar (#99, map #9)
 
-Source: research/31a-v2.md; research/47-good-rewrites.md (replaces the pair for S2, S3, C1, C4, B2, B3, V1, V3). Domain: ordering + billing (#99 brief). Stand-ins: `make test-module MOD=<m> TEST=<p>` → `./gradlew :<m>:test --tests '<p>'` (S3) · real-LLM opt-in tier (local Ollama, `-Dollama.it=true`) → PaymentGateway sandbox, `-Dgateway.sandbox=true`; exact model wording → gateway `receiptText` (TM3) · scripted fake LLM provider turns → PaymentGateway HTTP API stubbed at the wire with a WireMock scenario; third-party HTTP tool → fraud-check HTTP service (TM2) · Redis-backed store behind Toxiproxy → PaymentGateway HTTP behind Toxiproxy, `gatewayProxy` supplied by the shared container initializer (`@EnableSharedContainers`, IT2) (TM4) · provider startup check that never gets an answer → OverdueReminder job against a mail HTTP endpoint behind EmailSender (C2) · tool-output injection REQ scenario → order-cancellation AC on `/api/orders` (AT1) · stream consumer-group identity bug → same bug on stream `orders.placed`, groups of the billing and notifications modules (S4, V4) · entity version default tied to a migration → OrderEntity status default tied to migration V12 (C1, V5) · alert trigger enum → OrderStatus (V1, V3) · legacy exit-status strings → ErrorCode problem types (V2) · forwarded-header parser → OrderImportParser (B2, B3) · redaction offsets → payment allocation across invoices (B1) · Unicode NFC normaliser → CustomerEmail.normalise (C3). Added terms: OrderEntity (JPA entity of Order) · migration V12 · OrdersRepositoryIT (repository-slice base class) · OrderStatus.REFUNDED (new constant, V1 Bad only) · OrderImportParser (CSV of order lines) · PaymentAllocator · CustomerEmail.normalise · FakeInvoiceRepository + Resettable (own-code fake, TM2 Bad only) · BillingConsumer / NotificationsConsumer (consumers of `orders.placed`) · ErrorCode.problemType() + PUBLISHED_PROBLEM_TYPES · OrderCancellationHarness (AT1 Bad only) · gateway `receiptText`.
+Source: research/31a-v2.md; research/47-good-rewrites.md (replaces the pair for S2, S3, C1, C4, B2, B3, V1, V3). Domain: ordering + billing (#99 brief). Stand-ins: `make test-module MOD=<m> TEST=<p>` → `./gradlew :<m>:test --tests '<p>'` (S3) · real-LLM opt-in tier (local Ollama, `-Dollama.it=true`) → a real model behind `OrderSummariser`, `-Dmodel.real=true`; exact model wording → `OrderSummary.text()` (TM3, recast on a real model, agent-factory#31) · scripted fake LLM provider turns → PaymentGateway HTTP API stubbed at the wire with a WireMock scenario; third-party HTTP tool → fraud-check HTTP service (TM2) · Redis-backed store behind Toxiproxy → PaymentGateway HTTP behind Toxiproxy, `gatewayProxy` supplied by the shared container initializer (`@EnableSharedContainers`, IT2) (TM4) · provider startup check that never gets an answer → OverdueReminder job against a mail HTTP endpoint behind EmailSender (C2) · tool-output injection REQ scenario → order-cancellation AC on `/api/orders` (AT1) · stream consumer-group identity bug → same bug on stream `orders.placed`, groups of the billing and notifications modules (S4, V4) · entity version default tied to a migration → OrderEntity status default tied to migration V12 (C1, V5) · alert trigger enum → OrderStatus (V1, V3) · legacy exit-status strings → ErrorCode problem types (V2) · forwarded-header parser → OrderImportParser (B2, B3) · redaction offsets → payment allocation across invoices (B1) · Unicode NFC normaliser → CustomerEmail.normalise (C3). Added terms: OrderEntity (JPA entity of Order) · migration V12 · OrdersRepositoryIT (repository-slice base class) · OrderStatus.REFUNDED (new constant, V1 Bad only) · OrderImportParser (CSV of order lines) · PaymentAllocator · CustomerEmail.normalise · FakeInvoiceRepository + Resettable (own-code fake, TM2 Bad only) · BillingConsumer / NotificationsConsumer (consumers of `orders.placed`) · ErrorCode.problemType() + PUBLISHED_PROBLEM_TYPES · OrderCancellationHarness (AT1 Bad only) · OrderSummariser + OrderSummary (TM3).
 Skipped: none.
 
 ### S1 — Pick the tier by dependency; never start Spring to test plain service logic
@@ -27,7 +27,7 @@ What goes wrong: a Spring context whose every bean is a mock wires plain logic, 
 **Good** (neutral)
 ```groovy
     OrderRepository orderRepository = Stub()
-    PaymentGateway paymentGateway = Stub()
+    FakePaymentGateway paymentGateway = new FakePaymentGateway()
     OrderService service
 
     def setup() {
@@ -39,7 +39,7 @@ What goes wrong: a Spring context whose every bean is a mock wires plain logic, 
             Clock.fixed(NOW, ZoneOffset.UTC))
     }
 ```
-Why: the service is built with `new`, only outbound ports are doubled, our own TaxCalculator is real, and the clock is fixed.
+Why: the service is built with `new`, only outbound ports are replaced (the gateway by its fake), our own TaxCalculator is real, and the clock is fixed.
 
 Evidence: `aruvii-worker/src/test/java/ai/aruvii/worker/chat/HistoryCompressionTest.java:45-56` @origin/master 2026-10-02, no sha in source (Bad, real) · source 31a-v2.md:8 · fix from 31a-v2.md:10-26
 
@@ -140,7 +140,8 @@ Evidence: `none` (Bad, n/a — master squash-merged; 12 sampled fix commits all 
         orderService.addLine(orderId, "SKU-1", quantity)
 
         then: "the service guard fires before the CHECK constraint does, with a readable message"
-        thrown(IllegalArgumentException)
+        def e = thrown(IllegalArgumentException)
+        e.message.contains("quantity must be")
 
         and: "and nothing is written"
         orderService.lineCount(orderId) == 0L
@@ -153,6 +154,8 @@ What goes wrong: a pure `if` guard boots Postgres in an IT; the CHECK constraint
 
 **Good** (neutral)
 ```groovy
+    OrderRepository orderRepository = Mock()
+
     def "should refuse quantity #quantity before anything is written"() {
         when: "a quantity the column would reject is added"
         service.addLine(orderId, "SKU-1", quantity)
@@ -168,7 +171,7 @@ What goes wrong: a pure `if` guard boots Postgres in an IT; the CHECK constraint
         quantity << [0, -1, 100, Integer.MIN_VALUE]
     }
 ```
-Why: the error comes from pure logic, so it is a unit spec; `0 *` is the behaviour here because nothing may be reached.
+Why: the error comes from pure logic, so it is a unit spec; `0 *` on the `Mock()` repository is the behaviour here because nothing may be reached.
 
 Evidence: `aruvii-chat/src/integrationTest/groovy/ai/aruvii/chat/FeedbackServiceIT.groovy:62-74` @origin/master 2026-10-02, no sha in source (Bad, real) · source 31a-v2.md:128 · fix from 31a-v2.md:130-148
 
@@ -196,10 +199,15 @@ What goes wrong: it re-proves through a mock what the IT already proves on real 
         insertInvoice(customerId, InvoiceStatus.OPEN)
         insertInvoice(customerId, InvoiceStatus.PAID)
 
-        expect: "a filter that ignored the status would report every invoice as open"
-        invoiceService.listByCustomer(customerId, InvoiceStatus.OPEN, 0, 10).size() == 2
-        invoiceService.listByCustomer(customerId, InvoiceStatus.PAID, 0, 10).size() == 1
-        invoiceService.listByCustomer(customerId, null, 0, 10).size() == 3
+        when: "the invoices are listed by each status and with no filter"
+        def open = invoiceService.listByCustomer(customerId, InvoiceStatus.OPEN, 0, 10)
+        def paid = invoiceService.listByCustomer(customerId, InvoiceStatus.PAID, 0, 10)
+        def all = invoiceService.listByCustomer(customerId, null, 0, 10)
+
+        then: "a filter that ignored the status would report every invoice as open"
+        open.size() == 2
+        paid.size() == 1
+        all.size() == 3
     }
 ```
 Why: the filter lives in the SQL, so the IT against real Postgres is the primary proof, with `null` meaning unfiltered.
@@ -252,41 +260,36 @@ Evidence: `aruvii-api/src/integrationTest/java/ai/aruvii/api/support/FakeActiveS
 
 **Bad** (neutral)
 ```groovy
-    def "should pay an open invoice"() {
-        given: "an open invoice on the gateway sandbox — no @Requires, so it runs inside ./gradlew check"
-        def customerId = seedCustomer("sandbox-pay", CustomerTier.STANDARD)
-        def invoiceId = seedInvoice(customerId, new Money(new BigDecimal("25.50"), "EUR"))
-        def events = subscribePayments(invoiceId)
+    def "should summarise a placed order"() {
+        given: "a placed order of two lines — no @Requires, so the real model runs inside ./gradlew check"
+        def orderId = seedOrder(customerId, [line("SKU-1", 2), line("SKU-2", 1)])
 
-        when: "the clerk pays it"
-        invoiceService.pay(invoiceId)
-        await().atMost(Duration.ofSeconds(60)).until { events.completed() }
+        when: "the real model writes the order summary"
+        def summary = orderSummariser.summarise(orderId)
 
-        then: "the gateway's receipt is word-for-word what we expect"
-        events.firstPayment().receiptText() == "Approved: 25.50 EUR charged to card ending 4242."
+        then: "the model's summary is word-for-word what we expect"
+        summary.text() == "Your order has 2 lines: 2 x SKU-1 and 1 x SKU-2."
     }
 ```
-What goes wrong: it calls a real external service inside the gate and asserts wording the service is free to change.
+What goes wrong: it calls a real model inside the gate and asserts wording the model is free to change.
 
 **Good** (neutral)
 ```groovy
-    @Requires({ sys["gateway.sandbox"] == "true" })
-    def "should record a payment for an open invoice against the gateway sandbox"() {
-        given: "an open invoice of 25.50 EUR for a fresh customer"
-        def customerId = seedCustomer("sandbox-pay", CustomerTier.STANDARD)
-        def invoiceId = seedInvoice(customerId, new Money(new BigDecimal("25.50"), "EUR"))
-        def events = subscribePayments(invoiceId)
+    @Requires({ sys["model.real"] == "true" })
+    def "should summarise a placed order with the real model"() {
+        given: "a placed order of two lines"
+        def orderId = seedOrder(customerId, [line("SKU-1", 2), line("SKU-2", 1)])
 
-        when: "the clerk pays it and the gateway answers"
-        invoiceService.pay(invoiceId)
-        await().atMost(Duration.ofSeconds(60)).until { events.paymentCount() >= 1 }
+        when: "the real model writes the order summary"
+        def summary = orderSummariser.summarise(orderId)
 
-        then: "a payment of the amount we sent was recorded — never the gateway's own wording"
-        events.firstPayment().amount() == new Money(new BigDecimal("25.50"), "EUR")
-        invoiceRepository.findById(invoiceId).get().status() == InvoiceStatus.PAID
+        then: "the summary has the structure we need — never the model's own wording"
+        summary.orderId() == orderId
+        summary.lineCount() == 2
+        !summary.text().isBlank()
     }
 ```
-Why: it runs only on request, outside the gate, and asserts the shape of the outcome, not the external service's text.
+Why: it runs only on request, outside the gate, and asserts the structure of the model's answer, not its text.
 
 Evidence: `aruvii-worker/src/integrationTest/java/ai/aruvii/worker/chat/AllToolTypesIT.java:694-712` @origin/master 2026-10-02, no sha in source (Bad, adapted — no real exact-wording Bad found) · source 31a-v2.md:245 · fix from 31a-v2.md:247-265
 
@@ -312,7 +315,7 @@ Evidence: `aruvii-worker/src/integrationTest/java/ai/aruvii/worker/chat/AllToolT
         then: "the same payment goes through"
         invoiceService.pay(invoiceId).map { it.invoiceId() } == Optional.of(invoiceId)
 ```
-Why: the real gateway sits behind a proxy; it asserts predictable failure, the WARN line, and recovery once the fault clears.
+Why: the real gateway sits behind a proxy; it asserts predictable failure, the WARN line, and recovery once the fault clears. This is the cut, one of the three faults; latency and timeout get features of the same shape.
 
 Evidence: `none` (Bad, n/a — `git grep -i toxiproxy` empty on master) · source 31a-v2.md:285 · fix from 31a-v2.md:287-305
 
@@ -335,23 +338,21 @@ What goes wrong: it proves only silence; no WARN is asserted, so code that swall
 
 **Good** (neutral)
 ```groovy
+    @Timeout(14)
     def "should warn the mail service unreachable, within a bound, when it never answers"() {
         given: "an overdue invoice, behind a mail endpoint that holds every request for 15 s"
         wireMock.stubFor(post(urlEqualTo("/send")).willReturn(okJson("{}").withFixedDelay(15_000)))
         def invoiceId = seedOverdueInvoice(customerId)
 
         when: "the reminder job runs"
-        def start = System.currentTimeMillis()
         overdueReminder.run()
-        def elapsedMs = System.currentTimeMillis() - start
 
         then: "it gave up before the endpoint would have answered, and named the invoice at WARN"
-        elapsedMs < 14_000L
         def line = appender.list.find { it.formattedMessage.contains("status=unreachable invoiceId=$invoiceId") }
         line?.level == Level.WARN
     }
 ```
-Why: the dependency never answers; the test asserts a bounded time, the logged outcome, and its WARN level.
+Why: the dependency never answers; `@Timeout(14)` bounds the time with no wall-clock read, and the test asserts the logged outcome and its WARN level.
 
 Evidence: `aruvii-infra/src/test/groovy/ai/aruvii/infra/adapter/RedisModelOverrideStoreAdapterSpec.groovy:125-134` @origin/master 2026-10-02, no sha in source (Bad, real) · source 31a-v2.md:309 · fix from 31a-v2.md:311-329
 
@@ -385,15 +386,17 @@ What goes wrong: a separate `.feature` tier with its own Node runtime duplicates
         payInvoiceOf(orderId)
 
         when: "the customer cancels it through the API"
-        def response = client.post().uri("/api/orders/{id}/cancel", orderId).exchange()
+        def response = client.post().uri("/api/orders/{id}/cancel", orderId)
+            .header(HttpHeaders.AUTHORIZATION, login("CUSTOMER"))
+            .exchange()
 
         then: "the API refuses with the problem type, and the order is not cancelled"
         response.expectStatus().isEqualTo(409)
         response.expectBody().jsonPath('$.type').isEqualTo("https://example.com/errors/INVOICE_ALREADY_PAID")
-        orderRepository.findById(orderId).get().status() == OrderStatus.PAID
+        orderRepository.findById(orderId).get().status() != OrderStatus.CANCELLED
     }
 ```
-Why: the AC of issue #123 is an ordinary IT on the real API; its name reads as the scenario.
+Why: the AC of issue #123 is an ordinary IT on the real API, called with a customer's token; its name reads as the scenario.
 
 Evidence: `aruvii-worker/src/test/java/ai/aruvii/worker/acceptance/ToolOutputSplitHarness.java:92-106` @origin/master 2026-10-02, no sha in source (Bad, real) · source 31a-v2.md:347 · fix from 31a-v2.md:349-367
 
@@ -420,13 +423,16 @@ class OrderEntityStatusIT extends OrdersRepositoryIT {
     @Issue(["#123", "AC-2"])
     def "should store a newly created order as a draft"() {
         given: "an order built the way the app builds one, its status never set"
-        def id = em.persistFlushFind(newOrder()).id
+        def order = newOrder()
+
+        when: "it is stored and the persistence context is cleared"
+        def id = em.persistFlushFind(order).id
         em.clear()
 
-        expect: "Hibernate writes the field on every INSERT, so the stored row holds the entity's value"
+        then: "Hibernate writes the field on every INSERT, so the stored row holds the entity's value"
         em.find(OrderEntity, id).status == OrderStatus.DRAFT
 ```
-Why: every RIGHT-BICEP letter is decided in the header, and the case reads the stored row instead of a field default.
+Why: every RIGHT-BICEP letter is decided in the header, and the case stores the order in when: and reads the stored row in then:, instead of a field default.
 
 Evidence: `aruvii-agents/src/test/groovy/ai/aruvii/agents/infrastructure/entity/AgentEntityVersionSpec.groovy:8-11` @772736bf (Bad, real) · source 31a-v2.md:389 · fix from research/47-good-rewrites.md:88-106
 
@@ -446,8 +452,8 @@ What goes wrong: both sides come from `normalise`, so a `normalise` that returns
 
 **Good** (neutral)
 ```groovy
-    def "should store an email typed in mixed case in lower case"() {
-        expect: "the stored form is written out by hand, never produced by normalise itself"
+    def "should normalise an email typed in mixed case to lower case"() {
+        expect: "the lower-case form is written out by hand, never produced by normalise itself"
         CustomerEmail.normalise("Ann@Example.COM") == "ann@example.com"
     }
 ```
@@ -575,21 +581,31 @@ What goes wrong: only 100 is tried; 99 is never shown to pass, so an off-by-one 
 
 **Good** (neutral)
 ```groovy
-    def "should accept an import line with a quantity of exactly 99"() {
-        expect: "the limit itself is inside the range"
-        OrderImportParser.parse(importLine("SKU-1", 99)).first().quantity() == 99
+    def "should accept an import line with a quantity of #quantity, at an edge of 1..99"() {
+        expect: "each limit itself is inside the range"
+        OrderImportParser.parse(importLine("SKU-1", quantity)).first().quantity() == parsed
+
+        where:
+        quantity || parsed
+        1        || 1
+        99       || 99
     }
 
-    def "should refuse an import line with a quantity of 100"() {
-        when: "the quantity is one past the per-line limit"
-        OrderImportParser.parse(importLine("SKU-1", 100))
+    def "should refuse an import line with a quantity of #quantity, one past an edge"() {
+        when: "the quantity is one past a per-line limit"
+        OrderImportParser.parse(importLine("SKU-1", quantity))
 
         then: "the refusal names the limit it broke"
         def e = thrown(OrderException)
-        e.message.contains("max 99 per line")
+        e.message.contains(limit)
+
+        where:
+        quantity || limit
+        0        || "min 1 per line"
+        100      || "max 99 per line"
     }
 ```
-Why: the edge (99, accepted) and one past it (100, refused) each get a case, so `>` versus `>=` is decided.
+Why: each edge (1 and 99, accepted) and one past it (0 and 100, refused) gets a case, so `>` versus `>=` is decided at both ends.
 
 Evidence: `aruvii-platform/src/test/java/ai/aruvii/platform/application/ForwardContextParserTest.java:64-72` @772736bf (Bad, real) · source 31a-v2.md:532 · fix from research/47-good-rewrites.md:190-206
 
@@ -598,10 +614,8 @@ Evidence: `aruvii-platform/src/test/java/ai/aruvii/platform/application/ForwardC
 **Bad** (neutral)
 ```groovy
     def "a refunded order has its own status"() {
-        expect: "REFUNDED is named, and the existing five are unchanged"
+        expect: "REFUNDED is named"
         OrderStatus.valueOf("REFUNDED") != null
-        ["DRAFT", "PLACED", "PAID", "SHIPPED", "CANCELLED"]
-                .every { OrderStatus.valueOf(it) != null }
     }
 ```
 What goes wrong: no realistic regression fails it; removing a constant breaks compilation first, and nothing sets REFUNDED yet.
@@ -631,25 +645,18 @@ Evidence: `aruvii-platform/src/test/groovy/ai/aruvii/platform/domain/AlertTrigge
 
 **Bad** (neutral)
 ```groovy
-    def "the error codes are the three the order API lists"() {
-        expect: "no more and no fewer"
-        ErrorCode.values()*.name() as Set == [
-            'ORDER_NOT_FOUND',
-            'INVOICE_ALREADY_PAID',
-            'PAYMENT_DECLINED',
-        ] as Set
+    def "the declined-payment code carries its problem type"() {
+        expect: "the member found by its Java name"
+        ErrorCode.valueOf('PAYMENT_DECLINED').problemType() == "https://example.com/errors/PAYMENT_DECLINED"
     }
 ```
-What goes wrong: it pins Java enum member names; renaming a member breaks it while every problem type a client sees stays the same.
+What goes wrong: it reaches the problem type through a Java enum member name; renaming the member breaks it while every problem type a client sees stays the same.
 
 **Good** (neutral)
 ```groovy
     def "should still produce every problem type clients already handle after the refactor"() {
-        when: "the problem types the error codes produce are collected"
-        def producible = ErrorCode.values()*.problemType() as Set
-
-        then: "nothing a client already switches on has been lost"
-        (PUBLISHED_PROBLEM_TYPES - producible).isEmpty()
+        expect: "nothing a client already switches on has been lost"
+        (PUBLISHED_PROBLEM_TYPES - ErrorCode.values()*.problemType()).isEmpty()
     }
 ```
 Why: it asserts the problem-type strings clients see, so a rename that keeps them passes and a lost one is named.
