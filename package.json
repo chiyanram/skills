@@ -1,0 +1,24 @@
+{
+  "name": "chiyanram-skills",
+  "private": true,
+  "description": "Release tooling for the rulebook plugin. Nothing here ships: the plugin is plugins/rulebook/.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chiyanram/skills.git"
+  },
+  "engines": {
+    "node": "^22.22.2 || >=24.15.0"
+  },
+  "scripts": {
+    "release": "semantic-release",
+    "release:preview": "semantic-release --dry-run --no-ci"
+  },
+  "devDependencies": {
+    "@semantic-release/changelog": "7.0.0",
+    "@semantic-release/exec": "7.1.0",
+    "@semantic-release/git": "11.0.1",
+    "conventional-changelog-conventionalcommits": "9.3.1",
+    "semantic-release": "25.0.9"
+  }
+}

@@ -61,14 +61,51 @@ targets on every pull request and on every push to `main`.
 | `check_plugin.py` | a plugin is not under `plugins/`, has no README or icon, or the repo has no LICENSE |
 | `check_index.py` | a plugin README does not link every reference its skills ship |
 
+`make test` also checks `scripts/set_version.py`, which the release runs, and that `.releaserc.json` still matches
+the manifests.
+
 To add a check, follow the three steps in [AGENTS.md](AGENTS.md#add-a-check): plant the failure first.
 
 ## Commits and pull requests
 
 - Work on a branch, and open a pull request against `main`. CI must be green before merge.
-- Commit subjects follow [Conventional Commits](https://www.conventionalcommits.org/) with the domain as scope, and
-  cite the issue: `feat(testing): spock rule file (agent-factory#31)`, `docs(research): …`, `chore(repo): …`.
 - One reference or one research topic per pull request, so each review stays small.
-- When a release changes what the plugin ships, bump `version` in both
-  [`marketplace.json`](.claude-plugin/marketplace.json) and [`plugin.json`](plugins/rulebook/.claude-plugin/plugin.json),
-  and add a line to [CHANGELOG.md](CHANGELOG.md).
+- Pull requests are squash-merged, so **the pull request title becomes the commit** that decides the release. CI
+  fails a title that is not a [Conventional Commit](https://www.conventionalcommits.org/): `type(scope): summary`,
+  with the domain as scope and the issue cited, such as `feat(testing): spock rule file (agent-factory#31)`.
+
+## Releases
+
+Releases are automatic. [semantic-release](https://semantic-release.gitbook.io/) runs on every push to `main`,
+after `make lint` and `make test` pass, and reads the commits since the last release tag. Never edit a version or
+`CHANGELOG.md` by hand.
+
+```mermaid
+flowchart LR
+    M["PR squash-merged<br/>to main"] --> C["ci: check job<br/>make lint + make test"]
+    C --> A{"any feat, fix<br/>or breaking commit<br/>since the last tag?"}
+    A -->|"no"| N["no release"]
+    A -->|"yes"| V["bump version in<br/>marketplace.json + plugin.json"]
+    V --> L["prepend CHANGELOG.md"]
+    L --> T["commit chore(release)<br/>tag rulebook--v&lt;version&gt;"]
+    T --> G["GitHub release<br/>with the notes"]
+```
+
+| commit | release | use it when |
+|---|---|---|
+| `feat(<domain>): …` | minor, `0.2.0` → `0.3.0` | a new reference, a new rule, or a new skill |
+| `fix(<domain>): …` | patch, `0.2.0` → `0.2.1` | a rule, example or check in a shipped file says something wrong |
+| `feat(<domain>)!: …`, or a `BREAKING CHANGE:` footer | major | a rule ID is renamed or removed, or a reference moves, so links into the plugin break |
+| `docs`, `chore`, `test`, `ci`, `build`, `refactor`, `style` | none | everything that does not change what ships |
+| any type with scope `research`, `review` or `repo` | none | design work, even when it is a `feat` |
+
+Users stay on a version until it changes: Claude Code pins a plugin to the `version` in its manifest. That is why
+every shipped change has to be a `feat` or a `fix`. The tag `rulebook--v<version>` is the format
+`claude plugin tag` uses, so another plugin can depend on a range such as `rulebook@^0.2`.
+
+To preview the next release locally, run `npm ci` and then `GITHUB_TOKEN=<token> npm run release:preview` on
+`main`. It needs Node `^22.22.2` or `>=24.15`.
+
+**Branch protection.** The release job pushes a commit to `main` with the workflow's `github.token`. If a ruleset
+blocks that push, add a repository secret `RELEASE_TOKEN`: a fine-grained token, or a GitHub App token, with
+Contents read and write that is allowed to bypass the rule. The workflow uses it when it is set.

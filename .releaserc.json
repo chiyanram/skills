@@ -1,0 +1,34 @@
+{
+  "branches": ["main"],
+  "tagFormat": "rulebook--v${version}",
+  "plugins": [
+    [
+      "@semantic-release/commit-analyzer",
+      {
+        "preset": "conventionalcommits",
+        "releaseRules": [
+          { "scope": "research", "release": false },
+          { "scope": "review", "release": false },
+          { "scope": "repo", "release": false }
+        ]
+      }
+    ],
+    ["@semantic-release/release-notes-generator", { "preset": "conventionalcommits" }],
+    [
+      "@semantic-release/changelog",
+      {
+        "changelogFile": "CHANGELOG.md",
+        "changelogTitle": "# Changelog\n\nWhat the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on\n`main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed."
+      }
+    ],
+    ["@semantic-release/exec", { "prepareCmd": "python3 scripts/set_version.py ${nextRelease.version}" }],
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["CHANGELOG.md", ".claude-plugin/marketplace.json", "plugins/rulebook/.claude-plugin/plugin.json"],
+        "message": "chore(release): rulebook ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      }
+    ],
+    "@semantic-release/github"
+  ]
+}

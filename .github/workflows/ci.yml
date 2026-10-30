@@ -2,6 +2,7 @@ name: ci
 
 on:
   pull_request:
+    types: [opened, edited, synchronize, reopened]
   push:
     branches: [main]
   workflow_dispatch:
@@ -9,10 +10,11 @@ on:
 permissions:
   contents: read
 
-# A newer push to the same branch or pull request cancels the run still going.
+# A newer push to the same pull request cancels the run still going. Runs on main are never cancelled, so a
+# release is never cut off halfway.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
@@ -30,3 +32,61 @@ jobs:
       - name: make test
         if: ${{ !cancelled() }}
         run: make test
+
+  # Pull requests are squash-merged, so the title becomes the commit on main that semantic-release reads.
+  pr-title:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Title follows Conventional Commits
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          pattern='^(feat|fix|perf|revert|docs|style|refactor|test|build|ci|chore)(\([a-z0-9-]+\))?!?: .+'
+          if [[ ! "$TITLE" =~ $pattern ]]; then
+            echo "::error::PR title \"$TITLE\" is not a Conventional Commit, e.g. 'feat(testing): spock rule file (#NN)'. See CONTRIBUTING.md#releases."
+            exit 1
+          fi
+
+  release:
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write       # push the release commit and the rulebook--v<version> tag
+      issues: write         # comment "released in" on the issues a release closes
+      pull-requests: write  # comment "released in" on the merged pull requests
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          # RELEASE_TOKEN is only needed when branch protection stops github.token from pushing to main.
+          token: ${{ secrets.RELEASE_TOKEN || github.token }}
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 24
+          cache: npm
+
+      # The first run has no rulebook--v* tag yet. Tag the commit where plugin.json got its current version, so
+      # semantic-release counts from there instead of starting at 1.0.0. Every later run finds a tag and skips this.
+      - name: Baseline tag
+        run: |
+          if [ -z "$(git tag --list 'rulebook--v*')" ]; then
+            manifest=plugins/rulebook/.claude-plugin/plugin.json
+            version=$(python3 -c "import json; print(json.load(open('$manifest'))['version'])")
+            commit=$(git log -1 --format=%H -G'"version"' -- "$manifest")
+            git -c user.name=github-actions -c user.email=github-actions@github.com \
+              tag -a "rulebook--v$version" "$commit" -m "rulebook $version"
+            git push origin "rulebook--v$version"
+          fi
+
+      - name: Install release tooling
+        run: npm ci --no-fund --no-audit
+
+      - name: semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
+        run: npx semantic-release

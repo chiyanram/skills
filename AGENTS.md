@@ -29,6 +29,12 @@ No rule goes in without the operator's explicit yes and a row in `research/19-ap
 `research/00-reference-format.md`, then link the new file from the table in `plugins/rulebook/README.md`;
 `check_index.py` fails until you do.
 
+## Releases
+
+semantic-release cuts every release from the commits on `main` (`.releaserc.json`). Never bump a `version` or edit
+`CHANGELOG.md` by hand. A change to what ships is `feat(<domain>)` or `fix(<domain>)`; design work is scoped
+`research`, `review` or `repo` and never releases. Table: `CONTRIBUTING.md#releases`.
+
 ## Issue tracker
 
 GitHub issues on `chiyanram/skills`, through `gh`. See `docs/agents/issue-tracker.md`.
