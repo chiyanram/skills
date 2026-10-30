@@ -53,6 +53,12 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 | [mutation](skills/testing/references/mutation.md) | M | you configure PIT, read its report, or answer a surviving mutant |
 | [smoke-specs](skills/testing/references/smoke-specs.md) | EA–ED | you write or review a Playwright smoke spec, or a fixture such specs import |
 
+## Code references
+
+| reference | rule IDs | read it when |
+|---|---|---|
+| [security](skills/code/references/security.md) | SE, SS | code takes outside input, stores or checks a secret, or touches the security filter chain, a guard, a token or a security test |
+
 `make lint` fails when a reference is missing from this table.
 
 ## Where a rule comes from
