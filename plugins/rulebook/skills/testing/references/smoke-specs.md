@@ -56,9 +56,8 @@ Contents: Rules · When X, use Y · Good / Bad (EA1–EA6) · Decided edges · R
 
 `ledger :N` is line N of `research/19-approved-rules.md` in chiyanram/skills.
 
-Test titles, one `test.step` per Given/When/Then and the issue annotation: GT1, GT2, GT4 (`scenario-to-tests.md`).
-Which journeys get a smoke spec: S1 (`strategy.md`). A failure path for every acceptance criterion: GA5
-(`acceptance-criteria.md`, planning).
+Titles, one `test.step` per Given/When/Then, issue annotation: GT1, GT2, GT4 (`scenario-to-tests.md`). Which journeys
+get a smoke spec: S1 (`strategy.md`). A failure path per acceptance criterion: GA5 (`acceptance-criteria.md`, planning).
 
 ## Good / Bad
 
@@ -80,28 +79,25 @@ The poll returns silently at its deadline, so the test passes when the invoice n
 **Good** (neutral)
 ```ts
 await test.step('Then the invoice reaches PAID within the deadline', async () => {
-  const invoice = await pollInvoice(
-    request,
-    placedOrder.invoiceId,
-    clerkToken,
-    (inv) => inv.status === 'PAID',
-    { maxWaitMs: 30_000, intervalMs: 1_000 },
-  );
-  expect(invoice.status, `invoice ${placedOrder.invoiceId} was not PAID within 30 s`).toBe('PAID');
+  await expect
+    .poll(() => invoiceStatus(request, clerkToken, placedOrder.invoiceId), {
+      timeout: 20_000,
+      message: `invoice ${placedOrder.invoiceId} was not PAID within 20 s`,
+    })
+    .toBe('PAID');
 });
 ```
-The polled condition is asserted again with a message, so removing payments makes the test fail. (Real evidence:
-ledger row EA1.)
+`expect.poll` makes the condition an assertion with a message and a budget below the test timeout, so removing
+payments makes the test fail. (Real evidence: ledger row EA1.)
 
 ### EA2 — Assert a feature-only landmark by role, not a shared CSS class
 
 **Bad** (neutral)
 ```ts
-test('the invoice list loads with the Invoices heading and a status filter', async ({ page }) => {
-  await loginViaForm(page);
-  await page.goto('/invoices', { waitUntil: 'networkidle' });
-  await expect(page.getByRole('heading', { name: 'Invoices', exact: true, level: 1 })).toBeVisible({ timeout: 12_000 });
-  await expect(page.locator('.toggle-wrap').first()).toBeVisible({ timeout: 8_000 });
+test('the invoice list loads with the Invoices heading and a status filter', async ({ clerkPage }) => {
+  await clerkPage.goto('/invoices');
+  await expect(clerkPage.getByRole('heading', { name: 'Invoices', exact: true, level: 1 })).toBeVisible();
+  await expect(clerkPage.locator('.toggle-wrap')).toBeVisible();
 ```
 `.toggle-wrap` is a CSS class every settings page renders, so it proves no invoice filter rendered.
 
@@ -143,7 +139,6 @@ An error body or a changed shape becomes `[]`, so "it disappeared" passes withou
 ```ts
 test(
   'should remove a deleted draft order from the orders list',
-  { annotation: { type: 'issue', description: '#123 AC-2' } },
   async ({ request, clerkToken, draftOrder }) => {
     const resp = await test.step('When the draft order is deleted', () =>
       apiRequest(request, 'DELETE', `/api/orders/${draftOrder.id}`, clerkToken));
@@ -174,28 +169,34 @@ The payment record exists but its outcome is never checked, so a declined charge
 **Good** (neutral)
 ```ts
 await test.step('Then the card gateway took this payment and approved it', async () => {
-  const { payment } = await pollForPayment(request, invoice.id, clerkToken, 'card-gateway', {
-    maxWaitMs: 15_000,
-    intervalMs: 1_000,
-  });
-  expect(payment, 'a card-gateway payment must appear — the gateway was never called').toBeTruthy();
+  const cardPayment = async () => {
+    const resp = await apiRequest(request, 'GET', `/api/invoices/${invoice.id}/payments`, clerkToken);
+    const payments: Payment[] = (await resp.json()).data;
+    return payments.find((p) => p.gateway === 'card-gateway');
+  };
+  await expect
+    .poll(cardPayment, {
+      timeout: 15_000,
+      message: 'a card-gateway payment must appear — the gateway was never called',
+    })
+    .toBeDefined();
+  const payment = await cardPayment();
   expect(payment?.outcome, 'the gateway was called but declined').toBe('APPROVED');
   expect(payment?.amount, 'the payment must carry this invoice total').toEqual(invoice.total);
 });
 ```
-The record is matched by gateway name, then its approval, then the amount this test set up. (Real evidence: ledger
-row EA4.)
+`expect.poll` waits for the record matched by gateway name, then its approval and the amount this test set up are
+asserted. (Real evidence: ledger row EA4.)
 
 ### EA5 — A deliberate dependency failure asserts the failure shape
 
 **Bad** (neutral)
 ```ts
-test('pay invoice with the gateway offline', async ({ page, invoice, fakeGateway }) => {
+test('pay invoice with the gateway offline', async ({ clerkPage, invoice, fakeGateway }) => {
   fakeGateway.goOffline();
-  await loginViaForm(page);
-  await page.goto(`/invoices/${invoice.id}`);
-  await page.getByRole('button', { name: 'Pay invoice' }).click();
-  await expect(page.getByRole('alert')).toBeVisible();
+  await clerkPage.goto(`/invoices/${invoice.id}`);
+  await clerkPage.getByRole('button', { name: 'Pay invoice' }).click();
+  await expect(clerkPage.getByRole('alert')).toBeVisible();
 });
 ```
 Only a reply is checked, so a regression that records an approved payment for a dead gateway stays green.
