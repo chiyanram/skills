@@ -31,7 +31,7 @@ No rule goes in without the operator's explicit yes and a row in `research/19-ap
 
 ## Releases
 
-semantic-release cuts every release from the commits on `main` (`.releaserc.json`). Never bump a `version` or edit
+semantic-release cuts every release from the commits on `main` (`release.config.mjs`). Never bump a `version` or edit
 `CHANGELOG.md` by hand. A change to what ships is `feat(<domain>)` or `fix(<domain>)`; design work is scoped
 `research`, `review` or `repo` and never releases. Table: `CONTRIBUTING.md#releases`.
 

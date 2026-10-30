@@ -1,4 +1,5 @@
 import json
+import subprocess
 import unittest
 
 from tests.support import ROOT
@@ -11,12 +12,21 @@ def plugin_options(config: dict, name: str) -> dict:
 
 
 class ReleaseConfigTest(unittest.TestCase):
-    """.releaserc.json stays in step with the manifests it releases."""
+    """release.config.mjs stays in step with the manifests it releases."""
 
     @classmethod
     def setUpClass(cls):
-        cls.config = json.loads((ROOT / ".releaserc.json").read_text())
+        loaded = subprocess.run(["node", "--input-type=module", "-e",
+                                 "import c from './release.config.mjs'; console.log(JSON.stringify(c))"],
+                                cwd=ROOT, capture_output=True, text=True, check=True)
+        cls.config = json.loads(loaded.stdout)
         cls.entries = json.loads((ROOT / MARKETPLACE).read_text())["plugins"]
+
+    def test_should_have_no_other_config_that_semantic_release_would_load_first(self):
+        # cosmiconfig takes package.json "release" and every .releaserc* ahead of release.config.mjs.
+        self.assertNotIn("release", json.loads((ROOT / "package.json").read_text()))
+        self.assertEqual(sorted(p.name for p in ROOT.glob(".releaserc*")), [])
+        self.assertEqual(sorted(p.name for p in ROOT.glob(".config/releaserc*")), [])
 
     def test_should_tag_as_claude_plugin_tag_does(self):
         # `claude plugin tag` and dependency version ranges both use <plugin-name>--v<version>.

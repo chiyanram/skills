@@ -1,6 +1,6 @@
 """Write one version into every manifest: each marketplace plugin entry and each plugin.json.
 
-semantic-release runs it in its prepare step (.releaserc.json). It edits the `"version"` value in place, so the rest of
+semantic-release runs it in its prepare step (release.config.mjs). It edits the `"version"` value in place, so the rest of
 each file keeps its formatting, then reads the files back to prove the edit landed.
 """
 import json

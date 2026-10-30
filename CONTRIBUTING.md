@@ -49,8 +49,9 @@ make lint   # frontmatter, one version, links, size budgets, packaging, README i
 make test   # each check against its planted fixtures, and each review/ builder
 ```
 
-You need Python 3.10+ and the Claude Code CLI (`npm install -g @anthropic-ai/claude-code`). CI runs the same two
-targets on every pull request and on every push to `main`.
+You need Python 3.10+, Node `^22.22.2` or `>=24.15`, the Claude Code CLI (`npm install -g @anthropic-ai/claude-code`),
+and `npm ci` once for the release tooling the tests load. CI runs the same two targets on every pull request and on
+every push to `main`.
 
 | check | fails when |
 |---|---|
@@ -61,8 +62,8 @@ targets on every pull request and on every push to `main`.
 | `check_plugin.py` | a plugin is not under `plugins/`, has no README or icon, or the repo has no LICENSE |
 | `check_index.py` | a plugin README does not link every reference its skills ship |
 
-`make test` also checks `scripts/set_version.py`, which the release runs, and that `.releaserc.json` still matches
-the manifests.
+`make test` also checks `scripts/set_version.py`, which the release runs, and that `release.config.mjs` still matches
+the manifests and links each issue reference to its own repo.
 
 To add a check, follow the three steps in [AGENTS.md](AGENTS.md#add-a-check): plant the failure first.
 
