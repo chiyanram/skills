@@ -53,7 +53,13 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 | [mutation](skills/testing/references/mutation.md) | M | you configure PIT, read its report, or answer a surviving mutant |
 | [smoke-specs](skills/testing/references/smoke-specs.md) | EA–ED | you write or review a Playwright smoke spec, or a fixture such specs import |
 
-`make lint` fails when a reference is missing from this table.
+## Code references
+
+| reference | rule IDs | read it when |
+|---|---|---|
+| [spring](skills/code/references/spring.md) | LY6, LY7, SC, X6, SX | you write or review a bean, a configuration class, a settings record, a startup hook or a proxied method |
+
+`make lint` fails when a reference is missing from these tables.
 
 ## Where a rule comes from
 
