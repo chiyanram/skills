@@ -57,6 +57,9 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 
 | reference | rule IDs | read it when |
 |---|---|---|
+||||||| 6221d7f
+`make lint` fails when a reference is missing from this table.
+| [design](skills/code/references/design.md) | SEAM | you write or review an interface a caller depends on, or a method that implements one |
 | [services](skills/code/references/services.md) | LY1–LY3 | you write or review a controller, a service, an interface or a use case that makes two calls |
 
 `make lint` fails when a reference is missing from these tables.
