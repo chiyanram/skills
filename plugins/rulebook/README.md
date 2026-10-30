@@ -58,6 +58,7 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 | reference | rule IDs | read it when |
 |---|---|---|
 | [design](skills/code/references/design.md) | SEAM | you write or review an interface a caller depends on, or a method that implements one |
+| [java](skills/code/references/java.md) | U4, JV, CV3 | you write or review Java production code |
 | [smells](skills/code/references/smells.md) | DS, FW, NM, SM | you write or review production code: the smell baseline, and the shape and naming rules behind it |
 | [types](skills/code/references/types.md) | TY | you write or review a field, parameter, return type, record, enum, sealed type or generic type |
 
