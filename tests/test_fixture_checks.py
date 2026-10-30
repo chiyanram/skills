@@ -9,6 +9,7 @@ CASES = {
     "sizes": (["good", "good-template", "rules-heading-ours"],
               ["root-too-long", "chain-over-32k", "rule-too-long", "rules-heading-variant", "no-rules-section"]),
     "plugin": (["good"], ["source-is-root", "root-is-a-plugin", "no-readme", "no-icon", "no-license"]),
+    "index": (["good"], ["unlisted"]),
 }
 
 

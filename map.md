@@ -1,5 +1,10 @@
 # Map: One rulebook — rules, roles and review shared by laptop /crq and the SSH fleet
 
+> **Archive.** This map moved to GitHub issue [chiyanram/skills#9](https://github.com/chiyanram/skills/issues/9) on
+> 2026-10-02. Its ticket index maps each local ticket to its GitHub issue, and the open work is in the
+> [open issues](https://github.com/chiyanram/skills/issues). This file and [issues/](issues/) stay because research
+> files and other repos cite them by path and line.
+
 Label: wayfinder:map · Tracker: local markdown (this folder). Tickets: `issues/NN-*.md`.
 Ticket header lines: `Type:` · `Status: open|closed` · `Assignee:` (empty = unclaimed) · `Blocked by:`.
 
