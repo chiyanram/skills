@@ -55,6 +55,12 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 
 `make lint` fails when a reference is missing from this table.
 
+## Code references
+
+| reference | rule IDs | read it when |
+|---|---|---|
+| [messaging](skills/code/references/messaging.md) | MS | you write or review a message consumer, a scheduled job, or an operation that can run twice |
+
 ## Where a rule comes from
 
 Each rule has a source. A rule goes in only after the operator says yes; the
