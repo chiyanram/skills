@@ -34,8 +34,8 @@ Contents: Rules · When X, use Y · Good / Bad (M1–M6, M8–M10) · Decided ed
 | a SURVIVED mutant | the missing case: name its letter, add the example test | reached, not asserted (M2, M3) · 68c :65 |
 | a SURVIVED Conditionals Boundary mutant | a just-inside and just-outside case (B3, `boundaries.md`) | M2's source pairs Conditionals Boundary with B3 · ledger :88 |
 | a survivor whose letter you must name | CORRECT (B1, `boundaries.md`) or RIGHT-BICEP (C1, `coverage-design.md`) | M2 names these two lists · ledger :88 |
-| a survivor you cannot prove equivalent | a gap with its risk (C4, `coverage-design.md`) | unsure means gap, not equivalent (M8) · 68c :170-171 |
-| a new kill test that passes on its first run | a temporary hand mutation, then revert it | green on first run is expected (M10) · 68c :228 |
+| a survivor you cannot prove equivalent | a gap with its risk (C4, `coverage-design.md`) | unsure means gap, not equivalent (M8) · 68c :172-173 |
+| a new kill test that passes on its first run | a temporary hand mutation, then revert it | green on first run is expected (M10) · 68c :230 |
 
 68c is `research/68c-neutral-testing-mutation-property-scenarios.md`; ledger is `research/19-approved-rules.md`.
 `:N` is a line in that file.
@@ -69,7 +69,7 @@ It names a line, not a case. It asserts only non-null, so the next mutant on tha
 
 **Good** (neutral)
 ```groovy
-/** Answers a survivor in OrderService.cancel (RIGHT-BICEP · Cross-check: the gateway stays unconsulted). */
+/** Answers a survivor in OrderService.cancel (RIGHT-BICEP · Right: the gateway stays unconsulted). */
 def "should cancel a draft order without asking the payment gateway for a refund"() {
     given: "a draft order the gateway has never charged"
     def order = orderRepository.save(draftOrder())
@@ -108,7 +108,8 @@ Both numbers are shown. The two kinds of non-kill read as two different defects.
 
 **Bad** (neutral)
 ```kotlin
-excludedClasses.set(listOf("*Config", "*Properties", "*Policy", "get*", "is*"))
+excludedClasses.set(listOf("*Config", "*Properties", "*Policy"))
+excludedMethods.set(listOf("get*", "is*"))
 ```
 `DiscountPolicy` and `Invoice.isOverdue` are decisions. Excluding them hides their missing tests and lifts the score.
 
@@ -125,10 +126,11 @@ evidence: ledger row M4.)
 
 **Bad** (neutral)
 ```kotlin
+// Added org.springframework: survivors fell 18 → 4, so the change is safe (#123).
 avoidCallsTo.set(listOf("org.slf4j", "org.springframework"))
 ```
-The glob over-matches. Survivors fall, which looks like success, while the gateway's RestClient calls stop being
-mutated.
+Only the total was read, and no per-class counts were compared. So nobody sees that the gateway's RestClient calls
+stopped being mutated.
 
 **Good** (neutral)
 ```kotlin
@@ -217,7 +219,7 @@ The kill test was green on its first run, and nothing shows it was ever made to 
 **Good** (neutral)
 ```groovy
 /**
- * Kills the survivor in Order.withStatus that dropped placedAt (CORRECT · Reference).
+ * Kills the survivor in Order.withStatus that dropped placedAt (RIGHT-BICEP · Right).
  * Proved: withStatus hand-edited to pass a null placedAt → this feature failed; edit reverted.
  */
 def "should keep the placed time when an order is marked paid"() {

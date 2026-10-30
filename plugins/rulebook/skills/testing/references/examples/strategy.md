@@ -27,7 +27,7 @@ A Spring context whose every bean is a mock wires plain logic, crosses no bounda
 **Good** (neutral)
 ```groovy
     OrderRepository orderRepository = Stub()
-    PaymentGateway paymentGateway = Stub()
+    FakePaymentGateway paymentGateway = new FakePaymentGateway()
     OrderService service
 
     def setup() {
@@ -39,7 +39,7 @@ A Spring context whose every bean is a mock wires plain logic, crosses no bounda
             Clock.fixed(NOW, ZoneOffset.UTC))
     }
 ```
-The service is built with `new`, only outbound ports are doubled, our own TaxCalculator is real, and the clock is fixed. (Real evidence: ledger row S1.)
+The service is built with `new`, only outbound ports are replaced (the gateway by its fake), our own TaxCalculator is real, and the clock is fixed. (Real evidence: ledger row S1.)
 
 ## S2 — Assert observable behaviour
 
@@ -103,10 +103,15 @@ It re-proves through a mock what the IT already proves on real rows; the SQL tha
         insertInvoice(customerId, InvoiceStatus.OPEN)
         insertInvoice(customerId, InvoiceStatus.PAID)
 
-        expect: "a filter that ignored the status would report every invoice as open"
-        invoiceService.listByCustomer(customerId, InvoiceStatus.OPEN, 0, 10).size() == 2
-        invoiceService.listByCustomer(customerId, InvoiceStatus.PAID, 0, 10).size() == 1
-        invoiceService.listByCustomer(customerId, null, 0, 10).size() == 3
+        when: "the invoices are listed by each status and with no filter"
+        def open = invoiceService.listByCustomer(customerId, InvoiceStatus.OPEN, 0, 10)
+        def paid = invoiceService.listByCustomer(customerId, InvoiceStatus.PAID, 0, 10)
+        def all = invoiceService.listByCustomer(customerId, null, 0, 10)
+
+        then: "a filter that ignored the status would report every invoice as open"
+        open.size() == 2
+        paid.size() == 1
+        all.size() == 3
     }
 ```
 The filter lives in the SQL, so the IT against real Postgres is the primary proof, with `null` meaning unfiltered. (Real evidence: ledger row TM1.)
@@ -155,41 +160,36 @@ Only the payment gateway and the fraud-check service are faked, at the wire; our
 
 **Bad** (neutral)
 ```groovy
-    def "should pay an open invoice"() {
-        given: "an open invoice on the gateway sandbox — no @Requires, so it runs inside ./gradlew check"
-        def customerId = seedCustomer("sandbox-pay", CustomerTier.STANDARD)
-        def invoiceId = seedInvoice(customerId, new Money(new BigDecimal("25.50"), "EUR"))
-        def events = subscribePayments(invoiceId)
+    def "should summarise a placed order"() {
+        given: "a placed order of two lines — no @Requires, so the real model runs inside ./gradlew check"
+        def orderId = seedOrder(customerId, [line("SKU-1", 2), line("SKU-2", 1)])
 
-        when: "the clerk pays it"
-        invoiceService.pay(invoiceId)
-        await().atMost(Duration.ofSeconds(60)).until { events.completed() }
+        when: "the real model writes the order summary"
+        def summary = orderSummariser.summarise(orderId)
 
-        then: "the gateway's receipt is word-for-word what we expect"
-        events.firstPayment().receiptText() == "Approved: 25.50 EUR charged to card ending 4242."
+        then: "the model's summary is word-for-word what we expect"
+        summary.text() == "Your order has 2 lines: 2 x SKU-1 and 1 x SKU-2."
     }
 ```
-It calls a real external service inside the gate and asserts wording the service is free to change.
+It calls a real model inside the gate and asserts wording the model is free to change.
 
 **Good** (neutral)
 ```groovy
-    @Requires({ sys["gateway.sandbox"] == "true" })
-    def "should record a payment for an open invoice against the gateway sandbox"() {
-        given: "an open invoice of 25.50 EUR for a fresh customer"
-        def customerId = seedCustomer("sandbox-pay", CustomerTier.STANDARD)
-        def invoiceId = seedInvoice(customerId, new Money(new BigDecimal("25.50"), "EUR"))
-        def events = subscribePayments(invoiceId)
+    @Requires({ sys["model.real"] == "true" })
+    def "should summarise a placed order with the real model"() {
+        given: "a placed order of two lines"
+        def orderId = seedOrder(customerId, [line("SKU-1", 2), line("SKU-2", 1)])
 
-        when: "the clerk pays it and the gateway answers"
-        invoiceService.pay(invoiceId)
-        await().atMost(Duration.ofSeconds(60)).until { events.paymentCount() >= 1 }
+        when: "the real model writes the order summary"
+        def summary = orderSummariser.summarise(orderId)
 
-        then: "a payment of the amount we sent was recorded — never the gateway's own wording"
-        events.firstPayment().amount() == new Money(new BigDecimal("25.50"), "EUR")
-        invoiceRepository.findById(invoiceId).get().status() == InvoiceStatus.PAID
+        then: "the summary has the structure we need — never the model's own wording"
+        summary.orderId() == orderId
+        summary.lineCount() == 2
+        !summary.text().isBlank()
     }
 ```
-It runs only on request, outside the gate, and asserts the shape of the outcome, not the external service's text. (Real evidence: ledger row TM3.)
+It runs only on request, outside the gate, and asserts the structure of the model's answer, not its text. (Real evidence: ledger row TM3.)
 
 ## AT1 — No separate acceptance tier
 
@@ -221,15 +221,17 @@ A separate `.feature` tier with its own Node runtime duplicates an IT and is lef
         payInvoiceOf(orderId)
 
         when: "the customer cancels it through the API"
-        def response = client.post().uri("/api/orders/{id}/cancel", orderId).exchange()
+        def response = client.post().uri("/api/orders/{id}/cancel", orderId)
+            .header(HttpHeaders.AUTHORIZATION, login("CUSTOMER"))
+            .exchange()
 
         then: "the API refuses with the problem type, and the order is not cancelled"
         response.expectStatus().isEqualTo(409)
         response.expectBody().jsonPath('$.type').isEqualTo("https://example.com/errors/INVOICE_ALREADY_PAID")
-        orderRepository.findById(orderId).get().status() == OrderStatus.PAID
+        orderRepository.findById(orderId).get().status() != OrderStatus.CANCELLED
     }
 ```
-The AC of the order-cancellation story is an ordinary IT on the real API; its name reads as the scenario. (Real evidence: ledger row AT1.)
+The AC of the order-cancellation story is an ordinary IT on the real API, called with a customer's token; its name reads as the scenario. (Real evidence: ledger row AT1.)
 
 ## S3 — Run the existing tests before changing code
 
@@ -284,7 +286,8 @@ Bug #123 (every consumer shared `consumer-1`) makes this fail on the old code fo
         orderService.addLine(orderId, "SKU-1", quantity)
 
         then: "the service guard fires before the CHECK constraint does, with a readable message"
-        thrown(IllegalArgumentException)
+        def e = thrown(IllegalArgumentException)
+        e.message.contains("quantity must be")
 
         and: "and nothing is written"
         orderService.lineCount(orderId) == 0L
@@ -297,6 +300,8 @@ A pure `if` guard boots Postgres in an IT; the CHECK constraint it names is neve
 
 **Good** (neutral)
 ```groovy
+    OrderRepository orderRepository = Mock()
+
     def "should refuse quantity #quantity before anything is written"() {
         when: "a quantity the column would reject is added"
         service.addLine(orderId, "SKU-1", quantity)
@@ -312,4 +317,4 @@ A pure `if` guard boots Postgres in an IT; the CHECK constraint it names is neve
         quantity << [0, -1, 100, Integer.MIN_VALUE]
     }
 ```
-The error comes from pure logic, so it is a unit spec; `0 *` is the behaviour here because nothing may be reached. (Real evidence: ledger row S5.)
+The error comes from pure logic, so it is a unit spec; `0 *` on the `Mock()` repository is the behaviour here because nothing may be reached. (Real evidence: ledger row S5.)

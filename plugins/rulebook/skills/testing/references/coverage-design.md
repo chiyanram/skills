@@ -60,14 +60,17 @@ class OrderEntityStatusIT extends OrdersRepositoryIT {
     @Issue(["#123", "AC-2"])
     def "should store a newly created order as a draft"() {
         given: "an order built the way the app builds one, its status never set"
-        def id = em.persistFlushFind(newOrder()).id
+        def order = newOrder()
+
+        when: "it is stored and the persistence context is cleared"
+        def id = em.persistFlushFind(order).id
         em.clear()
 
-        expect: "Hibernate writes the field on every INSERT, so the stored row holds the entity's value"
+        then: "Hibernate writes the field on every INSERT, so the stored row holds the entity's value"
         em.find(OrderEntity, id).status == OrderStatus.DRAFT
 ```
-Every RIGHT-BICEP letter is decided in the header, and the case reads the stored row instead of a field default.
-(Real evidence: ledger row C1.)
+Every RIGHT-BICEP letter is decided in the header. The case stores the order in `when:` and reads the stored row in
+`then:`, instead of a field default. (Real evidence: ledger row C1.)
 
 ### C2 — Test the unavailable case of every external dependency
 
@@ -88,24 +91,22 @@ It proves only silence. No WARN is asserted, so code that swallows the outage wi
 
 **Good** (neutral)
 ```groovy
+    @Timeout(14)
     def "should warn the mail service unreachable, within a bound, when it never answers"() {
         given: "an overdue invoice, behind a mail endpoint that holds every request for 15 s"
         wireMock.stubFor(post(urlEqualTo("/send")).willReturn(okJson("{}").withFixedDelay(15_000)))
         def invoiceId = seedOverdueInvoice(customerId)
 
         when: "the reminder job runs"
-        def start = System.currentTimeMillis()
         overdueReminder.run()
-        def elapsedMs = System.currentTimeMillis() - start
 
         then: "it gave up before the endpoint would have answered, and named the invoice at WARN"
-        elapsedMs < 14_000L
         def line = appender.list.find { it.formattedMessage.contains("status=unreachable invoiceId=$invoiceId") }
         line?.level == Level.WARN
     }
 ```
-The dependency never answers. The test asserts a bounded time, the logged outcome and its WARN level. (Real evidence:
-ledger row C2.)
+The dependency never answers. `@Timeout(14)` bounds the time with no wall-clock read, and the test asserts the logged
+outcome and its WARN level. (Real evidence: ledger row C2.)
 
 ### C3 — Write the expected value out, worked independently
 
@@ -123,8 +124,8 @@ Both sides come from `normalise`, so a `normalise` that returns an empty string 
 
 **Good** (neutral)
 ```groovy
-    def "should store an email typed in mixed case in lower case"() {
-        expect: "the stored form is written out by hand, never produced by normalise itself"
+    def "should normalise an email typed in mixed case to lower case"() {
+        expect: "the lower-case form is written out by hand, never produced by normalise itself"
         CustomerEmail.normalise("Ann@Example.COM") == "ann@example.com"
     }
 ```
@@ -165,6 +166,10 @@ oversight. (Real evidence: ledger row C4.)
 - **Skip when** the logic has nothing the dimension reads: no two operations that undo each other (plinth :103), or
   no performance contract and no known performance risk (plinth :193). Write the one-line reason (C1). — **Do not
   skip when** the reason is left out: a bare skip cannot be told from a forgotten dimension. — **Confidence** high
+- **Skip when** the only time bound is a hang guard (`@Timeout`) on an unavailable case (C2): a hang guard
+  (`@Timeout`) is not a performance assertion, so it needs no Performance case. — **Do not skip when** the contract
+  names a speed: decide Performance with a deterministic proxy, not a wall-clock threshold. — **Confidence** high
+  (operator decision, agent-factory#31 R3)
 
 ## Review checks
 

@@ -1,6 +1,6 @@
 # 68b — Neutral Good/Bad pairs: unit tests · integration tests · Spock (#99, map #9)
 
-Source: research/31b-v2.md:1-617 (U1–U4, IT1–IT5, IT4b, SP1–SP11); research/47-good-rewrites.md (replaces the pair for IT2, IT4, SP2, SP11; replaces the Good only for SP3, SP5, whose Bad stays the 31b one because it shows the rule's own defect). Domain: ordering + billing (#99 brief). Stand-ins: `@EnableAruviiSpec` / `@EnableAruviiIT` → `@EnableSharedContainers` · `AruviiTestcontainersInitializer` → `SharedContainersInitializer` · `AruviiSpecResetInterceptor` → `SharedResetInterceptor`, `AruviiTestReset` → `TestReset` (SP3) · `PRESERVE` list kept as the reset's keep-list (SP3) · MiniStack S3 container of a non-Spring IT → PaymentGateway sandbox container (`SharedContainersInitializer.sharedGatewayUrl()`) (IT2) · owned settings port stubbed in an IT → `EmailSender` stubbed, replaced by `FakeEmailSender` (IT4) · audit port verified by Mock() → `InvoiceRepository.save` verified, writing the invoice IS the behaviour (U3) · provider rotation reminder → `OverdueReminder` on invoices past due (U1, U4) · password-reset expiry → invoice due-date check before payment (U4) · notification-config 400 per blank field → `/api/orders` 400 per blank field (IT1) · webhook controller over standalone MockMvc → order cancel endpoint (IT3) · agent-count-by-tool port and its SQL semantics → `PaymentGateway` and its idempotent charge (IT5) · connection-test port overridden by `@TestBean` → `PaymentGateway` (SP1) · pricing-override partial unique index → one invoice per order, `uq_invoice_order` (SP4) · SSRF allowlist resolved once → tax rates resolved once by `TaxCalculator` (SP6) · chat stream consumer → `BillingConsumer` on `orders.placed` (SP9) · sweepable-runs query → `findOverdue` (SP10) · chat test application → `OrdersTestApplication` (SP11). Added terms: `OverdueReminder.overdueInvoices(graceDays)` · `OrderController` · `OrderControllerIT`, `InvoiceControllerIT`, `PaymentGatewayIT` · `PaymentGatewayContract`, `FakePaymentGatewaySpec`, `PaymentGatewayAdapterIT` · `OrdersRepositoryIT` (repository-slice base, as in 68a), `OrdersTestApplication`, `OrdersServicesConfig` · `BillingConsumer` · `uq_invoice_order` · `invoices` / `payments` tables · `RestTestClient http`, `login(role)` helper · `payment.gateway.url` property · `PaymentGatewayAdapter` (real adapter, IT2/IT5) · `PaymentGateway.charge(payment)`, `chargesFor(invoiceId)` (IT5) · `Resettable` (fake reset hook, IT5) · `FakeEmailSender.sent()`, `OverdueReminder.remindOverdue()` (IT4) · `InvoiceRepository.findOpen()`, `findOverdue(date)`, `Invoice.withStatus(...)` (U4, SP10) · `AbstractIT` (JUnit IT base, SP3 Bad), `OrdersIT`, `TaxRateOverrideIT` · sandbox image `example/payment-sandbox` · packages `com.example.orders.repository` / `.billing.repository` / `.entity` (SP11) · `persistInvoice(...)`, `seedSandboxAccounts(...)` spec helpers.
+Source: research/31b-v2.md:1-617 (U1–U4, IT1–IT5, IT4b, SP1–SP11); research/47-good-rewrites.md (replaces the pair for IT2, IT4, SP2, SP11; replaces the Good only for SP3, SP5, whose Bad stays the 31b one because it shows the rule's own defect). Domain: ordering + billing (#99 brief). Stand-ins: `@EnableAruviiSpec` / `@EnableAruviiIT` → `@EnableSharedContainers` · `AruviiTestcontainersInitializer` → `SharedContainersInitializer` · `AruviiSpecResetInterceptor` → `SharedResetInterceptor`, `AruviiTestReset` → `TestReset` (SP3) · `PRESERVE` list kept as the reset's keep-list (SP3) · MiniStack S3 container of a non-Spring IT → PaymentGateway sandbox container (`SharedContainersInitializer.sharedGatewayUrl()`) (IT2) · owned settings port stubbed in an IT → `EmailSender` stubbed, replaced by `FakeEmailSender` (IT4) · audit port verified by Mock() → `InvoiceRepository.save` verified, writing the invoice IS the behaviour (U3) · provider rotation reminder → `OverdueReminder` on invoices past due (U1, U4) · password-reset expiry → invoice due-date check before payment (U4) · notification-config 400 per blank field → `/api/orders` 400 per blank field (IT1) · webhook controller over standalone MockMvc → order cancel endpoint (IT3) · agent-count-by-tool port and its SQL semantics → `PaymentGateway` and its idempotent charge (IT5) · connection-test port overridden by `@TestBean` → `ExchangeRateProvider`, a port the shared fakes do not hold (SP1) · pricing-override partial unique index → one invoice per order, `uq_invoice_order` (SP4) · SSRF allowlist resolved once → tax rates resolved once by `TaxCalculator` (SP6) · chat stream consumer → `BillingConsumer` on `orders.placed` (SP9) · sweepable-runs query → `findOverdue` (SP10) · chat test application → `OrdersTestApplication` (SP11). Added terms: `OverdueReminder.overdueInvoices(graceDays)` · `OrderController` · `OrderControllerIT`, `InvoiceControllerIT`, `PaymentGatewayIT` · `PaymentGatewayContract`, `FakePaymentGatewaySpec`, `PaymentGatewayAdapterIT` · `OrdersRepositoryIT` (repository-slice base, as in 68a), `OrdersTestApplication`, `OrdersServicesConfig` · `BillingConsumer` · `uq_invoice_order` · `invoices` / `payments` tables · `RestTestClient http`, `login(role)` helper · `payment.gateway.url` property · `PaymentGatewayAdapter` (real adapter, IT2/IT5) · `PaymentGateway.charge(payment)`, `chargesFor(invoiceId)` (IT5) · `Resettable` (fake reset hook, IT5) · `FakeEmailSender.sent()`, `OverdueReminder.remindOverdue()` (IT4) · `InvoiceRepository.findOpen()`, `findOverdue(date)`, `Invoice.withStatus(...)` (U4, SP10) · `AbstractIT` (JUnit IT base, SP3 Bad), `OrdersIT`, `TaxRateOverrideIT` · sandbox image `example/payment-sandbox` · packages `com.example.orders.repository` / `.billing.repository` / `.entity` (SP11) · `persistInvoice(...)`, `seedSandboxAccounts(...)` spec helpers · `ExchangeRateProvider`, `FakeExchangeRateProvider` (SP1) · `InvoiceRepository.markOverdue(date)` (SP10 Bad).
 Skipped: IT4b — MERGED into IT4 (2026-10-04). (U2 is SUPERSEDED by U2a on naming only; its labelled-blocks clause stands, so the pair is kept and shows both.)
 Stand-ins (Spock part): `@EnableSharedContainers` for the project's Spock IT annotation (K15) · `AbstractIT` kept as the generic JUnit IT base (K15) · trust/SSL port of K3 → `PaymentGateway` · lease + interaction row of K13 → gateway charge + `markPaid` · SQL analytics of K10 → `OverdueReminder` run · config parse of K6/K8 → `DiscountPolicy` / line quantity parse · logback logger kept as the global state (K14, K16) · Added terms: enum type names `CustomerTier`, `OrderStatus`, `InvoiceStatus` · `Quantity.Valid` / `Quantity.Invalid` (sealed parse result, K8) · `HttpPaymentGateway` (HTTP adapter of PaymentGateway, K9) · Hibernate `ConstraintViolationException` + constraint `invoices_order_id_key` (K19) · test helpers `eur()`, `line()`, `insertInvoice()` · Skipped: none (K1–K20, K2b all APPROVED)
 
@@ -29,7 +29,7 @@ What goes wrong: the result depends on wall-clock time and host speed, and an in
         new FakeEmailSender(),
         Clock.fixed(NOW, ZoneOffset.UTC))
 
-    def "should remind an invoice one day past due, and not one due today"() {
+    def "should treat an invoice one day past due as overdue, and not one due today"() {
         given: "two open invoices, one due exactly today and one due yesterday"
         invoiceRepository.findOpen() >> [invoice("due-today", TODAY), invoice("due-yesterday", TODAY.minusDays(1))]
         when: "the reminder looks for overdue invoices"
@@ -247,7 +247,7 @@ Evidence: `aruvii-api/src/test/java/ai/aruvii/api/controller/WebhookControllerRu
 
 **Bad** (neutral)
 ```groovy
-    def "shouldSendTheOverdueNoticeWhenTheReminderRuns"() {
+    def "should send the overdue notice when the reminder runs"() {
         given: "a reminder whose email sender is a Spock double"
         EmailSender emailSender = Stub() {
             send(_) >> true
@@ -258,13 +258,13 @@ What goes wrong: the IT replaces an outbound port with a double that has no beha
 
 **Good** (neutral)
 ```groovy
-    FakeEmailSender emailSender = new FakeEmailSender()
+    @Autowired OverdueReminder reminder
+    @Autowired FakeEmailSender emailSender // the EmailSender bean of OutboundFakesConfig
 
     @Issue(["#123", "AC-2"])
     def "should send one overdue notice when the reminder runs"() {
-        given: "an invoice one day past due and a reminder that sends through the fake"
+        given: "an invoice one day past due, and the wired reminder sending through the shared fake"
         saveInvoice(openInvoiceDue(TODAY.minusDays(1)))
-        def reminder = new OverdueReminder(invoiceRepository, emailSender, clock)
 
         when: "the reminder runs"
         reminder.remindOverdue()
@@ -272,7 +272,7 @@ What goes wrong: the IT replaces an outbound port with a double that has no beha
         then: "the fake holds exactly one notice, for this invoice's customer"
         emailSender.sent()*.to() == [CUSTOMER_EMAIL]
 ```
-Why: the port is a real in-memory fake with its own contract spec (IT5), shared by every feature instead of one stub each.
+Why: the subject is the wired bean, and the port is the shared in-memory fake from `OutboundFakesConfig`, with its own contract spec (IT5), instead of one stub per feature.
 
 Evidence: `aruvii-worker/src/integrationTest/groovy/ai/aruvii/worker/webhook/KafkaCallbackPublisherDrainIT.groovy:39-44` @772736bf (Bad, real) · source 31b-v2.md:243 · fix from research/47-good-rewrites.md:317-335 (replaces 31b-v2.md:244-274)
 
@@ -331,13 +331,13 @@ class InvoiceControllerIT extends Specification {
     @Autowired ApplicationContext applicationContext
 
     @TestBean
-    PaymentGateway paymentGateway
+    ExchangeRateProvider exchangeRateProvider
 
-    static PaymentGateway paymentGateway() {
-        new FakePaymentGateway()
+    static ExchangeRateProvider exchangeRateProvider() {
+        new FakeExchangeRateProvider()
     }
 ```
-Why: every IT that overrides `PaymentGateway` names the field `paymentGateway`, so they share one cached Spring context.
+Why: every IT that overrides `ExchangeRateProvider` names the field `exchangeRateProvider`, so they share one cached Spring context; the shared fakes do not hold this port, so each class overrides it.
 
 Evidence: no Bad (n/a, 31b-v2.md:364) · `aruvii-api/src/integrationTest/java/ai/aruvii/api/controller/ProviderTagsIT.java:20-27` @origin/master 2026-10-02, no sha in source (Good, adapted) · source 31b-v2.md:346 · fix from 31b-v2.md:347-362
 
@@ -373,7 +373,8 @@ class InvoiceControllerIT extends AbstractIT {
 
     @Test
     void shouldPayInvoice() {
-        http.post().uri("/api/invoices/{id}/payments", invoiceId).header(AUTHORIZATION, clerkAuth).exchange();
+        http.post().uri("/api/invoices/{id}/payments", invoiceId).header(AUTHORIZATION, clerkAuth).exchange()
+            .expectStatus().isCreated();
         // server thread already committed — this "rollback" undoes nothing it wrote
     }
 ```
@@ -412,6 +413,7 @@ Evidence: Bad adapted from Spring Boot §with-running-server (R22), no Aruvii pa
 
         then: "never thrown: the insert sits unflushed in the persistence context and is rolled back"
         def e = thrown(ConstraintViolationException)
+        e.constraintName == "uq_invoice_order"
     }
 ```
 What goes wrong: without a flush the second insert never reaches Postgres, so the unique index never runs and the expected exception never comes.
@@ -574,8 +576,8 @@ Evidence: `aruvii-worker/src/main/java/ai/aruvii/worker/chat/ChatStreamConsumer.
 **Bad** (neutral)
 ```java
     @Test
-    void shouldFindOverdueInvoices() {
-        assertTimeoutPreemptively(Duration.ofSeconds(10), () -> repo.findOverdue(today)); // new thread: no tx, no rollback
+    void shouldMarkOverdueInvoices() {
+        assertTimeoutPreemptively(Duration.ofSeconds(10), () -> repo.markOverdue(today)); // new thread: no tx, no rollback
     }
 ```
 What goes wrong: the timed body runs on another thread outside the test transaction, so its writes commit and never roll back.
@@ -590,8 +592,11 @@ What goes wrong: the timed body runs on another thread outside the test transact
         em.flush()
         em.clear()
 
-        expect: "an invoice due today is not overdue yet, so it must not be reminded"
-        repo.findOverdue(TODAY)*.orderId() == [ORDER_ID]
+        when: "the overdue invoices are looked up"
+        def overdue = repo.findOverdue(TODAY)
+
+        then: "an invoice due today is not overdue yet, so it must not be reminded"
+        overdue*.orderId() == [ORDER_ID]
     }
 ```
 Why: Spock's `@Timeout` keeps the feature on the test thread, so the slice transaction stays bound and still rolls back.
@@ -723,15 +728,17 @@ What goes wrong: the order id is known, but the wildcard lets a delete of anothe
 **Good** (neutral)
 ```groovy
     def "should replace the lines of this order only"() {
+        given: "a repository that hands back the order it stores"
+        orderRepository.save(_) >> { Order o -> o }
+
         when: "the clerk replaces the lines of a draft order"
         orderService.replaceLines(orderId, [line("SKU-1", 2), line("SKU-2", 1)])
 
         then: "a delete scoped to any other order would empty a customer's cart"
         1 * orderRepository.deleteLinesOf(orderId)
-        1 * orderRepository.save(_) >> { Order o -> o }
     }
 ```
-Why: the scope is the promise, so it is matched by its real value; the saved order's content belongs to another feature, so _ stays.
+Why: the scope is the promise, so it is matched by its real value; the save belongs to another feature, so it is a stub in given:, never counted.
 
 Evidence: `aruvii-agents/src/test/groovy/ai/aruvii/agents/infrastructure/PipelineRepositoryAdapterSpec.groovy:154-157` @master 2026-10-02 (Bad, real) · `aruvii-chat/src/test/groovy/ai/aruvii/chat/infrastructure/adapter/FeedbackAdapterSpec.groovy:48-55` (Good, adapted) · source research/31b-v2.md:688 · fix from research/31b-v2.md:709 ("the id is known, so pipelineId")
 
@@ -870,10 +877,10 @@ What goes wrong: where: cannot read an instance field or a mock, so Spock reject
 
 **Good** (neutral)
 ```groovy
-    @Shared UUID invoiceId = UUID.randomUUID()
+    static final UUID INVOICE_ID = UUID.fromString("3f2a9c4e-7b1d-4e8a-9f60-2c5d8e1b7a43")
     def "should refuse #entryPoint on an invoice that is already paid"() {
         given: "the invoice on file is paid"
-        invoiceRepository.findById(invoiceId) >> Optional.of(paidInvoice)
+        invoiceRepository.findById(INVOICE_ID) >> Optional.of(paidInvoice)
 
         when: "the entry point is called"
         call(invoiceService)
@@ -884,9 +891,9 @@ What goes wrong: where: cannot read an instance field or a mock, so Spock reject
 
         where: "every method that guards on the invoice status"
         entryPoint << ["pay", "remind"]
-        call << [{ it.pay(invoiceId) }, { it.remind(invoiceId) }]
+        call << [{ it.pay(INVOICE_ID) }, { it.remind(INVOICE_ID) }]
 ```
-Why: the table reads only the @Shared id and plain values; the mock stays an instance field, stubbed in given:.
+Why: the table reads only the static id and plain values; the mock stays an instance field, stubbed in given:.
 
 Evidence: none on master — 47 records the Bad as n/a, Spock refuses it at run time (Bad, adapted from Spock data_driven_testing.adoc:100, kept from source) · `aruvii-agents/src/test/groovy/ai/aruvii/agents/application/AgentEvalServiceSpec.groovy:35-66` @772736bf (Good, rewritten) · source research/31b-v2.md:827 · fix from research/47-good-rewrites.md:444
 
@@ -981,8 +988,9 @@ What goes wrong: the stubs the feature depends on are hidden in a helper, so the
 **Good** (neutral)
 ```groovy
     def "should remind only the invoice that is overdue on the clock's date"() {
-        given: "two open invoices, one due yesterday and one due tomorrow"
-        clock.instant() >> Instant.parse("2026-11-01T09:00:00Z")
+        given: "two open invoices, one due yesterday and one due tomorrow, and a clock fixed on the day"
+        def overdueReminder = new OverdueReminder(
+            invoiceRepository, emailSender, Clock.fixed(Instant.parse("2026-11-01T09:00:00Z"), ZoneOffset.UTC))
         invoiceRepository.findOpen() >> [dueYesterday, dueTomorrow]
 
         when: "the morning reminder run starts"
@@ -993,7 +1001,7 @@ What goes wrong: the stubs the feature depends on are hidden in a helper, so the
         0 * emailSender.sendReminder(dueTomorrow)
     }
 ```
-Why: every stub and count the feature relies on is visible in its own given: and then: blocks.
+Why: every stub, count and the fixed clock the feature relies on is visible in its own given: and then: blocks.
 
 Evidence: `aruvii-chat/src/test/groovy/ai/aruvii/chat/infrastructure/adapter/ConversationAnalyticsWindowSpec.groovy:47-49,85-89` @master 2026-10-02 (Bad, real) · `aruvii-chat/src/test/groovy/ai/aruvii/chat/infrastructure/adapter/ConversationAnalyticsAdapterSpec.groovy:63-76` (Good, adapted) · source research/31b-v2.md:918 · fix from research/31b-v2.md:920-935
 
@@ -1231,11 +1239,9 @@ Evidence: `aruvii-api/src/test/java/ai/aruvii/api/service/SetupServiceTest.java:
 
 **Bad** (neutral)
 ```groovy
-    private Customer customer() {
-        def customer = Spy(Customer)
-        customer.getId() >> UUID.randomUUID()
-        customer
-    }
+        given: "the customer who owns the order"
+        def owner = Spy(Customer)
+        owner.getId() >> UUID.randomUUID()
 ```
 What goes wrong: a plain data holder is doubled to fake one getter, so its equals, hashCode and toString can lie.
 

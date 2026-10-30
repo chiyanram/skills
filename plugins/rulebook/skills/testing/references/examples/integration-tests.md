@@ -109,7 +109,7 @@ RestTestClient on RANDOM_PORT sends real HTTP through security and error handlin
 
 **Bad** (neutral)
 ```groovy
-    def "shouldSendTheOverdueNoticeWhenTheReminderRuns"() {
+    def "should send the overdue notice when the reminder runs"() {
         given: "a reminder whose email sender is a Spock double"
         EmailSender emailSender = Stub() {
             send(_) >> true
@@ -120,13 +120,13 @@ The IT replaces an outbound port with a double that has no behaviour of its own,
 
 **Good** (neutral)
 ```groovy
-    FakeEmailSender emailSender = new FakeEmailSender()
+    @Autowired OverdueReminder reminder
+    @Autowired FakeEmailSender emailSender // the EmailSender bean of OutboundFakesConfig
 
     @Issue(["#123", "AC-2"])
     def "should send one overdue notice when the reminder runs"() {
-        given: "an invoice one day past due and a reminder that sends through the fake"
+        given: "an invoice one day past due, and the wired reminder sending through the shared fake"
         saveInvoice(openInvoiceDue(TODAY.minusDays(1)))
-        def reminder = new OverdueReminder(invoiceRepository, emailSender, clock)
 
         when: "the reminder runs"
         reminder.remindOverdue()
@@ -134,7 +134,7 @@ The IT replaces an outbound port with a double that has no behaviour of its own,
         then: "the fake holds exactly one notice, for this invoice's customer"
         emailSender.sent()*.to() == [CUSTOMER_EMAIL]
 ```
-The port is a real in-memory fake with its own contract spec (IT5), shared by every feature instead of one stub each. (Real evidence: ledger row IT4.)
+The subject is the wired bean, and the port is the shared in-memory fake from `OutboundFakesConfig`, with its own contract spec (IT5), instead of one stub per feature. (Real evidence: ledger row IT4.)
 
 ### TM4 — One Toxiproxy IT per dependency the system must survive
 
@@ -158,7 +158,7 @@ The port is a real in-memory fake with its own contract spec (IT5), shared by ev
         then: "the same payment goes through"
         invoiceService.pay(invoiceId).map { it.invoiceId() } == Optional.of(invoiceId)
 ```
-The real gateway sits behind a proxy; it asserts predictable failure, the WARN line, and recovery once the fault clears. (Real evidence: ledger row TM4.)
+The real gateway sits behind a proxy; it asserts predictable failure, the WARN line, and recovery once the fault clears. This is the cut, one of the three faults; latency and timeout get features of the same shape. (Real evidence: ledger row TM4.)
 
 ### IT5 — One contract spec for each fake and its real adapter
 
@@ -213,13 +213,13 @@ class InvoiceControllerIT extends Specification {
     @Autowired ApplicationContext applicationContext
 
     @TestBean
-    PaymentGateway paymentGateway
+    ExchangeRateProvider exchangeRateProvider
 
-    static PaymentGateway paymentGateway() {
-        new FakePaymentGateway()
+    static ExchangeRateProvider exchangeRateProvider() {
+        new FakeExchangeRateProvider()
     }
 ```
-Every IT that overrides `PaymentGateway` names the field `paymentGateway`, so they share one cached Spring context. (Real evidence: ledger row SP1.)
+Every IT that overrides `ExchangeRateProvider` names the field `exchangeRateProvider`, so they share one cached Spring context; the shared fakes do not hold this port, so each class overrides it. (Real evidence: ledger row SP1.)
 
 ### SP2 — Override only a bean whose advice the IT does not assert
 
@@ -251,7 +251,8 @@ class InvoiceControllerIT extends AbstractIT {
 
     @Test
     void shouldPayInvoice() {
-        http.post().uri("/api/invoices/{id}/payments", invoiceId).header(AUTHORIZATION, clerkAuth).exchange();
+        http.post().uri("/api/invoices/{id}/payments", invoiceId).header(AUTHORIZATION, clerkAuth).exchange()
+            .expectStatus().isCreated();
         // server thread already committed — this "rollback" undoes nothing it wrote
     }
 ```
@@ -288,6 +289,7 @@ One reset interceptor owns isolation and runs whatever thread the server committ
 
         then: "never thrown: the insert sits unflushed in the persistence context and is rolled back"
         def e = thrown(ConstraintViolationException)
+        e.constraintName == "uq_invoice_order"
     }
 ```
 Without a flush the second insert never reaches Postgres, so the unique index never runs and the expected exception never comes.
@@ -438,8 +440,8 @@ A `SmartLifecycle` bean is pauseable by default, so Spring stops the loop while 
 **Bad** (neutral)
 ```java
     @Test
-    void shouldFindOverdueInvoices() {
-        assertTimeoutPreemptively(Duration.ofSeconds(10), () -> repo.findOverdue(today)); // new thread: no tx, no rollback
+    void shouldMarkOverdueInvoices() {
+        assertTimeoutPreemptively(Duration.ofSeconds(10), () -> repo.markOverdue(today)); // new thread: no tx, no rollback
     }
 ```
 The timed body runs on another thread outside the test transaction, so its writes commit and never roll back.
@@ -454,8 +456,11 @@ The timed body runs on another thread outside the test transaction, so its write
         em.flush()
         em.clear()
 
-        expect: "an invoice due today is not overdue yet, so it must not be reminded"
-        repo.findOverdue(TODAY)*.orderId() == [ORDER_ID]
+        when: "the overdue invoices are looked up"
+        def overdue = repo.findOverdue(TODAY)
+
+        then: "an invoice due today is not overdue yet, so it must not be reminded"
+        overdue*.orderId() == [ORDER_ID]
     }
 ```
 Spock's `@Timeout` keeps the feature on the test thread, so the slice transaction stays bound and still rolls back. (Real evidence: ledger row SP10.)

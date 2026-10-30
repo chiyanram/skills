@@ -31,10 +31,10 @@ Each row maps a part of the scenario to the test construct that carries it.
 
 | the scenario has | use | why |
 |---|---|---|
-| a `Scenario:` title | the test name, equal to the title: the Spock feature method name, the Playwright `test()` title (68c :667, :763) | a reworded name makes a search for the scenario title find no test (GT1, ledger :69) |
-| a `Given`, `When`, `Then` or `And` step | Spock block descriptions with the step's text; one Playwright `test.step("Given …")` per step (ledger :70; 68c :694-700, :766-770) | Given/When/Then kept in comments never appears in the test report (GT2, ledger :70) |
-| a `Scenario Outline` with `Examples` | Spock `where:` or Jest `test.each` with the Examples column names unchanged, ` — #placeholder` in the name; e2e one representative row (ledger :69, :71; 68c :723, :730-734) | a renamed column hid what the test fed (GT3, ledger :71) |
-| a work item and an AC id | Spock `@Issue(["#NNN", "AC-n"])` (ledger :139; 68c :872); a Playwright `issue` annotation (ledger :72; 68c :764) | a javadoc mention gives no work-item number a search can find (GT4, ledger :72); Spock does not report a comment naming the AC (CV2, ledger :139) |
+| a `Scenario:` title | the test name, equal to the title: the Spock feature method name, the Playwright `test()` title (68c :672, :769) | a reworded name makes a search for the scenario title find no test (GT1, ledger :69) |
+| a `Given`, `When`, `Then` or `And` step | Spock block descriptions with the step's text; one Playwright `test.step("Given …")` per step (ledger :70; 68c :700-706, :772-779) | Given/When/Then kept in comments never appears in the test report (GT2, ledger :70) |
+| a `Scenario Outline` with `Examples` | Spock `where:` or Jest `test.each` with the Examples column names unchanged, ` — #placeholder` in the name; e2e one representative row (ledger :69, :71; 68c :729, :736-740) | a renamed column hid what the test fed (GT3, ledger :71) |
+| a work item and an AC id | Spock `@Issue(["#NNN", "AC-n"])` (ledger :139; 68c :883); a Playwright `issue` annotation (ledger :72; 68c :770) | a javadoc mention gives no work-item number a search can find (GT4, ledger :72); Spock does not report a comment naming the AC (CV2, ledger :139) |
 
 The ledger is `research/19-approved-rules.md` and 68c is `research/68c-neutral-testing-mutation-property-scenarios.md`,
 both in this repo; `:N` is a line.
@@ -66,16 +66,17 @@ The same string, byte for byte, so `grep -F` on the title finds the test. (Real 
 
 **Bad** (neutral)
 ```groovy
-    def "D4 — an invoice past its due date can never stay open"() {
-        given: "an invoice nobody has paid"
-        def invoice = invoiceRepository.save(openInvoiceDue(TODAY.minusDays(1)))
+@Issue(["#123", "AC-6"])
+def "should mark an invoice overdue once its due date has passed"() {
+    given: "an invoice nobody has paid"
+    def invoice = invoiceRepository.save(openInvoiceDue(TODAY.minusDays(1)))
 
-        when: "the job runs"
-        overdueReminder.run()
+    when: "the job runs"
+    overdueReminder.run()
 
-        then: "an open invoice past due is the defect this REQ exists to prevent"
-        invoiceRepository.findById(invoice.id()).orElseThrow().status() == InvoiceStatus.OVERDUE
-    }
+    then: "an open invoice past due is the defect this REQ exists to prevent"
+    invoiceRepository.findById(invoice.id()).orElseThrow().status() == InvoiceStatus.OVERDUE
+}
 ```
 The block texts paraphrase the scenario, so the test report does not read as the agreed steps.
 
@@ -160,10 +161,15 @@ test(
     await test.step('Then the page shows "Payment declined"', async () => {
       await expect(page.getByRole('alert')).toContainText('Payment declined');
     });
+    await test.step('And no payment is recorded for the invoice', async () => {
+      const payments = await page.request.get(`/api/invoices/${declinedInvoice.id}/payments`);
+      expect(await payments.json()).toEqual([]);
+    });
   },
 );
 ```
-Both tests carry a machine-readable link to `#123` and the scenario id. (Real evidence: ledger row GT4.)
+Both tests carry a machine-readable link to `#123` and the scenario id; the Playwright test also checks that the
+declined payment left no payment record. (Real evidence: ledger row GT4.)
 
 ### CV2 — One `@Issue` carries the work item and the AC id
 
@@ -185,7 +191,8 @@ One annotation carries both links, and a search for `"AC-3"` finds the test. (Re
 
 **Bad** (neutral)
 ```groovy
-    def "D1 — no discount makes an invoice total negative"() {
+    @Issue(["#123", "AC-10"])
+    def "should never make an invoice total negative with a discount"() {
         given: "one GOLD customer, each order saved to the real database"
         def customer = customerRepository.save(goldCustomer())
         200.times { i -> orderRepository.save(orderFor(customer, i)) }

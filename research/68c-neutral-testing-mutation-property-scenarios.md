@@ -1,6 +1,6 @@
 # 68c — Neutral Good/Bad pairs: mutation, property, acceptance criteria, scenario → tests, conventions (#99, map #9)
 
-Source: research/31c-v2.md (M1–M10, P1–P4, P6–P8, P10, GA1–GA6, GT1–GT6), research/31e-conventions.md (CV1–CV5); Goods for M1, M4, M6, M9, P4, P7, CV5 from research/47-good-rewrites.md. Domain: ordering + billing (#99 brief). Stand-ins: `billing` = the one module wired for PIT (was the guardrails module, M7); `FirstAdminSetupIT` = the one IT allowed its own container (was the setup-wizard controller IT, CV5); `TestClientConfig` = the project's test HTTP client config (CV5); the unconsulted NER sidecar (M2) → `FakePaymentGateway` never asked for a refund; the tool-output sanitizer properties (P1, P3, P7, P8) → `OrderService.mergeLines`, `DiscountPolicy`, a SKU generator; the chat-history properties (P6, P10) → order lines and totals; the chat-message copy that lost its tool-call id (M10) → `Order.withStatus` losing `placedAt`; the RestClient call inside the guard (M5) → the RestClient call inside the `PaymentGateway` adapter; Redis unreachable (GA5) → `PaymentGateway` unreachable; the login-throttle REQ (GA*, GT*) → REQ-123-order-cancellation with discount, refund and overdue scenarios. Added terms: `Discount` (sealed result of `DiscountPolicy.decide`: `Discount.Applied` · `Discount.None`); `SkuFormat` (pure decision: does a SKU string parse); `OrderService.mergeLines` (merges lines with the same SKU); `PaymentGateway.refund` / `FakePaymentGateway.refunds()`; Playwright fixture `declinedInvoice`; test helpers named in each Good (`draftOrder`, `placedOrderAt`, `openInvoiceDue`, `seedInvoice`, `payInvoice`).
+Source: research/31c-v2.md (M1–M10, P1–P4, P6–P8, P10, GA1–GA6, GT1–GT6), research/31e-conventions.md (CV1–CV5); Goods for M1, M4, M6, M9, P4, P7, CV5 from research/47-good-rewrites.md. Domain: ordering + billing (#99 brief). Stand-ins: `billing` = the one module wired for PIT (was the guardrails module, M7); `FirstAdminSetupIT` = the one IT allowed its own container (was the setup-wizard controller IT, CV5); `TestClientConfig` = the project's test HTTP client config (CV5); the unconsulted NER sidecar (M2) → `FakePaymentGateway` never asked for a refund; the tool-output sanitizer properties (P1, P3, P7, P8) → `OrderService.mergeLines`, `DiscountPolicy`, a SKU generator; the chat-history properties (P6, P10) → order lines and totals; the chat-message copy that lost its tool-call id (M10) → `Order.withStatus` losing `placedAt`; the RestClient call inside the guard (M5) → the RestClient call inside the `PaymentGateway` adapter; Redis unreachable (GA5) → `PaymentGateway` unreachable; the login-throttle REQ (GA*, GT*) → REQ-123-order-cancellation with discount, refund and overdue scenarios. Added terms: `Discount` (sealed result of `DiscountPolicy.decide`: `Discount.Applied` · `Discount.None`); `SkuFormat` (pure decision: does a SKU string parse); `OrderService.mergeLines` (merges lines with the same SKU); `PaymentGateway.refund` / `FakePaymentGateway.refunds()`; Playwright fixture `declinedInvoice`; test helpers named in each Good (`draftOrder`, `placedOrderAt`, `openInvoiceDue`, `seedInvoice`, `payInvoice`); `GET /api/invoices/{id}/payments` (GT4 Good); AC-10, the negative-total scenario (GT5 Bad).
 Skipped: CV6 — MERGED into U2a (2026-10-04).
 
 ### M1 — Mutation testing is a report, never a gate; threshold stays 0
@@ -30,7 +30,7 @@ What goes wrong: it names a line, not a case, and asserts non-null, so the next 
 
 **Good** (neutral)
 ```groovy
-/** Answers a survivor in OrderService.cancel (RIGHT-BICEP · Cross-check: the gateway stays unconsulted). */
+/** Answers a survivor in OrderService.cancel (RIGHT-BICEP · Right: the gateway stays unconsulted). */
 def "should cancel a draft order without asking the payment gateway for a refund"() {
     given: "a draft order the gateway has never charged"
     def order = orderRepository.save(draftOrder())
@@ -72,7 +72,8 @@ Evidence: Bad adapted (no mutation report committed on master; pitest.org report
 
 **Bad** (neutral)
 ```kotlin
-excludedClasses.set(listOf("*Config", "*Properties", "*Policy", "get*", "is*"))
+excludedClasses.set(listOf("*Config", "*Properties", "*Policy"))
+excludedMethods.set(listOf("get*", "is*"))
 ```
 What goes wrong: `DiscountPolicy` and `Invoice.isOverdue` are decisions; excluding them hides their missing tests and lifts the score.
 
@@ -90,9 +91,10 @@ Evidence: Bad adapted (no real Bad on master or in history, research/47:649) · 
 
 **Bad** (neutral)
 ```kotlin
+// Added org.springframework: survivors fell 18 → 4, so the change is safe (#123).
 avoidCallsTo.set(listOf("org.slf4j", "org.springframework"))
 ```
-What goes wrong: the glob over-matches; survivors fall, which looks like success, while the gateway's RestClient calls stop being mutated.
+What goes wrong: only the total was read and no per-class counts were compared, so nobody sees that the gateway's RestClient calls stopped being mutated.
 
 **Good** (neutral)
 ```kotlin
@@ -211,7 +213,7 @@ What goes wrong: the kill test was green on first run and nothing shows it was e
 **Good** (neutral)
 ```groovy
 /**
- * Kills the survivor in Order.withStatus that dropped placedAt (CORRECT · Reference).
+ * Kills the survivor in Order.withStatus that dropped placedAt (RIGHT-BICEP · Right).
  * Proved: withStatus hand-edited to pass a null placedAt → this feature failed; edit reverted.
  */
 def "should keep the placed time when an order is marked paid"() {
@@ -249,17 +251,14 @@ What goes wrong: the requirement says "any order", but the test checks one value
 **Good** (neutral)
 ```groovy
 def "should leave merged order lines unchanged when they are merged again"() {
-    when: "merging runs twice over any list of order lines"
+    expect: "a second merge over any list of order lines returns the first merge unchanged"
     Property.forAll(Gen.orderLines()) { lines ->
         def once = orderService.mergeLines(lines)
         assert orderService.mergeLines(once) == once
     }
-
-    then: "every second merge returned the first merge unchanged"
-    noExceptionThrown()
 }
 ```
-Why: idempotence is a law for any input, so a property states it; the check is an explicit `assert`.
+Why: idempotence is a law for any input, so a property states it under expect:; the check is an explicit `assert`. The harness injects edge cases (P6) and prints a replayable seed (P4).
 
 Evidence: `docs/spec/REQ-500-login-throttle-progressive-delay.md:331-335` + `aruvii-shared/src/test/groovy/ai/aruvii/shared/security/LoginBackoffPolicySpec.groovy:43-46` @master-2026-10-02 (sha not recorded) (Bad, real) · source 31c-v2.md:221 · fix from 31c-v2.md:222-235
 
@@ -302,22 +301,26 @@ What goes wrong: if no case ever reaches `Discount.Applied`, the property passes
 **Good** (neutral)
 ```groovy
 def "should keep an applied discount within ten percent of the order total"() {
-    given: "a count of cases that reach the Applied branch"
+    given: "a count of cases that reach each branch"
     def applied = 0
+    def none = 0
     when: "any order is priced for any tier"
     Property.forAll(Gen.orders(), Gen.tiers()) { order, tier ->
         def result = discountPolicy.decide(order, tier)
         if (result instanceof Discount.Applied) {
             applied++
             assert result.saving().amount() <= order.total().amount() * 0.10
+        } else {
+            none++
         }
     }
 
-    then: "the Applied branch was reached at least once"
+    then: "both the Applied and the None branch were reached"
     applied > 0
+    none > 0
 }
 ```
-Why: the branch is counted, so the feature fails when no case reached it.
+Why: both branches are counted, so the feature fails when no case reached either one. The harness injects edge cases (P6) and prints a replayable seed (P4).
 
 Evidence: `aruvii-guardrails/src/test/java/ai/aruvii/guardrails/application/ToolOutputSanitizerPropertyTest.java:67-77` @master-2026-10-02 (sha not recorded) (Bad, real) · source 31c-v2.md:269 · fix from 31c-v2.md:270-288
 
@@ -405,7 +408,7 @@ class DiscountPolicyPropertySpec extends Specification {
     }
 }
 ```
-Why: it carries no tag, so the main gate runs it and coverage counts it like any unit test.
+Why: it carries no tag, so the main gate runs it and coverage counts it like any unit test. The harness injects edge cases (P6) and prints a replayable seed (P4).
 
 Evidence: Bad n/a in source (research/47:717 has a real one: `ToolOutputSanitizerPropertyTest.java:29-31,43-44` @613429ec, `@Tag("property")`) · source 31c-v2.md:365 · fix from research/47-good-rewrites.md:715
 
@@ -427,13 +430,15 @@ What goes wrong: random ASCII almost never has the SKU shape, so nearly every ca
     private static Gen<String> skus() {
         final var families = Gen.oneOf("BOOK", "FOOD", "TOOL", "GIFT");
         final var numbers = Gen.integers(0, 9999);
+        final var edges = Gen.oneOf(0, 9999);
         return new Gen<>() {
             @Override public String generate(final Random random) {
-                return sku(families.generate(random), numbers.generate(random));
+                final var number = random.nextInt(10) == 0 ? edges.generate(random) : numbers.generate(random);
+                return sku(families.generate(random), number);
             }
             // shrink(...) unchanged
 ```
-Why: each SKU is composed from family and number generators, so every case has the shape and none is rejected.
+Why: each SKU is composed from family and number generators, with the 0 and 9999 edges mixed into one draw in ten, so every case has the shape, the edges come up, and none is rejected.
 
 Evidence: Bad adapted from `aruvii-guardrails/src/test/java/ai/aruvii/guardrails/application/ToolOutputSanitizerPropertyTest.java` @master-2026-10-02 (sha not recorded) · `ToolOutputSanitizerPropertyTest.java:194-202` (Good base, ST1 applied) · source 31c-v2.md:387 · fix from 31c-v2.md:388-400
 
@@ -674,16 +679,17 @@ Evidence: `docs/spec/REQ-500-login-throttle-progressive-delay.md:311` + `aruvii-
 
 **Bad** (neutral)
 ```groovy
-    def "D4 — an invoice past its due date can never stay open"() {
-        given: "an invoice nobody has paid"
-        def invoice = invoiceRepository.save(openInvoiceDue(TODAY.minusDays(1)))
+@Issue(["#123", "AC-6"])
+def "should mark an invoice overdue once its due date has passed"() {
+    given: "an invoice nobody has paid"
+    def invoice = invoiceRepository.save(openInvoiceDue(TODAY.minusDays(1)))
 
-        when: "the job runs"
-        overdueReminder.run()
+    when: "the job runs"
+    overdueReminder.run()
 
-        then: "an open invoice past due is the defect this REQ exists to prevent"
-        invoiceRepository.findById(invoice.id()).orElseThrow().status() == InvoiceStatus.OVERDUE
-    }
+    then: "an open invoice past due is the defect this REQ exists to prevent"
+    invoiceRepository.findById(invoice.id()).orElseThrow().status() == InvoiceStatus.OVERDUE
+}
 ```
 What goes wrong: the block texts paraphrase the scenario, so the test report does not read as the agreed steps.
 
@@ -770,10 +776,14 @@ test(
     await test.step('Then the page shows "Payment declined"', async () => {
       await expect(page.getByRole('alert')).toContainText('Payment declined');
     });
+    await test.step('And no payment is recorded for the invoice', async () => {
+      const payments = await page.request.get(`/api/invoices/${declinedInvoice.id}/payments`);
+      expect(await payments.json()).toEqual([]);
+    });
   },
 );
 ```
-Why: both tests carry a machine-readable link to `#123` and the scenario id.
+Why: both tests carry a machine-readable link to `#123` and the scenario id; the Playwright test also checks that the declined payment left no payment record.
 
 Evidence: `aruvii-shared/src/test/groovy/ai/aruvii/shared/security/LoginBackoffPolicySpec.groovy:8-17` @master-2026-10-02 (sha not recorded) (Bad, real) · `aruvii-ui/playwright/e2e/smoke/smoke-01-auth.spec.ts:13-24` (Good base) · source 31c-v2.md:699 · fix from 31c-v2.md:700-720
 
@@ -781,7 +791,8 @@ Evidence: `aruvii-shared/src/test/groovy/ai/aruvii/shared/security/LoginBackoffP
 
 **Bad** (neutral)
 ```groovy
-    def "D1 — no discount makes an invoice total negative"() {
+    @Issue(["#123", "AC-10"])
+    def "should never make an invoice total negative with a discount"() {
         given: "one GOLD customer, each order saved to the real database"
         def customer = customerRepository.save(goldCustomer())
         200.times { i -> orderRepository.save(orderFor(customer, i)) }

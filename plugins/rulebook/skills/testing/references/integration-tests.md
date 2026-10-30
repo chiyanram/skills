@@ -13,7 +13,7 @@ Contents: Rules · When X, use Y · Good / Bad (IT1, IT2, IT4, SP3, SP11) · Dec
   `@ServiceConnection`, because a cached context can outlive a per-class container that has stopped.
 - **IT3** — Call the HTTP API with `RestTestClient` against the real server on `RANDOM_PORT`, never MockMvc,
   MockMvcTester or TestRestTemplate, because MockMvc skips the real servlet stack, filters and error pages.
-- **IT4** — Swap a collaborator in an IT only at an outbound port, with an in-memory fake port bean, never
+- **IT4** — In an IT, swap any outbound port except a repository (TM2) for an in-memory fake port bean, never
   `@MockitoBean`, because a mock has no behaviour of its own and couples the IT to calls.
 - **TM4** — Give each dependency the system must survive one Toxiproxy IT injecting latency, timeout and a cut;
   assert predictable failure, WARN/ERROR logs and recovery, because an untested outage path can hang or swallow the error.
@@ -50,8 +50,8 @@ Contents: Rules · When X, use Y · Good / Bad (IT1, IT2, IT4, SP3, SP11) · Dec
 | to check a branch the unit spec reaches (field validation, error mapping) | the unit spec; the IT keeps one case for the contract (IT1); the tier split is TM1 (`strategy.md`) | ledger :31, :37 · 68b :152 |
 | to replace a collaborator | a fake port bean at an outbound port (IT4); which collaborators to replace is TM2 (`strategy.md`) | ledger :34, :38 |
 | a repository slice (`@DataJpaTest`, `@JdbcTest`) | `replace = NONE` with the singleton initializer (SP5); `em.flush()` before asserting a write (SP4) | ledger :78, :79 |
-| a timeout in a transactional test | Spock's `@Timeout`, which keeps the feature on the test thread (SP10) | 68b :597 |
-| a component scan for the full `@SpringBootTest` | a separate `@Configuration` that only the full test imports (SP11) | 68b :631 |
+| a timeout in a transactional test | Spock's `@Timeout`, which keeps the feature on the test thread (SP10) | 68b :602 |
+| a component scan for the full `@SpringBootTest` | a separate `@Configuration` that only the full test imports (SP11) | 68b :636 |
 | to prove the system survives a dependency outage | one Toxiproxy IT per dependency (TM4); the unavailable case of each call is C2 (`coverage-design.md`) | ledger :40, :16 |
 | to find why ITs slow down or connections grow | the cache logger at DEBUG; the cache holds at most 32 contexts and evicts the least recently used (SP7) | ledger :81 |
 
@@ -135,7 +135,7 @@ The container lives in the shared initializer beside Postgres, so no spec owns i
 
 **Bad** (neutral)
 ```groovy
-    def "shouldSendTheOverdueNoticeWhenTheReminderRuns"() {
+    def "should send the overdue notice when the reminder runs"() {
         given: "a reminder whose email sender is a Spock double"
         EmailSender emailSender = Stub() {
             send(_) >> true
@@ -146,13 +146,13 @@ The IT replaces an outbound port with a double that has no behaviour of its own,
 
 **Good** (neutral)
 ```groovy
-    FakeEmailSender emailSender = new FakeEmailSender()
+    @Autowired OverdueReminder reminder
+    @Autowired FakeEmailSender emailSender // the EmailSender bean of OutboundFakesConfig
 
     @Issue(["#123", "AC-2"])
     def "should send one overdue notice when the reminder runs"() {
-        given: "an invoice one day past due and a reminder that sends through the fake"
+        given: "an invoice one day past due, and the wired reminder sending through the shared fake"
         saveInvoice(openInvoiceDue(TODAY.minusDays(1)))
-        def reminder = new OverdueReminder(invoiceRepository, emailSender, clock)
 
         when: "the reminder runs"
         reminder.remindOverdue()
@@ -160,7 +160,7 @@ The IT replaces an outbound port with a double that has no behaviour of its own,
         then: "the fake holds exactly one notice, for this invoice's customer"
         emailSender.sent()*.to() == [CUSTOMER_EMAIL]
 ```
-The port is a real in-memory fake with its own contract spec (IT5), shared by every feature instead of one stub each. (Real evidence: ledger row IT4.)
+The subject is the wired bean, and the port is the shared in-memory fake from `OutboundFakesConfig`, with its own contract spec (IT5), instead of one stub per feature. (Real evidence: ledger row IT4.)
 
 ### SP3 — Take isolation from the shared reset, never from @Transactional
 
@@ -171,7 +171,8 @@ class InvoiceControllerIT extends AbstractIT {
 
     @Test
     void shouldPayInvoice() {
-        http.post().uri("/api/invoices/{id}/payments", invoiceId).header(AUTHORIZATION, clerkAuth).exchange();
+        http.post().uri("/api/invoices/{id}/payments", invoiceId).header(AUTHORIZATION, clerkAuth).exchange()
+            .expectStatus().isCreated();
         // server thread already committed — this "rollback" undoes nothing it wrote
     }
 ```
@@ -249,8 +250,8 @@ Walk every changed IT, fake port, test configuration and test-support class.
   lifecycle. A feature that re-runs a branch the unit spec owns, or a second IT for one contract, is a finding.
 - [ ] IT2 — `grep -nE "@Testcontainers|@Container|@ServiceConnection"`. A hit is a finding.
 - [ ] IT3 — `grep -nE "MockMvc|TestRestTemplate"` (this also finds MockMvcTester). A hit is a finding.
-- [ ] IT4 — `grep -n "@MockitoBean"`, then open each swapped bean. A hit, or a swap that is not an outbound port
-  replaced by a real in-memory implementation, is a finding.
+- [ ] IT4 — `grep -n "@MockitoBean"`, then open each swapped bean. A hit, a swapped repository (TM2), or a swap that
+  is not an outbound port replaced by a real in-memory implementation, is a finding.
 - [ ] TM4 — For each dependency the system must survive, find one Toxiproxy IT that injects latency, a timeout and a
   cut, and asserts predictable failure, a WARN/ERROR log and recovery. A missing IT or item is a finding.
 - [ ] IT5 — For each new or changed fake port, find a contract spec that runs against the fake and against the real
