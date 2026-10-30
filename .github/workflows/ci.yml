@@ -70,6 +70,19 @@ jobs:
           node-version: 24
           cache: npm
 
+      # The first run has no rulebook--v* tag yet. Tag the commit where plugin.json got its current version, so
+      # semantic-release counts from there instead of starting at 1.0.0. Every later run finds a tag and skips this.
+      - name: Baseline tag
+        run: |
+          if [ -z "$(git tag --list 'rulebook--v*')" ]; then
+            manifest=plugins/rulebook/.claude-plugin/plugin.json
+            version=$(python3 -c "import json; print(json.load(open('$manifest'))['version'])")
+            commit=$(git log -1 --format=%H -G'"version"' -- "$manifest")
+            git -c user.name=github-actions -c user.email=github-actions@github.com \
+              tag -a "rulebook--v$version" "$commit" -m "rulebook $version"
+            git push origin "rulebook--v$version"
+          fi
+
       - name: Install release tooling
         run: npm ci --no-fund --no-audit
 
