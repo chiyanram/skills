@@ -12,7 +12,7 @@ The version both manifests carry. No release is tagged yet.
 
 - The `chiyanram` marketplace and the `rulebook` plugin (G23 #93).
 - `testing` references: strategy, value-bar, coverage-design, boundaries, unit-tests, spock, integration-tests,
-  scenario-to-tests, property-based and mutation, with example files for strategy, spock and integration-tests
+  scenario-to-tests, property-based, mutation and smoke-specs, with example files for strategy, spock and integration-tests
   (agent-factory#31).
 - `make lint` checks: skill frontmatter, one version, links, size budgets, packaging, the plugin README index, and
   `claude plugin validate --strict` (#111).

@@ -51,6 +51,7 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 | [scenario-to-tests](skills/testing/references/scenario-to-tests.md) | GT | a Gherkin scenario in a work item's acceptance criteria needs its tests |
 | [property-based](skills/testing/references/property-based.md) | P | a requirement says "for any input", or you write a generator |
 | [mutation](skills/testing/references/mutation.md) | M | you configure PIT, read its report, or answer a surviving mutant |
+| [smoke-specs](skills/testing/references/smoke-specs.md) | EA–ED | you write or review a Playwright smoke spec, or a fixture such specs import |
 
 `make lint` fails when a reference is missing from this table.
 
