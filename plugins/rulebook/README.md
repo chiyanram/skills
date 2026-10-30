@@ -55,6 +55,12 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 
 `make lint` fails when a reference is missing from this table.
 
+## Code references
+
+| reference | rule IDs | read it when |
+|---|---|---|
+| [comments](skills/code/references/comments.md) | CM | you write or review a comment, a Javadoc block or a lint suppression |
+
 ## Where a rule comes from
 
 Each rule has a source. A rule goes in only after the operator says yes; the
