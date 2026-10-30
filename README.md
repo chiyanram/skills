@@ -7,7 +7,7 @@ The engineering rules every project shares, written once and shipped as one plug
 [`rulebook`](plugins/rulebook/). The agent that writes the code and the agent that reviews it load the same file, so
 they cannot drift apart. Rules that belong to one project stay in that project's own `AGENTS.md`.
 
-**Status:** `0.1.0`. The `testing` references are in. The skill router, the other
+**Status:** see the [changelog](CHANGELOG.md) for the current version. The `testing` references are in. The skill router, the other
 domains (code, obs, migrations, delivery, planning) and the `/crq` workflow are still to come. See the
 [open issues](https://github.com/chiyanram/skills/issues).
 
@@ -40,7 +40,8 @@ claude plugin marketplace add chiyanram/skills
 claude plugin install rulebook@chiyanram
 ```
 
-Update with `claude plugin marketplace update chiyanram`. Auto-update is off for third-party marketplaces unless you
+Update with `claude plugin marketplace update chiyanram`. Each release bumps the plugin's version, which is what
+tells Claude Code there is an update. Auto-update is off for third-party marketplaces unless you
 turn it on.
 
 **Other agent tools**
@@ -72,6 +73,7 @@ one shape: **Rules · When X, use Y · Good / Bad · Decided edges · Review che
 | [`plugins/rulebook/`](plugins/rulebook/) | **ships** | the plugin: skills, references and examples |
 | [`.claude-plugin/`](.claude-plugin/) | **ships** | the marketplace manifest that points at the plugin |
 | [`scripts/`](scripts/), [`tests/`](tests/), [`Makefile`](Makefile) | live | the checks behind `make lint`, and their tests |
+| [`.releaserc.json`](.releaserc.json), [`package.json`](package.json) | live | semantic-release: cuts each release from the commits on `main` |
 | [`research/`](research/) | live | the evidence behind each rule, plus the [rule ledger](research/19-approved-rules.md) and the [decision register](research/00-decision-register.md) |
 | [`review/`](review/) | live | builders that turn research into the HTML pages the operator approves rules on |
 | [`docs/agents/`](docs/agents/) | live | the answers upstream skills need: issue tracker, labels, domain docs |
