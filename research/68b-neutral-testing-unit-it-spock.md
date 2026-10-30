@@ -1,6 +1,6 @@
 # 68b — Neutral Good/Bad pairs: unit tests · integration tests · Spock (#99, map #9)
 
-Source: research/31b-v2.md:1-617 (U1–U4, IT1–IT5, IT4b, SP1–SP11); research/47-good-rewrites.md (replaces the pair for IT2, IT4, SP2, SP11; replaces the Good only for SP3, SP5, whose Bad stays the 31b one because it shows the rule's own defect). Domain: ordering + billing (#99 brief). Stand-ins: `@EnableAruviiSpec` / `@EnableAruviiIT` → `@EnableSharedContainers` · `AruviiTestcontainersInitializer` → `SharedContainersInitializer` · `AruviiSpecResetInterceptor` → `SharedResetInterceptor`, `AruviiTestReset` → `TestReset` (SP3) · `PRESERVE` list kept as the reset's keep-list (SP3) · MiniStack S3 container of a non-Spring IT → PaymentGateway sandbox container (`SharedContainersInitializer.sharedGatewayUrl()`) (IT2) · owned settings port stubbed in an IT → `EmailSender` stubbed, replaced by `FakeEmailSender` (IT4) · audit port verified by Mock() → `InvoiceRepository.save` verified, writing the invoice IS the behaviour (U3) · provider rotation reminder → `OverdueReminder` on invoices past due (U1, U4) · password-reset expiry → invoice due-date check before payment (U4) · notification-config 400 per blank field → `/api/orders` 400 per blank field (IT1) · webhook controller over standalone MockMvc → order cancel endpoint (IT3) · agent-count-by-tool port and its SQL semantics → `PaymentGateway` and its idempotent charge (IT5) · connection-test port overridden by `@TestBean` → `PaymentGateway` (SP1) · pricing-override partial unique index → one invoice per order, `uq_invoice_order` (SP4) · SSRF allowlist resolved once → tax rates resolved once by `TaxCalculator` (SP6) · chat stream consumer → `BillingConsumer` on `orders.placed` (SP9) · sweepable-runs query → `findOverdue` (SP10) · chat test application → `OrdersTestApplication` (SP11). Added terms: `OverdueReminder.overdueInvoices(graceDays)` · `OrderController` · `OrderControllerIT`, `InvoiceControllerIT`, `PaymentGatewayIT` · `PaymentGatewayContract`, `FakePaymentGatewaySpec`, `PaymentGatewayAdapterIT` · `OrdersRepositoryIT` (repository-slice base, as in 68a), `OrdersTestApplication`, `OrdersServicesConfig` · `BillingConsumer` · `uq_invoice_order` · `invoices` / `payments` tables · `RestTestClient http`, `login(role)` helper · `payment.gateway.url` property · `PaymentGatewayAdapter` (real adapter, IT2/IT5) · `PaymentGateway.charge(payment)`, `chargesFor(invoiceId)` (IT5) · `Resettable` (fake reset hook, IT5) · `FakeEmailSender.sent()`, `OverdueReminder.remindOverdue()` (IT4) · `InvoiceRepository.findOpen()`, `findOverdue(date)`, `Invoice.withStatus(...)` (U4, SP10) · `AbstractIT` (JUnit IT base, SP3 Bad), `OrdersIT`, `TaxRateOverrideIT` · `SharedRedis` helper, sandbox image `example/payment-sandbox` · packages `com.example.orders.repository` / `.billing.repository` / `.entity` (SP11) · `persistInvoice(...)`, `seedSandboxAccounts(...)` spec helpers.
+Source: research/31b-v2.md:1-617 (U1–U4, IT1–IT5, IT4b, SP1–SP11); research/47-good-rewrites.md (replaces the pair for IT2, IT4, SP2, SP11; replaces the Good only for SP3, SP5, whose Bad stays the 31b one because it shows the rule's own defect). Domain: ordering + billing (#99 brief). Stand-ins: `@EnableAruviiSpec` / `@EnableAruviiIT` → `@EnableSharedContainers` · `AruviiTestcontainersInitializer` → `SharedContainersInitializer` · `AruviiSpecResetInterceptor` → `SharedResetInterceptor`, `AruviiTestReset` → `TestReset` (SP3) · `PRESERVE` list kept as the reset's keep-list (SP3) · MiniStack S3 container of a non-Spring IT → PaymentGateway sandbox container (`SharedContainersInitializer.sharedGatewayUrl()`) (IT2) · owned settings port stubbed in an IT → `EmailSender` stubbed, replaced by `FakeEmailSender` (IT4) · audit port verified by Mock() → `InvoiceRepository.save` verified, writing the invoice IS the behaviour (U3) · provider rotation reminder → `OverdueReminder` on invoices past due (U1, U4) · password-reset expiry → invoice due-date check before payment (U4) · notification-config 400 per blank field → `/api/orders` 400 per blank field (IT1) · webhook controller over standalone MockMvc → order cancel endpoint (IT3) · agent-count-by-tool port and its SQL semantics → `PaymentGateway` and its idempotent charge (IT5) · connection-test port overridden by `@TestBean` → `PaymentGateway` (SP1) · pricing-override partial unique index → one invoice per order, `uq_invoice_order` (SP4) · SSRF allowlist resolved once → tax rates resolved once by `TaxCalculator` (SP6) · chat stream consumer → `BillingConsumer` on `orders.placed` (SP9) · sweepable-runs query → `findOverdue` (SP10) · chat test application → `OrdersTestApplication` (SP11). Added terms: `OverdueReminder.overdueInvoices(graceDays)` · `OrderController` · `OrderControllerIT`, `InvoiceControllerIT`, `PaymentGatewayIT` · `PaymentGatewayContract`, `FakePaymentGatewaySpec`, `PaymentGatewayAdapterIT` · `OrdersRepositoryIT` (repository-slice base, as in 68a), `OrdersTestApplication`, `OrdersServicesConfig` · `BillingConsumer` · `uq_invoice_order` · `invoices` / `payments` tables · `RestTestClient http`, `login(role)` helper · `payment.gateway.url` property · `PaymentGatewayAdapter` (real adapter, IT2/IT5) · `PaymentGateway.charge(payment)`, `chargesFor(invoiceId)` (IT5) · `Resettable` (fake reset hook, IT5) · `FakeEmailSender.sent()`, `OverdueReminder.remindOverdue()` (IT4) · `InvoiceRepository.findOpen()`, `findOverdue(date)`, `Invoice.withStatus(...)` (U4, SP10) · `AbstractIT` (JUnit IT base, SP3 Bad), `OrdersIT`, `TaxRateOverrideIT` · sandbox image `example/payment-sandbox` · packages `com.example.orders.repository` / `.billing.repository` / `.entity` (SP11) · `persistInvoice(...)`, `seedSandboxAccounts(...)` spec helpers.
 Skipped: IT4b — MERGED into IT4 (2026-10-04). (U2 is SUPERSEDED by U2a on naming only; its labelled-blocks clause stands, so the pair is kept and shows both.)
 Stand-ins (Spock part): `@EnableSharedContainers` for the project's Spock IT annotation (K15) · `AbstractIT` kept as the generic JUnit IT base (K15) · trust/SSL port of K3 → `PaymentGateway` · lease + interaction row of K13 → gateway charge + `markPaid` · SQL analytics of K10 → `OverdueReminder` run · config parse of K6/K8 → `DiscountPolicy` / line quantity parse · logback logger kept as the global state (K14, K16) · Added terms: enum type names `CustomerTier`, `OrderStatus`, `InvoiceStatus` · `Quantity.Valid` / `Quantity.Invalid` (sealed parse result, K8) · `HttpPaymentGateway` (HTTP adapter of PaymentGateway, K9) · Hibernate `ConstraintViolationException` + constraint `invoices_order_id_key` (K19) · test helpers `eur()`, `line()`, `insertInvoice()` · Skipped: none (K1–K20, K2b all APPROVED)
 
@@ -352,7 +352,7 @@ Evidence: no Bad (n/a, 31b-v2.md:364) · `aruvii-api/src/integrationTest/java/ai
  * @Retryable or method security, so replacing it bare removes no advice an IT could assert.
  */
 @TestConfiguration
-public class FakePortsConfig {
+public class OutboundFakesConfig {
 
     @Bean
     @Primary
@@ -489,7 +489,7 @@ What goes wrong: the connection limit is raised on an estimated context count, a
 
 **Good** (neutral)
 ```yaml
-# orders-api/src/integrationTest/resources/application-it.yml — temporary, while diagnosing
+# orders-api/src/test/resources/application-it.yml — temporary, while diagnosing
 logging:
   level:
     org.springframework.test.context.cache: DEBUG
@@ -507,7 +507,7 @@ Evidence: `aruvii-test-support/src/main/java/ai/aruvii/testsupport/AruviiTestcon
         r.add("spring.datasource.url",      postgres::getJdbcUrl);
         r.add("spring.datasource.username", postgres::getUsername);
         r.add("spring.datasource.password", postgres::getPassword);
-        SharedRedis.registerProperties(r);
+        r.add("spring.data.redis.host",     redis::getHost);
     }
 ```
 What goes wrong: per-class properties enter the context cache key, so this class forks its own Spring context.
@@ -1137,13 +1137,13 @@ class InvoiceApiIT extends AbstractIT {
         return new FakeEmailSender();
     }
 ```
-What goes wrong: the class overrides a port the shared FakePortsConfig already fakes, so it forks its own uncached Spring context.
+What goes wrong: the class overrides a port the shared OutboundFakesConfig already fakes, so it forks its own uncached Spring context.
 
 **Good** (neutral)
 ```groovy
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableSharedContainers
-@Import(FakePortsConfig)
+@Import(OutboundFakesConfig)
 class InvoiceApiIT extends Specification {
 
     @Autowired
