@@ -19,17 +19,15 @@ What goes wrong: the poll returns silently at its deadline, so the test passes w
 **Good** (neutral)
 ```ts
 await test.step('Then the invoice reaches PAID within the deadline', async () => {
-  const invoice = await pollInvoice(
-    request,
-    placedOrder.invoiceId,
-    clerkToken,
-    (inv) => inv.status === 'PAID',
-    { maxWaitMs: 30_000, intervalMs: 1_000 },
-  );
-  expect(invoice.status, `invoice ${placedOrder.invoiceId} was not PAID within 30 s`).toBe('PAID');
+  await expect
+    .poll(() => invoiceStatus(request, clerkToken, placedOrder.invoiceId), {
+      timeout: 20_000,
+      message: `invoice ${placedOrder.invoiceId} was not PAID within 20 s`,
+    })
+    .toBe('PAID');
 });
 ```
-Why: the polled condition is asserted again with a message, so removing payments makes the test fail.
+Why: `expect.poll` makes the condition an assertion with a message and a budget below the test timeout, so removing payments makes the test fail.
 
 Evidence: `aruvii-ui/playwright/e2e/smoke/smoke-56-agent-judge.spec.ts:85-90` @origin/master 2026-10-02, no sha in source (Bad, real) · source research/31d-v2.md:46 · fix from research/31d-v2.md:26
 
@@ -37,11 +35,10 @@ Evidence: `aruvii-ui/playwright/e2e/smoke/smoke-56-agent-judge.spec.ts:85-90` @o
 
 **Bad** (neutral)
 ```ts
-test('the invoice list loads with the Invoices heading and a status filter', async ({ page }) => {
-  await loginViaForm(page);
-  await page.goto('/invoices', { waitUntil: 'networkidle' });
-  await expect(page.getByRole('heading', { name: 'Invoices', exact: true, level: 1 })).toBeVisible({ timeout: 12_000 });
-  await expect(page.locator('.toggle-wrap').first()).toBeVisible({ timeout: 8_000 });
+test('the invoice list loads with the Invoices heading and a status filter', async ({ clerkPage }) => {
+  await clerkPage.goto('/invoices');
+  await expect(clerkPage.getByRole('heading', { name: 'Invoices', exact: true, level: 1 })).toBeVisible();
+  await expect(clerkPage.locator('.toggle-wrap')).toBeVisible();
 ```
 What goes wrong: `.toggle-wrap` is a CSS class every settings page renders, so it proves no invoice filter rendered.
 
@@ -84,7 +81,6 @@ What goes wrong: an error body or a changed shape becomes `[]`, so "it disappear
 ```ts
 test(
   'should remove a deleted draft order from the orders list',
-  { annotation: { type: 'issue', description: '#123 AC-2' } },
   async ({ request, clerkToken, draftOrder }) => {
     const resp = await test.step('When the draft order is deleted', () =>
       apiRequest(request, 'DELETE', `/api/orders/${draftOrder.id}`, clerkToken));
@@ -116,16 +112,23 @@ What goes wrong: the payment record exists but its outcome is never checked, so 
 **Good** (neutral)
 ```ts
 await test.step('Then the card gateway took this payment and approved it', async () => {
-  const { payment } = await pollForPayment(request, invoice.id, clerkToken, 'card-gateway', {
-    maxWaitMs: 15_000,
-    intervalMs: 1_000,
-  });
-  expect(payment, 'a card-gateway payment must appear — the gateway was never called').toBeTruthy();
+  const cardPayment = async () => {
+    const resp = await apiRequest(request, 'GET', `/api/invoices/${invoice.id}/payments`, clerkToken);
+    const payments: Payment[] = (await resp.json()).data;
+    return payments.find((p) => p.gateway === 'card-gateway');
+  };
+  await expect
+    .poll(cardPayment, {
+      timeout: 15_000,
+      message: 'a card-gateway payment must appear — the gateway was never called',
+    })
+    .toBeDefined();
+  const payment = await cardPayment();
   expect(payment?.outcome, 'the gateway was called but declined').toBe('APPROVED');
   expect(payment?.amount, 'the payment must carry this invoice total').toEqual(invoice.total);
 });
 ```
-Why: the record is matched by gateway name, then its approval, then the amount this test set up.
+Why: `expect.poll` waits for the record matched by gateway name, then its approval and the amount this test set up are asserted.
 
 Evidence: `.claude/skills/smoke-spec/SKILL.md:119-122` @origin/master 2026-10-02, no sha in source (Bad, real) · source research/31d-v2.md:139 · fix from research/31d-v2.md:121
 
@@ -133,12 +136,11 @@ Evidence: `.claude/skills/smoke-spec/SKILL.md:119-122` @origin/master 2026-10-02
 
 **Bad** (neutral)
 ```ts
-test('pay invoice with the gateway offline', async ({ page, invoice, fakeGateway }) => {
+test('pay invoice with the gateway offline', async ({ clerkPage, invoice, fakeGateway }) => {
   fakeGateway.goOffline();
-  await loginViaForm(page);
-  await page.goto(`/invoices/${invoice.id}`);
-  await page.getByRole('button', { name: 'Pay invoice' }).click();
-  await expect(page.getByRole('alert')).toBeVisible();
+  await clerkPage.goto(`/invoices/${invoice.id}`);
+  await clerkPage.getByRole('button', { name: 'Pay invoice' }).click();
+  await expect(clerkPage.getByRole('alert')).toBeVisible();
 });
 ```
 What goes wrong: only a reply is checked, so a regression that records an approved payment for a dead gateway stays green.
@@ -317,7 +319,6 @@ What goes wrong: a public third-party site decides which branch runs, in a test 
 ```ts
 test(
   'should report a reachable payment gateway in the dry-run connection test',
-  { annotation: { type: 'issue', description: '#123 AC-4' } },
   async ({ request, clerkToken, fakeGateway }) => {
     const resp = await test.step('When the gateway connection is tested against the fake', () =>
       apiRequest(request, 'POST', '/api/payment-gateway/test-connection', clerkToken, {
@@ -359,11 +360,11 @@ await test.step('Then the invoice reaches OVERDUE', async () => {
     const resp = await apiRequest(request, 'GET', `/api/invoices/${invoice.id}`, clerkToken);
     return (await resp.json()).data.status;
   };
-  // OverdueReminder runs every 10 s on the test profile, so 60 s is a generous budget
-  await expect.poll(invoiceStatus, { timeout: 60_000, intervals: [1_000] }).toBe('OVERDUE');
+  // OverdueReminder runs every 10 s on the test profile, so 25 s covers two runs inside the test timeout
+  await expect.poll(invoiceStatus, { timeout: 25_000, intervals: [1_000] }).toBe('OVERDUE');
 });
 ```
-Why: `expect.poll` waits on the state that matters, with a named budget, and fails if the state never arrives.
+Why: `expect.poll` waits on the state that matters, with a named budget below the test timeout, and fails if the state never arrives.
 
 Evidence: `aruvii-ui/playwright/e2e/smoke/smoke-44-webhook-retry.spec.ts:18-28` @origin/master 2026-10-02, no sha in source (Bad, real) · source research/31d-v2.md:373 · fix from research/31d-v2.md:356
 
@@ -371,11 +372,10 @@ Evidence: `aruvii-ui/playwright/e2e/smoke/smoke-44-webhook-retry.spec.ts:18-28` 
 
 **Bad** (neutral)
 ```ts
-test('order page links to its invoice', async ({ page, placedOrder }) => {
-  await loginViaForm(page);
-  await page.goto(`/orders/${placedOrder.id}`, { waitUntil: 'networkidle' });
-  const invoiceLink = page.getByRole('link', { name: /view invoice/i });
-  await expect(invoiceLink).toBeVisible({ timeout: 10_000 });
+test('order page links to its invoice', async ({ clerkPage, placedOrder }) => {
+  await clerkPage.goto(`/orders/${placedOrder.id}`);
+  const invoiceLink = clerkPage.getByRole('link', { name: /view invoice/i });
+  await expect(invoiceLink).toBeVisible();
   expect(await invoiceLink.getAttribute('href')).toContain(`/invoices/${placedOrder.invoiceId}`);
 });
 ```
@@ -405,13 +405,12 @@ Evidence: `aruvii-ui/playwright/e2e/smoke/smoke-33-agent-studio-gallery.spec.ts:
 
 **Bad** (neutral)
 ```ts
-const row = page.locator('tr, [data-testid="invoice-row"]').filter({ hasText: invoice.id }).first();
-await row.locator('.row-actions button').click();
-await page.locator('.row-menu').first().waitFor({ state: 'visible', timeout: 4_000 });
-await page.locator('.row-menu .row-menu-item').first().click();
+const row = page.getByRole('row').filter({ hasText: invoice.id }).first();
+await row.getByRole('button').first().click();
+await page.getByRole('menuitem').first().click();
 
 // then — the Pay invoice dialog opens
-const dialog = page.locator('.modal-overlay .modal, .modal').first();
+const dialog = page.getByRole('dialog').first();
 ```
 What goes wrong: four `.first()` calls hide strictness errors; "first menu item" is Pay invoice only until the menu order changes.
 
@@ -436,10 +435,9 @@ Evidence: `aruvii-ui/playwright/e2e/smoke/smoke-04-tools.spec.ts:78-84` @origin/
 
 **Bad** (neutral)
 ```ts
-test('UI: /invoices loads without error', async ({ page }) => {
-  await loginViaForm(page);
-  await page.goto('/invoices');
-  expect(page.getByRole('heading', { name: 'Invoices', exact: true })).toBeVisible();
+test('UI: /invoices loads without error', async ({ clerkPage }) => {
+  await clerkPage.goto('/invoices');
+  expect(clerkPage.getByRole('heading', { name: 'Invoices', exact: true })).toBeVisible();
 });
 ```
 What goes wrong: nobody awaits the `toBeVisible` promise, so the test ends green before the check runs.
@@ -496,15 +494,14 @@ Evidence: `aruvii-ui/playwright/e2e/smoke/smoke-78-stability.spec.ts:376-377` @o
 
 **Bad** (neutral)
 ```ts
-test('pay an invoice after changing its due date', async ({ page, invoice }) => {
+test('pay an invoice after changing its due date', async ({ clerkPage, invoice }) => {
   // Extended timeout: under full-suite load Pay invoice sometimes fails, then passes on retry.
   // Passes in ~5s alone; budget 6x headroom for worst-case load.
   test.setTimeout(180_000);
-  await loginViaForm(page);
-  await page.goto(`/invoices/${invoice.id}`);
-  await page.getByRole('textbox', { name: 'Due date' }).fill('2026-11-30');
-  await page.getByRole('button', { name: 'Save', exact: true }).click();
-  await page.getByRole('button', { name: 'Pay invoice' }).click();
+  await clerkPage.goto(`/invoices/${invoice.id}`);
+  await clerkPage.getByRole('textbox', { name: 'Due date' }).fill('2026-11-30');
+  await clerkPage.getByRole('button', { name: 'Save', exact: true }).click();
+  await clerkPage.getByRole('button', { name: 'Pay invoice' }).click();
 ```
 What goes wrong: the timeout was raised for suite load, which hides the real cause: paying before the save has landed.
 
@@ -562,17 +559,16 @@ Evidence: `aruvii-ui/playwright/e2e/smoke/smoke-05-sessions.spec.ts:24,47,68-71`
 
 **Bad** (neutral)
 ```ts
-test('UI: pay invoice dialog is interactive — first field accepts input', async ({ page }) => {
-  await loginViaForm(page);
-  await page.goto('/invoices');
-  await expect(page.getByRole('heading', { name: /invoices/i })).toBeVisible({ timeout: 12_000 });
-  // The page should present a form with at least one textarea or input
-  const firstField = page.locator('textarea, input[type="text"]').first();
-  await expect(firstField).toBeVisible({ timeout: 8_000 });
-  await firstField.click();
-  await firstField.fill('Smoke test amount');
+test('UI: pay invoice dialog is interactive — first field accepts input', async ({ clerkPage }) => {
+  await clerkPage.goto('/invoices');
+  await expect(clerkPage.getByRole('heading', { name: /invoices/i })).toBeVisible();
+  // The page should present a form with a text field
+  const field = clerkPage.getByRole('textbox');
+  await expect(field).toBeVisible();
+  await field.click();
+  await field.fill('Smoke test amount');
   // Verify the value was accepted
-  await expect(firstField).toHaveValue('Smoke test amount');
+  await expect(field).toHaveValue('Smoke test amount');
 ```
 What goes wrong: Pay invoice is never clicked; a text box that accepts text proves nothing about paying an invoice.
 
