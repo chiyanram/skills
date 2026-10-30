@@ -57,15 +57,10 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 
 | reference | rule IDs | read it when |
 |---|---|---|
+| [concurrency](skills/code/references/concurrency.md) | CC | you start threads, submit async work, call a remote service, retry, lock, or build a pool or a cache |
 | [design](skills/code/references/design.md) | SEAM | you write or review an interface a caller depends on, or a method that implements one |
 
 `make lint` fails when a reference is missing from these tables.
-
-## Code references
-
-| reference | rule IDs | read it when |
-|---|---|---|
-| [concurrency](skills/code/references/concurrency.md) | CC | you start threads, submit async work, call a remote service, retry, lock, or build a pool or a cache |
 
 ## Where a rule comes from
 
