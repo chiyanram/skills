@@ -11,6 +11,7 @@ was looked at, what was decided and why.
 | [00-decision-register.md](00-decision-register.md) | every decision that is not a rule, and the repo and file it lands in |
 | [00-reference-format.md](00-reference-format.md) | the template every reference follows |
 | [00-operator-inputs.md](00-operator-inputs.md) | every link and idea the operator shared, and where it landed |
+| [69-llm-testing-in-agent-sdks.md](69-llm-testing-in-agent-sdks.md) | how 10 agent SDKs and Spring repos test LLM features: fakes, recordings, real-model tests, evals; candidates LT1–LT18 (R40, #131) |
 | [64-core-design.md](64-core-design.md) | the core design from first principles, with the *why* of each reference repo in `64a`–`64e` |
 | [repos/INDEX.md](repos/INDEX.md) | one deep report per reference repo: mattpocock, pstack, superpowers, addyosmani, openclaw and others |
 
