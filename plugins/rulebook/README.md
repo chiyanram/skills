@@ -55,6 +55,12 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 
 `make lint` fails when a reference is missing from this table.
 
+## Workflow skills
+
+| skill | read it when |
+|---|---|
+| [deslop](skills/deslop/SKILL.md) | an implemented branch needs a behaviour-neutral cleanup of its diff before review |
+
 ## Where a rule comes from
 
 Each rule has a source. A rule goes in only after the operator says yes; the
