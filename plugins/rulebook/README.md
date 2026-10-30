@@ -59,6 +59,7 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 |---|---|---|
 | [design](skills/code/references/design.md) | SEAM | you write or review an interface a caller depends on, or a method that implements one |
 | [deslop](skills/deslop/SKILL.md) | an implemented branch needs a behaviour-neutral cleanup of its diff before review |
+| [types](skills/code/references/types.md) | TY | you write or review a field, parameter, return type, record, enum, sealed type or generic type |
 
 `make lint` fails when a reference is missing from these tables.
 
