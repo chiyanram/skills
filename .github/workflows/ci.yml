@@ -68,10 +68,13 @@ jobs:
         env:
           TITLE: ${{ github.event.pull_request.title }}
           BODY: ${{ github.event.pull_request.body }}
-          BASE: ${{ github.event.pull_request.base.sha }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        # Only the PR's own commits reach main in the squash; commits already on the base branch (such as a release
+        # commit merged in from main) do not, so they are not checked.
         run: |
           marker='\[(skip ci|ci skip|no ci|skip actions|actions skip)\]|skip-checks: *true'
-          if printf '%s\n%s\n' "$TITLE" "$BODY" | grep -qiE "$marker" || git log --format=%B "$BASE..HEAD" | grep -qiE "$marker"; then
+          if printf '%s\n%s\n' "$TITLE" "$BODY" | grep -qiE "$marker" || git log --format=%B "origin/$BASE_REF..$HEAD_SHA" | grep -qiE "$marker"; then
             echo "::error::The title, description or a commit message contains a skip-ci marker. The squash merge would carry it to main and skip the release. Reword it."
             exit 1
           fi
