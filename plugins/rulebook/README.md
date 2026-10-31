@@ -57,12 +57,14 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 
 | reference | rule IDs | read it when |
 |---|---|---|
+| [angular-ui](skills/code/references/angular-ui.md) | NGA–NGD | you write or review an Angular component, template, or its TypeScript or `tsconfig` |
 | [comments](skills/code/references/comments.md) | CM | you write or review a comment, a Javadoc block or a lint suppression |
 | [concurrency](skills/code/references/concurrency.md) | CC | you start threads, submit async work, call a remote service, retry, lock, or build a pool or a cache |
 | [design](skills/code/references/design.md) | SEAM | you write or review an interface a caller depends on, or a method that implements one |
 | [deslop](skills/deslop/SKILL.md) | an implemented branch needs a behaviour-neutral cleanup of its diff before review |
 | [errors](skills/code/references/errors.md) | ER | you write or review a `throw`, a `catch`, an exception handler or request validation |
 | [java](skills/code/references/java.md) | U4, JV, CV3 | you write or review Java production code |
+| [messaging](skills/code/references/messaging.md) | MS | you write or review a message consumer, a scheduled job, or an operation that can run twice |
 | [security](skills/code/references/security.md) | SE, SS | code takes outside input, stores or checks a secret, or touches the security filter chain, a guard, a token or a security test |
 | [services](skills/code/references/services.md) | LY1–LY3 | you write or review a controller, a service, an interface or a use case that makes two calls |
 | [smells](skills/code/references/smells.md) | DS, FW, NM, SM | you write or review production code: the smell baseline, and the shape and naming rules behind it |
