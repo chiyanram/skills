@@ -22,4 +22,5 @@ Planning Good/Bad (20 rules, research/42, page https://claude.ai/artifact/JaHyxM
 All 35 rewritten Goods approved (research/47-good-rewrites.md, page https://claude.ai/artifact/5bJrMoSs7Werx9P2mbP2EJ). They replace the old "real" Goods in 31a–31e-v2 and 42 for the same rule ids. NEEDS COMPILE CHECK items are compiled when the references are written (agent-platform #644 / G9 domains).
 
 ## LLM testing (#133, G34) — operator 2026-10-31
-Fake model Good/Bad (LT1–LT6, research/71-llm-testing-good-bad.md, page https://claude.ai/artifact/Aa3nMykp8FRfU2VzUiWww1): approve all. Agent loop pairs (LT7–LT11) pending.
+Fake model Good/Bad (LT1–LT6, research/71-llm-testing-good-bad.md, page https://claude.ai/artifact/Aa3nMykp8FRfU2VzUiWww1): approve all.
+Agent loop Good/Bad (LT7–LT11, research/71, same page): approve all. NEEDS COMPILE CHECK when the reference is written (#134): the pairs use stand-in types (`ChatModelPort`, `ScriptedChatModel`, `OrderAssistant`).
