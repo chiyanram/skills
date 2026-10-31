@@ -102,17 +102,20 @@ const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "
 const decided = g => g.items.filter(it => (state[g.key + ":" + it.id] || {}).v).length;
 const label = v => v === "change" ? "Change…" : v[0].toUpperCase() + v.slice(1);
 const paired = g => g.items.every(it => it.pair && it.pair.good);
+const ruled = g => g.items.every(it => it.status);
+const mode = g => !paired(g) ? "rules" : ruled(g) ? "pairs" : "both";
+const recBlock = it => `<section class="rec"><h3>Recommendation <span class="chip ${esc(it.rec)}">${label(it.rec).replace("…", "")}</span></h3><p>${esc(it.why)}</p></section>`;
 const side = (s, name) => s ? `<section class="side ${name.toLowerCase()}"><h3>${name} · neutral</h3>
   <pre><code>${esc(s.code)}</code></pre><div class="why">${esc(s.note)}</div></section>` : "";
 function cardBody(it) {
   if (it.pair && it.pair.good) {
     const r = it.pair.ref;
-    return `<div class="pair">${side(it.pair.bad, "Bad")}${side(it.pair.good, "Good")}</div>
+    return `${it.status ? "" : `<div class="cites">${esc(it.cites)} · ${esc(it.file)}</div>${recBlock(it)}`}<div class="pair">${side(it.pair.bad, "Bad")}${side(it.pair.good, "Good")}</div>
       ${r ? `<section class="ref"><h3>How the reference does it</h3><div class="where">${esc(r.where)}</div>
         <pre><code>${esc(r.code)}</code></pre>${r.note ? `<div class="why">${esc(r.note)}</div>` : ""}</section>` : ""}`;
   }
   return `<div class="cites">${esc(it.cites)} · ${esc(it.file)}</div>
-      <section class="rec"><h3>Recommendation <span class="chip ${esc(it.rec)}">${label(it.rec).replace("…", "")}</span></h3><p>${esc(it.why)}</p></section>`;
+      ${recBlock(it)}`;
 }
 
 function renderTabs() {
@@ -127,8 +130,11 @@ function render() {
   renderTabs();
   const g = DATA.find(x => x.key === current);
   const list = document.getElementById("list");
-  document.getElementById("gnote").textContent = !g ? "" : paired(g)
+  const m = g ? mode(g) : "";
+  document.getElementById("gnote").textContent = !g ? "" : m === "pairs"
     ? "The rules in this group are approved. Now approve each Good/Bad pair: Bad and Good are neutral examples written to the house style; the reference's own code is evidence only and never goes into the reference."
+    : m === "both"
+    ? g.note + " Decide each rule and its Good/Bad pair together: Approve takes both; use Change… to change either. The reference's own code is evidence only."
     : g.note;
   if (!g) { list.innerHTML = "<p>No groups loaded yet.</p>"; return; }
   list.innerHTML = g.items.map(it => {
@@ -163,7 +169,8 @@ function decisionText(g) {
     ch.forEach(i => parts.push(`change ${i.id}: ${((state[g.key + ":" + i.id] || {}).note || "").trim() || "(no note)"}`));
     if (open.length) parts.push("undecided " + open.join(", "));
   }
-  return `G34 ${g.name}${paired(g) ? " Good/Bad" : ""}: ` + parts.join("; ");
+  const suffix = { rules: "", pairs: " Good/Bad", both: " rules + Good/Bad" }[mode(g)];
+  return `G34 ${g.name}${suffix}: ` + parts.join("; ");
 }
 function summary() {
   const g = DATA.find(x => x.key === current); if (!g) return;
@@ -175,7 +182,7 @@ document.getElementById("all").onclick = () => {
   g.items.forEach(it => {
     const k = g.key + ":" + it.id;
     if ((state[k] || {}).v) return;
-    state[k] = paired(g) ? { v: "approve" } : it.rec === "change" ? { v: "change", note: "as recommended: " + it.why } : { v: it.rec };
+    state[k] = mode(g) === "pairs" ? { v: "approve" } : it.rec === "change" ? { v: "change", note: "as recommended: " + it.why } : { v: it.rec };
   });
   save(); render();
 };
