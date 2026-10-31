@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.7.0](https://github.com/chiyanram/skills/compare/rulebook--v0.6.1...rulebook--v0.7.0) (2026-10-31)
+
+### Features
+
+* **code:** deslop rule skill ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#145](https://github.com/chiyanram/skills/issues/145)) ([38dbd61](https://github.com/chiyanram/skills/commit/38dbd619bf999f5cb207e782bdf8537e484573ab))
+
 ## [0.6.1](https://github.com/chiyanram/skills/compare/rulebook--v0.6.0...rulebook--v0.6.1) (2026-10-31)
 
 ### Bug Fixes
