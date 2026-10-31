@@ -72,6 +72,7 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 | reference | rule IDs | read it when |
 |---|---|---|
 | [levels](skills/obs/references/levels.md) | — | you choose the level of a log call or of a caught exception |
+| [logging](skills/obs/references/logging.md) | LG1–LG6, LG8, LGN1 | you write or review a log call, a logger field, a `catch` that logs, or the logging configuration |
 
 ## Where a rule comes from
 
