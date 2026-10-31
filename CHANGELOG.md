@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.13.0](https://github.com/chiyanram/skills/compare/rulebook--v0.12.0...rulebook--v0.13.0) (2026-10-31)
+
+### Features
+
+* **testing:** LLM testing references, fake tier and live tier ([#165](https://github.com/chiyanram/skills/issues/165)) ([3232cf1](https://github.com/chiyanram/skills/commit/3232cf1380c78a49c387a8be8b837de8216bf88a))
+
 ## [0.12.0](https://github.com/chiyanram/skills/compare/rulebook--v0.11.0...rulebook--v0.12.0) (2026-10-31)
 
 ### Features
