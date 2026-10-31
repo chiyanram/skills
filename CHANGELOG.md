@@ -3,6 +3,14 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.6.0](https://github.com/chiyanram/skills/compare/rulebook--v0.5.0...rulebook--v0.6.0) (2026-10-31)
+
+### Features
+
+* **code:** comments rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#143](https://github.com/chiyanram/skills/issues/143)) ([5f3b9e0](https://github.com/chiyanram/skills/commit/5f3b9e007861a5fc3a3d863e86fce41f3d1d45dc))
+* **code:** errors rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#142](https://github.com/chiyanram/skills/issues/142)) ([001ad6e](https://github.com/chiyanram/skills/commit/001ad6e1d1234314761a4013d278d59f167b31e2))
+* **code:** smells rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#144](https://github.com/chiyanram/skills/issues/144)) ([fef4eb5](https://github.com/chiyanram/skills/commit/fef4eb55d7ae7d4e48846cb27cd7c50f48713ab4))
+
 ## [0.5.0](https://github.com/chiyanram/skills/compare/rulebook--v0.4.0...rulebook--v0.5.0) (2026-10-30)
 
 ### Features
