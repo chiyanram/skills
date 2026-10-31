@@ -41,9 +41,7 @@ Which types, keys and names a schema uses is in `postgres-design.md` (MG30–MG3
 | updates or deletes existing rows | its own migration or job, `WHERE`-bounded batches, each committed (MG22) | strong_migrations; GitLab style guide, batched migrations; Django; Flyway RG06, RG09 · r47 :211-214 |
 | fixes a migration that is merged or applied | a new versioned migration (MG1) | Flyway migrations, validate; Rails migrations guide · r47 :220-221 |
 
-`r47` is agent-factory `research/47-industry-migrations-obs.md`; `:N` is a line in that file. Every rule has ≥2
-independent industry sources, quoted there; none comes from one project's history (operator, 2026-10-31,
-agent-factory#34).
+`r47` is agent-factory `research/47-industry-migrations-obs.md`; `:N` is a line in that file.
 
 ## Good / Bad
 
