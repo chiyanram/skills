@@ -5,8 +5,8 @@ creates a table, adds a column, a key, a constraint or an index.
 
 Contents: Rules · When X, use Y · Good / Bad (MG31, MG35) · Decided edges · Review checks
 
-How to apply these on a table that already holds rows, without blocking it, is in `review.md` (MG5, MG10, MG41, MG44,
-MG45).
+How to apply these on a table that already holds rows, without blocking it, is in [review.md](review.md) (MG5, MG10,
+MG41, MGN1, MG44, MG45).
 
 ## Rules
 
@@ -31,17 +31,15 @@ MG45).
 | the migration declares | use | why |
 |---|---|---|
 | a column that holds an instant | `timestamptz` (MG30) | squawk prefer-timestamptz; GitLab migration style guide · r47 :103-104 |
-| a new string column with a business length limit | `text` + a named `CHECK (char_length(col) <= n)` (MG31) | squawk prefer-text-field; GitLab strings guide · r47 :111-112 |
+| a new string column with a business length limit | `text` + a `CHECK (char_length(col) <= n)` (MG31; its name, MG38) | squawk prefer-text-field; GitLab strings guide · r47 :111-112 |
 | a fixed-length string | `text`, never `char(n)` (MG31, MG36) | PG 8.3 "character(n) is usually the slowest"; squawk ban-char-field · r47 :110, :141 |
-| a primary key | `bigint GENERATED ALWAYS AS IDENTITY`, or `uuid` (MG36) | squawk prefer-identity, prefer-bigint-over-int; GitLab downtime guide · r47 :139-140 |
+| a primary key | `bigint GENERATED … AS IDENTITY`, or `uuid` (MG36) | squawk prefer-identity, prefer-bigint-over-int; GitLab downtime guide · r47 :139-140, :143 |
 | a JSON document | `jsonb` (MG36) | PG 8.14 "prefer to store JSON data as jsonb"; strong_migrations · r47 :142 |
 | a `REFERENCES` clause | an explicit `ON DELETE` action (MG32) and an index led by the referencing column (MG33) | PG 5.5.5; GitLab foreign keys guide · r47 :118-119, :125-126 |
 | a `UNIQUE` constraint or unique index | `NOT NULL` on each column, or `NULLS NOT DISTINCT` (MG35) | PG 5.5.3; GitLab adding indexes guide · r47 :132-133 |
 | an index or a constraint | a name with a fixed prefix: `pk_`, `fk_`, `uq_`, `ck_`, `idx_` (MG38) | GitLab constraint naming; PG CREATE INDEX "Index name is required when IF NOT EXISTS is specified" · r47 :148-150 |
 
-`r47` is agent-factory `research/47-industry-migrations-obs.md`; `:N` is a line in that file. Every rule has ≥2
-independent industry sources, quoted there; none comes from one project's history (operator, 2026-10-31,
-agent-factory#34).
+`r47` is agent-factory `research/47-industry-migrations-obs.md`; `:N` is a line in that file.
 
 ## Good / Bad
 
@@ -72,6 +70,7 @@ The limit is a named constraint. A new limit is a new `CHECK` added `NOT VALID`,
 
 **Bad** (neutral)
 ```sql
+SET LOCAL lock_timeout = '2s';
 CREATE TABLE payments (
   id           bigint GENERATED ALWAYS AS IDENTITY,
   customer_id  bigint NOT NULL,
@@ -86,6 +85,7 @@ Two payments for one customer, each with `external_ref` NULL, both pass the cons
 
 **Good** (neutral)
 ```sql
+SET LOCAL lock_timeout = '2s';
 CREATE TABLE payments (
   id           bigint GENERATED ALWAYS AS IDENTITY,
   customer_id  bigint NOT NULL,
@@ -96,7 +96,8 @@ CREATE TABLE payments (
   CONSTRAINT uq_payments_customer_ref UNIQUE (customer_id, external_ref)
 );
 ```
-Every column of the constraint is `NOT NULL`, so it means what it says. The unique constraint leads with
+Every column of the constraint is `NOT NULL`, so it means what it says. The lock timeout is there because the
+foreign key locks the existing `customers` table (MG5, `review.md`). The unique constraint leads with
 `customer_id`, so it is also the foreign-key index (MG33). When one NULL per customer is meant, keep the column
 nullable and write `UNIQUE NULLS NOT DISTINCT (customer_id, external_ref)` (PostgreSQL 15+).
 
@@ -119,11 +120,12 @@ Walk every changed migration file, and every `CREATE TABLE`, `ADD COLUMN`, `REFE
 - [ ] MG35 — For each `UNIQUE` constraint or unique index, check that every column in it is `NOT NULL`, or that it
   says `NULLS NOT DISTINCT`. A nullable column in a plain `UNIQUE` is a finding.
 - [ ] MG30 — `grep -n -i -E "\btimestamp\b"` in each changed migration. A column declared `timestamp` or
-  `timestamp without time zone`, not `timestamptz`, is a finding.
-- [ ] MG31 — `grep -n -i -E "varchar|character varying|char\("` in each new column. A new `varchar(n)` or `char(n)`
-  column is a finding; a length limit must be a named `CHECK (char_length(col) <= n)`.
-- [ ] MG36 — `grep -n -i -E "\bserial\b|bigserial|smallserial|\bjson\b"` in each changed migration, and read the type of
-  each new key column. `serial`, an `integer` key, `char(n)` or `json` is a finding.
+  `timestamp without time zone` is a finding; `timestamp with time zone` is `timestamptz` and is not.
+- [ ] MG31 — `grep -n -i -E "varchar|character varying|\bcharacter\b|\bchar\b|bpchar"` in each changed migration. A new
+  column declared `varchar(n)` or `char(n)` is a finding; a length limit is a `CHECK (char_length(col) <= n)`.
+- [ ] MG36 — `grep -n -i -E "\bserial[248]?\b|bigserial|smallserial|\bjson\b"` in each changed migration, and read the
+  type of each new key column. `serial`, an `integer` key or `json` is a finding; `char(n)` hits come from the MG31
+  grep.
 - [ ] MG38 — For each `CREATE INDEX` and each `PRIMARY KEY`, `FOREIGN KEY`, `UNIQUE` and `CHECK` (inline or
   `ADD CONSTRAINT`), find its explicit name with a `pk_`, `fk_`, `uq_`, `ck_` or `idx_` prefix. One with no name, or
   with another prefix, is a finding.
