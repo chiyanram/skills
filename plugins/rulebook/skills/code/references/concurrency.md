@@ -1,0 +1,215 @@
+# Concurrency
+
+How Java code runs work on other threads, calls remote services, retries, shares state and bounds its pools and
+caches. Read it when you write or review code that starts threads, submits async work, calls a remote service, retries,
+locks, or builds a pool or a cache.
+
+Contents: Rules · When X, use Y · Good / Bad (CC3, CC4, CC9) · Decided edges · Review checks
+
+## Rules
+
+- **CC1** — Use virtual threads for blocking I/O fan-out, never pooled; `synchronized` is fine on Java 25; avoid
+  blocking in a class initialiser, because a blocking class initialiser still pins its carrier thread.
+- **CC2** — Submit blocking async work to an explicit, named executor, never no-arg `supplyAsync`/`runAsync`, because
+  no-arg `supplyAsync` puts blocking I/O on the common pool and starves it.
+- **CC3** — Give every remote call a timeout that stops the work; `orTimeout` alone only abandons the future, because a
+  call with no stopping timeout can hang forever and keep running.
+- **CC9** — Treat a remote call as success, failure or unknown; record intent before it; the idempotency key comes
+  from the initiator, never the retrying layer, because a timed-out effect may have applied; retries then duplicate it.
+- **CC8** — Retry only a transient failure of an idempotent call, with bounded attempts and jittered backoff, and only
+  after a timeout exists (CC3), because retrying a non-idempotent call repeats its side effect.
+- **CC4** — Give a bounded pool a bounded queue and a stated rejection behaviour, because an unbounded queue never
+  rejects; it grows memory until the process fails.
+- **CC5** — Remove the shared write target (one key or file per actor) before locking; a lock still needed has one
+  owner and one documented order, because shared writes race intermittently and opposite lock orders deadlock.
+- **CC6** — Never call `join()`/`get()` mid-pipeline in request-serving code; compose with
+  `thenApply`/`thenCompose`/`allOf`, because a mid-pipeline `join()` blocks a thread and undoes the reason for async.
+- **CC7** — Carry request- or call-scoped context (depth, tenant, principal) in a `ScopedValue` or an explicit
+  parameter, never a new `ThreadLocal`, because a `ThreadLocal` does not reach an async thread unless copied by hand.
+- **CC10** — Bound each cache with an eviction policy and a memory ceiling; keep one connection pool per database per
+  process, with a fail-fast connect timeout, because unbounded caches leak memory and extra pools exhaust database
+  connections.
+
+## When X, use Y
+
+| the code has | use | why |
+|---|---|---|
+| many blocking I/O calls to run at once | `Executors.newVirtualThreadPerTaskExecutor()`, one virtual thread per task, never a pool of them (CC1) | virtual threads for I/O-bound tasks; avoid pooling them (pl125 :31) |
+| blocking work to run async | `supplyAsync(task, executor)` with a dedicated executor (CC2) | avoid blocking I/O in the common pool; use a dedicated executor (pl125 :37) · the two-argument form (pl142 :854) |
+| CPU-bound, short, side-effect-free work | ForkJoin or a parallel stream, outside request- or queue-serving code (CC2; JV2, `java.md`) | the common pool is reserved for that work (pl125 :37) |
+| a client for a remote service | a connect and a read timeout on the client itself (CC3) | always bound remote calls with timeouts (pl125 :40) · cancel ongoing work on timeout (pl126 :34) |
+| a remote call with a side effect | an intent record before the call, and three outcomes: success, failure, unknown (CC9) | a timeout tells you nothing about whether the effect applied (addy api :213) |
+| an idempotency key | one key per intent, minted by the initiator and reused on every retry (CC9) | a new key per attempt makes every retry a new charge (addy api :163, :171) |
+| a failed remote call to retry | the timeout first, then bounded attempts with jitter, for transient failures of idempotent calls only (CC8) | timeouts before retries; bounded attempts and jitter (pl123cc :42-43) · retry only transient failures (pl123cc :95) |
+| a dependency that can exhaust shared threads, connections or queue capacity | a bulkhead: a bounded pool, a bounded queue and a rejection policy (CC4) | bulkheads isolate that dependency (pl123cc :152) · bounded queues and rejection policies (pl125 :35) |
+| two actors that write the same state | each actor its own key or file, merged where it is read (CC5) | eliminate the shared write target first (ps separate :15) |
+| two locks held at once | one global acquisition order (CC5) | establish global lock ordering (pl125 :36) |
+| a `CompletableFuture` pipeline | `thenApply`/`thenCompose`/`allOf`; block only at the outer boundary (CC6) | avoid premature `join()`/`get()` mid-flow (pl142 :839) |
+| context that async tasks read | a `ScopedValue` (CC7) | `ScopedValue` over `ThreadLocal` across tasks (pl125 :33, :39) |
+| a cache | an eviction policy and a memory ceiling (CC10) | an unbounded cache is a memory leak (addy perf :181, :232) |
+| a database connection pool | one pool per process; a connect timeout that fails fast (CC10) | one pool per process; exhaustion fails fast (addy perf :114, :116) |
+
+Sources, all read at a pinned commit; `:N` is a line:
+
+- pl125, pl126, pl142: jabrena/plinth `skills/<n>-<name>/references/<n>-<name>.md` for 125-java-concurrency,
+  126-java-exception-handling and 142-java-functional-programming, @a46375a.
+- pl123cc: jabrena/plinth `skills/123-java-design-patterns/references/123-cross-cutting-integration-patterns.md`,
+  @a46375a.
+- addy api, addy perf: addyosmani/agent-skills `skills/api-and-interface-design/SKILL.md` and
+  `references/performance-checklist.md`, @aeac41d.
+- ps separate: pstack `skills/principle-separate-before-serializing-shared-state/SKILL.md`, @f713f14.
+
+## Good / Bad
+
+### CC3 — A timeout that stops the work, not only the wait
+
+**Bad** (neutral)
+```java
+@Bean
+public HttpPaymentGateway paymentGateway(GatewayCredentials credentials) {
+    RestClient restClient = RestClient.builder().build();
+    return new HttpPaymentGateway(credentials, restClient);
+}
+// InvoiceService.pay:
+return CompletableFuture.supplyAsync(() -> paymentGateway.charge(request), chargeExecutor)
+    .orTimeout(limits.timeout().toMillis(), TimeUnit.MILLISECONDS)
+```
+The gateway `RestClient` has no connect or read timeout, so after `orTimeout` fires the charge request keeps running on
+a pool thread.
+
+**Good** (neutral)
+```java
+@Bean
+public HttpPaymentGateway paymentGateway(
+        final GatewayCredentials credentials,
+        final GatewayHttpProperties gatewayHttp) {
+    final HttpClient httpClient = HttpClient.newBuilder()
+            .connectTimeout(gatewayHttp.connectTimeout())
+            .build();
+    final var requestFactory = new JdkClientHttpRequestFactory(httpClient);
+    requestFactory.setReadTimeout(gatewayHttp.readTimeout());
+    final RestClient restClient = RestClient.builder().requestFactory(requestFactory).build();
+    return new HttpPaymentGateway(credentials, restClient);
+}
+```
+The deadline is on the socket, so a stuck gateway read ends and frees its thread; `orTimeout` may stay as the caller's
+wait. (Real evidence: ledger row CC3.)
+
+### CC4 — A bounded pool has a bounded queue and a stated rejection
+
+**Bad** (neutral)
+```java
+@Bean(destroyMethod = "shutdownNow")
+ScheduledExecutorService orderStreamHeartbeatScheduler() {
+    return Executors.newScheduledThreadPool(4,
+        Thread.ofPlatform().name("order-stream-heartbeat-", 0).factory());
+}
+```
+Four threads look bounded, but every open order-status stream adds its own periodic task, and nothing says what happens
+past capacity.
+
+**Good** (neutral)
+```java
+@Bean
+SseHeartbeats sseHeartbeats(final SseProperties sseProperties) {
+    return new SseHeartbeats(new ArrayBlockingQueue<>(sseProperties.maxOpenStreams()));
+}
+
+@Bean(destroyMethod = "shutdownNow")
+ScheduledThreadPoolExecutor orderStreamHeartbeatTicker(final SseHeartbeats heartbeats) {
+    final var ticker = new ScheduledThreadPoolExecutor(
+            1,
+            Thread.ofPlatform().name("order-stream-heartbeat").factory());
+    ticker.scheduleAtFixedRate(heartbeats::sendToAll, HEARTBEAT_SECONDS, HEARTBEAT_SECONDS, TimeUnit.SECONDS);
+    return ticker;
+}
+```
+One thread runs one task over a queue of `maxOpenStreams`; `register` returns `Registered | Refused`, so the stream past
+the cap is refused out loud. (Real evidence: ledger row CC4.)
+
+### CC9 — Success, failure or unknown; intent before the call; the initiator's key
+
+**Bad** (neutral)
+```java
+for (int attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    try {
+        HttpRequest request = HttpRequest.newBuilder()
+            // … gateway url, signature, Idempotency-Key = payment id, timeout(15 s), POST body …
+            .build();
+        HttpResponse<Void> response = HTTP.send(request, HttpResponse.BodyHandlers.discarding());
+        int status = response.statusCode();
+        // … 2xx → return; 4xx → return; 5xx → retry …
+    } catch (IOException failure) {
+        log.warn("PaymentGateway charge failed paymentId={} attempt={}: {}: {}",
+            payment.id(), attempt + 1, failure.getClass().getSimpleName(), failure.getMessage());
+    }
+    // … sleep, next attempt …
+}
+```
+A read timeout after the charge was sent is logged as "failed" and sent again, though the gateway may already have
+taken the money.
+
+**Good** (neutral)
+```java
+public ChargeOutcome charge(final Payment payment) {
+    paymentLog.recordCharging(payment.id());
+    try {
+        final HttpResponse<Void> response = http.send(signedCharge(payment), discarding());
+        return ChargeOutcome.fromStatus(payment.id(), response.statusCode());
+    } catch (final HttpConnectTimeoutException | ConnectException notConnected) {
+        return new ChargeOutcome.NotSent(payment.id(), notConnected.getClass().getSimpleName());
+    } catch (final IOException afterConnect) {
+        return new ChargeOutcome.Unknown(payment.id(), afterConnect.getClass().getSimpleName());
+    } catch (final InterruptedException interrupted) {
+        Thread.currentThread().interrupt();
+        return new ChargeOutcome.Unknown(payment.id(), "interrupted");
+    }
+}
+```
+Intent is recorded first; anything after connect is `Unknown`; the caller resends only `NotSent`, with the same
+payment-id key. (Real evidence: ledger row CC9.)
+
+## Decided edges
+
+- **Skip when** a `synchronized` block holds a blocking call on Java 24 or later: JEP 491 removed that pinning, and
+  pl125 :38, which says otherwise, is stale (CC1). — **Do not skip when** the blocking call runs inside a class
+  initialiser: that still pins (CC1). — **Confidence** high
+- **Skip when** `orTimeout` sits beside a client timeout that stops the work: it is the caller's wait (CC3; the CC3 Good
+  above). — **Do not skip when** `orTimeout` is the only timeout on the call. — **Confidence** high
+- **Skip when** a non-idempotent command carries an idempotency key from its initiator: it may be retried (CC8; pl123cc
+  :95). — **Do not skip when** the key is minted per attempt: every retry is then a new effect (addy api :163). —
+  **Confidence** high
+- **Skip when** one shared write target is a real invariant: serialize access structurally, with a lock, a
+  single-writer actor or a compare-and-swap (CC5; ps separate :16). — **Do not skip when** the actors publish
+  independent facts: give each its own target (ps separate :15). — **Confidence** high
+- **Skip when** the `join()` sits at the outer boundary of the flow, such as a batch entry point (CC6; pl142 :839). —
+  **Do not skip when** it sits mid-pipeline in request-serving code. — **Confidence** high
+
+## Review checks
+
+Walk every changed Java file that starts threads, submits async work, calls a remote service, retries, locks, or builds
+a pool or a cache.
+
+- [ ] CC1 — Blocking I/O fanned out on a platform-thread pool is a finding. A pool whose thread factory makes virtual
+  threads (`grep -n "ofVirtual"`) is a finding. A blocking call inside a `static {}` block or a static field
+  initialiser is flagged: CC1 says avoid, not never.
+- [ ] CC2 — For each `supplyAsync` or `runAsync` (`grep -nE "(supply|run)Async\("`), find an executor argument. A
+  one-argument call that does blocking work is a finding.
+- [ ] CC3 — For each remote call (`RestClient`, `HttpClient`, `WebClient`, a JDBC or Redis client), find a timeout
+  that stops the work, such as a connect and a read timeout on the client. A call whose only timeout is `orTimeout` is
+  a finding.
+- [ ] CC9 — For each remote call with a side effect, find the intent record before the call and an outcome that keeps
+  unknown apart from failure. A timeout after connect handled as failure, or a key minted inside the retry, is a
+  finding.
+- [ ] CC8 — For each retry loop or retry policy, find bounded attempts, jittered backoff, a transient-only filter, an
+  idempotent call (or an initiator's key) and a timeout. Any one missing is a finding.
+- [ ] CC4 — For each bounded pool built (`grep -nE "new ThreadPoolExecutor|Executors\.newFixedThreadPool"`), find a
+  bounded queue and a stated rejection behaviour. `newFixedThreadPool`, whose queue is unbounded, is a finding.
+- [ ] CC5 — For each new lock, `synchronized` block or shared mutable field, ask whether each actor could own its
+  own target. Shared state that could be separated is a finding. A lock with more than one owning class, or two locks
+  held at once with no documented order, is a finding.
+- [ ] CC6 — Each `.join()` or `.get()` on a future in request-serving code (`grep -nE "\.(join|get)\(\)"`) that is not
+  at the outer boundary is a finding.
+- [ ] CC7 — Each new `ThreadLocal` (`grep -n "ThreadLocal"`) is a finding.
+- [ ] CC10 — For each cache, find an eviction policy and a maximum size. For each connection pool, find one pool per
+  database per process and a connect timeout. Either one missing is a finding.

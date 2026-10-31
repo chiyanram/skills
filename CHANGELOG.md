@@ -3,6 +3,22 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.9.0](https://github.com/chiyanram/skills/compare/rulebook--v0.8.0...rulebook--v0.9.0) (2026-10-31)
+
+### Features
+
+* **code:** angular-ui rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#151](https://github.com/chiyanram/skills/issues/151)) ([4ad861b](https://github.com/chiyanram/skills/commit/4ad861bd4939348a6b75e7fa990b7104fce3dc5e))
+* **code:** messaging rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#149](https://github.com/chiyanram/skills/issues/149)) ([62353ea](https://github.com/chiyanram/skills/commit/62353ea8156e57267bcba66e52698ac0d006ab67))
+
+## [0.8.0](https://github.com/chiyanram/skills/compare/rulebook--v0.7.0...rulebook--v0.8.0) (2026-10-31)
+
+### Features
+
+* **code:** concurrency rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#148](https://github.com/chiyanram/skills/issues/148)) ([3505519](https://github.com/chiyanram/skills/commit/3505519849aff3c28755fccd4edeeef6d3e8f03c))
+* **code:** services rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#146](https://github.com/chiyanram/skills/issues/146)) ([1865f60](https://github.com/chiyanram/skills/commit/1865f6041fc1fe8220ecb7cfed02bf0f428feffe))
+* **code:** spring rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#147](https://github.com/chiyanram/skills/issues/147)) ([49209e6](https://github.com/chiyanram/skills/commit/49209e6d80dbb2549cdedb681165c57f887f6a36))
+* **migrations:** postgres-design reference from industry sources ([#157](https://github.com/chiyanram/skills/issues/157)) ([7f685cf](https://github.com/chiyanram/skills/commit/7f685cf2e1c20e1a9bb8ce1c3a7ae6fdb1f88e3d))
+
 ## [0.7.0](https://github.com/chiyanram/skills/compare/rulebook--v0.6.1...rulebook--v0.7.0) (2026-10-31)
 
 ### Features

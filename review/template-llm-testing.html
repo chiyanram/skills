@@ -1,0 +1,199 @@
+<title>LLM Testing Rules</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the existing Rule Review system (review/template.html). One column of candidate rules, each with its
+   sources and a recommendation beside the decision buttons; a fixed decision bar at the bottom. */
+:root {
+  --bg: #f6f7f5; --panel: #ffffff; --ink: #1d2320; --muted: #5d6762; --line: #dfe3df;
+  --accent: #2f5d50; --good: #1f7a4d; --good-bg: #e8f4ec; --bad: #a33a2b; --bad-bg: #f8ebe8;
+  --warn: #8a6100; --warn-bg: #fbf2dc; --code-bg: #f0f2ef;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #141816; --panel: #1b201d; --ink: #e5ebe7; --muted: #9aa59f; --line: #2c332f;
+  --accent: #7cc0a8; --good: #6fcf9a; --good-bg: #17291f; --bad: #f08a78; --bad-bg: #2e1b17;
+  --warn: #e7c065; --warn-bg: #2b2414; --code-bg: #111512; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #141816; --panel: #1b201d; --ink: #e5ebe7; --muted: #9aa59f; --line: #2c332f;
+  --accent: #7cc0a8; --good: #6fcf9a; --good-bg: #17291f; --bad: #f08a78; --bad-bg: #2e1b17;
+  --warn: #e7c065; --warn-bg: #2b2414; --code-bg: #111512; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--sans); }
+.wrap { max-width: 980px; margin: 0 auto; padding-block: 24px 160px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header h1 { font-size: 1.5rem; margin: 0 0 4px; text-wrap: balance; }
+header p { margin: 0; color: var(--muted); max-width: 70ch; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 8px; }
+.tab { font: 500 0.85rem var(--sans); padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; font-variant-numeric: tabular-nums; }
+.tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.tab .done { color: var(--good); }
+.tab[aria-selected="true"] .done { color: var(--bg); }
+.tab:focus-visible, button:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.gnote { color: var(--muted); font-size: 0.9rem; max-width: 70ch; margin: 4px 0 6px; }
+.rule { border-top: 1px solid var(--line); padding-block: 20px; display: grid; gap: 10px; }
+.rule > *, .ref > *, .side > * { min-width: 0; }
+.rule-head { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; }
+.rid { font: 600 0.95rem var(--mono); color: var(--accent); min-width: 3.2em; }
+.rtext { flex: 1 1 420px; min-width: 0; font-weight: 500; }
+.cites { font: 0.74rem/1.5 var(--mono); color: var(--muted); overflow-wrap: anywhere; padding-left: calc(3.2em + 12px); }
+.rec { display: grid; gap: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.rec h3 { margin: 0; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); display: flex; gap: 8px; align-items: center; }
+.chip { font: 500 0.72rem var(--sans); letter-spacing: 0.02em; text-transform: none; padding: 2px 8px; border-radius: 999px; }
+.chip.approve { background: var(--good-bg); color: var(--good); }
+.chip.change { background: var(--warn-bg); color: var(--warn); }
+.chip.reject { background: var(--bad-bg); color: var(--bad); }
+.rec p { margin: 0; font-size: 0.9rem; max-width: 75ch; }
+.status { font: 500 0.72rem var(--sans); padding: 2px 8px; border-radius: 999px; background: var(--good-bg); color: var(--good); }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 12px; }
+.side { min-width: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: grid; gap: 8px; align-content: start; }
+.side h3 { margin: 0; font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.side.good h3 { color: var(--good); } .side.bad h3 { color: var(--bad); }
+pre { margin: 0; background: var(--code-bg); border-radius: 6px; padding: 10px; overflow-x: auto; font: 0.78rem/1.5 var(--mono); }
+.why { font-size: 0.88rem; overflow-wrap: anywhere; }
+.ref { min-width: 0; display: grid; gap: 6px; border-left: 3px solid var(--line); padding-left: 12px; }
+.ref h3 { margin: 0; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.ref .where { font: 0.74rem var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+.decide { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.decide button { font: 500 0.82rem var(--sans); padding: 6px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+.decide button[aria-pressed="true"][data-v="approve"] { background: var(--good-bg); border-color: var(--good); color: var(--good); }
+.decide button[aria-pressed="true"][data-v="reject"] { background: var(--bad-bg); border-color: var(--bad); color: var(--bad); }
+.decide button[aria-pressed="true"][data-v="change"] { background: var(--warn-bg); border-color: var(--warn); color: var(--warn); }
+.decide textarea { flex: 1 1 100%; min-height: 54px; font: 0.85rem var(--sans); padding: 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+.bar { position: fixed; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line);
+  padding-top: 10px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.bar-in { max-width: 980px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.count { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 0.85rem; flex: 1 1 260px; }
+.bar button { font: 600 0.85rem var(--sans); padding: 8px 14px; border-radius: 6px; border: 1px solid var(--accent); background: var(--accent); color: var(--bg); cursor: pointer; }
+.bar button.ghost { background: transparent; color: var(--accent); }
+#out { flex: 1 1 100%; font: 0.78rem var(--mono); white-space: pre-wrap; color: var(--muted); overflow-wrap: anywhere; max-height: 22vh; overflow-y: auto; }
+#out:empty { display: none; }
+@media (max-width: 520px) { .cites { padding-left: 0; } }
+@media (prefers-reduced-motion: no-preference) { .tab, .decide button { transition: background .15s, color .15s; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>LLM Testing Rules</h1>
+    <p>G34 (skills #133): rules for testing code that calls an LLM, from research/69 (LT) and research/70 (LS). Approved groups show each rule's neutral Good/Bad pair beside the reference project's own code; the rest show the candidate rule with a recommendation. Mark each one, then copy the decision line and paste it into the chat.</p>
+  </header>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <p class="gnote" id="gnote"></p>
+  <main id="list"></main>
+</div>
+<div class="bar"><div class="bar-in">
+  <span class="count" id="count"></span>
+  <button class="ghost" id="all">Take the recommendations</button>
+  <button id="copy">Copy decision</button>
+  <div id="out" aria-live="polite"></div>
+</div></div>
+
+<script>
+const DATA = /*DATA*/[];
+const KEY = "llm-testing-review-v2";
+let state = {};
+try { state = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { state = {}; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+let current = DATA.length ? DATA[0].key : null;
+try { const h = location.hash.slice(1); if (DATA.some(g => g.key === h)) current = h; } catch (e) {}
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const decided = g => g.items.filter(it => (state[g.key + ":" + it.id] || {}).v).length;
+const label = v => v === "change" ? "Change…" : v[0].toUpperCase() + v.slice(1);
+const hasPair = it => !!(it.pair && it.pair.good);
+const paired = g => g.items.some(hasPair);
+const ruled = g => g.items.every(it => it.status);
+const mode = g => !paired(g) ? "rules" : ruled(g) && g.items.every(hasPair) ? "pairs" : "both";
+const recBlock = it => `<section class="rec"><h3>Recommendation <span class="chip ${esc(it.rec)}">${label(it.rec).replace("…", "")}</span></h3><p>${esc(it.why)}</p></section>`;
+const side = (s, name) => s ? `<section class="side ${name.toLowerCase()}"><h3>${name} · neutral</h3>
+  <pre><code>${esc(s.code)}</code></pre><div class="why">${esc(s.note)}</div></section>` : "";
+function cardBody(it) {
+  if (it.pair && it.pair.good) {
+    const r = it.pair.ref;
+    return `${it.status ? "" : `<div class="cites">${esc(it.cites)} · ${esc(it.file)}</div>${recBlock(it)}`}<div class="pair">${side(it.pair.bad, "Bad")}${side(it.pair.good, "Good")}</div>
+      ${r ? `<section class="ref"><h3>How the reference does it</h3><div class="where">${esc(r.where)}</div>
+        <pre><code>${esc(r.code)}</code></pre>${r.note ? `<div class="why">${esc(r.note)}</div>` : ""}</section>` : ""}`;
+  }
+  return `<div class="cites">${esc(it.cites)} · ${esc(it.file)}</div>
+      ${recBlock(it)}`;
+}
+
+function renderTabs() {
+  const t = document.getElementById("tabs");
+  t.innerHTML = DATA.map(g => {
+    const n = decided(g), all = n === g.items.length;
+    return `<button class="tab" role="tab" aria-selected="${g.key === current}" data-k="${g.key}">${esc(g.name)} · ${all ? `<span class="done">done</span>` : `${n}/${g.items.length}`}</button>`;
+  }).join("");
+  t.querySelectorAll(".tab").forEach(b => b.onclick = () => { current = b.dataset.k; try { history.replaceState(null, "", "#" + current); } catch (e) {} render(); });
+}
+function render() {
+  renderTabs();
+  const g = DATA.find(x => x.key === current);
+  const list = document.getElementById("list");
+  const m = g ? mode(g) : "";
+  document.getElementById("gnote").textContent = !g ? "" : m === "pairs"
+    ? "The rules in this group are approved. Now approve each Good/Bad pair: Bad and Good are neutral examples written to the house style; the reference's own code is evidence only and never goes into the reference."
+    : m === "both"
+    ? g.note + " Decide each rule and its Good/Bad pair together: Approve takes both; use Change… to change either. The reference's own code is evidence only."
+    : g.note;
+  if (!g) { list.innerHTML = "<p>No groups loaded yet.</p>"; return; }
+  list.innerHTML = g.items.map(it => {
+    const d = state[g.key + ":" + it.id] || {};
+    return `<article class="rule" data-id="${esc(it.id)}">
+      <div class="rule-head"><span class="rid">${esc(it.id)}</span><span class="rtext">${esc(it.rule)}</span>${it.status ? `<span class="status" title="${esc(it.status)}">rule approved</span>` : ""}</div>
+      ${cardBody(it)}
+      <div class="decide">
+        ${["approve", "reject", "change"].map(v => `<button data-v="${v}" aria-pressed="${d.v === v}">${label(v)}</button>`).join("")}
+        <textarea id="note-${esc(g.key)}-${esc(it.id)}" placeholder="What should change?" ${d.v === "change" ? "" : "hidden"}>${esc(d.note || "")}</textarea>
+      </div></article>`;
+  }).join("");
+  list.querySelectorAll(".rule").forEach(a => {
+    const id = a.dataset.id, k = g.key + ":" + id;
+    a.querySelectorAll(".decide button").forEach(b => b.onclick = () => {
+      state[k] = { ...(state[k] || {}), v: b.dataset.v }; save(); render();
+    });
+    const ta = a.querySelector("textarea");
+    ta.oninput = () => { state[k] = { ...(state[k] || {}), v: "change", note: ta.value }; save(); summary(); };
+  });
+  summary();
+}
+function decisionText(g) {
+  const pick = v => g.items.filter(it => (state[g.key + ":" + it.id] || {}).v === v);
+  const ap = pick("approve").map(i => i.id), rj = pick("reject").map(i => i.id), ch = pick("change");
+  const open = g.items.filter(it => !(state[g.key + ":" + it.id] || {}).v).map(i => i.id);
+  const parts = [];
+  if (ap.length === g.items.length) parts.push("approve all");
+  else {
+    if (ap.length) parts.push("approve " + ap.join(", "));
+    if (rj.length) parts.push("reject " + rj.join(", "));
+    ch.forEach(i => parts.push(`change ${i.id}: ${((state[g.key + ":" + i.id] || {}).note || "").trim() || "(no note)"}`));
+    if (open.length) parts.push("undecided " + open.join(", "));
+  }
+  const suffix = { rules: "", pairs: " Good/Bad", both: " rules + Good/Bad" }[mode(g)];
+  return `G34 ${g.name}${suffix}: ` + parts.join("; ");
+}
+function summary() {
+  const g = DATA.find(x => x.key === current); if (!g) return;
+  const n = v => g.items.filter(it => (state[g.key + ":" + it.id] || {}).v === v).length;
+  document.getElementById("count").textContent = `${g.name}: ${n("approve")} approved · ${n("reject")} rejected · ${n("change")} to change · ${g.items.length - n("approve") - n("reject") - n("change")} undecided`;
+}
+document.getElementById("all").onclick = () => {
+  const g = DATA.find(x => x.key === current); if (!g) return;
+  g.items.forEach(it => {
+    const k = g.key + ":" + it.id;
+    if ((state[k] || {}).v) return;
+    state[k] = mode(g) === "pairs" ? { v: "approve" } : it.rec === "change" ? { v: "change", note: "as recommended: " + it.why } : { v: it.rec };
+  });
+  save(); render();
+};
+document.getElementById("copy").onclick = () => {
+  const g = DATA.find(x => x.key === current); if (!g) return;
+  const t = decisionText(g), out = document.getElementById("out");
+  out.textContent = t;
+  const done = () => { out.textContent = "Copied. Paste it into the chat:\n" + t; };
+  try { navigator.clipboard.writeText(t).then(done, () => { out.textContent = "Select and copy this line:\n" + t; }); }
+  catch (e) { out.textContent = "Select and copy this line:\n" + t; }
+};
+render();
+</script>
