@@ -5,26 +5,25 @@ or review an interface a caller depends on, or a method that implements one.
 
 ## Rules
 
-- **SEAM1** — Give every seam one job, a record in, a sealed result out, pure decisions, I/O that decides nothing
+- **SEAM1** (operator preference, 2026-10-31) — Give every seam one job, a record in, a sealed result out, pure decisions, I/O that decides nothing
   and rule lists at cyclomatic complexity ≤5, because a branching method hides paths no test reaches.
 
 ## When X, use Y
 
 | the seam has | use | why |
 |---|---|---|
-| more than one job | one seam per job (SEAM1) | "one job" (ledger :133) |
-| an input | one record (SEAM1) | "typed in and out (record in, sealed out)" (ledger :133) |
-| an outcome to return | a sealed result (SEAM1); its caller switches over it with no `default` arm (TY2, `types.md`) | "seams chain by exhaustive switch over the previous seam's sealed result" (ledger :133) |
-| a decision to make | a pure function that calls no I/O (SEAM1) | "decide or do (pure decision vs one-statement I/O)" (ledger :133) |
-| I/O to do | a method that does the I/O and chooses no outcome (SEAM1) | "decide or do" (ledger :133) · "I/O decides nothing" (agent-factory#21 Q3) |
-| a choice among several cases | a rule list, not an if-ladder; each method at cyclomatic complexity ≤5 (SEAM1) | "rule lists not if-ladders", "complexity ≤5" (ledger :133) |
-| a value that may be absent | `Optional`, a sealed type or an enum (TY1, `types.md`) | "no null" is part of the seam principle (agent-factory#21 Q3) |
-| code to check for smells | the smell baseline in `smells.md` | "Our own smells.md list … replaces the rameezk link in SEAM1" (ledger :568) |
+| more than one job | one seam per job (SEAM1) | a class has one job, one reason to change (pl121p Example 2); operator preference |
+| an input | one record (SEAM1) | operator preference |
+| an outcome to return | a sealed result (SEAM1); its caller switches over it with no `default` arm (TY2, `types.md`) | the compiler must fail when a new variant is not handled (pstack :20); the compiler confirms every permitted subclass is covered (JEP 409) |
+| a decision to make | a pure function that calls no I/O (SEAM1) | isolate side effects at the edges (pl142 :740); return results, do not produce side effects (mattpocock `codebase-design/SKILL.md` :83) |
+| I/O to do | a method that does the I/O and chooses no outcome (SEAM1) | isolate side effects at the edges (pl142 :740) |
+| a choice among several cases | a rule list, not an if-ladder; each method at cyclomatic complexity ≤5 (SEAM1) | operator preference |
+| a value that may be absent | `Optional`, a sealed type or an enum (TY1, `types.md`) | a bag of optional fields lets contradictory combinations compile (pstack :15) |
+| code to check for smells | the smell baseline in `smells.md` | one smell list for the rulebook |
 
-`ledger :N` is a line of `research/19-approved-rules.md`. agent-factory#21 Q3 is the operator's decision that
-splits the generic seam principle (this file) from a project's own seam rules.
-SEAM1's reason comes from agent-factory research/32:34 (agent-factory#21 Part B), approved by the operator
-(agent-factory#32 D9); the ledger row has none.
+`pstack` is cursor-plugins pstack `skills/principle-type-system-discipline/SKILL.md`. `pl121p` is plinth
+`121-java-object-oriented-design-principles.md` and `pl142` is plinth `142-java-functional-programming.md`. `:N` is
+the line. The sealed result and the pure decision are industry rules; the other SEAM1 parts are operator preference.
 
 ## Good / Bad
 
@@ -34,11 +33,10 @@ SEAM1 has no approved pair. The pair for an absent value is TY1, and the pair fo
 ## Decided edges
 
 - **Skip when** the build already fails on cyclomatic complexity (for example a Checkstyle `CyclomaticComplexity`
-  check): leave that count to the gate (ledger OQ3 :200). — **Do not skip when** no gate measures it: count the
+  check): leave that count to the gate. — **Do not skip when** no gate measures it: count the
   branches of each changed method by hand. — **Confidence** high
-- **Skip when** a project states its own seam rules: point to them and do not copy them here (one owner per fact,
-  ledger OQ1 :383). — **Do not skip when** a project rule and SEAM1 disagree: no file wins, and the disagreement is a
-  bug fixed in the same change (ledger OQ1 :383). — **Confidence** high
+- **Skip when** a project states its own seam rules: point to them and do not copy them here (one owner per fact). — **Do not skip when** a project rule and SEAM1 disagree: no file wins, and the disagreement is a
+  bug fixed in the same change. — **Confidence** high
 
 ## Review checks
 
