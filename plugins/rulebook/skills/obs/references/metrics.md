@@ -34,12 +34,11 @@ Contents: Rules · When X, use Y · Good / Bad (MX1, MXN1, MX3) · Decided edges
 | how long a completed operation took | a `Timer` (MX2) | Micrometer timers "you should use a `Timer` rather than a `DistributionSummary`"; counters · r47 :555-556 |
 | work still in progress | a `LongTaskTimer` (MX2) | Micrometer long task timers "A normal Timer only records the duration *after* the task is complete" · r47 :558 |
 | a value that can go down | a gauge on a strongly held object (MX2) | Prometheus instrumentation "if the value can go down, it is a gauge"; Micrometer gauges · r47 :557, :559 |
-| latency percentiles | `publishPercentileHistogram()` or SLO buckets (MXN1) | Micrometer histograms "aggregable (across dimensions)"; Prometheus histograms · r47 :564-565 |
+| latency percentiles | `publishPercentileHistogram()` or SLO buckets (MXN1) | Micrometer histograms "aggregable (across dimensions)"; Prometheus histograms · r47 :562, :564-565 |
 | a unit | none in the name; a `Duration` for timers, `baseUnit` for summaries (MXN2) | OpenTelemetry metrics "SHOULD NOT include the units in the metric name"; Prometheus naming "base units" · r47 :580-582 |
 | a scheduled or batch job | a gauge of the last success as epoch seconds, plus a `LongTaskTimer` (MXN3) | Prometheus instrumentation "the last time it succeeded", alerting; Micrometer long task timers · r47 :594-596 |
 
-`r47` is agent-factory `research/47-industry-migrations-obs.md`; `:N` is a line in that file. Grafana's page carries
-the Google SRE golden signals; the SRE book is not counted as a separate source.
+`r47` is agent-factory `research/47-industry-migrations-obs.md`; `:N` is a line in that file.
 
 ## Good / Bad
 
@@ -103,26 +102,32 @@ One meter. The error ratio is a filter on the `outcome` tag.
 
 ## Decided edges
 
-- **Skip when** an id is recorded on a span or a log line, not on a meter: ids are fine there (MX1; Micrometer
-  Observation "High cardinality key values are not included in meters", r47 :634). — **Do not skip when** the same
-  value is passed as a meter tag. — **Confidence** high
+- **Skip when** an id is a span attribute or a `highCardinalityKeyValue`: it never reaches a meter (MX1; Micrometer
+  Observation "High cardinality key values are not included in meters", r47 :634). — **Do not skip when** it is a
+  meter tag or a `lowCardinalityKeyValue`, which becomes one (r47 :550). Ids in log lines are LG1 in `logging.md`.
+  — **Confidence** high
 
 ## Review checks
 
 Walk every meter, tag and `Timer` or histogram setting added or changed in the diff, and every new endpoint, outbound
 client, pool, queue and scheduled job.
 
-- [ ] MX1 — For each tag, read where its value comes from. An id, email, raw URL, user input or exception message is
+- [ ] MX1 — For each tag and each `lowCardinalityKeyValue`, read where its value comes from. An id, email, raw URL, user input or exception message is
   a finding; an unknown value not mapped to a fixed one such as `NOT_FOUND` is a finding.
 - [ ] MX5 — For each new endpoint and outbound client, find its rate, error and duration meters; for each new pool and
-  queue, its utilisation, saturation and error meters. One missing is a finding.
-- [ ] MX3 — `grep -n -E '"[a-z.]*\.(success|failed|failure|error)"'` in meter names. A paired or generated meter name,
+  queue, its utilisation, saturation and error meters. One missing is a finding. One `Timer` with an `outcome` tag
+  gives all three, and a meter the framework records for it (an HTTP server or client timer, an executor or pool
+  binder) counts.
+- [ ] MX3 — `grep -n -E '"[a-z0-9._]*[._](success|succeeded|ok|failed|failure|failures|error|errors)[._"]'` and
+  `grep -n -E '(counter|timer|builder)\("[^"]*" *\+'` in meter names. A paired or generated meter name,
   or one not dot-separated lower case, is a finding.
 - [ ] MX2 — For each new meter, check its type against what it measures. A `Counter` or `DistributionSummary` for a
-  duration, or a gauge on an object nothing else holds, is a finding.
-- [ ] MXN1 — `grep -n -E "publishPercentiles\(|publishPercentileHistogram"` in each latency `Timer`. Client-side
-  percentiles only, or an average only, is a finding.
-- [ ] MXN2 — `grep -n -E '"[a-z.]*[._](ms|millis|seconds|bytes)"'` in meter names. A unit in the name, or a `Timer`
-  recorded with a raw number, is a finding.
+  duration, a `Counter` for an event a `Timer` already records, in-flight work with no `LongTaskTimer`, or a gauge on
+  an object nothing else holds, is a finding.
+- [ ] MXN1 — `grep -n -E "publishPercentiles\(|publishPercentileHistogram|serviceLevelObjectives\(|histogram *= *true|percentiles-histogram"`
+  across code and config, for each latency `Timer`. Client-side percentiles only, or an average only, is a finding.
+- [ ] MXN2 — `grep -n -E '"[a-zA-Z0-9._]*([._](ms|millis|milliseconds|nanos|micros|seconds|secs|bytes|kb|mb)|[a-z](Ms|Millis|Nanos|Seconds|Bytes))[._"]'`
+  in meter names. A unit in the name, a `Timer` recorded with a raw number, or a `DistributionSummary` of a quantity
+  with a unit and no `baseUnit`, is a finding.
 - [ ] MXN3 — For each new scheduled or batch job, find a gauge of its last success as epoch seconds and a
   `LongTaskTimer`. A job with either missing, or a "seconds since" gauge, is a finding.

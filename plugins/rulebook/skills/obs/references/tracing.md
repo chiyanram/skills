@@ -32,9 +32,9 @@ Contents: Rules · When X, use Y · Good / Bad (TR1, TR2, TRN1, TRN2, TRN3) · D
 | measures one operation | `observation.observe(() -> …)` (TRN2) | OpenTelemetry Trace API "Any span that is created MUST also be ended"; Micrometer Observation · r47 :646-647 |
 | starts a span it cannot wrap in a lambda | `start()`, the scope in try-with-resources, `stop()` in `finally` (TRN2) | OpenTelemetry Trace API; Micrometer Observation "The Scope must be closed" · r47 :646-647 |
 | needs a tracer or registry | the API or facade type, with no null check (TR2) | OpenTelemetry library guidelines "the API calls should be no-ops"; Trace API; Micrometer Tracing "without vendor lock-in" · r47 :621-623 |
-| names a span | the class of operation: a verb on a resource, or `{method} {route template}` (TRN1) | OpenTelemetry Trace API "the most general string"; HTTP spans; Micrometer Observation · r47 :639-641 |
+| names a span | the class of operation: a constant such as `orders.place`, or `{method} {route template}` (TRN1) | OpenTelemetry Trace API "the most general string"; HTTP spans; Micrometer Observation · r47 :639-641 |
 | records an id | a high-cardinality key value (span attribute) (TRN1, TR3) | OpenTelemetry Trace API "account_id=42 would make a nice Span attribute"; Micrometer Observation · r47 :634 |
-| catches a failure it handles, retries or turns into a 4xx | no error status; an event if it is worth recording (TRN3) | OpenTelemetry Trace API, recording errors "SHOULD NOT be recorded on spans", HTTP spans · r47 :652-654 |
+| catches a failure it handles, retries or turns into a 4xx | no error status (TRN3) | OpenTelemetry Trace API, recording errors "SHOULD NOT be recorded on spans", HTTP spans · r47 :652-654 |
 | sets the sampling ratio | a parent-based sampler, ratio in configuration (TR5) | OpenTelemetry Trace SDK `ParentBased`; Spring Boot `management.tracing.sampling.probability` · r47 :661-662 |
 
 `r47` is agent-factory `research/47-industry-migrations-obs.md`; `:N` is a line in that file. TRN3's sources are all
@@ -53,7 +53,8 @@ kafkaTemplate.send(
     "orders",
     message);
 ```
-The consumer reads a string, not a parent context, so it starts an unrelated trace.
+The copied field is a string, not a parent context, so it builds no link from the consumer's span to the producer's
+trace.
 
 **Good** (neutral)
 ```java
@@ -120,7 +121,7 @@ An exception from `render` skips `stop()`, so the span leaks and is never export
 Observation.createNotStarted("invoices.render", observationRegistry)
     .observe(() -> renderer.render(invoice));
 ```
-One call opens the scope, records an error, and stops the observation.
+One call opens the scope, records an error if the lambda throws, and stops the observation.
 
 ### TRN3 — An error status only for a failed operation
 
@@ -149,7 +150,7 @@ The handled miss is an event, so the error rate counts only real failures.
 ## Decided edges
 
 - **Skip when** an environment sets its ratio to 1.0 in configuration: the ratio is a cost choice per environment
-  (TR5; OpenTelemetry Trace SDK, Spring Boot tracing, r47 :661-662). — **Do not skip when** the ratio or the sampler
+  (TR5; OpenTelemetry Trace SDK, Spring Boot tracing, r47 :662, :664). — **Do not skip when** the ratio or the sampler
   is set in code. — **Confidence** high
 - **Skip when** an id is a span attribute: ids are fine on spans (TR3, TRN1; OpenTelemetry Trace API, Micrometer
   Observation, r47 :634). — **Do not skip when** the id is in the span name, or the value is a secret, token or
@@ -162,15 +163,15 @@ changed in the diff.
 
 - [ ] TR1 — For each message sent to another process and each task handed to another thread, find the propagator or
   context-propagating executor. A `traceId` copied into a payload field, or a bare executor, is a finding.
-- [ ] TRN2 — For each `start()`, find its `stop()` in a `finally` and its scope in try-with-resources, or an
-  `observe(…)` instead. A path that skips `stop()` is a finding.
-- [ ] TR2 — `grep -n -E "io\.opentelemetry\.sdk|Tracer.*!= *null|Registry.*!= *null"`. An SDK type in application
+- [ ] TRN2 — For each `start()`, find its `stop()` (`end()` on a `Span`) in a `finally` and its scope in
+  try-with-resources, or an `observe(…)` instead. A path that skips the end is a finding.
+- [ ] TR2 — `grep -n -i -E "io\.opentelemetry\.sdk|(tracer|tracing|observationregistry)[a-z]* *[!=]= *null|null *[!=]= *(tracer|tracing|observationregistry)|objects\.(nonnull|isnull)\((tracer|tracing|observationregistry)"`. An SDK type in application
   code, or a null check on a tracer or registry, is a finding.
 - [ ] TR3 — For each span name, attribute, event and status description, read the value. A secret, token, credential
   or sensitive PII value is a finding.
-- [ ] TRN1 — For each span or observation name, check it is a constant or a route template. An id, or any value
-  concatenated into the name, is a finding.
+- [ ] TRN1 — For each span or observation name, check it is a constant or a route template. An id or other unbounded
+  value in the name is a finding; a name built only from bounded parts (method, route template) is not.
 - [ ] TRN3 — For each `error(…)` or error status, check the operation failed. One in a `catch` that handles, retries or
-  returns a 4xx is a finding.
+  returns a 4xx is a finding, and so is the same failure marked by `error(…)` at more than one layer.
 - [ ] TR5 — In each changed tracing configuration, find the sampler and its ratio. A sampler that ignores the parent,
   or a ratio set in code, is a finding.
