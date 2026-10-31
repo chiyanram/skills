@@ -3,6 +3,13 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.9.0](https://github.com/chiyanram/skills/compare/rulebook--v0.8.0...rulebook--v0.9.0) (2026-10-31)
+
+### Features
+
+* **code:** angular-ui rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#151](https://github.com/chiyanram/skills/issues/151)) ([4ad861b](https://github.com/chiyanram/skills/commit/4ad861bd4939348a6b75e7fa990b7104fce3dc5e))
+* **code:** messaging rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#149](https://github.com/chiyanram/skills/issues/149)) ([62353ea](https://github.com/chiyanram/skills/commit/62353ea8156e57267bcba66e52698ac0d006ab67))
+
 ## [0.8.0](https://github.com/chiyanram/skills/compare/rulebook--v0.7.0...rulebook--v0.8.0) (2026-10-31)
 
 ### Features
