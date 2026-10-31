@@ -1123,3 +1123,117 @@ def check_for_ssn(data: ToolOutputGuardrailData) -> ToolGuardrailFunctionOutput:
 result = await check_for_ssn.run(data)
 assert result.behavior["type"] == "raise_exception"
 ```
+
+---
+
+## Recordings (LT12–LT13): rules and pairs together
+
+These apply only to a project that replays recorded provider traffic; the JVM references hand-write payloads instead.
+Rules not approved yet, decided with their pairs in one pass. Stand-in: `replay` is the test's record/replay server
+(for example WireMock), and `ProviderRecorder` saves new recordings.
+
+### LT12 — Replay fails on unplayed or unmatched traffic, never accepts near-matches
+
+**Bad** (neutral)
+```groovy
+def "should answer from the recorded provider reply"() {
+    given:
+    replay.load("recordings/where-is-order", matchBody: false)
+
+    when:
+    def reply = adapter.reply(question("Where is A-17?"))
+
+    then:
+    reply.text == "A-17 has shipped."
+}
+```
+What goes wrong: the recording matches any request body and unused recordings are ignored. The test keeps passing after
+the adapter stops sending the tools or the system prompt.
+
+**Good** (neutral)
+```groovy
+def "should send exactly the recorded requests and play every recording"() {
+    given:
+    replay.load("recordings/where-is-order", matchBody: true)
+
+    when:
+    def reply = adapter.reply(question("Where is A-17?"))
+
+    then:
+    reply.text == "A-17 has shipped."
+    replay.unmatchedRequests() == []
+    replay.unplayedRecordings() == []
+}
+```
+Why this is right: a changed request no longer matches its recording, and a recording the code stopped using fails the
+test.
+
+**How the reference does it** — pydantic-ai `tests/conftest.py:847-875 @79e157e8b`
+```python
+def check_vcr_cassette_usage(vcr: Cassette, strict_usage: bool) -> None:
+    unused = {
+        'HTTP': [index for index in range(len(vcr.interactions)) if vcr.play_counts.get(index, 0) == 0],
+        ...
+    }
+    if any(unused.values()):
+        pytest.fail(f'Cassette {vcr.path} did not play all interactions: {details}')
+
+@pytest.fixture(autouse=True)
+def fail_partially_used_vcr_cassettes(request, vcr): ...
+```
+(Shortened with "...".) Contrast: mastra accepts a recording at 60% similarity with only a warning
+(`packages/_llm-recorder/src/llm-recorder.ts:608,1019-1044 @5480e7b7c`).
+
+### LT13 — Scrub credentials and account ids in a hook before a recording is saved
+
+**Bad** (neutral)
+```groovy
+def "should record the provider exchange"() {
+    given:
+    def recorder = new ProviderRecorder(dir: "recordings/where-is-order")
+
+    when:
+    recorder.record { adapter.reply(question("Where is A-17?")) }
+
+    then:
+    recorder.saved().size() == 1
+}
+```
+What goes wrong: it saves headers and bodies as sent. The API key and the account id are committed with the recording,
+and the recording only replays in the account that made it.
+
+**Good** (neutral)
+```groovy
+def "should scrub credentials and account ids before saving a recording"() {
+    given:
+    def recorder = new ProviderRecorder(dir: "recordings/where-is-order", beforeSave: Scrub.standard())
+
+    when:
+    recorder.record { adapter.reply(question("Where is A-17?")) }
+
+    then:
+    def saved = recorder.saved()[0]
+    saved.request.headers.keySet().disjoint(["authorization", "x-api-key", "cookie"])
+    saved.request.url == "https://provider.example/v1/accounts/{account}/messages"
+}
+```
+Why this is right: one hook scrubs every recording the same way, and the test proves the secret and the account id never
+reach the saved file.
+
+**How the reference does it** — pydantic-ai `tests/cassette_hooks.py:63-77 @79e157e8b`
+```python
+FILTERED_HEADER_PREFIXES = ['anthropic-', 'cf-', 'x-']
+FILTERED_HEADERS = {
+    'authorization',
+    'chatgpt-account-id',
+    'cookie',
+    'openai-organization',
+    'openai-project',
+    'set-cookie',
+    'api-key',
+    'xi-api-key',
+}
+```
+(Shortened.) The same hooks scrub tokens in JSON bodies (`:97`) and normalise account and project ids in URIs so a
+recording made in one account replays in another (`:132-143`). Contrast: mastra stores request bodies unscrubbed
+(`packages/_llm-recorder/src/llm-recorder.ts:142-146 @5480e7b7c`).
