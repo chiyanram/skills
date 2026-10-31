@@ -23,6 +23,7 @@ BUILDERS = {
     "build-spring.py": ([], "spring-rules.html", "<title>Spring Rules Review</title>"),
     "build-neutral.py": ([], "neutral-pairs.html", '"key": "strategy"'),
     "build-reasons.py": ([], "rule-reasons.html", '"excluded": ['),
+    "build-llm-testing.py": ([], "llm-testing-rules.html", '"id": "LT1"'),
 }
 
 

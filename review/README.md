@@ -22,6 +22,7 @@ flowchart LR
 | [`build-planning.py`](build-planning.py) | `planning-good-bad.html` | planning Good/Bad pairs (`research/42`) |
 | [`build-g9b.py`](build-g9b.py) | `g9b-rules.html` | code and obs rules (`g9b.json`) |
 | [`build-g9c-mg.py`](build-g9c-mg.py) | `g9c-migration-rules.html` | migration rules (`research/60a`) |
+| [`build-llm-testing.py`](build-llm-testing.py) | `llm-testing-rules.html` | G34: the LLM-testing candidates LT and LS (`research/69`, `research/70`), with a recommendation each (`llm-testing.json`) |
 | [`build-spring.py`](build-spring.py) | `spring-rules.html` | Spring core and Security rules (`r33.json`, `r34.json`) |
 
 Run a builder from the repo root, for example `python3 review/build-neutral.py`. Builders read only paths relative to
