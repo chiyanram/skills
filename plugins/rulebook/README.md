@@ -57,8 +57,11 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 
 | reference | rule IDs | read it when |
 |---|---|---|
+| [comments](skills/code/references/comments.md) | CM | you write or review a comment, a Javadoc block or a lint suppression |
 | [design](skills/code/references/design.md) | SEAM | you write or review an interface a caller depends on, or a method that implements one |
+| [errors](skills/code/references/errors.md) | ER | you write or review a `throw`, a `catch`, an exception handler or request validation |
 | [java](skills/code/references/java.md) | U4, JV, CV3 | you write or review Java production code |
+| [smells](skills/code/references/smells.md) | DS, FW, NM, SM | you write or review production code: the smell baseline, and the shape and naming rules behind it |
 | [spring](skills/code/references/spring.md) | LY6, LY7, SC, X6, SX | you write or review a bean, a configuration class, a settings record, a startup hook or a proxied method |
 | [types](skills/code/references/types.md) | TY | you write or review a field, parameter, return type, record, enum, sealed type or generic type |
 
