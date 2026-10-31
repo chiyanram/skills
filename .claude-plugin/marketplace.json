@@ -6,7 +6,7 @@
     {
       "name": "rulebook",
       "source": "./plugins/rulebook",
-      "version": "0.9.0",
+      "version": "0.10.0",
       "description": "Generic skills, references with neutral-domain examples, and the /crq workflow."
     }
   ]
