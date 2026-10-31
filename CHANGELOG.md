@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.16.0](https://github.com/chiyanram/skills/compare/rulebook--v0.15.0...rulebook--v0.16.0) (2026-10-31)
+
+### Features
+
+* **rulebook:** one SKILL.md router per domain, so references load ([#169](https://github.com/chiyanram/skills/issues/169)) ([7ce8e2d](https://github.com/chiyanram/skills/commit/7ce8e2dbe48fd5bd1f23c2ddedcc996c59e27388))
+
 ## [0.15.0](https://github.com/chiyanram/skills/compare/rulebook--v0.14.0...rulebook--v0.15.0) (2026-10-31)
 
 ### Features

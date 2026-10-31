@@ -4,13 +4,14 @@ PYTHON ?= python3
 
 check: lint test ## run everything CI runs
 
-lint: ## skill frontmatter, one version, links, size budgets, packaging, README index, plugin validate
+lint: ## skill frontmatter, one version, links, size budgets, packaging, README index, skill routers, plugin validate
 	$(PYTHON) scripts/check_skills.py .
 	$(PYTHON) scripts/check_versions.py .
 	$(PYTHON) scripts/check_links.py .
 	$(PYTHON) scripts/check_sizes.py .
 	$(PYTHON) scripts/check_plugin.py .
 	$(PYTHON) scripts/check_index.py .
+	$(PYTHON) scripts/check_routers.py .
 	claude plugin validate --strict .
 	claude plugin validate --strict --profile directory plugins/rulebook
 

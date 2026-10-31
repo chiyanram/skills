@@ -3,8 +3,14 @@
 Generic engineering rules for coding agents. The agent that writes the code and the agent that reviews it read the same
 file. Project-specific values (commands, paths, module names) stay in each project's own `AGENTS.md`.
 
-> **Status: 0.1.0, references only.** The `testing` references below are written and approved. The `SKILL.md` router
-> that loads them is not written yet, so nothing loads on its own. Point an agent at a reference by path until then.
+Each domain is one skill: `testing`, `code`, `migrations` and `obs`. Its `SKILL.md` lists every reference in the
+domain and when to read it, and the agent opens only the references the task needs. From a project's nested
+`AGENTS.md`, point at a reference by name, never by path, because the plugin's install folder differs per machine and
+per version:
+
+```text
+Tests here call the model: use the `testing` skill (rulebook plugin) and read its `llm-tests` reference.
+```
 
 ## Install
 
