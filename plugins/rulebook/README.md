@@ -57,6 +57,7 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 
 | reference | rule IDs | read it when |
 |---|---|---|
+| [angular-ui](skills/code/references/angular-ui.md) | NGA–NGD | you write or review an Angular component, template, or its TypeScript or `tsconfig` |
 | [comments](skills/code/references/comments.md) | CM | you write or review a comment, a Javadoc block or a lint suppression |
 | [concurrency](skills/code/references/concurrency.md) | CC | you start threads, submit async work, call a remote service, retry, lock, or build a pool or a cache |
 | [design](skills/code/references/design.md) | SEAM | you write or review an interface a caller depends on, or a method that implements one |
