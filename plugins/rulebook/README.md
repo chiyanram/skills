@@ -78,6 +78,7 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 | reference | rule IDs | read it when |
 |---|---|---|
 | [postgres-design](skills/migrations/references/postgres-design.md) | MG30–MG38 | you write or review a migration that creates a table or adds a column, key, constraint or index |
+| [review](skills/migrations/references/review.md) | MG1, MG5, MG10, MG22, MG41, MG44, MG45, MGN1 | you write or review a migration that alters, indexes, constrains, renames, drops or backfills an existing table |
 
 ## Observability references
 
