@@ -11,6 +11,7 @@ CASES = {
                "preference-label-too-long"]),
     "plugin": (["good"], ["source-is-root", "root-is-a-plugin", "no-readme", "no-icon", "no-license"]),
     "index": (["good"], ["unlisted"]),
+    "routers": (["good"], ["unlisted", "no-router"]),
 }
 
 
