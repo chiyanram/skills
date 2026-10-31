@@ -156,7 +156,7 @@ An IT fakes our own repository, which our database backs, so its real query is n
 ```
 Only the payment gateway and the fraud-check service are faked, at the wire; our services, repositories and Postgres run for real. (Real evidence: ledger row TM2.)
 
-## TM3 — Real-model tier: opt-in, outside the gate, structure only
+## TM3 — Real-model tier: opt-in, outside the gate
 
 **Bad** (neutral)
 ```groovy
@@ -189,7 +189,7 @@ It calls a real model inside the gate and asserts wording the model is free to c
         !summary.text().isBlank()
     }
 ```
-It runs only on request, outside the gate, and asserts the structure of the model's answer, not its text. (Real evidence: ledger row TM3.)
+It runs only on request, outside the gate. How a live test asserts, structure and never wording, is LT15 in [`../llm-live-tests.md`](../llm-live-tests.md). (Real evidence: ledger row TM3.)
 
 ## AT1 — No separate acceptance tier
 

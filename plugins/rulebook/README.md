@@ -52,6 +52,7 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 | [property-based](skills/testing/references/property-based.md) | P | a requirement says "for any input", or you write a generator |
 | [mutation](skills/testing/references/mutation.md) | M | you configure PIT, read its report, or answer a surviving mutant |
 | [llm-tests](skills/testing/references/llm-tests.md) | LT1–LT13, LS1–LS10 | the code under test calls a language model: the scripted fake, the agent loop, agent scenarios, recorded traffic |
+| [llm-live-tests](skills/testing/references/llm-live-tests.md) | LT14–LT18, LS11, LS13, LS15, LS16, LS19, LS20 | a test calls a real model provider, or an eval scores model quality |
 | [smoke-specs](skills/testing/references/smoke-specs.md) | EA–ED | you write or review a Playwright smoke spec, or a fixture such specs import |
 
 ## Code references
