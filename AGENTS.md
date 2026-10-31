@@ -8,7 +8,7 @@ Everything else is the design work behind it. People start at `README.md` and `C
 Run both before you push. CI runs the same two targets on every pull request and on push to `main`.
 
 ```bash
-make lint   # skill frontmatter, one version, links, size budgets, packaging, README index, `claude plugin validate --strict`
+make lint   # skill frontmatter, one version, links, size budgets, packaging, README index, skill routers, `claude plugin validate --strict`
 make test   # python3 -m unittest: each check against its planted fixtures, and each review/ builder
 ```
 
@@ -26,8 +26,8 @@ make test   # python3 -m unittest: each check against its planted fixtures, and 
 ## Add a reference
 
 No rule goes in without the operator's explicit yes and a row in `research/19-approved-rules.md`. Follow
-`research/00-reference-format.md`, then link the new file from the table in `plugins/rulebook/README.md`;
-`check_index.py` fails until you do.
+`research/00-reference-format.md`, then link the new file from its domain's `SKILL.md` router and from the table in
+`plugins/rulebook/README.md`; `check_routers.py` and `check_index.py` fail until you do.
 
 Read Sonar rules for calibration only. Never copy their text into a reference, because Sonar's source-available
 licence does not permit vendoring its rule text.
