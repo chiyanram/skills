@@ -3,6 +3,16 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.12.0](https://github.com/chiyanram/skills/compare/rulebook--v0.11.0...rulebook--v0.12.0) (2026-10-31)
+
+### Features
+
+* **obs:** logging reference from industry sources ([#161](https://github.com/chiyanram/skills/issues/161)) ([c82b50b](https://github.com/chiyanram/skills/commit/c82b50b15746746ba6a9ca4f932742a640e41225))
+
+### Bug Fixes
+
+* **migrations:** review round 1 for postgres-design, review and levels ([#162](https://github.com/chiyanram/skills/issues/162)) ([d8a8f3a](https://github.com/chiyanram/skills/commit/d8a8f3a7abee8f12883c76e33f249dc139b4c9a3))
+
 ## [0.11.0](https://github.com/chiyanram/skills/compare/rulebook--v0.10.0...rulebook--v0.11.0) (2026-10-31)
 
 ### Features
