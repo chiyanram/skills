@@ -267,11 +267,12 @@ Evidence: `aruvii-api/src/integrationTest/java/ai/aruvii/api/support/FakeActiveS
         when: "the real model writes the order summary"
         def summary = orderSummariser.summarise(orderId)
 
-        then: "the model's summary is word-for-word what we expect"
-        summary.text() == "Your order has 2 lines: 2 x SKU-1 and 1 x SKU-2."
+        then: "the summary has the structure we need"
+        summary.orderId() == orderId
+        summary.lineCount() == 2
     }
 ```
-What goes wrong: it calls a real model inside the gate and asserts wording the model is free to change.
+What goes wrong: its assertions are fine, but with no opt-in it calls a real model inside the gate, so every run is slow, paid and flaky.
 
 **Good** (neutral)
 ```groovy

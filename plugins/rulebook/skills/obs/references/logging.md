@@ -31,20 +31,18 @@ Which level a log event gets is in `levels.md`.
 
 | the log call or config holds | use | why |
 |---|---|---|
-| a secret, token, session id, credential header, key, connection string or card data | nothing: drop it (LG4) | OWASP Logging "should usually not be recorded directly in the logs"; Log4j API · r47 :502-503 |
-| a request or response body | the id and allowlisted fields only (LG4) | OWASP Logging; OpenTelemetry HTTP "SHOULD be scrubbed" · r47 :502, :504 |
+| a password, token, session id, auth or cookie header, key, connection string, card data or sensitive PII | nothing: drop it (LG4) | OWASP Logging "should usually not be recorded directly in the logs" · r47 :502 |
+| a request or response body | the id and allowlisted fields only (LG4) | OWASP Logging; OpenTelemetry HTTP "`url.full` … SHOULD be scrubbed" · r47 :502, :504 |
 | a `catch` that rethrows or wraps with the cause | no log call; the handler that decides the outcome logs it (LG2) | OpenTelemetry recording errors "NOT RECOMMENDED to record the same exception more than once"; exceptions in logs · r47 :486-487 |
 | an exception | the throwable as the last argument (LG3) | SLF4J FAQ "its stack trace will NOT be printed"; Log4j API "Don't use `Throwable#getMessage()`!" · r47 :494-495 |
 | a trace id or a business id | a key-value field: MDC or `addKeyValue` (LG1) | OWASP Logging "Interaction identifier"; OpenTelemetry logs data model; Spring Boot logging, tracing · r47 :476-479 |
 | any other variable value | a `{}` placeholder in a constant template (LG6) | SLF4J FAQ; Log4j API; OWASP Logging "Keep message templates constant" · r47 :517-519 |
-| an argument that is costly to build | a `Supplier`, or a call behind `isXEnabled()` (LG6) | Log4j API "Use `Supplier`s"; SLF4J FAQ · r47 :517-518 |
+| an argument that is costly to build | a `Supplier` (Log4j API; SLF4J fluent `addArgument(Supplier)`), or a call behind `isXEnabled()` (LG6) | Log4j API "Use `Supplier`s"; SLF4J FAQ; SLF4J manual "pass arguments with a Supplier", `LoggingEventBuilder` · r47 :517-518, :869-875 |
 | a production log layout | a structured (JSON) encoder (LG5) | OWASP Logging "Do not use unstructured text log formats"; Log4j security FAQ · r47 :511-512 |
 | a logger field | `LoggerFactory.getLogger(DeclaringClass.class)` (LG8) | Log4j API; SLF4J FAQ · r47 :524-525 |
 | an appender | the console (stdout) only (LGN1) | Twelve-Factor "writes its event stream, unbuffered, to stdout"; Kubernetes logging; Spring Boot logging · r47 :532-534 |
 
-`r47` is agent-factory `research/47-industry-migrations-obs.md`; `:N` is a line in that file. Every rule has ≥2
-sources, quoted there; none comes from one project's history (operator, 2026-10-31, agent-factory#34). LG2's two
-sources are both OpenTelemetry documents; the operator kept it.
+`r47` is agent-factory `research/47-industry-migrations-obs.md`; `:N` is a line in that file.
 
 ## Good / Bad
 
@@ -113,24 +111,31 @@ The throwable is the last argument, so the logger prints its type and stack.
 - **Skip when** the logger field is an instance field rather than `static`: both are allowed (LG8; SLF4J leaves
   static or instance "to the user", r47 :527). — **Do not skip when** the class passed is not the declaring class.
   — **Confidence** high
+- **Skip when** the throwable is passed with `setCause(e)` on the SLF4J fluent builder: it is the event's cause, as
+  the last argument is (LG3; SLF4J `LoggingEventBuilder` "Set the cause for the logging event being built", r47
+  :873-875). — **Do not skip when** the fluent call passes `e.getMessage()` or adds the throwable with
+  `addArgument`. — **Confidence** high
 
 ## Review checks
 
 Walk every log call, logger field and `catch` block added or changed in the diff, and every changed logging
 configuration file.
 
-- [ ] LG4 — For each log call, read every argument and field. A secret, token, session id, credential header, key,
-  connection string, card number, sensitive PII value or whole request or response body is a finding.
+- [ ] LG4 — For each log call, read every argument and field. A password, token, session id, auth or cookie header,
+  key, connection string, card data, sensitive PII value or whole request or response body is a finding.
 - [ ] LG2 — For each `catch` that logs, check that it does not rethrow or wrap. A log call followed by `throw` in the
   same block is a finding.
-- [ ] LG3 — `grep -n -E "getMessage\(\)|printStackTrace\("` in each log call and `catch`. Either one, or a throwable
-  that is not the last argument, is a finding.
+- [ ] LG3 — `grep -n -E "getMessage\(\)|printStackTrace\("`. A `getMessage()` inside a log call's arguments, any
+  `printStackTrace(` call, or a throwable that is neither the last argument nor set with `setCause`, is a finding.
 - [ ] LG1 — For each log call, find every trace id and business id. One passed as a `{}` argument or joined into the
   message, not as an MDC entry or `addKeyValue` field, is a finding.
-- [ ] LG6 — `grep -n -E 'log\.[a-z]+\(".*" *\+'` in each changed file. A concatenated message, or a costly argument
-  built outside a `Supplier` or an `isXEnabled()` guard, is a finding.
-- [ ] LG5 — In each changed logging configuration, find the production encoder. A pattern layout with no CR/LF
-  stripping of untrusted values and exception text is a finding.
+- [ ] LG6 — `grep -n -E '(log|logger|LOG|LOGGER)\.[a-zA-Z]+\(.*(" *\+|\+ *")|setMessage\(.*(" *\+|\+ *")'` in each
+  changed file, and read multi-line calls by eye. A concatenated message, or a costly argument built outside a
+  `Supplier` or an `isXEnabled()` guard, is a finding.
+- [ ] LG5 — In each changed logging configuration, find the production encoder. One that is not a structured (JSON)
+  encoder is a finding. On any pattern layout, a message or exception converter without CR/LF stripping (Logback
+  `%replace`, Log4j2 `%enc{}{CRLF}`) is a finding.
 - [ ] LG8 — `grep -n "getLogger("`. A string argument, or a class other than the declaring class, is a finding.
-- [ ] LGN1 — In each changed logging configuration, `grep -n -i -E "FileAppender|RollingFile|logging\.file"`. A file
-  appender, a rotation policy or a log path is a finding.
+- [ ] LGN1 — In each changed logging configuration,
+  `grep -n -i -E 'FileAppender|<(Rolling)?(RandomAccess)?File[ >]|MemoryMappedFile|type *= *(Rolling)?(RandomAccess)?File|logging\.file|^\s+file:|rollingpolicy|file-appender'`.
+  A file appender, a rotation policy or a log path is a finding.

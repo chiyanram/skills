@@ -15,8 +15,8 @@ Contents: Rules · When X, use Y · Good / Bad (S1, S2, TM1, TM2, S3, S5) · Dec
   because a unit spec through a mock cannot see what the real boundary does.
 - **TM2** — In ITs and smoke specs, fake only what others own (LLM: scripted model; third-party HTTP: WireMock at the
   wire, unless the vendor ships a container sandbox (IT5)), because faking our code leaves its query untested.
-- **TM3** — Run key end-to-end scenarios in a small opt-in real-model tier outside the gate, asserting structure, never
-  exact wording, because a small model will not repeat exact wording, so text checks fail falsely.
+- **TM3** — Keep real-model tests in their own opt-in tier outside the gate, written to `llm-live-tests.md`, because a
+  real model in the gate makes every run slow, paid and flaky.
 - **AT1** — Prove an acceptance criterion with an IT (API) or a smoke spec (UI), never a separate acceptance tier,
   because a `.feature` tier with no Gherkin runtime left an orphan copy of an IT.
 - **S3** — Before changing code, run the existing tests that touch it and note what was green, because a red test
@@ -288,9 +288,9 @@ Walk every changed test file, and the MR that carries it.
 - [ ] TM2 — In each changed IT and smoke spec, list every fake. A fake is allowed only for the LLM (a scripted fake
   model) and for third-party HTTP (WireMock at the wire). Where the vendor ships a container sandbox, the IT uses it
   and WireMock is not required (IT5). A fake of our own service, repository or Redis consumer is a finding.
-- [ ] TM3 — For each real-model test, check that it is opt-in, runs outside the gate, and asserts structure only.
-  An exact-wording assertion is a finding. If the change touches prompt or provider code, or is a release, find the
-  real-model tier's passing result. No such result is a finding.
+- [ ] TM3 — For each real-model test, check that it is opt-in and runs outside the gate. If the change touches prompt
+  or provider code, or is a release, find the real-model tier's passing result. No such result is a finding. What a
+  live test asserts and how its job runs are checked against `llm-live-tests.md`.
 - [ ] AT1 — For each acceptance criterion, find the IT (API) or smoke spec (UI) that proves it. A `.feature` file
   or a separate acceptance harness is a finding.
 - [ ] S3 — Find the note of the existing tests that touch the changed code, run before the change, and what was

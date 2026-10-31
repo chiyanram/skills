@@ -156,7 +156,7 @@ An IT fakes our own repository, which our database backs, so its real query is n
 ```
 Only the payment gateway and the fraud-check service are faked, at the wire; our services, repositories and Postgres run for real. (Real evidence: ledger row TM2.)
 
-## TM3 — Real-model tier: opt-in, outside the gate, structure only
+## TM3 — Real-model tier: opt-in, outside the gate
 
 **Bad** (neutral)
 ```groovy
@@ -167,11 +167,12 @@ Only the payment gateway and the fraud-check service are faked, at the wire; our
         when: "the real model writes the order summary"
         def summary = orderSummariser.summarise(orderId)
 
-        then: "the model's summary is word-for-word what we expect"
-        summary.text() == "Your order has 2 lines: 2 x SKU-1 and 1 x SKU-2."
+        then: "the summary has the structure we need"
+        summary.orderId() == orderId
+        summary.lineCount() == 2
     }
 ```
-It calls a real model inside the gate and asserts wording the model is free to change.
+Its assertions are fine, but with no opt-in it calls a real model inside the gate, so every run is slow, paid and flaky.
 
 **Good** (neutral)
 ```groovy
@@ -189,7 +190,7 @@ It calls a real model inside the gate and asserts wording the model is free to c
         !summary.text().isBlank()
     }
 ```
-It runs only on request, outside the gate, and asserts the structure of the model's answer, not its text. (Real evidence: ledger row TM3.)
+It runs only on request, outside the gate. How a live test asserts, structure and never wording, is LT15 in [`../llm-live-tests.md`](../llm-live-tests.md). (Real evidence: ledger row TM3.)
 
 ## AT1 — No separate acceptance tier
 
