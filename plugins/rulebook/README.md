@@ -67,6 +67,12 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 
 `make lint` fails when a reference is missing from these tables.
 
+## Observability references
+
+| reference | rule IDs | read it when |
+|---|---|---|
+| [levels](skills/obs/references/levels.md) | — | you choose the level of a log call or of a caught exception |
+
 ## Where a rule comes from
 
 Each rule has a source. A rule goes in only after the operator says yes; the
