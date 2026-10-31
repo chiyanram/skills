@@ -1,0 +1,88 @@
+[
+  {
+    "key": "fake",
+    "name": "Fake model",
+    "file": "69-llm-testing-in-agent-sdks.md",
+    "note": "Unit and IT tiers: the fake that stands in for the model. Every strong reference does all six; the Java ones are spring-ai, langchain4j and adk-java.",
+    "items": [
+      {"id": "LT1", "rec": "approve", "why": "Matches U3 (double only at a boundary) and research/24. spring-ai, openai-agents and adk-java each ship one shared scripted fake; claude-agent-sdk's copied per-test fakes drifted apart (two fake CLIs report different versions)."},
+      {"id": "LT2", "rec": "approve", "why": "Cheap and catches a loop that runs one turn too many or too few. spring-ai, adk-java and openai-agents all throw when the script runs out; openai-agents also fails on unused steps."},
+      {"id": "LT3", "rec": "approve", "why": "In Spock or JUnit this is a global extension, or a test-profile bean, that fails any real model client unless the spec is tagged live. openai-agents and pydantic-ai both guard this way; claude-agent-sdk and adk-python have no guard."},
+      {"id": "LT4", "rec": "approve", "why": "The main place loop bugs show: a lost tool result or broken history appears in the next request, not in the final answer. It is the positive form of V3 (no mock that implements the asserted behaviour)."},
+      {"id": "LT5", "rec": "approve", "why": "Needed wherever adapters are hand-written over raw HTTP: a model-port fake never runs the request mapping. langchain4j (MockHttpClient), adk-java (FakeGeminiApi) and anthropic-sdk-java all do it."},
+      {"id": "LT6", "rec": "change", "why": "Approve the rule, but merge it with LS12 when the reference is written: the same abstract contract suite runs at the IT tier against a fake HTTP server and at the live tier against the real provider (langchain4j: 33 methods, 43 provider classes)."}
+    ]
+  },
+  {
+    "key": "loop",
+    "name": "Agent loop",
+    "file": "69-llm-testing-in-agent-sdks.md",
+    "note": "How the loop itself is tested on the fake: errors, caps, streaming, retries, time.",
+    "items": [
+      {"id": "LT7", "rec": "approve", "why": "Every strong reference asserts the error reaches the model and the run continues (anthropic-sdk-java, langchain4j, pydantic-ai, adk-python)."},
+      {"id": "LT8", "rec": "approve", "why": "anthropic-sdk-java, adk-java and pydantic-ai test the cap; spring-ai's live IT has an unbounded while-loop, which is the failure this prevents."},
+      {"id": "LT9", "rec": "approve", "why": "spring-ai's scripted fake streams one chunk only, so its streaming tests never cross a chunk boundary; langchain4j joins partials and tool-call deltas and checks order."},
+      {"id": "LT10", "rec": "approve", "why": "mastra's mid-stream-drop scenario guards a real regression: the partial attempt was merged into the stored message."},
+      {"id": "LT11", "rec": "change", "why": "The fixed-clock half is already U1 (repeatable: fixed clock). Keep only the new half: order races with explicit signals, never sleeps (openai-agents' guardrail race test)."}
+    ]
+  },
+  {
+    "key": "scenarios",
+    "name": "Agent scenarios",
+    "file": "70-agent-scenario-tests.md",
+    "note": "One rule per agent scenario, each from the best fake-tier test found (research/70 section 2).",
+    "items": [
+      {"id": "LS1", "rec": "approve", "why": "langchain4j evicts a tool call and its result together; spring-ai snaps to a turn boundary and keeps the system prompt."},
+      {"id": "LS2", "rec": "approve", "why": "spring-ai pins what is kept and what the summariser saw; adk-java pins that already-compacted history is never summarised again."},
+      {"id": "LS3", "rec": "approve", "why": "The strongest test found: pydantic-ai checks byte-stable prefixes over every capability and three providers, with a moving fake clock."},
+      {"id": "LS4", "rec": "approve", "why": "spring-ai caps Anthropic's 4 cache breakpoints and marks only the last tool result."},
+      {"id": "LS5", "rec": "approve", "why": "mastra keys on tenant and never caches errors; spring-ai includes the system prompt so personas don't share answers."},
+      {"id": "LS6", "rec": "approve", "why": "pydantic-ai keeps the response that crossed the limit, because it was already billed."},
+      {"id": "LS7", "rec": "approve", "why": "openai-agents asserts the blocked run made zero model calls, and that a rejected tool input never runs the tool."},
+      {"id": "LS8", "rec": "approve", "why": "openai-agents and adk-java resume from saved state and assert each side effect ran exactly once, including adversarial cases."},
+      {"id": "LS9", "rec": "approve", "why": "pydantic-ai names and prices the serving model. No Java reference tests fallback at all, so this fills a real gap."},
+      {"id": "LS10", "rec": "change", "why": "No reference tests this, so it has no source: approve it only as an ours-rule, marked as such in the ledger, or leave it in Fog until we have a failure that shows it."}
+    ]
+  },
+  {
+    "key": "recordings",
+    "name": "Recordings",
+    "file": "69-llm-testing-in-agent-sdks.md",
+    "note": "Only applies to a project that replays recorded provider traffic. The JVM references hand-write payloads instead; these rules say how to do replay safely if a project chooses it.",
+    "items": [
+      {"id": "LT12", "rec": "approve", "why": "pydantic-ai fails on unplayed interactions; mastra accepts a 60% fuzzy match with only a warning, the failure this prevents."},
+      {"id": "LT13", "rec": "approve", "why": "pydantic-ai scrubs credentials, tokens and account ids in pre-record hooks; mastra stores request bodies unscrubbed."}
+    ]
+  },
+  {
+    "key": "live",
+    "name": "Live tests",
+    "file": "both",
+    "note": "Tests that call a real provider. Several rules overlap; the recommendations merge them so the reference keeps one rule per idea. The schedule (every PR first) is a project choice and lives in the project's docs/agents/testing.md.",
+    "items": [
+      {"id": "LS11", "rec": "approve", "why": "The core rule of the tier: all ten references fake agent behaviour and go live only for acceptance, decisions, real chunking, and real usage and errors."},
+      {"id": "LS12", "rec": "change", "why": "Merge with LT6 into one rule: one contract suite, run against a fake HTTP server in IT and against the real provider live."},
+      {"id": "LS13", "rec": "approve", "why": "langchain4j asserts maxOutputTokens(5) gives exactly 5 tokens and finish reason LENGTH; acceptance alone hides a dropped field."},
+      {"id": "LS14", "rec": "change", "why": "Merge into LT15 as its tool-call example (exact arguments plus a stub-tool marker)."},
+      {"id": "LS15", "rec": "approve", "why": "Real chunking is the most live-tested behaviour after basic chat: about 96 spring-ai classes and every langchain4j streaming provider."},
+      {"id": "LS16", "rec": "approve", "why": "Only the provider reports cache-write and cache-read tokens; spring-ai, langchain4j and pydantic-ai all assert them."},
+      {"id": "LS17", "rec": "change", "why": "Merge into LT15 as its agent-level example (a bank balance, a routed sub-agent)."},
+      {"id": "LT14", "rec": "change", "why": "Keep everything except 'scheduled': a separate job with a pinned small model, a token cap and a protected secret, failing when skipped. Whether it runs per PR or nightly is the project's choice. Also absorb LS18."},
+      {"id": "LS18", "rec": "change", "why": "Merge into LT14: pinning the model and failing on a missing key are the same rule."},
+      {"id": "LT15", "rec": "approve", "why": "Nobody asserts live prose; this becomes the one assertion rule, with LS14 and LS17 as its examples."},
+      {"id": "LT16", "rec": "approve", "why": "langchain4j retries every failure 3 times and spring-ai reruns twice, which hides flaky prompts; openai-agents injects the fault and asserts its own retry instead."},
+      {"id": "LS19", "rec": "approve", "why": "mastra's prefill test blanks its own key and always skips; two claude-agent-sdk tests assert nothing."},
+      {"id": "LS20", "rec": "approve", "why": "pydantic-ai's weekly model-catalogue check, with excluded names as strict expected failures; cheap and catches retired models."}
+    ]
+  },
+  {
+    "key": "evals",
+    "name": "Evals",
+    "file": "69-llm-testing-in-agent-sdks.md",
+    "note": "Scored quality checks over repeated runs. A separate tier from live tests; none of the ten references blocks CI on an eval.",
+    "items": [
+      {"id": "LT17", "rec": "approve", "why": "mastra's judge gives verdicts and code does the arithmetic; langchain4j counts NOT_SURE as failing; spring-ai's IT lets the generator grade itself, the failure this prevents."},
+      {"id": "LT18", "rec": "approve", "why": "adk-python versions thresholds per metric and aggregates by pass rate or minimum over runs; mastra fails a non-finite score."}
+    ]
+  }
+]
