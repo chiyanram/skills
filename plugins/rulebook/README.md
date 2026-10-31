@@ -88,6 +88,7 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 |---|---|---|
 | [levels](skills/obs/references/levels.md) | — | you choose the level of a log call or of a caught exception |
 | [logging](skills/obs/references/logging.md) | LG1–LG6, LG8, LGN1 | you write or review a log call, a logger field, a `catch` that logs, or the logging configuration |
+| [metrics](skills/obs/references/metrics.md) | MX1–MX3, MX5, MXN1–MXN3 | you write or review a meter, a tag, a timer or histogram setting, or the metrics of an endpoint, an outbound dependency, a pool, a queue or a job |
 
 ## Where a rule comes from
 
