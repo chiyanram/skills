@@ -101,9 +101,10 @@ try { const h = location.hash.slice(1); if (DATA.some(g => g.key === h)) current
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const decided = g => g.items.filter(it => (state[g.key + ":" + it.id] || {}).v).length;
 const label = v => v === "change" ? "Change…" : v[0].toUpperCase() + v.slice(1);
-const paired = g => g.items.every(it => it.pair && it.pair.good);
+const hasPair = it => !!(it.pair && it.pair.good);
+const paired = g => g.items.some(hasPair);
 const ruled = g => g.items.every(it => it.status);
-const mode = g => !paired(g) ? "rules" : ruled(g) ? "pairs" : "both";
+const mode = g => !paired(g) ? "rules" : ruled(g) && g.items.every(hasPair) ? "pairs" : "both";
 const recBlock = it => `<section class="rec"><h3>Recommendation <span class="chip ${esc(it.rec)}">${label(it.rec).replace("…", "")}</span></h3><p>${esc(it.why)}</p></section>`;
 const side = (s, name) => s ? `<section class="side ${name.toLowerCase()}"><h3>${name} · neutral</h3>
   <pre><code>${esc(s.code)}</code></pre><div class="why">${esc(s.note)}</div></section>` : "";

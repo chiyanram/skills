@@ -1237,3 +1237,439 @@ FILTERED_HEADERS = {
 (Shortened.) The same hooks scrub tokens in JSON bodies (`:97`) and normalise account and project ids in URIs so a
 recording made in one account replays in another (`:132-143`). Contrast: mastra stores request bodies unscrubbed
 (`packages/_llm-recorder/src/llm-recorder.ts:142-146 @5480e7b7c`).
+
+---
+
+## Live tests (LT14–LT16, LS11–LS20): rules and pairs together
+
+Tests that call a real provider. Rules not approved yet, decided with their pairs in one pass. Four candidates are
+merges and get no pair of their own: LS12 into LT6 (already approved), LS14 and LS17 into LT15, LS18 into LT14.
+Stand-ins: `@LiveModel` is the opt-in from LT3; `liveAdapter()` builds the real provider adapter with the project's
+pinned small model; `LiveModels` holds the project's model names. Which flows and providers run live, and when, is the
+project's choice (#135).
+
+### LS11 — Live-test only what a fake cannot know
+
+**Bad** (neutral)
+```groovy
+@LiveModel
+class OrderAssistantLiveSpec extends Specification {
+    def "should stop at the turn cap"() {
+        given:
+        def assistant = new OrderAssistant(liveAdapter(), orders, maxTurns: 1)
+
+        when:
+        assistant.ask("Check A-17, then B-02, then C-33")
+
+        then:
+        thrown(TurnLimitExceeded)
+    }
+}
+```
+What goes wrong: the turn cap is our own code. A real model makes the test slow, paid and flaky: it may answer without
+calling a tool, and the cap never fires. The fake tests it exactly (LT8).
+
+**Good** (neutral)
+```groovy
+@LiveModel
+class ProviderAcceptanceLiveSpec extends Specification {
+    def "should have the provider accept our tool schema and call the tool"() {
+        when:
+        def reply = liveAdapter().reply(new ChatRequest(text: "Where is A-17? Use the tool.", tools: [FIND_ORDER]))
+
+        then:
+        reply.toolCalls*.name == ["findOrder"]
+        reply.toolCalls[0].arguments == [orderId: "A-17"]
+    }
+}
+```
+Why this is right: only the real provider can reject our tool schema, and only a real model decides to call the tool.
+
+### LS13 — Assert that a parameter took effect, not only that it was accepted
+
+**Bad** (neutral)
+```groovy
+def "should accept a max-tokens limit"() {
+    when:
+    def reply = liveAdapter().reply(new ChatRequest(text: "Describe order A-17 in detail.", maxOutputTokens: 5))
+
+    then:
+    reply.text
+}
+```
+What goes wrong: an adapter that drops the limit still gets an answer, so the test passes while production pays for
+full-length replies.
+
+**Good** (neutral)
+```groovy
+def "should stop at five output tokens"() {
+    when:
+    def reply = liveAdapter().reply(new ChatRequest(text: "Describe order A-17 in detail.", maxOutputTokens: 5))
+
+    then:
+    reply.usage.outputTokens == 5
+    reply.finishReason == FinishReason.LENGTH
+}
+```
+Why this is right: exactly five tokens and a LENGTH finish prove the limit reached the provider and was obeyed.
+
+**How the reference does it** — langchain4j `langchain4j-core/src/test/java/dev/langchain4j/model/chat/common/AbstractBaseChatModelIT.java:372-396,1950-1951 @709c6fd10`
+```java
+protected void should_respect_maxOutputTokens_in_chat_request(M model) {
+    int maxOutputTokens = maxOutputTokens();
+    ChatResponse chatResponse = chat(model, chatRequest).chatResponse();
+    assertThat(chatResponse.aiMessage().text()).isNotBlank();
+    assertTokenUsage(chatResponse.metadata(), maxOutputTokens, model);
+    assertThat(chatResponse.metadata().finishReason()).isIn(finishReasonForMaxOutputTokens());
+}
+protected void assertOutputTokenCount(TokenUsage tokenUsage, Integer maxOutputTokens) {
+    assertThat(tokenUsage.outputTokenCount()).isEqualTo(maxOutputTokens);
+}
+```
+(Shortened.)
+
+### LT15 — Assert real-model output only on what the test controls
+
+Includes LS14 (exact tool arguments and a stub-tool marker) and LS17 (agent outcome checked on the state it changed).
+
+**Bad** (neutral)
+```groovy
+def "should tell the customer the order has shipped"() {
+    given:
+    orders.find("A-17") >> new Order("A-17", status: "SHIPPED")
+
+    when:
+    def answer = new OrderAssistant(liveAdapter(), orders).ask("Where is A-17?")
+
+    then:
+    answer == "Your order A-17 has shipped."
+}
+```
+What goes wrong: the wording changes with every model and run, so the test flakes. And a model that guessed "shipped"
+without calling the tool would pass.
+
+**Good** (neutral)
+```groovy
+def "should look the order up and use the result"() {
+    given:
+    orders.find("A-17") >> new Order("A-17", status: "SHIPPED-7Q4")
+
+    when:
+    def run = new OrderAssistant(liveAdapter(), orders).run("Where is A-17?")
+
+    then:
+    run.toolCalls*.name == ["findOrder"]
+    run.toolCalls[0].arguments == [orderId: "A-17"]
+    run.answer.contains("SHIPPED-7Q4")
+}
+```
+Why this is right: exact tool arguments, and a marker no model would guess, prove the tool was called and its result
+reached the answer. For an agent that changes state, assert that state instead: the order cancelled once, the balance
+moved.
+
+**How the reference does it** — langchain4j `…/AbstractBaseChatModelIT.java:705-706` and
+`langchain4j-agentic/src/test/java/dev/langchain4j/agentic/SupervisorAgentIT.java:309-313 @709c6fd10`
+```java
+assertThat(toolExecutionRequest.name()).isEqualTo(WEATHER_TOOL.name());
+assertThat(toolExecutionRequest.arguments()).isEqualToIgnoringWhitespace("{\"city\":\"Munich\"}");
+
+String result = bankSupervisor.invoke("Transfer 100 USD from Mario's account to Georgios' one");
+assertThat(bankTool.getBalance("Mario")).isEqualTo(900.0);
+assertThat(bankTool.getBalance("Georgios")).isEqualTo(1100.0);
+```
+adk-java checks a stub-tool marker: "sunny" from the tool's own output
+(`contrib/langchain4j/…/LangChain4jIntegrationTest.java:159 @64ce48c74`).
+
+### LS15 — Join real streamed chunks and tool-call deltas into the final message
+
+**Bad** (neutral)
+```groovy
+def "should stream an answer"() {
+    when:
+    def chunks = liveAdapter()
+        .stream(new ChatRequest(text: "List the states an order goes through."))
+        .collectList()
+        .block(Duration.ofSeconds(30))
+
+    then:
+    !chunks.isEmpty()
+}
+```
+What goes wrong: any stream passes. It never checks that the chunks join, or that only the last chunk carries the finish
+reason, which is where real chunking breaks aggregators.
+
+**Good** (neutral)
+```groovy
+def "should join streamed chunks and tool-call deltas into the final message"() {
+    when:
+    def events = liveAdapter()
+        .stream(new ChatRequest(text: "Where is order A-17? Use the tool.", tools: [FIND_ORDER]))
+        .collectList()
+        .block(Duration.ofSeconds(30))
+
+    then:
+    def last = events.last()
+    events.init().every { it.finishReason == null }
+    events*.toolCallDelta.findAll().join() == last.toolCalls[0].argumentsJson
+    last.toolCalls[0].arguments == [orderId: "A-17"]
+}
+```
+Why this is right: the provider's real chunking runs through our aggregator, and the test checks the joined result.
+
+**How the reference does it** — spring-ai `models/spring-ai-openai/src/test/java/org/springframework/ai/openai/chat/OpenAiChatModelIT.java:344-359 @b19514195`
+```java
+void intermediateStreamingChunksHaveNullFinishReason() {
+	Flux<ChatResponse> flux = this.chatModel.stream(new Prompt("List the days of the week, one per line."));
+	List<ChatResponse> withResult = flux.collectList().block().stream()
+		.filter(r -> r.getResult() != null).collect(Collectors.toList());
+	assertThat(withResult).hasSizeGreaterThan(1);
+	// All intermediate chunks must have a null finish reason
+	withResult.subList(0, withResult.size() - 1)
+		.forEach(r -> assertThat(r.getResult().getMetadata().getFinishReason()).isNull());
+	assertThat(withResult.get(withResult.size() - 1).getResult().getMetadata().getFinishReason()).isNotNull();
+```
+(Shortened.)
+
+### LS16 — Check real cache and usage numbers, and the price we compute from them
+
+**Bad** (neutral)
+```groovy
+def "should enable prompt caching"() {
+    when:
+    def reply = liveAdapter().reply(longSystemPromptRequest("Where is A-17?").cached())
+
+    then:
+    reply.text
+}
+```
+What goes wrong: caching may be silently off, or priced wrongly, and nothing looks at the provider's cache counts.
+
+**Good** (neutral)
+```groovy
+def "should read the cache on the second turn and price it right"() {
+    given:
+    def adapter = liveAdapter()
+
+    when:
+    def first = adapter.reply(longSystemPromptRequest("Where is A-17?").cached())
+    def second = adapter.reply(longSystemPromptRequest("And B-02?").cached())
+
+    then:
+    first.usage.cacheWriteTokens > 0
+    second.usage.cacheReadTokens > 0
+    pricing.cost(second) == pricing.atPublishedRates(second.usage)
+}
+```
+Why this is right: only the provider reports cache-write and cache-read tokens, and the test checks our price against
+them.
+
+**How the reference does it** — spring-ai `models/spring-ai-anthropic/src/test/java/org/springframework/ai/anthropic/chat/AnthropicPromptCachingIT.java:196-215 @b19514195`
+```java
+ChatResponse turn1 = this.chatModel.call(new Prompt(conversationHistory, options));
+long turn1Creation = getSdkUsage(turn1).cacheCreationInputTokens().orElse(0L);
+conversationHistory.add(new UserMessage("How does quantum entanglement work?"));
+ChatResponse turn2 = this.chatModel.call(new Prompt(conversationHistory, options));
+long turn2Read = getSdkUsage(turn2).cacheReadInputTokens().orElse(0L);
+if (turn1Creation > 0) {
+	assertThat(turn2Read).as("Turn 2 should read cache from Turn 1").isGreaterThan(0);
+}
+```
+(Shortened.) pydantic-ai also snapshots the real cost (`tests/models/test_anthropic.py:15157 @79e157e8b`).
+
+### LT14 — A separate live job: pinned small model, token cap, protected secret, fails when skipped
+
+Approved-to-be with the recommended change: no "scheduled". Whether it runs per PR or nightly is the project's choice.
+Includes LS18 (pin the model, fail on a missing key).
+
+**Bad** (neutral)
+```groovy
+@Requires({ env.PROVIDER_API_KEY })
+class ProviderContractLiveSpec extends ChatAdapterContract {
+    ChatModelPort adapter() {
+        new ProviderChatAdapter(System.getenv("PROVIDER_API_KEY"))
+    }
+}
+```
+What goes wrong: without the key, the whole suite skips and CI is green. The provider's default model changes under the
+test, and nothing caps the tokens.
+
+**Good** (neutral)
+```groovy
+@LiveModel
+class ProviderContractLiveSpec extends ChatAdapterContract {
+    def setupSpec() {
+        assert System.getenv("PROVIDER_API_KEY") : "live tests need PROVIDER_API_KEY: they fail, never skip"
+    }
+
+    ChatModelPort adapter() {
+        new ProviderChatAdapter(System.getenv("PROVIDER_API_KEY"), model: LiveModels.SMALL, maxOutputTokens: 256)
+    }
+}
+```
+Why this is right: a missing key fails the job, the model is pinned, and every call is capped. The job runs on its own,
+with the key held as a protected CI secret.
+
+**How the reference does it** — claude-agent-sdk `e2e-tests/conftest.py:16,19-28` and `.github/workflows/test.yml:81-95 @1ea8cb74d`
+```python
+os.environ.setdefault("ANTHROPIC_DEFAULT_MODEL", "claude-opus-5")
+
+@pytest.fixture(scope="session")
+def api_key():
+    key = os.environ.get("ANTHROPIC_API_KEY")
+    if not key:
+        pytest.fail("ANTHROPIC_API_KEY environment variable is required for e2e tests. ...")
+```
+```yaml
+test-e2e:
+  if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+  needs: test # Run after unit tests pass
+  permissions:
+    id-token: write   # OIDC token exchanged for a Claude API access token
+```
+(Shortened.) The model is pinned because "the CLI's default model ... changes between CLI releases" (`conftest.py:7-16`).
+
+### LT16 — Never retry a failed assertion; inject the fault and test our own retry
+
+**Bad** (neutral)
+```groovy
+@Retry(count = 3)
+def "should look the order up and use the result"() {
+    when:
+    def run = new OrderAssistant(liveAdapter(), orders).run("Where is A-17?")
+
+    then:
+    run.toolCalls*.name == ["findOrder"]
+}
+```
+What goes wrong: a prompt that works one time in three still goes green, so a flaky prompt is never fixed.
+
+**Good** (neutral)
+```groovy
+def "should retry once after a dropped connection and then succeed"() {
+    given:
+    def transport = FaultyTransport.failFirst(new ConnectException("connection reset"))
+    def adapter = liveAdapter(transport: transport)
+
+    when:
+    def reply = adapter.reply(new ChatRequest(text: "Reply with exactly READY."))
+
+    then:
+    transport.attempts == 2
+    reply.text.trim() == "READY"
+}
+```
+Why this is right: the test fails on a real assertion failure, and the adapter's own retry is proved by injecting one
+transport fault before a real call.
+
+**How the reference does it** — openai-agents `integration_tests/openai/test_retry.py:34-79 @cd26bbbc5`
+```python
+async def fail_once(*args: Any, **kwargs: Any) -> Any:
+    nonlocal attempts
+    attempts += 1
+    if attempts == 1:
+        raise APIConnectionError(message="Controlled integration-test transport failure.", request=...)
+    return await original_fetch(*args, **kwargs)
+
+monkeypatch.setattr(model, "_fetch_response", fail_once)
+...
+assert attempts == 2
+assert result.final_output == "RETRY_RECOVERED"
+```
+(Shortened with "...".) Contrast: langchain4j retries every live failure 3 times, assertions included
+(`internal/langchain4j-internal-test-retry/…/GlobalTestRetryExtension.java:23,37-38 @709c6fd10`).
+
+### LS19 — Every live test can fail, and its gate does not always skip
+
+**Bad** (neutral)
+```groovy
+def "should switch to the small model mid-conversation"() {
+    given:
+    def assistant = new OrderAssistant(liveAdapter(), orders)
+
+    when:
+    assistant.switchModel(LiveModels.SMALL)
+    assistant.ask("Where is A-17?")
+
+    then:
+    noExceptionThrown()
+}
+```
+What goes wrong: it passes when the switch silently did nothing.
+
+**Good** (neutral)
+```groovy
+def "should send the next request with the small model after a switch"() {
+    given:
+    def assistant = new OrderAssistant(liveAdapter(), orders)
+
+    when:
+    assistant.switchModel(LiveModels.SMALL)
+    def reply = assistant.reply("Where is A-17?")
+
+    then:
+    reply.servedBy == LiveModels.SMALL
+}
+```
+Why this is right: the test checks what the provider says served the reply. It fails if the switch did nothing.
+
+**How the reference does it** — two failures to avoid. mastra blanks its own key before the gate, so the test always
+skips (`packages/core/src/agent/__tests__/prefill-error-recovery.e2e.test.ts:20,47 @5480e7b7c`):
+```ts
+process.env.ANTHROPIC_API_KEY = '';
+...
+it.skipIf(!process.env.ANTHROPIC_API_KEY)(
+```
+claude-agent-sdk switches the model and asserts nothing (`e2e-tests/test_dynamic_control.py:44-60 @1ea8cb74d`):
+```python
+async def test_set_model():
+    async with ClaudeSDKClient(options=options) as client:
+        await client.query("What is 1+1? Just the number.")
+        await client.set_model("haiku")
+```
+(Shortened.)
+
+### LS20 — Check every configured model name; excluded names must still fail
+
+**Bad** (neutral)
+```groovy
+def "should answer with the small model"() {
+    expect:
+    liveAdapter(model: "small-2025-01").reply(new ChatRequest(text: "Reply with OK.")).text.trim() == "OK"
+}
+```
+What goes wrong: it checks one hard-coded name. The names production is configured with are never checked, so users
+find a retired model first.
+
+**Good** (neutral)
+```groovy
+def "should get an answer from every configured model"() {
+    expect:
+    liveAdapter(model: model).reply(new ChatRequest(text: "Reply with OK.", maxOutputTokens: 5)).text.trim() == "OK"
+
+    where:
+    model << LiveModels.configured()
+}
+
+@FailsWith(ModelNotFound)
+def "should still reject the model we excluded as retired"() {
+    expect:
+    liveAdapter(model: LiveModels.EXCLUDED).reply(new ChatRequest(text: "Reply with OK."))
+}
+```
+Why this is right: every configured name is checked, and the excluded one must keep failing. If it starts working, the
+test fails, so someone notices it can come back.
+
+**How the reference does it** — pydantic-ai `tests/providers/test_gateway_catalog.py:73-84 @79e157e8b`
+```python
+@pytest.mark.parametrize('model_name', _gateway_known_model_names(), ids=str)
+async def test_gateway_known_model_name_smoke_test(model_name, allow_model_requests, gateway_live_api_key):
+    await _run_gateway_smoke_test(model_name)
+
+@pytest.mark.parametrize('model_name', sorted(UNSUPPORTED_GATEWAY_MODEL_NAMES), ids=str)
+@pytest.mark.xfail(
+    strict=True,
+    raises=(ModelAPIError, ModelHTTPError),
+    reason='Excluded gateway models should still fail; an XPASS means the literal can likely be restored.',
+)
+```
+It runs weekly, with a Slack alert on failure (`.github/workflows/gateway-model-health.yml:6`).
