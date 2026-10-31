@@ -25,3 +25,4 @@ All 35 rewritten Goods approved (research/47-good-rewrites.md, page https://clau
 Fake model Good/Bad (LT1–LT6, research/71-llm-testing-good-bad.md, page https://claude.ai/artifact/Aa3nMykp8FRfU2VzUiWww1): approve all.
 Agent loop Good/Bad (LT7–LT11, research/71, same page): approve all. NEEDS COMPILE CHECK when the reference is written (#134): the pairs use stand-in types (`ChatModelPort`, `ScriptedChatModel`, `OrderAssistant`).
 Agent scenarios rules + Good/Bad (LS1–LS10, research/71, same page): approve LS1–LS9; LS10 approved as an ours-rule, with its pair. Same compile check at #134.
+Recordings rules + Good/Bad (LT12–LT13, research/71, same page): approve all.

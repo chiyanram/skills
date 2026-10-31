@@ -608,7 +608,8 @@
 
 Operator 2026-10-31, group "Fake model": approve LT1–LT5; change LT6 as recommended. Group "Agent loop": approve
 LT7–LT10; change LT11 as recommended. Group "Agent scenarios" (rules and pairs together): approve LS1–LS9;
-change LS10 as recommended, recorded as an ours-rule (no reference source). Generic rules only: each project's
+change LS10 as recommended, recorded as an ours-rule (no reference source). Group "Recordings" (rules and pairs
+together): approve all. Generic rules only: each project's
 own choices (providers, which flows run live, the schedule) go in its `docs/agents/testing.md` (#135).
 
 | id | reference | rule | reason | source | evidence | status |
@@ -634,3 +635,5 @@ own choices (providers, which flows run live, the schedule) go in its `docs/agen
 | LS8 | testing/references (file decided at G34 close) | Test approval by serialising the paused run, restoring it, then approving or rejecting, asserting each side effect ran exactly once. | because resume re-runs completed tools | OA:tests/test_resume_tool_use_behavior.py:15; ADKJ:…/RequestConfirmationLlmRequestProcessorTest.java:142,162 (research/70 §6) | | APPROVED |
 | LS9 | testing/references (file decided at G34 close) | Test fallback by failing the primary fake, then assert the serving model's name, the recorded failed attempt and the price on the serving model. | because cost reports book the wrong model | PA:tests/models/test_fallback.py:186,1992,228 (research/70 §6) | | APPROVED |
 | LS10 | testing/references (file decided at G34 close) | Test prompt injection arriving in a tool result through a whole run. | because every reference guards user input only, and tool results are where untrusted text enters | ours — no reference source (research/70 §2.12) | | APPROVED (ours-rule: no reference project tests this; closest is OA tests/test_tool_guardrails.py:351, called directly) |
+| LT12 | testing/references (file decided at G34 close) | If you replay recorded traffic, fail on unplayed or unmatched interactions and never accept near-matches. | because a stale recording keeps passing after the code stops sending a field | PA:tests/conftest.py:847-875; PA:tests/AGENTS.md:15,159,163; contrast MA:packages/_llm-recorder/src/llm-recorder.ts:608,1019-1044 (research/69 §8) | | APPROVED |
+| LT13 | testing/references (file decided at G34 close) | Scrub credentials, account ids and vendor headers in a pre-record hook, and pin load-bearing facts in the test body. | because recordings are committed forever and nobody reviews them | PA:tests/cassette_hooks.py:63-77,132-143,237-238; PA:tests/AGENTS.md:268; contrast MA:…/llm-recorder.ts:142-146 (research/69 §8) | | APPROVED |
