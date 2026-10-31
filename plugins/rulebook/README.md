@@ -79,6 +79,12 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 |---|---|---|
 | [postgres-design](skills/migrations/references/postgres-design.md) | MG30–MG38 | you write or review a migration that creates a table or adds a column, key, constraint or index |
 
+## Observability references
+
+| reference | rule IDs | read it when |
+|---|---|---|
+| [levels](skills/obs/references/levels.md) | — | you choose the level of a log call or of a caught exception |
+
 ## Where a rule comes from
 
 Each rule has a source. A rule goes in only after the operator says yes; the
