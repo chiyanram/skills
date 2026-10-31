@@ -1673,3 +1673,123 @@ async def test_gateway_known_model_name_smoke_test(model_name, allow_model_reque
 )
 ```
 It runs weekly, with a Slack alert on failure (`.github/workflows/gateway-model-health.yml:6`).
+
+---
+
+## Evals (LT17–LT18): rules and pairs together
+
+Scored quality checks over repeated runs: a separate tier from live tests. Rules not approved yet, decided with their
+pairs in one pass. Stand-in: `liveAssistant()` builds the assistant on the real provider (a `@LiveModel` spec).
+
+### LT17 — The judge gives atomic verdicts; code computes the score; "not sure" fails; never self-grade
+
+**Bad** (neutral)
+```groovy
+def "should rate the answer as faithful to the order record"() {
+    given:
+    def judge = new LlmJudge(assistantModel, prompt: "Score from 0 to 1 how faithful this answer is.")
+
+    when:
+    def score = judge.score(answer: "A-17 shipped on Monday.", context: orderRecord("A-17"))
+
+    then:
+    score >= 0.8
+}
+```
+What goes wrong: the model that wrote the answer also grades it, and the score is whatever number the judge returns.
+Neither the judge's arithmetic nor the parsing of its reply is tested.
+
+**Good** (neutral)
+```groovy
+def "should count unsure and missing verdicts as unsupported"() {
+    given:
+    def judge = new ScriptedChatModel(name: "judge-model")
+        .thenAnswer('{"claims": ["shipped", "on Monday", "by courier", "signed for"]}')
+        .thenAnswer('{"verdicts": ["SUPPORTED", "NOT_SURE"]}')
+    def scorer = new FaithfulnessScorer(judge, answeredBy: "assistant-model")
+
+    when:
+    def result = scorer.score(answer: "A-17 shipped on Monday by courier, signed for.", context: orderRecord("A-17"))
+
+    then:
+    result.score == 0.25
+    result.verdicts*.claim == ["shipped", "on Monday"]
+}
+```
+Why this is right: the judge only splits claims and gives a verdict per claim. Our code does the arithmetic: one
+supported claim out of four is 0.25, so NOT_SURE and the two missing verdicts count as unsupported. A scripted judge
+makes that arithmetic testable. The scorer refuses a judge whose name equals `answeredBy`.
+
+**How the reference does it** — mastra `packages/evals/src/scorers/llm/hallucination/index.ts:90-100` and
+`packages/evals/src/scorers/llm/denominator.test.ts:41-46 @5480e7b7c`
+```ts
+.generateScore(({ results }) => {
+  const verdicts = results.analyzeStepResult.verdicts;
+  // Score against the extracted claims so verdicts the judge omitted are not dropped from the denominator
+  const totalStatements = results.preprocessStepResult?.claims?.length || verdicts.length;
+  const contradictedStatements = verdicts.filter(v => v.verdict.toLowerCase().trim() === 'yes').length;
+
+it('counts claims without a verdict as unsupported', async () => {
+  const scorer = createFaithfulnessScorer({ model: scriptedJudge([claimsJson, verdicts(['yes', 'yes']), 'reason']) });
+  expect((await scorer.run(run)).score).toBe(0.5);
+```
+(Shortened.) langchain4j: "A criterion the judge was not sure about is not satisfied"
+(`langchain4j-test/src/main/java/dev/langchain4j/test/judge/JudgeVerdict.java:60-65 @709c6fd10`). spring-ai tests its
+verdict parser, so "yes and more" and "maybe" fail (`spring-ai-client-chat/…/RelevancyEvaluatorTests.java:95-106 @b19514195`),
+but its integration test lets the generating model judge itself (`…/QuestionAnswerAdvisorIT.java:187-189`): the failure
+this rule prevents.
+
+### LT18 — Gate an eval on versioned thresholds over repeated runs
+
+**Bad** (neutral)
+```groovy
+def "should answer order questions well"() {
+    given:
+    def eval = new OrderAnswersEval(dataset: "evals/order-questions.json")
+
+    when:
+    def result = eval.runOnce(liveAssistant())
+
+    then:
+    result.averageScore > 0.7
+}
+```
+What goes wrong: one run decides, so a lucky run passes and an unlucky one blocks. The threshold lives in test code,
+where it is quietly tuned until the test is green.
+
+**Good** (neutral)
+```groovy
+def "should meet the versioned thresholds over repeated runs"() {
+    given:
+    def config = EvalConfig.load("evals/order-questions.thresholds.json")
+    def eval = new OrderAnswersEval(dataset: "evals/order-questions.json")
+
+    when:
+    def runs = (1..config.runs).collect { eval.run(liveAssistant()) }
+
+    then:
+    config.metrics.every { metric -> metric.passes(runs*.score(metric.name)) }
+}
+```
+Why this is right: the run count and each metric's rule (a minimum over runs, or a pass rate) live in a versioned file
+that changes by review. `passes` treats a non-finite score as a failure.
+
+**How the reference does it** — adk-python `src/google/adk/evaluation/eval_config.py:469-486 @c501d8eda`
+```json
+{
+  "criteria": {
+    "tool_trajectory_avg_score": 1.0,
+    "response_match_score": 0.8
+  },
+  "multi_run_config": {
+    "num_runs": 3,
+    "cross_run_scoring_by_metric": {
+      "response_match_score": "min_over_runs",
+      "tool_trajectory_avg_score": {"method": "pass_rate", "threshold": 0.9}
+    },
+    "cross_run_criteria": [{"method": "pass_rate", "threshold": 0.8}]
+  }
+}
+```
+mastra fails a non-finite score (`packages/core/src/evals/thresholds.ts:16-19 @5480e7b7c`):
+`if (!Number.isFinite(score)) { return false; }`.
