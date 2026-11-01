@@ -112,7 +112,7 @@ on a handler, such as `@PreAuthorize`.
 | calls an LLM provider | a per-caller rate limit and quota before the call (SE8) | OWASP LLM10 "Apply rate limiting and user quotas"; addyosmani security-and-hardening "cap tokens, request rate, and recursion depth" · r48 :909 |
 | writes a password, token, session id or key to a log | nothing: LG4 in [logging.md](../../obs/references/logging.md) | OWASP Logging "should usually not be recorded … Access tokens … Authentication passwords … Encryption keys"; spring-boot-skills "Never log bearer tokens." · r48 :1024 |
 | configures `authorizeHttpRequests` | an explicit matcher per endpoint and `anyRequest().denyAll()` last (SS1) | Spring Security authorize-http-requests examples end `.anyRequest().denyAll()`; OWASP Authorization "Adopt a 'deny-by-default' mentality" · r48 :916 |
-| permits a dispatch type | `dispatcherTypeMatchers(FORWARD, ERROR).permitAll()` (SS2) | Spring Security authorize-http-requests example permits `FORWARD` and `ERROR` (vendor docs) · r48 :925 |
+| permits a dispatch type | `dispatcherTypeMatchers(FORWARD, ERROR).permitAll()` (SS2) | Spring Security "authorizes all dispatcher types by default … allow dispatcher types like `FORWARD` and `ERROR`" (vendor docs) · r48 :925, :1421-1426 |
 | adds a custom security `Filter` | the chain, with `FilterRegistrationBean.setEnabled(false)` (SS3) | Spring Security architecture "That may cause the filter to be invoked twice"; spring-boot-skills "disable servlet-container registration" · r48 :929 |
 | receives an invalid, expired or wrong-type token | 401 at once, on public paths too (SS4) | spring-boot-skills "An invalid supplied token returns 401 even when the route permits anonymous access"; OAuth 2.1 `invalid_token` "SHOULD respond with the 401" · r48 :934 |
 | serves a named cross-origin client | `http.cors(…)` with an origin allowlist (SS5) | ASVS 3.4.2 "validated against an allowlist of trusted origins"; Spring Security cors "providing a `CorsConfigurationSource`" · r48 :939 |
@@ -214,9 +214,6 @@ evidence: ledger row SS21.)
 
 ## Decided edges
 
-- **Skip when** existing endpoints do not all have a public-path entry or an explicit matcher yet:
-  `anyRequest().authenticated()` stays last until they do (SS1). — **Do not skip when** every endpoint has one: end
-  with `denyAll()`. — **Confidence** medium (r48 :917)
 - **Skip when** a service method is called only from guarded controller handlers: it needs no check of its own
   (SS16; Spring Security calls guard placement "taste", r48 :946). — **Do not skip when** a worker, a scheduler or a
   listener also calls it. — **Confidence** high
