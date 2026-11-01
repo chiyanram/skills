@@ -11,8 +11,8 @@ Contents: Rules · When X, use Y · Good / Bad (MS6) · Decided edges · Review 
 
 - **MS6** — For every state-changing operation, answer "what if it runs twice, or the last run crashed halfway?";
   reconcile when the answer depends on leftovers, because a rerun on leftover partial state gives a different result.
-- **MS4** — Skip a message we did not author that cannot be parsed, and log its partition and offset; never skip our own
-  failures, because a retried malformed message fails again and blocks the partition.
+- **MS4** — Send a record that cannot be deserialized to a dead-letter topic on its first failure, never retry it,
+  because a retried unparseable record fails again and blocks the partition.
 
 ## When X, use Y
 
@@ -20,14 +20,16 @@ Contents: Rules · When X, use Y · Good / Bad (MS6) · Decided edges · Review 
 |---|---|---|
 | a consumer that changes state | processing that handles a duplicate record safely (MS6) | consumers that change state must handle duplicates (pl123k :42) · no queue gives exactly-once across a consumer crash (addy api :335) |
 | a check for "already done" followed by the act | one atomic claim: a unique constraint or a row lock picks the winner (MS6) | a check followed by an act is a race (addy api :173, :182, :347) |
-| a step that leaves something behind: a lock, a temporary file, a half-written record, a claimed job | a marker the next run can judge stale, such as a temporary path renamed into place (MS6) | a marker the next run cannot judge turns every crash into manual cleanup (ps idempotent :15) |
-| a record that cannot be parsed | a defined path for poison records; for a record we did not author, skip it and log partition and offset (MS4) | define retry, DLT, alerting and replay behaviour for poison records (pl123k :45) |
+| a step that leaves something behind: a lock, a temporary file, a half-written record, a claimed job | a marker the next run can judge stale, such as a temporary path renamed into place (MS6) | a marker the next run cannot judge turns every crash into manual cleanup (ps idempotent :14, :16) |
+| a record that cannot be parsed | a dead-letter topic, with no retry (MS4) | define retry, DLT, alerting and replay behaviour for poison records (pl123k :45) · a `DeserializationException` is fatal, unlikely to be resolved on a retried delivery; the recoverer publishes it to a dead-letter topic (Spring Kafka error handling) |
 
-Sources, all read at a pinned commit; `:N` is a line:
+Sources, all read at a pinned commit or at the URL named; `:N` is a line:
 
 - pl123k: jabrena/plinth `skills/123-java-design-patterns/references/123-kafka-event-driven-patterns.md`, @a46375a.
 - addy api: addyosmani/agent-skills `skills/api-and-interface-design/SKILL.md`, @aeac41d.
 - ps idempotent: pstack `skills/principle-make-operations-idempotent/SKILL.md`, @f713f14.
+- Spring Kafka error handling: https://docs.spring.io/spring-kafka/reference/kafka/annotation-error-handling.html
+  §DefaultErrorHandler, §Publishing Dead-letter Records.
 
 ## Good / Bad
 
@@ -86,6 +88,5 @@ Walk every changed message consumer, scheduled job and state-changing service me
 - [ ] MS6 — For each one, answer both questions from the code. A check for "already done" followed by a separate act
   (`SELECT` then `INSERT` or update) with no unique constraint or row lock is a finding. A leftover the next run cannot
   judge stale is a finding.
-- [ ] MS4 — For each consumer path that skips a record (returns or acknowledges without processing), the record failed
-  to parse, we did not author it, and the log line carries partition and offset. A skip of our own failure, such as a
-  downstream timeout, is a finding.
+- [ ] MS4 — For each consumer, find the path a deserialization failure takes. A retry of it, a silent skip, or no
+  dead-letter topic is a finding.
