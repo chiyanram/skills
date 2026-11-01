@@ -29,7 +29,7 @@ on a handler, such as `@PreAuthorize`.
 
 ### Secrets
 
-- **SE2** (operator preference, 2026-10-31) — Stop the call when decryption fails, and never fall back to
+- **SE2** — Stop the call when decryption fails, and never fall back to
   unauthenticated, cached or default credentials, because a fallback sends the call unauthenticated or with a cached
   credential.
 - **SE7** — Encrypt a stored credential with AES-GCM and mask it in every response; hash passwords with BCrypt, never
@@ -37,7 +37,7 @@ on a handler, such as `@PreAuthorize`.
 - **SS21** — Hash human passwords with `DelegatingPasswordEncoder` (bcrypt ≥10); hash machine secrets of ≥128 bits
   with server-keyed HMAC-SHA-256, compared in constant time, because a per-request slow hash makes a public endpoint a
   CPU sink.
-- **SE7a** (operator preference, 2026-10-31) — Keep the credential-encryption key distinct from the token signing key,
+- **SE7a** — Keep the credential-encryption key distinct from the token signing key,
   because a key used for two purposes exposes both uses when one leaks.
 - **SE8** — Apply rate limiting and user quotas before any LLM call reaches a provider, because uncapped LLM calls
   cause unbounded consumption (OWASP LLM10).
@@ -49,7 +49,7 @@ on a handler, such as `@PreAuthorize`.
 - **SS12** — Give every controller handler `@PreAuthorize`, on the method or the class, or a public-path entry,
   enforced by an architecture test with a written exempt list, because method security leaves an unannotated handler
   open.
-- **SS2** (operator preference, 2026-10-31) — Permit `ERROR` and `ASYNC` dispatches in one matcher with the reason in
+- **SS2** — Permit `ERROR` and `ASYNC` dispatches in one matcher with the reason in
   a comment, never `REQUEST` or `FORWARD`, because Spring Security authorizes every dispatch type by default.
 - **SS3** — Register a custom security `Filter` in the chain and disable its servlet registration with
   `FilterRegistrationBean.setEnabled(false)`, because a `Filter` bean runs twice: once in the chain, once out of order.
@@ -58,10 +58,10 @@ on a handler, such as `@PreAuthorize`.
 - **SS5** — Configure CORS only for a named cross-origin client, through `http.cors(…)` with an origin allowlist,
   never `*` or `allowedOriginPatterns("*")` with credentials, because a reflected credentialed origin lets any site
   read a credentialed response.
-- **SS17** (operator preference, 2026-10-31) — Filter collections in the query and never put `@PostAuthorize` or
+- **SS17** — Filter collections in the query and never put `@PostAuthorize` or
   `@PostFilter` on a method that writes, because `@PostAuthorize` runs after the write commits, so a denial undoes
   nothing.
-- **SS26** (operator preference, 2026-10-31) — For a security design, adapt Spring Security's pattern
+- **SS26** — For a security design, adapt Spring Security's pattern
   (`AuthorizationManager`, a SpEL bean, a chain filter, a meta-annotation) after reading its source, because a
   hand-rolled check misses what the framework already checks.
 
@@ -90,15 +90,15 @@ on a handler, such as `@PreAuthorize`.
 
 ### Security tests
 
-- **SS22** (operator preference, 2026-10-31) — Authenticate security ITs through the real login and filter chain (IT3,
+- **SS22** — Authenticate security ITs through the real login and filter chain (IT3,
   [integration-tests.md](../../testing/references/integration-tests.md)), with `@WithMockUser` or `jwt()` only in a
   guard bean's unit spec, because mock users skip the filter building authorities.
-- **SS23** (operator preference, 2026-10-31) — Give each guarded controller a matrix IT: caller kind (anonymous, each
+- **SS23** — Give each guarded controller a matrix IT: caller kind (anonymous, each
   role, another tenant's member, a machine client) × endpoint → status, a refusal changing nothing, because one
   wrong-role test misses other caller kinds.
 - **SS24** — Keep ITs that send a forged, expired, `alg:none`, wrong-key and wrong-`typ` token and expect 401, because
   JWT libraries have shipped critical flaws that accepted forged tokens.
-- **SS25** (operator preference, 2026-10-31) — Give each public-path entry an IT proving the check that replaces the
+- **SS25** — Give each public-path entry an IT proving the check that replaces the
   token refuses a bad caller, because on a public path that check is the only guard.
 
 ## When X, use Y
@@ -119,6 +119,8 @@ on a handler, such as `@PreAuthorize`.
 | checks who owns a resource, or adds an auth step | an `AuthorizationManager`, a SpEL bean, a chain filter or a meta-annotation (SS26) | operator preference: a hand-rolled check misses what the framework already checks |
 | decides on membership or account status | a database read at decision time, not a token claim (SS6) | authz changes apply at once · ASVS 8.3.2, 7.4.2; spring-boot-skills spring-security-jwt "validate current account status" |
 | tests a guard | a guard bean's unit spec may use `@WithMockUser` or `jwt()`; an IT logs in for real (SS22) | operator preference · Spring Security testing: `@WithMockUser` "cannot apply to full HTTP requests" |
+
+Operator preference, 2026-10-31 (SRC2), in whole or in part: SE2, SE7a, SS2, SS17, SS26, SS22, SS23 and SS25.
 
 ## Good / Bad
 

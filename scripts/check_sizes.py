@@ -1,8 +1,7 @@
 """Size budgets from agent-factory docs/adr/0003-rulebook-layout-across-tools.md.
 
 - root AGENTS.md under 200 lines (ADR-0003:14)
-- each rule in a reference's `## Rules` section at most 35 words (ADR-0003:20-21); the id and an
-  "(operator preference, YYYY-MM-DD)" label do not count
+- each rule in a reference's `## Rules` section at most 35 words (ADR-0003:20-21); the id does not count
 - each root-to-leaf AGENTS.md chain within Codex's 32 KiB (G20; agent-factory research/22:11,22)
 """
 import re
@@ -15,7 +14,7 @@ ROOT_AGENTS_MAX_LINES = 199
 RULE_MAX_WORDS = 35
 CHAIN_MAX_BYTES = 32 * 1024
 LIST_ITEM = re.compile(r"^(?:[-*+]|\d+\.)\s+")
-RULE_ID = re.compile(r"^\*\*[A-Z]+\d+[a-z]?\*\*\s*(\(operator preference, \d{4}-\d{2}-\d{2}\)\s*)?—\s*")
+RULE_ID = re.compile(r"^\*\*[A-Z]+\d+[a-z]?\*\*\s*—\s*")
 RULES_HEADING = re.compile(r"Rules\s*(\(ours\))?\s*\n")
 
 

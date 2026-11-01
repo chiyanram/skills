@@ -7,18 +7,18 @@ Contents: Rules · When X, use Y · Good / Bad (DS1, DS3) · Decided edges · Re
 
 ## Rules
 
-- **DS11** (operator preference, 2026-10-31) — Review every diff against the When X, use Y baseline; report each hit
+- **DS11** — Review every diff against the When X, use Y baseline; report each hit
   as a labelled heuristic ("possible Feature Envy"); a documented repo rule overrides it, because a smell is a judgement
   call.
 - **SM1** — Take the baseline from Fowler and Beck's 24 smells (_Refactoring_ 2e, ch. 3), one line each in our
   words, and skip the ones a gate covers, because a 12-smell list misses half of them.
-- **SM2** (operator preference, 2026-10-31) — Add Kerievsky's Conditional Complexity, Oddball Solution and Indecent
+- **SM2** — Add Kerievsky's Conditional Complexity, Oddball Solution and Indecent
   Exposure to the baseline, because Fowler's 24 smells do not name these three.
 - **SM3** — Treat Dead Code (an unused private member, an unreachable branch) as a baseline smell, because no gate or
   rule covers unused private members.
 - **FW9** — Keep Long Function, Long Parameter List and Data Class in the baseline, because the 12-smell list it
   replaced misses Long Function.
-- **DS1** (operator preference, 2026-10-31) — Before you accept a change, look for a restructure that deletes branches,
+- **DS1** — Before you accept a change, look for a restructure that deletes branches,
   modes or layers instead of moving them; kept incidental complexity is a finding, because a moved branch stays
   duplicated and the copies disagree.
 - **DS3** — Add no one-off `if` or second boolean to an existing flow; model the case as a sealed type, enum switch,
@@ -31,12 +31,12 @@ Contents: Rules · When X, use Y · Good / Bad (DS1, DS3) · Decided edges · Re
   before you name a pattern, because added complexity compounds into every later change.
 - **DS12** — Define a predicate or literal that encodes a rule (a prefix, a status, a limit) once and call it from every
   site, because copies of one rule drift apart.
-- **DS14** (operator preference, 2026-10-31) — Extract a shared helper only when the duplicated thing is a rule (DS12),
+- **DS14** — Extract a shared helper only when the duplicated thing is a rule (DS12),
   not for two or three similar lines, because a helper for unrelated callers grows a mode flag per caller.
-- **DS2** (operator preference, 2026-10-31) — Treat a change that pushes a file over 1000 lines as a finding and
+- **DS2** — Treat a change that pushes a file over 1000 lines as a finding and
   decompose first (exception: Decided edges), because a reviewer misses a divergence inside a file too long to hold in
   mind.
-- **FW1** (operator preference, 2026-10-31) — Treat a constructor with more than 7 collaborators as a finding: split the
+- **FW1** — Treat a constructor with more than 7 collaborators as a finding: split the
   class (Extract Class) or bundle travelling values (Introduce Parameter Object), because a long constructor often
   signals an over-busy object.
 - **FW2** — Treat a boolean parameter that selects which operation runs as a finding: split it into two named methods
@@ -49,11 +49,11 @@ Contents: Rules · When X, use Y · Good / Bad (DS1, DS3) · Decided edges · Re
   (a compare-and-set result) or a fluent `this`, because only side-effect-free queries are safe in any order.
 - **NM1** — Name a variable, method or type for what it holds or does: no `data`, `result`, `temp`, `item`, no
   abbreviation beyond `id`, `url`, `api`, because an unrevealing name makes the reader trace the code.
-- **NM2** (operator preference, 2026-10-31) — When no honest name comes for a method or type, split or reshape it as a
+- **NM2** — When no honest name comes for a method or type, split or reshape it as a
   design finding instead of inventing a vague name, because a name that will not come signals a murky design.
 - **NM3** — Name a method that changes state for that change; a getter-shaped name (`get…`, `is…`) never writes,
   because a `get`-shaped name that also writes misleads the caller.
-- **NM4** (operator preference, 2026-10-31) — Give the types of one family one naming pattern and aligned method
+- **NM4** — Give the types of one family one naming pattern and aligned method
   signatures (`CsvExporter`, `JsonExporter`), because inconsistent names in one family cost the reader a lookup each
   time.
 
@@ -98,6 +98,8 @@ the row points at it.
 [refactoring.guru](https://refactoring.guru/refactoring/smells) and `simplification` is addy
 `skills/code-simplification/SKILL.md`. `:N` is the line.
 Smell names checked against refactoring.com; the 2e smell-to-cure pairs were not checked against the book text.
+
+Operator preference, 2026-10-31 (SRC2), in whole or in part: DS11, SM2, DS1, DS14, DS2, FW1, NM2 and NM4.
 
 ## Good / Bad
 

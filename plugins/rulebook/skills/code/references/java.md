@@ -7,12 +7,12 @@ Contents: Rules · When X, use Y · Good / Bad (U4, JV1, JV5, CV3) · Decided ed
 
 ## Rules
 
-- **U4** (operator preference, 2026-10-31) — In logic a test must pin, take an injected `Clock` (and a `Supplier<UUID>` where an id matters), never
+- **U4** — In logic a test must pin, take an injected `Clock` (and a `Supplier<UUID>` where an id matters), never
   `Instant.now()`, `LocalDate.now()` or `UUID.randomUUID()`, because a direct `Instant.now()` call cannot be
   stubbed and makes tests flaky.
 - **JV1** — Compute time as an `Instant` or a `Duration`; convert to `Date` or a zoned type only at a library or
   display boundary, because a shared `SimpleDateFormat` corrupts dates under concurrent use.
-- **JV2** (operator preference, 2026-10-31) — Use sequential streams in request- or queue-serving code, never `parallelStream()` or `.parallel()`,
+- **JV2** — Use sequential streams in request- or queue-serving code, never `parallelStream()` or `.parallel()`,
   because a blocking call in a parallel stream parks a JVM-wide shared thread.
 - **JV3** — Let a stream only compute; do I/O, logging and mutation outside `map` and `filter`, and never log with
   `peek`, because an effect inside `map` or `filter` makes the pipeline hard to test.
@@ -27,9 +27,9 @@ Contents: Rules · When X, use Y · Good / Bad (U4, JV1, JV5, CV3) · Decided ed
   shape, and a one-line edit touches three lines.
 - **JV8** — Close every `AutoCloseable` a method opens with try-with-resources, because a resource that is not closed
   when an exception fires leaks.
-- **JV9** (operator preference, 2026-10-31) — Put braces on every `if`, `else`, `for` and `while` body, because a
+- **JV9** — Put braces on every `if`, `else`, `for` and `while` body, because a
   line added to a brace-less body runs outside the condition.
-- **CV3** (operator preference, 2026-10-31) — Let the formatter decide wrapping: the configured line length for Java
+- **CV3** — Let the formatter decide wrapping: the configured line length for Java
   and Groovy, Prettier for TypeScript, because a hand-wrapping rule that differs from the formatter fights its output.
 
 ## When X, use Y
@@ -49,6 +49,8 @@ Contents: Rules · When X, use Y · Good / Bad (U4, JV1, JV5, CV3) · Decided ed
 321 is `321-frameworks-spring-boot-testing-unit-tests.md`; `:N` is the line. JDK = the Oracle Java SE API docs and
 tutorials. U4, JV2, JV9 and CV3 are operator preferences: JV2 follows the JDK warning on shared state in parallel
 streams; JV9 and CV3 follow Google Java Style §4.1.1 and §4.4.
+
+Operator preference, 2026-10-31 (SRC2), in whole or in part: U4, JV2, JV9 and CV3.
 
 ## Good / Bad
 

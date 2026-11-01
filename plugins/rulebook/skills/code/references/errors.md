@@ -7,25 +7,25 @@ Contents: Rules · When X, use Y · Good / Bad (ER1, ER4, ER8, ER10) · Decided 
 
 ## Rules
 
-- **ER1** (operator preference, 2026-10-31) — A foreseeable non-success (not found, already exists, over limit) is a
+- **ER1** — A foreseeable non-success (not found, already exists, over limit) is a
   sealed outcome in the return type; only faults throw, because an expected case that is thrown lets callers ignore it
   until runtime.
-- **ER2** (operator preference, 2026-10-31) — A fault throws one base exception type with a machine-readable error
+- **ER2** — A fault throws one base exception type with a machine-readable error
   code; no checked exceptions; never a bare `ResponseEntity…build()`, because a bare `build()` returns an empty body
   with no error code.
-- **ER7** (operator preference, 2026-10-31) — Do not use `Either` or VAVR; a domain-named sealed outcome carries the
+- **ER7** — Do not use `Either` or VAVR; a domain-named sealed outcome carries the
   non-success case, because a domain-named sealed type says what failed; an `Either` left says only "left".
 - **ER10** — An error response carries the error code's generic message only; never `getMessage()` from a library,
   driver or JDK exception, a stack, or SQL, because those expose internal details to the client.
 - **ER11** — Map exceptions to responses only in the one central exception handler; a controller declares no
   `@ExceptionHandler`, because each extra handler is one more place that can return internal details to the client.
-- **ER3** (operator preference, 2026-10-31) — A rethrow chains its cause; a caught exception is handled, rethrown or
+- **ER3** — A rethrow chains its cause; a caught exception is handled, rethrown or
   logged with its class name, never left empty, because a dropped cause ends the stack trace and an empty catch hides
   bugs.
-- **ER4** (operator preference, 2026-10-31) — Catch the narrowest type; `catch (Exception)` only at a must-not-fail
+- **ER4** — Catch the narrowest type; `catch (Exception)` only at a must-not-fail
   boundary, with a comment; never `Throwable`, because a broad catch hides failures; `Throwable` even swallows
   `OutOfMemoryError`.
-- **ER5** (operator preference, 2026-10-31) — When you catch `InterruptedException`, restore the flag with
+- **ER5** — When you catch `InterruptedException`, restore the flag with
   `Thread.currentThread().interrupt()` or rethrow, because a swallowed interrupt causes a quiet hang.
 - **ER6** — Validate request input at the boundary with Bean Validation; inside, trust the types, because a service
   re-validating what the boundary checked is duplicated logic that drifts.
@@ -54,6 +54,8 @@ is the line. OWASP is the Error Handling Cheat Sheet,
 https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html. JDK `Error` is the Java SE Javadoc of
 `java.lang.Error`. Spring Framework, Validation is
 https://docs.spring.io/spring-framework/reference/core/validation/beanvalidation.html.
+
+Operator preference, 2026-10-31 (SRC2), in whole or in part: ER1, ER2, ER7, ER3, ER4 and ER5.
 
 ## Good / Bad
 

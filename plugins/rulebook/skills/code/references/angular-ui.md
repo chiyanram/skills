@@ -17,7 +17,7 @@ Contents: Rules · When X, use Y · Good / Bad (NGB3) · Decided edges · Review
   new variant compiles with no case to handle it.
 - **NGA6** — Check a value against a type with `satisfies`, not `as`, because `satisfies` validates the value
   without widening it, while `as` hides a mismatch the compiler could catch.
-- **NGA7** (operator preference, 2026-10-31) — Derive frontend DTO types from the backend's OpenAPI schema, never a
+- **NGA7** — Derive frontend DTO types from the backend's OpenAPI schema, never a
   hand-written parallel type, because a hand-written copy of the shape drifts when the schema changes.
 - **NGB1** — Write standalone components only, never an NgModule, and omit `standalone: true`, because standalone is
   the default from Angular v20, so the flag and an NgModule only add declarations the framework no longer needs.
@@ -25,7 +25,7 @@ Contents: Rules · When X, use Y · Good / Bad (NGB3) · Decided edges · Review
   because ZoneJS runs change detection more often than state changes, and OnPush is Angular's step towards zoneless.
 - **NGB3** — Hold component state in `signal()` and derived state in `computed()`; use `effect()` only for side
   effects, never to copy state, because a hand-synced copy stays stale when its source loads later.
-- **NGC1** (operator preference, 2026-10-31) — Inject with `inject()` in a field initialiser, never through
+- **NGC1** — Inject with `inject()` in a field initialiser, never through
   constructor parameters, because `inject()` reads better with many dependencies and infers types better than a long
   constructor list.
 - **NGC3** — Bind a subscription that outlives one HTTP call (router events, an interval, an event stream) with
@@ -55,6 +55,8 @@ Contents: Rules · When X, use Y · Good / Bad (NGB3) · Decided edges · Review
 | a list in a template | `@for` with `track` (NGD1) | `track` maps items to DOM nodes and speeds rendering · angular.dev control flow §Why is track in @for blocks important; Jeffallan angular-architect `references/components.md` |
 | a clickable element | `<a>` when it navigates, `<button type="button">` when it acts (NGD2) | a clickable `div` cannot take focus · WCAG 2.1.1 Keyboard; addyosmani accessibility-checklist "NEVER use div/span as buttons" |
 | a button whose only content is an icon | `aria-label` (NGD3) | a screen reader needs a name · WCAG 4.1.2 Name, Role, Value; addyosmani accessibility-checklist "Icon-only buttons have `aria-label`" |
+
+Operator preference, 2026-10-31 (SRC2), in whole or in part: NGA7 and NGC1.
 
 ## Good / Bad
 

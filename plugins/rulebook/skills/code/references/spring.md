@@ -7,28 +7,28 @@ Contents: Rules · When X, use Y · Good / Bad (LY6, LY7, SC21) · Decided edges
 
 ## Rules
 
-- **LY6** (operator preference, 2026-10-31) — Take dependencies through one constructor; make an optional or
+- **LY6** — Take dependencies through one constructor; make an optional or
   zero-or-more collaborator an `ObjectProvider<T>` resolved at use, never a setter, a no-arg constructor or
   `@Autowired(required=false)`, because a setter-injected collaborator may be null at every use.
-- **SC1** (operator preference, 2026-10-31) — Never use `@Autowired` in production code; give each bean exactly one
+- **SC1** — Never use `@Autowired` in production code; give each bean exactly one
   constructor and no test-only second constructor, because a test-only constructor that accepts null hides a production
   wiring mistake.
-- **SC2** (operator preference, 2026-10-31) — Cut a dependency cycle; if it cannot be cut, hold an `ObjectProvider<T>`
+- **SC2** — Cut a dependency cycle; if it cannot be cut, hold an `ObjectProvider<T>`
   field, resolve it at call time and name the cycle in a comment, because a constructor cycle fails startup with
   `BeanCurrentlyInCreationException`.
-- **SC3** (operator preference, 2026-10-31) — Never put `@Lazy` on an `ObjectProvider` and never enable
+- **SC3** — Never put `@Lazy` on an `ObjectProvider` and never enable
   `spring.main.lazy-initialization`; let wiring fail at startup, because with laziness a missing bean fails at the first
   request instead.
-- **SC4** (operator preference, 2026-10-31) — When only one implementation of an interface should run, select it with a
+- **SC4** — When only one implementation of an interface should run, select it with a
   config flag (`@ConditionalOnProperty`), never with `@Primary`, because `@Primary` builds both beans and leaves the
   choice in code, not configuration.
-- **SC9** (operator preference, 2026-10-31) — Give every property-selected bean an `ApplicationContextRunner` spec
+- **SC9** — Give every property-selected bean an `ApplicationContextRunner` spec
   proving each value picks the right bean and a missing value fails startup, because a wrong bean choice otherwise ships
   with no failing test.
-- **SC5** (operator preference, 2026-10-31) — Write each configuration class `@Configuration(proxyBeanMethods = false)`
+- **SC5** — Write each configuration class `@Configuration(proxyBeanMethods = false)`
   and take collaborators as `@Bean` method parameters, never another `@Bean` method call, because without the CGLIB
   proxy a direct `@Bean` call builds a second instance of the bean.
-- **SC6** (operator preference, 2026-10-31) — Declare a `@Bean` method's return type as the most specific type it
+- **SC6** — Declare a `@Bean` method's return type as the most specific type it
   builds, because before creation the container and type-based conditions see only the declared type.
 - **SC8** — Put feature switches (`@EnableScheduling`, `@EnableAsync`, `@Enable*Auditing`) on a dedicated
   `@Configuration`, never on the `@SpringBootApplication` class, because every slice test loads the main class and so
@@ -39,28 +39,28 @@ Contents: Rules · When X, use Y · Good / Bad (LY6, LY7, SC21) · Decided edges
   default, so two reads of one key can disagree.
 - **SC11** — Register a properties record with `@EnableConfigurationProperties` on the module's configuration class,
   never also as `@Component` or `@Bean`, because constructor binding does not apply to a record created that way.
-- **SC13** (operator preference, 2026-10-31) — Read configuration only through binding or the `Environment`, as
+- **SC13** — Read configuration only through binding or the `Environment`, as
   kebab-case keys under the app's own prefix, never `System.getenv` or an env-var name in `@Value`, because
   `System.getenv` skips configtree secrets and tests cannot override it.
-- **SC10** (operator preference, 2026-10-31) — Name a kebab-case key under the app's own prefix in
+- **SC10** — Name a kebab-case key under the app's own prefix in
   `@ConditionalOnProperty`, and state `havingValue` and `matchIfMissing`, because an env-var name skips the bound
   configuration and tests cannot override it.
-- **SC14** (operator preference, 2026-10-31) — Bind times and sizes as `Duration` or `DataSize` with a unit in the value
+- **SC14** — Bind times and sizes as `Duration` or `DataSize` with a unit in the value
   (`2s`), never a `long` named `*-ms` or `*-seconds`, because a bare number hides its unit, so seconds bind silently as
   milliseconds.
 - **SC15** — Make a settings record reject bad values at startup with a message naming the key, and prove it with a
   runner spec, because a missing key otherwise crashes with a bare NullPointerException naming nothing.
 - **SC16** — Give a secret or a required endpoint no default: its absence fails startup or selects a named degraded mode
   that logs once at WARN, because a blank encryption-key default silently stores secrets unencrypted.
-- **SC17** (operator preference, 2026-10-31) — Keep a secret out of every `@ConfigurationProperties` record, because the
+- **SC17** — Keep a secret out of every `@ConfigurationProperties` record, because the
   record's generated `toString` prints the secret.
 - **X6** — Never use `@PostConstruct` in main code; put a startup check in the constructor and startup work in an
   `ApplicationRunner` or `SmartLifecycle`, because `@PostConstruct` runs inside the singleton creation lock and risks
   deadlock.
-- **SC19** (operator preference, 2026-10-31) — Run startup work that must finish before traffic in an
+- **SC19** — Run startup work that must finish before traffic in an
   `ApplicationRunner`; hand later work to another thread from `@EventListener(ApplicationReadyEvent)`, which returns at
   once, because event listeners must not run lengthy tasks.
-- **SC20** (operator preference, 2026-10-31) — Make a component that starts and stops background work (a listener
+- **SC20** — Make a component that starts and stops background work (a listener
   container, a consumer loop) a Spring-managed `SmartLifecycle` bean, never `new`-ed and started by hand, because a
   hand-started container misses the context's shutdown phases.
 - **SC21** — Call a method with a proxied annotation only from another bean; move it to a second bean, with no
@@ -69,10 +69,10 @@ Contents: Rules · When X, use Y · Good / Bad (LY6, LY7, SC21) · Decided edges
   `@Transactional` on each write method, because without the read-only default every query pays for dirty checking.
 - **SX18** — Make a static-only class `final` with a private constructor, because Java
   adds a public constructor by default, which lets callers instantiate a class where an instance makes no sense.
-- **SX19** (operator preference, 2026-10-31) — Write output through the logger, never `System.out`, `System.err` or
+- **SX19** — Write output through the logger, never `System.out`, `System.err` or
   `printStackTrace()` in main code, because console output bypasses the logger's level and context, so a failed run
   cannot be triaged from the logs.
-- **SX14** (operator preference, 2026-10-31) — In a package-private class, make a method `public` only when it
+- **SX14** — In a package-private class, make a method `public` only when it
   overrides, because a public method there widens visibility by accident and exposes a method no caller should reach.
 
 ## When X, use Y
@@ -106,6 +106,8 @@ NOT); SC17 JDK `java.lang.Record#toString` (the implicit string holds each compo
 `HideUtilityClassConstructor` and `FinalClass`, github/awesome-copilot `instructions/springboot.instructions.md:33`;
 SC9, SX14 and SX19 operator preference. `68f § ID — title` is a heading of
 `research/68f-neutral-code.md`.
+
+Operator preference, 2026-10-31 (SRC2), in whole or in part: LY6, SC1, SC2, SC3, SC4, SC9, SC5, SC6, SC13, SC10, SC14, SC17, SC19, SC20, SX19 and SX14.
 
 ## Good / Bad
 

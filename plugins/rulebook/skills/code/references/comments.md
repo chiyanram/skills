@@ -14,9 +14,9 @@ Contents: Rules · When X, use Y · Good / Bad (CM3, CM4, CM7) · Decided edges 
 - **CM3** — Keep a comment only for what code cannot show (external dependency or protocol, public-API contract,
   license, issue/RFC link, must-not-fail boundary catch (ER4)); else reshape, because a why-comment about our code
   rots into a false claim.
-- **CM4** (operator preference, 2026-10-31) — Check each comment's claim before it lands; replace a 'do not remove' note
+- **CM4** — Check each comment's claim before it lands; replace a 'do not remove' note
   with a type, test or lint, because a false comment gets believed and a 'keep in sync' note never fails.
-- **CM5** (operator preference, 2026-10-31) — Write Javadoc on an interface only when its contract is not obvious from
+- **CM5** — Write Javadoc on an interface only when its contract is not obvious from
   the signature, and none on its implementation, because Javadoc on the implementation is a second copy that goes stale.
 - **CM7** — Fix the type instead of suppressing a lint or compiler rule that protects correctness or safety
   (`eslint-disable`, `@ts-expect-error`, `@SuppressWarnings`); style-only rules may be suppressed, because a suppressed
@@ -39,6 +39,8 @@ Contents: Rules · When X, use Y · Good / Bad (CM3, CM4, CM7) · Decided edges 
 `sicko` is pstack `agents/comment-sicko.md`, `no-comments` is pstack `skills/no-comments/SKILL.md`, `simplification`
 is addy `skills/code-simplification/SKILL.md` and `codebase-design` is mattpocock
 `skills/engineering/codebase-design/SKILL.md`; `:N` is the line.
+
+Operator preference, 2026-10-31 (SRC2), in whole or in part: CM4 and CM5.
 
 ## Good / Bad
 
