@@ -7,50 +7,46 @@ Contents: Rules · When X, use Y · Good / Bad (CM3, CM4, CM7) · Decided edges 
 
 ## Rules
 
-- **CM1** — Write no banner or divider comments, in any file type, because a divider stays after the section it
-  labelled is split or moved.
-- **CM2** — Write no comment that restates the code, a dependency or a config value, because a restating comment adds
-  nothing and is a second place to update, which goes stale once the code changes.
-- **CM3** — Keep a comment only for what code cannot show (external dependency or protocol, public-API contract,
-  license, issue/RFC link, must-not-fail boundary catch (ER4)); else reshape, because a why-comment about our code
-  rots into a false claim.
-- **CM4** — Check each comment's claim before it lands; replace a 'do not remove' note
-  with a type, test or lint, because a false comment gets believed and a 'keep in sync' note never fails.
-- **CM5** — Write Javadoc on an interface only when its contract is not obvious from
-  the signature, and none on its implementation, because Javadoc on the implementation is a second copy that goes stale.
-- **CM7** — Fix the type instead of suppressing a lint or compiler rule that protects correctness or safety
-  (`eslint-disable`, `@ts-expect-error`, `@SuppressWarnings`); style-only rules may be suppressed, because a suppressed
-  correctness rule stops catching the bugs it targets.
+- **CM1** — Write no banner or divider comments (`// ====`, `// --- Helpers ---`), because a divider outlives the
+  section it labelled once code moves; use a new method or file instead.
+- **CM2** — Write no comment that restates the code, a name or a config value, because it adds nothing and goes stale
+  when the code changes; rename instead.
+- **CMN1** — Delete commented-out code, because it is never compiled, goes stale, and version control already keeps
+  it.
+- **CM3** — Try a rename, extracted method or type first; keep a comment only for what code cannot say (non-obvious
+  reason, outside constraint, contract, license, link), because prose duplicating code goes stale.
+- **CM4** — Check a comment's factual claim against the code before it lands, and delete or fix any that is false,
+  because readers act on a false comment.
+- **CM5** — Document a public interface method's contract (what the signature cannot say: nulls, errors, side
+  effects); skip it for a self-explanatory member, and write none on an override, because a copied doc drifts from
+  the original.
+- **CM7** — Fix the code rather than suppress a compiler or lint warning that guards correctness; scope a proven-safe
+  suppression to one declaration, with a comment saying why, because a bare suppression hides the next real bug.
 
 ## When X, use Y
 
 | the comment is | use | why |
 |---|---|---|
-| a banner or divider | delete it (CM1) | banners are on the kill list (sicko :12) |
-| narration of what the code, a dependency or a config value does | delete it (CM2) | narration is on the kill list (sicko :12); a comment that explains "what" goes (simplification :144) |
-| a legal or license header | keep it (CM3) | sicko :16 |
-| behaviour forced by an external dependency, platform, vendor or protocol | keep it (CM3) | sicko :17 |
-| a surprise in our own code | delete it; rename, extract or type the symbol until the behaviour is obvious (CM3) | sicko :17 |
-| a doc comment that defines a public API contract | keep it when the signature does not show the contract (CM3, CM5) | sicko :19; an interface is also its invariants, ordering constraints and error modes (codebase-design :16) |
-| an issue or RFC link for a constraint the code cannot express | keep it (CM3) | sicko :20 |
-| a constraint note: `do not remove`, `do not change wording`, `talk to X before changing` | check the claim; encode it as a type, test or lint, then delete it (CM4) | sicko :26; no-comments :23 |
-| a lint or compiler suppression | fix the type when the rule protects correctness or safety; keep it when the rule is style-only (CM7) | sicko :18, :24 |
+| a banner or divider | delete it (CM1) | avoid positional markers; let names and formatting give the structure (clean-code-javascript, r48 :295); banners are on the kill list (pstack `comment-sicko` :12, r48 :295) |
+| a restatement of the code, a name or a config value | delete it; rename instead (CM2) | delete a comment that explains "what" (addy `code-simplification` :144, r48 :300); a first sentence redundant with the name could be deleted (Martin and Ousterhout, aposd-vs-clean-code, r48 :300) |
+| commented-out code | delete it (CMN1) | don't leave commented-out code in your codebase (clean-code-javascript, r48 :332); commented-out blocks: remove (addy `code-simplification` :152, r48 :332); also Sonar S125 (r48 :332) |
+| prose a rename, an extracted method or a type could replace | the rename, method or type, then no comment (CM3) | implementation code only needs comments when the code is nonobvious (Ousterhout and Martin, aposd-vs-clean-code, r48 :306) |
+| a non-obvious reason, outside constraint, contract, license or link | keep it (CM3) | keep "why" comments: they carry intent the code can't express (addy `code-simplification` :145, r48 :306); a comment is for important information not obvious from the code (Ousterhout, r48 :306) |
+| a factual claim | check it against the code; fix or delete it if false (CM4) | every comment is potential misinformation (Martin, aposd-vs-clean-code, r48 :313); run `/how` or `/why` on the named symbol when the claim is not obvious (pstack `comment-sicko` :26, r48 :313) |
+| a public interface method | a doc comment on its contract: nulls, errors, side effects (CM5) | a header comment describes the method's interface, all a caller needs (Ousterhout, r48 :320); doc comments that define a public API contract survive (pstack `comment-sicko` :19, r48 :320) |
+| a simple, obvious member or an override | no doc comment (CM5) | Javadoc is optional for simple, obvious members and not always present on an override (Google Java Style §7.3.1, §7.3.2, r48 :320) |
+| a lint or compiler suppression | the code fixed; a proven-safe one scoped to one declaration, with a comment saying why (CM7) | eliminate warnings; when the code is proven safe, suppress and comment on why it is safe (Effective Java Item 27, r48 :327); a suppression needs a comment explaining why the warning is safe to ignore (Error Prone `SuppressWarningsWithoutExplanation`, r48 :190) |
 
-`sicko` is pstack `agents/comment-sicko.md`, `no-comments` is pstack `skills/no-comments/SKILL.md`, `simplification`
-is addy `skills/code-simplification/SKILL.md` and `codebase-design` is mattpocock
-`skills/engineering/codebase-design/SKILL.md`; `:N` is the line.
-
-Operator preference, 2026-10-31 (SRC2), in whole or in part: CM4 and CM5.
+`r48 :N` is the line in agent-factory `research/48-industry-recheck-code.md` that quotes the source, read at the
+commit it names.
 
 ## Good / Bad
 
-### CM3 — A comment survives only for a constraint the code cannot show
+### CM3 — Try a rename, method or type before a comment
 
 **Bad** (neutral)
 ```java
-// Metric: payment.charge.duration tagged by method + status. Bounded cardinality —
-// payment methods are an enum, statuses are a small fixed set. Operators get a graph
-// of "is the gateway getting slower?" and "is the PAID rate dropping?"
+// Bounded cardinality: method and status each take only a few fixed values.
 try {
     meters.timer("payment.charge.duration",
         "method", method,
@@ -63,7 +59,7 @@ try {
             meterFailure.getMessage());
 }
 ```
-The comment defends our own tag choice instead of the code showing it, and it is false: `method` is a `String`.
+The comment says what a type could show. `method` is a `String`, so nothing stops an unbounded tag value.
 
 **Good** (neutral)
 ```java
@@ -83,10 +79,10 @@ private void recordChargeDuration(
     }
 }
 ```
-Two enum parameters now show the bounded cardinality, so the comment has nothing left to say. Operator questions
-belong in the metrics docs. (Real evidence: ledger row CM3.)
+Two enum parameters now show the bounded cardinality, so the comment has nothing left to say. (Real evidence: ledger
+row CM3.)
 
-### CM4 — Check a comment's claim; encode a constraint note
+### CM4 — Check a comment's factual claim
 
 **Bad** (neutral)
 ```java
@@ -95,8 +91,7 @@ belong in the metrics docs. (Real evidence: ledger row CM3.)
 response.setHeader("Cache-Control",     "no-cache, no-transform");
 response.setHeader("X-Accel-Buffering", "no");
 ```
-The doc section holds no header text, so the claim is false. The same two headers are hand-copied into two other
-stream endpoints.
+The doc section holds no header text, so the sync claim is false.
 
 **Good** (neutral)
 ```java
@@ -122,10 +117,10 @@ def "should tell proxies not to buffer the order event stream"() {
     response.getHeader(HttpHeaders.CACHE_CONTROL) == "no-cache, no-transform"
 }
 ```
-Every stream endpoint calls one helper and a spec pins the headers, so the sync note goes. The proxy sentence stays:
-it is an outside constraint. (Real evidence: ledger row CM4.)
+The false sync claim goes. The proxy sentence stays, because it states an outside constraint. One helper and a spec
+keep the headers in one place. (Real evidence: ledger row CM4.)
 
-### CM7 — Fix the type instead of suppressing a correctness rule
+### CM7 — Fix the code instead of suppressing a correctness warning
 
 **Bad** (neutral)
 ```ts
@@ -141,7 +136,8 @@ ask(options: ConfirmOptions): Promise<boolean> {
   return this.enqueue(options, 'confirm') as Promise<boolean>;
 }
 ```
-Silencing `no-explicit-any` lets `accept()` hand a string to the "Pay invoice" confirm, and the cast hides it.
+The suppression has no proof and no reason. Silencing `no-explicit-any` lets `accept()` hand a string to the "Pay
+invoice" confirm, and the cast hides it.
 
 **Good** (neutral)
 ```ts
@@ -165,32 +161,29 @@ CM7.)
 
 ## Decided edges
 
-- **Skip when** the comment fits a keep clause of CM3 that is proven true today on a live path (sicko :26). — **Do not
-  skip when** you are not sure a keep clause applies: the comment goes (sicko :22). — **Confidence** high
-- **Skip when** the why names a constraint the code cannot show (CM3). — **Do not skip when** the why is about our own
-  code, even though addy keeps such comments (simplification :145): delete it and ask for a reshape (operator
-  preference, 2026-10-31). — **Confidence** high
-- **Skip when** a member's contract is obvious from its signature: write no Javadoc (Google Java Style §7.3.1 makes it
-  optional for a simple, obvious member, and §7.3.2 for an override). — **Do not skip when** the interface has an
-  invariant, ordering constraint or error mode the signature cannot show (codebase-design :16). — **Confidence** high
-- **Skip when** the suppression is a Java unchecked cast: TY10 (`types.md`) owns that one exception to CM7. — **Do not
-  skip when** the rule is `no-explicit-any` or another correctness rule: fix the type (NGA2, `angular-ui.md`;
-  typescript-eslint `ban-ts-comment`). — **Confidence** high
+- **Skip when** the suppression is a Java unchecked cast proven safe: TY10 (`types.md`) sets its form, on the smallest
+  declaration with a comment saying why (Effective Java Item 27, r48 :190). — **Do not skip when** the warning is
+  TypeScript `no-explicit-any`: type the value `unknown` and narrow it instead (NGA2, `angular-ui.md`;
+  typescript-eslint `no-explicit-any`, r48 :1247). — **Confidence** high
 
 ## Review checks
 
 Walk every comment, Javadoc block and suppression that the change adds or edits, in every file type. CM6 is a
 review check only, not an author rule.
 
-- [ ] CM1 — A banner or divider comment is a finding.
-- [ ] CM2 — A comment that restates the code next to it, a dependency or a config value is a finding.
-- [ ] CM3 — Each kept comment fits one keep clause: an external dependency or protocol, a public-API contract, a
-  license, an issue/RFC link, or a must-not-fail boundary catch (ER4). A comment that fits none is a finding; name the symbol to rename, extract or type.
-- [ ] CM4 — Check each factual claim against the code or the source it names. A false claim is a finding, and so is a
-  constraint note ('do not remove', 'talk to X first', 'keep in sync') that no type, test or lint enforces.
-- [ ] CM5 — Javadoc on an implementation of an interface is a finding, and so is interface Javadoc that only repeats
-  the signature.
-- [ ] CM7 — For each suppression (`grep -nE "eslint-disable|@ts-expect-error|@ts-ignore|@SuppressWarnings"`), look up
-  the rule. A suppressed rule that protects correctness or safety is a finding.
-- [ ] CM6 — A long justification comment is a finding: ask for a reshape or a keep-clause reason (CM3), because a long
-  justification usually defends a branch that should be deleted.
+- [ ] CM1 — A banner or divider comment (`grep -nE "(//|#|/\*|<!--) *([=*#-]){4,}|(//|#) *-{2,} .+ -{2,}"`) is a
+  finding.
+- [ ] CM2 — A comment that restates the code next to it, a name or a config value is a finding.
+- [ ] CMN1 — Commented-out code (`grep -nE "^\s*(//|#).*[;{}]\s*$"`) is a finding.
+- [ ] CM3 — For each kept comment, ask whether a rename, an extracted method or a type could say it. One that could is
+  a finding; name the symbol. One that states a non-obvious reason, an outside constraint, a contract, a license or a
+  link stays.
+- [ ] CM4 — Check each factual claim against the code or the source it names. A false claim is a finding.
+- [ ] CM5 — A public interface method whose contract (nulls, errors, side effects) the signature cannot say, with no
+  doc comment stating it, is a finding. A doc comment on an override, or one that only repeats the signature, is a
+  finding.
+- [ ] CM7 — For each suppression (`grep -nE "eslint-disable|@ts-expect-error|@ts-ignore|@SuppressWarnings|NOSONAR"`),
+  look up the rule. A suppressed correctness warning the code could fix is a finding, and so is a suppression wider
+  than one declaration or with no comment saying why.
+- [ ] CM6 — A long justification comment is a finding: ask for a reshape or the reason the code cannot say (CM3),
+  because a long justification usually defends a branch that should be deleted.

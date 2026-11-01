@@ -462,13 +462,11 @@ Why: the body says only what the error catalogue says; the operator gets trace i
 
 Evidence: `aruvii-api/…/controller/AgentController.java:186-190` @772736bf (Bad, real) · source 56a-g9b-good-bad-java-errors.md:513-545 · fix from 56a:527-545
 
-### CM3 — A comment survives only for a constraint the code cannot show
+### CM3 — Try a rename, method or type first; comment only what code cannot say
 
 **Bad** (neutral)
 ```java
-// Metric: payment.charge.duration tagged by method + status. Bounded cardinality —
-// payment methods are an enum, statuses are a small fixed set. Operators get a graph
-// of "is the gateway getting slower?" and "is the PAID rate dropping?"
+// Bounded cardinality: method and status each take only a few fixed values.
 try {
     meters.timer("payment.charge.duration",
         "method", method,
@@ -481,7 +479,7 @@ try {
             meterFailure.getMessage());
 }
 ```
-What goes wrong: the comment defends our own tag choice instead of the code showing it, and it is false: `method` is a `String`.
+What goes wrong: the comment says what a type could show: `method` is a `String`, so nothing stops an unbounded tag value.
 
 **Good** (neutral)
 ```java
@@ -501,11 +499,11 @@ private void recordChargeDuration(
     }
 }
 ```
-Why: two enum parameters now show the bounded cardinality, so the comment has nothing left to say; operator questions belong in the metrics docs.
+Why: two enum parameters now show the bounded cardinality, so the comment has nothing left to say.
 
 Evidence: `aruvii-worker/…/chat/ChatOrchestrator.java:219-229` @772736bf (Bad, real) · source 56a-g9b-good-bad-java-errors.md:547-587 · fix from 56a:568-587
 
-### CM4 — Check a comment's factual claim; encode "keep in sync" as a type, test or lint
+### CM4 — Check a comment's factual claim; fix or delete a false one
 
 **Bad** (neutral)
 ```java
@@ -540,11 +538,11 @@ def "should tell proxies not to buffer the order event stream"() {
     response.getHeader(HttpHeaders.CACHE_CONTROL) == "no-cache, no-transform"
 }
 ```
-Why: every stream endpoint calls one helper and a spec pins the headers, so the sync note goes; the proxy sentence stays, an outside constraint.
+Why: the false sync claim goes; the proxy sentence stays, an outside constraint; one helper and a spec keep the headers in one place.
 
 Evidence: `aruvii-api/…/controller/SessionMessageController.java:230-233` @772736bf (Bad, real; copies `PromptBuilderController.java:162`, `WebhookController.java:140`) · source 56a-g9b-good-bad-java-errors.md:589-626 · fix from 56a:603-626
 
-### CM7 — Never suppress a lint or compiler rule that protects correctness; fix the type
+### CM7 — Fix the code instead of suppressing a correctness warning
 
 **Bad** (neutral)
 ```ts
@@ -579,7 +577,7 @@ accept(inputValue = ''): void {
   this._current.set(this.queue.shift() ?? null);
 }
 ```
-Why: the union ties each `mode` to its `resolve` type, so suppression and casts go; style rules may be suppressed, type rules fixed.
+Why: the union ties each `mode` to its `resolve` type, so the suppression and the cast go.
 
 Evidence: `aruvii-ui/src/app/core/confirm.service.ts:13-19,27-29` @772736bf (Bad, real) · source 56a-g9b-good-bad-java-errors.md:628-667 · fix from 56a:648-667
 
