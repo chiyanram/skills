@@ -11,53 +11,58 @@ Contents: Rules · When X, use Y · Good / Bad (TY1, TY3, TY8, TY9) · Decided e
   enum, because nullable fields let contradictory field combinations compile.
 - **TY2** — Make a closed set of two or more cases sealed or an enum, and switch over it with no `default` arm,
   because a `default` arm lets a new case compile and be silently mishandled.
-- **TY3** — Model forbidden combinations away with sealed variants first; let a record's compact constructor reject
+- **TY3** (operator preference, 2026-10-31) — Model forbidden combinations away with sealed variants first; let a record's compact constructor reject
   only the combinations the variants cannot exclude, because a record that admits forbidden combinations leaves
   every caller guessing which are legal.
-- **TY7** — Return an empty collection, never `null`, from a method that returns a collection, because a `null`
+- **TY7** (operator preference, 2026-10-31) — Return an empty collection, never `null`, from a method that returns a collection, because a `null`
   collection forces every caller to null-check and causes bugs.
-- **TY9** — Strengthen a type only where partiality appears: a cast, a null check, a "never happens" throw; elsewhere
+- **TY9** (operator preference, 2026-10-31) — Strengthen a type only where partiality appears: a cast, a null check, a "never happens" throw; elsewhere
   keep the plain type, because only there is the type too weak to stop a runtime failure.
-- **TY12** — Allow `null` only while mapping a wire DTO; turn it into an `Optional`, a sealed case or an enum in the
+- **TY12** (operator preference, 2026-10-31) — Allow `null` only while mapping a wire DTO; turn it into an `Optional`, a sealed case or an enum in the
   adapter, because an escaped null becomes a runtime failure the compiler could stop.
 - **TY8** — Wrap a primitive in a domain type when two same-typed values could swap places, or when it carries an
   invariant, because two same-typed ids can swap places at a call site and still compile.
-- **TY4** — Mark fields `final` always; mark locals and parameters `final` in new code; never edit an old line only
+- **TY4** (operator preference, 2026-10-31) — Mark fields `final` always; mark locals and parameters `final` in new code; never edit an old line only
   to add `final`, because final fields keep an object immutable and safe to share across threads.
 - **TY5** — Type money, cost and price as `BigDecimal` with explicit scale and rounding, and use `double` only for
   latencies and scores, because `double` arithmetic adds binary rounding errors to money.
-- **TY6** — Model a closed set of states, roles or modes as an enum, never a string literal, and persist it as
-  `EnumType.STRING`, because a status compared as a string literal compiled and never matched.
-- **TY11** — Make an `equals` between an enum and a `String` fail the build (ErrorProne `EqualsIncompatibleType` or an
-  ArchUnit rule), never leave it to review, because an enum `.equals("SUCCESS")` compiled, passed review and never
-  matched.
+- **TY6** (operator preference, 2026-10-31) — Model a closed set of states, roles or modes as an enum, never a string
+  literal, and persist it as `EnumType.STRING`, because an ordinal breaks when the enum is reordered.
+- **TY11** (operator preference, 2026-10-31) — Make an `equals` between an enum and a `String` fail the build (ErrorProne
+  `EqualsIncompatibleType` or an ArchUnit rule), never leave it to review, because an equality test between
+  incompatible types always returns false.
 - **TY10** — Write no raw generic types; put `@SuppressWarnings("unchecked")` on one statement with the reason it is
   safe, never on a method or class, because a raw type bypasses generic checks and throws `ClassCastException` at
   runtime.
-- **TY13** — Build a value with its record constructor or a static factory; write no builder classes, no `Impl`
-  suffix and no nested-class hierarchies, because a builder is a second construction API to maintain.
+- **TY13** (operator preference, 2026-10-31) — Build a value with its record constructor or a static
+  factory; name a single implementation `Default<Name>`, never `<Name>Impl`, because a builder is a second
+  construction API to maintain, and `Impl` names no role.
 
 ## When X, use Y
 
 | the code has | use | why |
 |---|---|---|
-| a value that may be absent | `Optional` as a return type (JV6, `java.md`), a sealed interface with records, or an enum (TY1) | a bag of optional fields lets contradictory combinations compile (pstack :15) |
-| a closed set of two or more cases | a sealed interface or an enum, and a switch with no `default` arm (TY2) | the compiler must fail when a new variant is not handled (pstack :20, :29) |
-| a record whose fields are legal only in some combinations | one record per legal shape under a sealed interface; the compact constructor for what the shapes cannot exclude (TY3) | a comment that explains when fields are valid means the type is too loose (pstack :26) |
-| two parameters of one primitive type that mean different things | one wrapping record per meaning (TY8) | same-typed arguments that mean different things are branded (pstack :17, :27) |
+| a value that may be absent | `Optional` as a return type (JV6, `java.md`), a sealed interface with records, or an enum (TY1) | a bag of optional fields lets contradictory combinations compile (pstack :15); `Optional` states absence explicitly (pl141 :206) |
+| a closed set of two or more cases | a sealed interface or an enum, and a switch with no `default` arm (TY2) | the compiler must fail when a new variant is not handled (pstack :20, :29); the compiler confirms every permitted subclass is covered (JEP 409) |
+| a record whose fields are legal only in some combinations | one record per legal shape under a sealed interface; the compact constructor for what the shapes cannot exclude (TY3) | a comment that explains when fields are valid means the type is too loose (pstack :15, :26); sealed classes restrict the subclasses to model the domain (JEP 409); the compact-constructor clause is operator preference |
+| two parameters of one primitive type that mean different things | one wrapping record per meaning (TY8) | same-typed arguments that mean different things are branded (pstack :17, :27); give the concept its own small type (mattpocock `code-review/SKILL.md` :49); type-safe wrappers (pl122 Example 4) |
 | a cast, a null check or a "never happens" throw | the check moved into the type, where the value is built (TY9) | that place marks a type too weak (pstack :22, :28) |
 | an operation with an answer for every input | the plain type (TY9) | if nothing would otherwise fail, keep the plain type (pstack :22, :31) |
 | a wire DTO with a missing field | `null` inside the mapping only; `Optional`, a sealed case or an enum out of the adapter (TY12) | external data is untyped until parsed at the boundary (pstack :18) |
-| an amount of money | `BigDecimal` with a set scale and rounding mode (TY5) | binary floating point adds rounding errors (pl122 :670-672) |
-| a method that returns a collection | an empty collection for "none" (TY7) | a `null` forces clients into null checks (pl121m :231-233) |
-| an unchecked warning | the generic type fixed; else `@SuppressWarnings("unchecked")` on one statement, with its reason (TY10); any other suppression is CM7, `comments.md` | suppress only provably safe operations, as narrowly as possible (pl128 :1504-1506) |
-| a value to construct | its record constructor or a static factory (TY13) | a builder is another construction API to maintain (pl123 :110-112) |
+| an amount of money | `BigDecimal` with a set scale and rounding mode (TY5) | floating point is never for precise values such as currency (Java Tutorial *Primitive Data Types*); `BigDecimal` for precision (pl122 :670-672) |
+| a method that returns a collection | an empty collection for "none" (TY7) | never return `null` from a method that returns a collection (pl121m :231-233) |
+| an unchecked warning | the generic type fixed; else `@SuppressWarnings("unchecked")` on one statement, with its reason (TY10); any other suppression is CM7, `comments.md` | raw types defer generic type checks to runtime (Java Tutorial *Raw Types*); suppress only provably safe operations, as narrowly as possible (pl128 :1504-1506) |
+| a value to construct | its record constructor or a static factory (TY13) | prefer constructors, static factories and records first (pl123 :22; pl121c Example 2) |
 
 `pstack` is cursor-plugins pstack `skills/principle-type-system-discipline/SKILL.md`. `pl122` is plinth
 `122-java-type-design.md`, `pl121m` is plinth `121-java-object-oriented-design-methods.md`, `pl128` is plinth
-`128-java-generics.md` and `pl123` is plinth `123-java-design-patterns.md`. `:N` is the line.
-TY9's reason comes from agent-factory research/31:31, TY12's from research/31:32 and TY4's from research/31:33,
-approved by the operator; the ledger rows have none. TY4's reason covers its fields half only.
+`128-java-generics.md`, `pl123` is plinth `123-java-design-patterns.md`, `pl141` is plinth
+`141-java-refactoring-with-modern-features.md` and `pl121c` is plinth
+`121-java-object-oriented-design-object-creation.md`. `:N` is the line.
+TY4, TY6, TY7, TY9, TY11 and TY12 are operator preferences. TY7 follows pl121m :231-233, TY9 pstack :22, TY12
+pstack :18, TY6 pl121-enums Example 2, and TY11 ErrorProne `EqualsIncompatibleType`.
+TY3's sealed-variants part and TY13's constructor-or-factory part are industry; TY3's compact-constructor clause
+and TY13's `Default<Name>` naming are operator preference.
 
 ## Good / Bad
 
@@ -208,16 +213,16 @@ keeps its plain list, because it is total. (Real evidence: ledger row TY9.)
 ## Decided edges
 
 - **Skip when** a parameter or local sits on an old line that the change does not otherwise edit: leave it without
-  `final` (TY4; ledger OQ2 keeps a final-parameters gate off because it would flag every existing signature). —
+  `final` (TY4; a final-parameters gate would flag every existing signature). —
   **Do not skip when** the line is new, or the declaration is a field: fields are `final` always. — **Confidence**
   high
 - **Skip when** the code maps a wire DTO inside its adapter: a `null` check there is allowed (TY12). — **Do not skip
   when** the value has left the adapter: TY1 applies. — **Confidence** high
 - **Skip when** the operation has an answer for every input: keep the plain type (TY9, pstack :22). — **Do not skip
   when** the code needs a cast, a null check or a "never happens" throw to work. — **Confidence** high
-- **Skip when** records are nested in a sealed interface: that is TY2's form (TY2, TY3; ledger :208), not a
-  nested-class hierarchy (TY13; ledger :219). — **Do not skip when** the nested types are ordinary classes that form
-  a hierarchy: TY13 applies. — **Confidence** high
+- **Skip when** a large record really needs a builder, because many of its parameters are optional (pl121c
+  Example 3): expose one builder (TY13, operator preference). — **Do not skip when** a constructor or a static
+  factory reads clearly: TY13 applies. — **Confidence** medium
 
 ## Review checks
 
@@ -236,8 +241,8 @@ Walk every changed Java file.
 - [ ] TY8 — A method with two or more parameters of one primitive type that could swap places at a call site is a
   finding, and so is an unwrapped primitive that carries an invariant.
 - [ ] TY4 — A field without `final` is a finding. A new parameter without `final` is a finding. A changed line whose
-  only change is an added `final` is a finding. Only where no gate enforces it (Checkstyle `FinalLocalVariable`;
-  ledger OQ2, OQ3): a new local without `final` is a finding.
+  only change is an added `final` is a finding. Only where no gate enforces it (Checkstyle
+  `FinalLocalVariable`): a new local without `final` is a finding.
 - [ ] TY5 — Money, cost or price held in `double` or `float` is a finding. A `BigDecimal` division or rescale with no
   explicit scale and `RoundingMode` is a finding.
 - [ ] TY6 — A state, role or mode held or compared as a string literal is a finding. `@Enumerated` without
@@ -246,5 +251,5 @@ Walk every changed Java file.
   `equals`. A build with neither is a finding.
 - [ ] TY10 — A raw generic type is a finding. `@SuppressWarnings("unchecked")` on a method or class, or with no
   reason beside it, is a finding.
-- [ ] TY13 — A builder class, an `Impl` suffix, or a hierarchy of nested ordinary classes is a finding. Records
-  nested in a sealed interface are TY2's form and are not a finding.
+- [ ] TY13 — A builder on a value that a constructor or a static factory serves is a finding. A single
+  implementation named `<Name>Impl` is a finding.
