@@ -625,7 +625,7 @@ Why: the service checks status, charges and records in order, returning a sealed
 
 Evidence: `aruvii-api/…/controller/SessionMessageController.java:142,155-173` @772736bf (Bad, real) · source 56a-g9b-good-bad-java-errors.md:669-712 · fix from 56a:692-712
 
-### LY2 — An interface only for a faked boundary or a module boundary; its one implementation is `Default<Name>`
+### LY2 — An interface only where two implementations exist now, or at a module boundary
 
 **Bad** (neutral)
 ```java
@@ -647,7 +647,7 @@ public class PaymentGatewayRegistryImpl implements PaymentGatewayRegistry {
         throw new UnsupportedPaymentMethodException(method);
     }
 ```
-What goes wrong: a public `*Impl` behind an interface in a shared module, though every caller is in billing and the real boundary is `PaymentGateway`.
+What goes wrong: an interface with one implementation and no fake of it is indirection without a seam; the real boundary is `PaymentGateway`.
 
 **Good** (neutral)
 ```java

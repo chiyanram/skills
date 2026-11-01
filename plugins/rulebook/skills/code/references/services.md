@@ -9,28 +9,28 @@ Contents: Rules · When X, use Y · Good / Bad (LY1, LY2) · Decided edges · Re
 
 - **LY1** — Keep a controller to binding, delegating and shaping the response; put any branch that chooses an outcome
   in a service, because logic in a controller cannot be tested without the web framework.
-- **LY2** — Add an interface only for a boundary dependency a test fakes, or a type
-  another module calls, with one package-private implementation named `Default<Name>`, because a one-implementation
-  interface is indirection with no real seam.
-- **LY3** — Put two operations that must not be split (a write and its audit record) behind one method and one
-  transaction at the use-case level, because two separate calls let one be dropped, leaving half done.
+- **LY3** — Put operations that must succeed or fail together, such as a change and its audit row, in one
+  transactional use-case method, because two calls left to the caller let one commit without the other.
+- **LYN1** — Return response DTOs from a controller, never persistence entities, because an entity in a response leaks
+  every field it owns and ties the API to the schema.
+- **LY2** — Add an interface only where two implementations exist now, such as an adapter and a fake, or at a
+  module boundary; else depend on the class, because a one-implementation interface is indirection without a seam.
 
 ## When X, use Y
 
 | the code has | use | why |
 |---|---|---|
-| a branch that chooses an outcome: a state check, or the order of calls | a service method that returns the outcome (LY1) | pstack principle-boundary-discipline :9 "Business logic lives in pure functions. The shell is thin" · Jeffallan :183 `@Service` for business logic, `@RestController` for HTTP · plinth 301 :203 web stereotypes for HTTP adapters, `@Service` for application logic |
-| a dependency a test replaces with a fake, such as an outbound port, or a type another module calls | an interface and one package-private `Default<Name>` implementation (LY2) | mattpocock tdd/mocking.md :3 "Mock at system boundaries only" · the `Default<Name>` name and package-private: operator preference |
-| a class with one implementation that no test fakes | the concrete class, with no interface (LY2) | mattpocock codebase-design DEEPENING.md :29 "One adapter means a hypothetical seam" · plinth 123-java-design-patterns :44 "NO OVER-ABSTRACTION … single stable implementation" · pstack design-red-flags :33 "Keep a forwarding boundary only when it adds policy, adaptation, or a distinct abstraction" |
-| two operations that must not be split | one use-case method in one transaction (LY3) | plinth 123-database-persistence-patterns :42 "Place transaction boundaries at use-case/service level" and Example 3 · pstack design-red-flags :13 "Callers coordinate several methods to complete one operation" |
+| a branch that chooses an outcome: a state check, or the order of calls | a service method that returns the outcome (LY1) | SBS layered-architecture: "`@RestController` ← HTTP only. No business logic." · DDH: a controller is "used for parsing requests, triggering business logic and presenting the result back to the client" (r48 :761) |
+| operations that must succeed or fail together | one use-case method in one transaction (LY3) | SBS transactional-patterns: "Place multi-step business transactions at the application/service boundary." · DDH: "a global transaction to make sure all the changes … are stored atomically (all or nothing)" (r48 :772) |
+| a controller response | a response DTO, mapped from the entity (LYN1) | SBS layered-architecture: "No JPA entities in responses" · DDH: "clients only receive data described in DTOs contract, not everything that your model/entity owns (which may result in data leaks)" (r48 :778) |
+| a dependency with a production adapter and a test fake | an interface for the seam (LY2) | MP codebase-design: "Two adapters means a real one." (r48 :766) |
+| a class with one implementation | the concrete class, with no interface (LY2) | MP DEEPENING: "A single-adapter seam is just indirection." · DDH: "it's totally fine to depend on a concrete implementation instead of abstracting it with an interface" (r48 :766) |
 
-Sources: pstack = cursor-plugins `pstack/skills` (`principle-boundary-discipline/SKILL.md`,
-`architect/references/design-red-flags.md`); mattpocock = mattpocock-skills `skills/engineering`; plinth =
-jabrena-plinth `skills/*/references`; Jeffallan = Jeffallan claude-skills `spring-boot-engineer/SKILL.md`.
+Sources: `r48 :N` is a line of agent-factory `research/48-industry-recheck-code.md`, which records each quote with
+the repository and commit it was read at. SBS = rrezartprebreza/spring-boot-skills `skills/spring-boot-4/*/SKILL.md`;
+DDH = Sairyss/domain-driven-hexagon `README.md`; MP = mattpocock/skills `skills/engineering/codebase-design`.
 `68f § ID — title` is a heading of `research/68f-neutral-code.md`. How a bean takes its dependencies (LY6) and binds
 its settings (LY7) is in `spring.md`.
-
-Operator preference, 2026-10-31 (SRC2), in whole or in part: LY2.
 
 ## Good / Bad
 
@@ -77,7 +77,7 @@ The service checks status, charges and records in order, returning a sealed outc
 shaping, which is allowed. (Pair: 68f § LY1 — A controller binds, delegates and shapes; a branch that chooses an outcome
 lives in a service. Real evidence: ledger row LY1.)
 
-### LY2 — An interface only for a faked boundary or a module boundary; its one implementation is `Default<Name>`
+### LY2 — An interface only where two implementations exist now, or at a module boundary
 
 **Bad** (neutral)
 ```java
@@ -99,7 +99,7 @@ public class PaymentGatewayRegistryImpl implements PaymentGatewayRegistry {
         throw new UnsupportedPaymentMethodException(method);
     }
 ```
-A public `*Impl` behind an interface in a shared module, though every caller is in billing and the real boundary is
+An interface with one implementation and no fake of it is indirection without a seam; the real boundary is
 `PaymentGateway`.
 
 **Good** (neutral)
@@ -121,14 +121,14 @@ public class PaymentGatewayRegistry {
     }
 ```
 One concrete class in billing; tests build it with `FakePaymentGateway`s instead of mocking the selection logic. (Pair:
-68f § LY2 — An interface only for a faked boundary or a module boundary; its one implementation is `Default<Name>`. Real
-evidence: ledger row LY2.)
+68f § LY2 — An interface only where two implementations exist now, or at a module boundary. Real evidence: ledger row
+LY2.)
 
 ## Decided edges
 
-- **Skip when** the controller switches exhaustively over a sealed outcome the service returned: that switch is shaping,
-  which is allowed (LY1, operator preference). — **Do not skip when** the controller itself checks state or chooses the
-  order of calls (LY1). — **Confidence** high
+- **Skip when** the controller switches exhaustively over a sealed outcome the service returned: that switch presents
+  the result, which is shaping (DDH, r48 :761) (LY1). — **Do not skip when** the controller itself checks state or
+  chooses the order of calls (LY1). — **Confidence** high
 
 ## Review checks
 
@@ -136,8 +136,9 @@ Walk every changed controller, service and interface.
 
 - [ ] LY1 — For each controller method, list its `if`, `switch` and loop statements. A branch that chooses an outcome is
   a finding; an exhaustive `switch` over an outcome the service returned is not.
-- [ ] LY2 — For each new or changed interface, find a fake of it in the tests or a caller in another module. An
-  interface with neither is a finding. A single implementation not named `Default<Name>`, or not package-private, is a
-  finding, and so is `*Impl` (`grep -rn "class .*Impl "`).
-- [ ] LY3 — For each pair of operations that must not be split, such as a write and its audit record, find one use-case
-  method in one transaction. Two calls left to the caller, or two transactions, is a finding.
+- [ ] LY3 — For each set of operations that must succeed or fail together, such as a change and its audit row, find one
+  use-case method in one transaction. Two calls left to the caller, or two transactions, is a finding.
+- [ ] LYN1 — List the entity classes (`grep -rlE "^\s*@Entity\b"`). A controller method whose return type is, holds
+  or wraps one of them is a finding.
+- [ ] LY2 — For each new or changed interface, find two implementations in the code now (a test fake counts) or a
+  caller in another module. An interface with neither is a finding.

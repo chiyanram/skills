@@ -74,7 +74,7 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 | [java](skills/code/references/java.md) | U4, JV, CV3 | you write or review Java production code |
 | [messaging](skills/code/references/messaging.md) | MS | you write or review a message consumer, a scheduled job, or an operation that can run twice |
 | [security](skills/code/references/security.md) | SE, SS | code takes outside input, stores or checks a secret, or touches the security filter chain, a guard, a token or a security test |
-| [services](skills/code/references/services.md) | LY1–LY3 | you write or review a controller, a service, an interface or a use case that makes two calls |
+| [services](skills/code/references/services.md) | LY1, LY3, LYN1, LY2 | you write or review a controller, a service, an interface or a use case that makes two calls |
 | [smells](skills/code/references/smells.md) | DS, FW, NM, SM | you write or review production code: the smell baseline, and the shape and naming rules behind it |
 | [spring](skills/code/references/spring.md) | LY6, LY7, SC, X6, SX | you write or review a bean, a configuration class, a settings record, a startup hook or a proxied method |
 | [types](skills/code/references/types.md) | TY | you write or review a field, parameter, return type, record, enum, sealed type or generic type |
