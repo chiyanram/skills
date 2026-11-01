@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.16.2](https://github.com/chiyanram/skills/compare/rulebook--v0.16.1...rulebook--v0.16.2) (2026-11-01)
+
+### Bug Fixes
+
+* **code:** a rule line holds the rule only; preference moves to one line ([#183](https://github.com/chiyanram/skills/issues/183)) ([a2af313](https://github.com/chiyanram/skills/commit/a2af3136611c646bd722e3335cfd533e4fe3fcdd))
+
 ## [0.16.1](https://github.com/chiyanram/skills/compare/rulebook--v0.16.0...rulebook--v0.16.1) (2026-11-01)
 
 ### Bug Fixes
