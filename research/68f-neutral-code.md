@@ -1606,14 +1606,11 @@ public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder(12);
 }
 // ApiKeyService — runs on every request that carries an API key
-ApiKeyEntity found = null;
-if (rawKey != null && rawKey.startsWith("ok_")) {
-    String prefix = rawKey.substring(0, Math.min(8, rawKey.length()));
-    found = apiKeyRepository.findByKeyPrefix(prefix).stream()
-        .filter(ApiKeyEntity::isValid)
-        .filter(key -> passwordEncoder.matches(rawKey, key.getKeyHash()))
-        .findFirst()
-        .orElse(null);
+public Optional<ApiKeyEntity> authenticateKey(final ApiKeyCandidate candidate) {
+    return apiKeyRepository.findByKeyPrefix(candidate.prefix()).stream()
+            .filter(ApiKeyEntity::isValid)
+            .filter(key -> passwordEncoder.matches(candidate.rawKey(), key.getKeyHash()))
+            .findFirst();
 }
 ```
 What goes wrong: one slow password hash also checks API keys, so every API-key request pays a deliberately slow hash per candidate row.
@@ -1635,4 +1632,4 @@ public Optional<ApiKeyEntity> authenticateKey(final ApiKeyCandidate candidate) {
 ```
 Why: passwords keep an adaptive hash; a random 128-bit key needs only a keyed HMAC, compared in constant time.
 
-Evidence: `aruvii-auth/src/main/java/ai/aruvii/auth/infrastructure/AuthAutoConfiguration.java:16-19` + `aruvii-auth/src/main/java/ai/aruvii/auth/application/ApiKeyService.java:239-248` @772736bf (Bad, real) · source 56c:346-396 · fix from 56c:372-386
+Evidence: `aruvii-auth/src/main/java/ai/aruvii/auth/infrastructure/AuthAutoConfiguration.java:16-19` + `aruvii-auth/src/main/java/ai/aruvii/auth/application/ApiKeyService.java:239-248` @772736bf (Bad, real; reshaped like the Good so it breaks only SS21, not TY1, agent-factory#32) · source 56c:346-396 · fix from 56c:372-386

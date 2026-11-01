@@ -753,7 +753,7 @@
    },
    {
     "id": "SS21",
-    "evidence": "`aruvii-auth/src/main/java/ai/aruvii/auth/infrastructure/AuthAutoConfiguration.java:16-19` + `aruvii-auth/src/main/java/ai/aruvii/auth/application/ApiKeyService.java:239-248` @772736bf (Bad, real) \u00b7 source 56c:346-396 \u00b7 fix from 56c:372-386"
+    "evidence": "`aruvii-auth/src/main/java/ai/aruvii/auth/infrastructure/AuthAutoConfiguration.java:16-19` + `aruvii-auth/src/main/java/ai/aruvii/auth/application/ApiKeyService.java:239-248` @772736bf (Bad, real; reshaped like the Good so it breaks only SS21, not TY1, agent-factory#32) \u00b7 source 56c:346-396 \u00b7 fix from 56c:372-386"
    }
   ]
  }

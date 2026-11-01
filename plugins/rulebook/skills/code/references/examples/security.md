@@ -124,14 +124,11 @@ public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder(12);
 }
 // ApiKeyService — runs on every request that carries an API key
-ApiKeyEntity found = null;
-if (rawKey != null && rawKey.startsWith("ok_")) {
-    String prefix = rawKey.substring(0, Math.min(8, rawKey.length()));
-    found = apiKeyRepository.findByKeyPrefix(prefix).stream()
-        .filter(ApiKeyEntity::isValid)
-        .filter(key -> passwordEncoder.matches(rawKey, key.getKeyHash()))
-        .findFirst()
-        .orElse(null);
+public Optional<ApiKeyEntity> authenticateKey(final ApiKeyCandidate candidate) {
+    return apiKeyRepository.findByKeyPrefix(candidate.prefix()).stream()
+            .filter(ApiKeyEntity::isValid)
+            .filter(key -> passwordEncoder.matches(candidate.rawKey(), key.getKeyHash()))
+            .findFirst();
 }
 ```
 One slow password hash also checks API keys, so every API-key request pays a deliberately slow hash per candidate row.
