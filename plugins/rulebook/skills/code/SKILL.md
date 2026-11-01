@@ -14,7 +14,7 @@ approved Good/Bad pair, `references/examples/<name>.md` holds them all.
 | [angular-ui](references/angular-ui.md) | NGA–NGD | you write or review an Angular component, template, or its TypeScript or `tsconfig` |
 | [comments](references/comments.md) | CM | you write or review a comment, a Javadoc block or a lint suppression |
 | [concurrency](references/concurrency.md) | CC | you start threads, submit async work, call a remote service, retry, lock, or build a pool or a cache |
-| [design](references/design.md) | SEAM | you write or review an interface a caller depends on, or a method that implements one |
+| [design](references/design.md) | SEAM, DSN | you write or review a method that chooses an outcome, does I/O, or has many branches |
 | [errors](references/errors.md) | ER | you write or review a `throw`, a `catch`, an exception handler or request validation |
 | [java](references/java.md) | U4, JV, CV3 | you write or review Java production code |
 | [messaging](references/messaging.md) | MS | you write or review a message consumer, a scheduled job, or an operation that can run twice |
