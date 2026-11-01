@@ -126,83 +126,75 @@ Operator preference, 2026-10-31 (SRC2), in whole or in part: SE2, SE7a, SS2, SS1
 
 Every rule's approved pair: [examples/security.md](examples/security.md).
 
-### SE1 — A URL not in code is fetched only through the checked fetch
+### SE1 — A URL not in code is fetched only after the URL check
 
-**Bad** (neutral)
+**Bad** (from addyosmani/agent-skills skills/security-and-hardening/references/hardening-patterns.md:126)
 ```java
-private RefundReply requestRefund(final GatewayDiscovery discovery, final RefundRequest request) {
-    final RefundReply reply = restClient.post()
-            .uri(discovery.refundEndpoint())
-            .contentType(MediaType.APPLICATION_JSON)
-            .header("X-Api-Secret", gatewaySecret)
-            .body(request)
+void deliver(final URI callback, final InvoiceEvent event) {
+    restClient.post()
+            .uri(callback)
+            .body(event)
             .retrieve()
-            .body(RefundReply.class);
-    return reply;
+            .toBodilessEntity();
 }
 ```
-The discovery document was fetched through the URL check, but the endpoint it returned is called unchecked, carrying
-the secret.
+The subscriber chose the callback URL. It can name `169.254.169.254` or `localhost`, and the client follows redirects.
 
-**Good** (neutral)
+**Good** (from addyosmani/agent-skills skills/security-and-hardening/references/hardening-patterns.md:129-147)
 ```java
-private RefundReply requestRefund(final GatewayDiscovery discovery, final RefundRequest request) {
-    final CheckedUrl refundEndpoint = switch (urlGuard.check(discovery.refundEndpoint())) {
-        case UrlDecision.Blocked blocked -> throw new OrderException(
-                ErrorCode.GATEWAY_URL_BLOCKED,
-                blocked.host());
-        case UrlDecision.Permitted permitted -> permitted.target();
+UrlCheck check(final URI url) {
+    if (!Set.of("http", "https").contains(url.getScheme())) {
+        return new UrlCheck.Refused("scheme not allowed");
+    }
+    final List<InetAddress> addresses = dns.resolveAll(url.getHost());
+    return addresses.stream().anyMatch(PublicAddress::isPrivateOrReserved)
+            ? new UrlCheck.Refused("private or reserved address")
+            : new UrlCheck.Allowed(url);
+}
+
+Delivery deliver(final URI callback, final InvoiceEvent event) {
+    return switch (check(callback)) {
+        case UrlCheck.Refused refused -> new Delivery.Refused(refused.reason());
+        case UrlCheck.Allowed allowed -> send(noRedirectClient, allowed.url(), event);
     };
-    return noRedirectRestClient.post()
-            .uri(refundEndpoint.value())
-            .contentType(MediaType.APPLICATION_JSON)
-            .header("X-Api-Secret", gatewaySecret)
-            .body(request)
-            .retrieve()
-            .body(RefundReply.class);
 }
 ```
-Every URL the remote side names passes the same check, on a client with redirects off. (Real evidence: ledger row
-SE1.)
+The check allows http or https only and refuses the URL when any resolved address is private or reserved. The call
+then goes out on a client with redirects off.
 
 ### SS21 — Passwords via `DelegatingPasswordEncoder`; machine secrets via HMAC-SHA-256; never the encoder per request
 
 **Bad** (neutral)
 ```java
 @Bean
-public PasswordEncoder passwordEncoder() {
+PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder(12);
 }
-// ApiKeyService — runs on every request that carries an API key
-ApiKeyEntity found = null;
-if (rawKey != null && rawKey.startsWith("ok_")) {
-    String prefix = rawKey.substring(0, Math.min(8, rawKey.length()));
-    found = apiKeyRepository.findByKeyPrefix(prefix).stream()
-        .filter(ApiKeyEntity::isValid)
-        .filter(key -> passwordEncoder.matches(rawKey, key.getKeyHash()))
-        .findFirst()
-        .orElse(null);
+
+// runs on every request that carries an API key
+Optional<ApiClient> authenticate(final PresentedKey key) {
+    return clientRepository.findByKeyId(key.keyId())
+            .filter(client -> passwordEncoder.matches(key.secret(), client.secretHash()));
 }
 ```
-One slow password hash also checks API keys, so every API-key request pays a deliberately slow hash per candidate row.
+The password encoder also checks API keys, so every API-key request pays a deliberately slow hash.
 
-**Good** (neutral)
+**Good** (encoder from jabrena/plinth skills/304-frameworks-spring-boot-security/references/304-frameworks-spring-boot-security.md:184-203; HMAC half neutral)
 ```java
 @Bean
-public PasswordEncoder passwordEncoder() {
+PasswordEncoder passwordEncoder() {
     return PasswordEncoderFactories.createDelegatingPasswordEncoder();
 }
-// ApiKeyService
-public Optional<ApiKeyEntity> authenticateKey(final ApiKeyCandidate candidate) {
-    final byte[] presented = apiKeyMac.digest(candidate.rawKey());
-    return apiKeyRepository.findByKeyPrefix(candidate.prefix()).stream()
-            .filter(ApiKeyEntity::isValid)
-            .filter(key -> MessageDigest.isEqual(presented, key.getKeyHmac()))
-            .findFirst();
+
+// runs on every request that carries an API key
+Optional<ApiClient> authenticate(final PresentedKey key) {
+    final byte[] presented = keyMac.hmacSha256(key.secret());
+    return clientRepository.findByKeyId(key.keyId())
+            .filter(client -> MessageDigest.isEqual(presented, client.secretHmac()));
 }
 ```
-Passwords keep an adaptive hash; a random 128-bit key needs only a keyed HMAC, compared in constant time. (Real
-evidence: ledger row SS21.)
+Passwords keep an adaptive hash that can be upgraded by its `{id}` prefix. A random key of 128 bits or more needs only
+a server-keyed HMAC, compared in constant time.
 
 ## Decided edges
 
