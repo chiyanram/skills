@@ -3,6 +3,24 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.16.1](https://github.com/chiyanram/skills/compare/rulebook--v0.16.0...rulebook--v0.16.1) (2026-11-01)
+
+### Bug Fixes
+
+* **code:** angular-ui rules cite two sources or the preference label ([#170](https://github.com/chiyanram/skills/issues/170)) ([1deeabc](https://github.com/chiyanram/skills/commit/1deeabc03d1153f4ef858c071428d347f47b124e)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+* **code:** comments rules cite two sources or the preference label ([#171](https://github.com/chiyanram/skills/issues/171)) ([6cba5f6](https://github.com/chiyanram/skills/commit/6cba5f60c0a5983136008bfa43fd047439308e3a)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+* **code:** concurrency rules cite two sources or the preference label ([#172](https://github.com/chiyanram/skills/issues/172)) ([b3d8f0f](https://github.com/chiyanram/skills/commit/b3d8f0f9c8bdebbbb935227e81ef8791eb82750f)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+* **code:** design rules cite two sources or the preference label ([#173](https://github.com/chiyanram/skills/issues/173)) ([2f5bc75](https://github.com/chiyanram/skills/commit/2f5bc750f33401c221e7f0634977c92f43342e50)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+* **code:** deslop rules cite two sources or the preference label ([#174](https://github.com/chiyanram/skills/issues/174)) ([48a9229](https://github.com/chiyanram/skills/commit/48a92296a1a322f3a05882c50afb98041e960a89)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+* **code:** errors rules cite two sources or the preference label ([#175](https://github.com/chiyanram/skills/issues/175)) ([5c34e38](https://github.com/chiyanram/skills/commit/5c34e38ec4ba00a9eaf5ebc3004bf73321c75e84)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+* **code:** java rules cite two sources or the preference label ([#176](https://github.com/chiyanram/skills/issues/176)) ([742aa95](https://github.com/chiyanram/skills/commit/742aa956423926f727cf9356224d5028776d7400)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+* **code:** messaging rules cite two sources or the preference label ([#177](https://github.com/chiyanram/skills/issues/177)) ([4d7c66e](https://github.com/chiyanram/skills/commit/4d7c66e24a989ed7af6a41f5f8d707d396491999)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+* **code:** security rules cite two sources or the preference label ([#178](https://github.com/chiyanram/skills/issues/178)) ([4263af4](https://github.com/chiyanram/skills/commit/4263af4dda20c5f76478d23a91d482f51cef2d64)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+* **code:** services rules cite two sources or the preference label ([#179](https://github.com/chiyanram/skills/issues/179)) ([d258c52](https://github.com/chiyanram/skills/commit/d258c52b421bf0746d2c95636ccfe13a40757671)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+* **code:** smells rules cite two sources or the preference label ([#180](https://github.com/chiyanram/skills/issues/180)) ([fda57e4](https://github.com/chiyanram/skills/commit/fda57e4be1ac28ad37444a5a95a477b0aae7f54a)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+* **code:** spring rules cite two sources or the preference label ([#181](https://github.com/chiyanram/skills/issues/181)) ([3ae91ca](https://github.com/chiyanram/skills/commit/3ae91ca5bfb924d8f9d90bf490d1676f789c67bc)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+* **code:** types rules cite two sources or the preference label ([#182](https://github.com/chiyanram/skills/issues/182)) ([7a6f307](https://github.com/chiyanram/skills/commit/7a6f30725f16b4c7408846deba9437d66bb46a31)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+
 ## [0.16.0](https://github.com/chiyanram/skills/compare/rulebook--v0.15.0...rulebook--v0.16.0) (2026-10-31)
 
 ### Features
