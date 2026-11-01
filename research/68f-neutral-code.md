@@ -1004,7 +1004,7 @@ public OverdueReminder overdueReminder(
     return new OverdueReminder(invoiceRepository, emailSender);
 }
 ```
-What goes wrong: the provider is resolved while the bean is built, so in orders-api (no EmailSender) it bakes in a throwing stub at startup.
+What goes wrong: the provider is resolved while the bean is built, so in an application with no EmailSender bean it bakes in a throwing stub at startup.
 
 **Good** (neutral)
 ```java
@@ -1162,7 +1162,7 @@ Why: each field carries its own constraint, so Boot's bind-validation failure na
 
 Evidence: `WorkerStreamsProperties.java:17-35` @772736bf (Bad, real; spec `WorkerStreamsStartupSpec.groovy:43-49`) · source 56b-g9b-good-bad-shape-spring.md:546-592 · fix from 56b:572-585
 
-### SC16 — No default for a secret or required endpoint; fail, or a named degraded mode at WARN
+### SC16 — No default for a secret or required endpoint; its absence fails startup
 
 **Bad** (neutral)
 ```java
@@ -1187,24 +1187,17 @@ What goes wrong: a missing master key defaults to `""` twice, which silently sto
 **Good** (neutral)
 ```java
 @Bean
-CredentialEncryptor credentialEncryptor(final Environment environment, final CredentialProperties credentials) {
+AesGcmCredentialEncryptor credentialEncryptor(final Environment environment) {
     return Optional.ofNullable(environment.getProperty("example.master-key"))
             .filter(not(String::isBlank))
-            .<CredentialEncryptor>map(AesGcmCredentialEncryptor::new)
-            .orElseGet(() -> plaintextIfAllowed(credentials));
-}
-
-private static CredentialEncryptor plaintextIfAllowed(final CredentialProperties credentials) {
-    if (!credentials.plaintextAllowed()) {
-        throw new InvalidConfigurationPropertyValueException("example.master-key", "", "required for credentials");
-    }
-    log.warn("action=credentials.mode mode=plaintext key=example.credentials.plaintext-allowed");
-    return new PlaintextCredentialEncryptor();
+            .map(AesGcmCredentialEncryptor::new)
+            .orElseThrow(() -> new InvalidConfigurationPropertyValueException(
+                    "example.master-key", "", "required for credentials"));
 }
 ```
-Why: absence fails startup naming the key; plaintext is only a named mode, set outside the shipped yml, that warns once.
+Why: a missing or blank master key fails startup naming the key; there is no default and no plaintext fallback.
 
-Evidence: `ProvidersAutoConfiguration.java:31-33` + `CredentialEncryptor.java:21-26` + `application.yml:104` @772736bf (Bad, real) · source 56b-g9b-good-bad-shape-spring.md:594-643 · fix from 56b:619-636
+Evidence: `ProvidersAutoConfiguration.java:31-33` + `CredentialEncryptor.java:21-26` + `application.yml:104` @772736bf (Bad, real) · source 56b-g9b-good-bad-shape-spring.md:594-643 · fix from 56b:619-636, degraded mode removed (agent-factory#32, r48 :709)
 
 ### SC19 — Work that must finish before traffic runs in an `ApplicationRunner`; later work goes to a thread from ready
 

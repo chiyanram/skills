@@ -76,7 +76,7 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 | [security](skills/code/references/security.md) | SE, SS | code takes outside input, stores or checks a secret, or touches the security filter chain, a guard, a token or a security test |
 | [services](skills/code/references/services.md) | LY1–LY3 | you write or review a controller, a service, an interface or a use case that makes two calls |
 | [smells](skills/code/references/smells.md) | DS, FW, NM, SM | you write or review production code: the smell baseline, and the shape and naming rules behind it |
-| [spring](skills/code/references/spring.md) | LY6, LY7, SC, X6, SX | you write or review a bean, a configuration class, a settings record, a startup hook or a proxied method |
+| [spring](skills/code/references/spring.md) | LY6, SC1, SC2, SCN1, SC21, SC22, SC3, SC5, SC6, SC7, SC8, LY7, SC11, SC15, SC16, SC17, SC14, X6, SC20, SC23, SX18, SX19 | you write or review a bean, a configuration class, a settings record, a startup hook or a proxied method |
 | [types](skills/code/references/types.md) | TY | you write or review a field, parameter, return type, record, enum, sealed type or generic type |
 
 `make lint` fails when a reference is missing from these tables.
