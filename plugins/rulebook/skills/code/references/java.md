@@ -35,20 +35,20 @@ Contents: Rules · When X, use Y · Good / Bad (U4, JV1, JV5) · Decided edges �
 
 | situation | use | why |
 |---|---|---|
-| the logic reads the current time | an injected `Clock`, called as `now(clock)` (U4); the test's fixed clock is U1 ([unit-tests.md](../../testing/references/unit-tests.md)) | pass a `Clock` into any method that requires the current instant (OpenJDK `Clock` javadoc, r48 :209); also Sonar S8692 (r48 :209) |
-| a point or a span of time | `Instant`, `Duration` or another `java.time` type; `Date` only at a library or display edge (JV1) | avoid `java.util.Date` and prefer the `java.time` APIs (Error Prone `JavaUtilDate`, r48 :215); also Sonar S2143 (r48 :215) |
-| a stream in request- or queue-serving code | a sequential stream (JV2) | a task not submitted to a specified pool runs on the common pool (OpenJDK `ForkJoinPool`, r48 :221); parallelizing a pipeline is often no faster (Effective Java Item 48, r48 :221) |
-| an I/O, logging or state-changing step in a stream | that step outside the pipeline (JV3) | side effects of behavioral parameters may not always be executed (OpenJDK `java.util.stream`, r48 :227); also Sonar S3864 (r48 :227) |
-| a `toMap` | the three-argument form, with a merge function (JV4) | if the mapped keys might have duplicates, use the form with a merge function (OpenJDK `Collectors.toMap`, r48 :233) |
-| two `BigDecimal` values to compare | `compareTo` (JVN1) | also Sonar S9351 (r48 :271); `equals` compares the scale as well as the value (Error Prone `BigDecimalEquals`, r48 :271) |
-| a local variable | `var` when the initializer names the type; else the type written out; never `var` with `<>` (JV5) | consider `var` when the initializer gives the reader enough information (OpenJDK LVTI guide G3, r48 :239); `var` with a diamond infers `Object` (LVTI guide G6, r48 :239) |
-| a value that can be absent | `Optional` as the return type only (JV6) | `Optional` is meant for method return types (OpenJDK `Optional` apiNote, r48 :117); also Sonar S3553 (r48 :245) |
-| a multi-line SQL, JSON or HTML string | a text block (JV7) | use a text block for multi-line strings (OpenJDK text-blocks guide G1, r48 :251); also Sonar S6126 (r48 :251) |
-| an I/O-backed `AutoCloseable` opened in a method | a try-with-resources header (JV8) | try-with-resources ensures prompt release and avoids resource exhaustion (OpenJDK `AutoCloseable`, r48 :256); always use try-with-resources (Effective Java Item 9, r48 :256) |
-| an `if`, `else`, `for`, `do` or `while` body | braces, even for one statement (JV9) | braces are used even when the body is empty or one statement (Google Java Style §4.1.1, r48 :261); also Sonar S121 (r48 :261) |
+| the logic reads the current time | an injected `Clock`, called as `now(clock)` (U4); the test's fixed clock is U1 ([unit-tests.md](../../testing/references/unit-tests.md)) | pass a `Clock` into any method that requires the current instant (OpenJDK `Clock` javadoc, r48 :215); also Sonar S8692 (r48 :215) |
+| a point or a span of time | `Instant`, `Duration` or another `java.time` type; `Date` only at a library or display edge (JV1) | avoid `java.util.Date` and prefer the `java.time` APIs (Error Prone `JavaUtilDate`, r48 :221); also Sonar S2143 (r48 :221) |
+| a stream in request- or queue-serving code | a sequential stream (JV2) | a task not submitted to a specified pool runs on the common pool (OpenJDK `ForkJoinPool`, r48 :227); parallelizing a pipeline is often no faster (Effective Java Item 48, r48 :227) |
+| an I/O, logging or state-changing step in a stream | that step outside the pipeline (JV3) | side effects of behavioral parameters may not always be executed (OpenJDK `java.util.stream`, r48 :233); also Sonar S3864 (r48 :233) |
+| a `toMap` | the three-argument form, with a merge function (JV4) | if the mapped keys might have duplicates, use the form with a merge function (OpenJDK `Collectors.toMap`, r48 :239) |
+| two `BigDecimal` values to compare | `compareTo` (JVN1) | also Sonar S9351 (r48 :277); `equals` compares the scale as well as the value (Error Prone `BigDecimalEquals`, r48 :277) |
+| a local variable | `var` when the initializer names the type; else the type written out; never `var` with `<>` (JV5) | consider `var` when the initializer gives the reader enough information (OpenJDK LVTI guide G3, r48 :245); `var` with a diamond infers `Object` (LVTI guide G6, r48 :245) |
+| a value that can be absent | `Optional` as the return type only (JV6) | `Optional` is meant for method return types (OpenJDK `Optional` apiNote, r48 :123); also Sonar S3553 (r48 :251) |
+| a multi-line SQL, JSON or HTML string | a text block (JV7) | use a text block for multi-line strings (OpenJDK text-blocks guide G1, r48 :257); also Sonar S6126 (r48 :257) |
+| an I/O-backed `AutoCloseable` opened in a method | a try-with-resources header (JV8) | try-with-resources ensures prompt release and avoids resource exhaustion (OpenJDK `AutoCloseable`, r48 :262); always use try-with-resources (Effective Java Item 9, r48 :262) |
+| an `if`, `else`, `for`, `do` or `while` body | braces, even for one statement (JV9) | braces are used even when the body is empty or one statement (Google Java Style §4.1.1, r48 :267); also Sonar S121 (r48 :267) |
 
 `r48 :N` is the line in agent-factory `research/48-industry-recheck-code.md` that quotes the source, read at the
-commit it names. JV4 rests on the JDK's own docs alone (vendor exception, r48 :33).
+commit it names. JV4 rests on the JDK's own docs alone (vendor exception, r48 :39).
 
 ## Good / Bad
 
@@ -136,11 +136,11 @@ evidence: ledger row JV5.)
 
 ## Decided edges
 
-- **Skip when** a framework's own style guide bans `var` (Spring Framework CONTRIBUTING.md:597, r48 :240): that ban
+- **Skip when** a framework's own style guide bans `var` (Spring Framework CONTRIBUTING.md:597, r48 :246): that ban
   serves a library read without an IDE, and JV5 already stops `var` from hiding a type. — **Do not skip when** the
   initializer does not name the type: write the type (JV5). — **Confidence** high
 - **Skip when** the `AutoCloseable` is not backed by I/O, such as a `Stream` over a collection: try-with-resources is
-  in general unnecessary there (OpenJDK `AutoCloseable`, r48 :256). — **Do not skip when** it holds a file, a socket
+  in general unnecessary there (OpenJDK `AutoCloseable`, r48 :262). — **Do not skip when** it holds a file, a socket
   or a connection: JV8 applies. — **Confidence** high
 
 ## Review checks
