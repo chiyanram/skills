@@ -3,6 +3,17 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.16.3](https://github.com/chiyanram/skills/compare/rulebook--v0.16.2...rulebook--v0.16.3) (2026-11-01)
+
+### Bug Fixes
+
+* **code:** comments-concurrency-ui-services Good/Bad pairs come from sources, not project code ([#189](https://github.com/chiyanram/skills/issues/189)) ([6aba449](https://github.com/chiyanram/skills/commit/6aba449f933fd076589b8e51727eb62da2c4a4d2)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+* **code:** errors-messaging Good/Bad pairs come from sources, not project code ([#187](https://github.com/chiyanram/skills/issues/187)) ([d25e8f5](https://github.com/chiyanram/skills/commit/d25e8f59cf8d57ac38e8bb3cf8cd1fd7b03cae18)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+* **code:** java-types Good/Bad pairs come from sources, not project code ([#188](https://github.com/chiyanram/skills/issues/188)) ([0d694b2](https://github.com/chiyanram/skills/commit/0d694b202114f0a9be7085910a090fbaa77695cc)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+* **code:** security Good/Bad pairs come from sources, not project code ([#185](https://github.com/chiyanram/skills/issues/185)) ([11ec167](https://github.com/chiyanram/skills/commit/11ec1678cba4cc27d22cb15a4f289ddd3224aaf3)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+* **code:** smells-design Good/Bad pairs come from sources, not project code ([#186](https://github.com/chiyanram/skills/issues/186)) ([1d77a3e](https://github.com/chiyanram/skills/commit/1d77a3e431c9a4e117867b857980a3ae78ebb848)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+* **code:** spring Good/Bad pairs come from sources, not project code ([#184](https://github.com/chiyanram/skills/issues/184)) ([d6fe8ab](https://github.com/chiyanram/skills/commit/d6fe8ab88dfa8634790f74d7b20e7b5a25128ae4)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+
 ## [0.16.2](https://github.com/chiyanram/skills/compare/rulebook--v0.16.1...rulebook--v0.16.2) (2026-11-01)
 
 ### Bug Fixes
