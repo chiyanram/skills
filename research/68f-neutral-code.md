@@ -355,15 +355,11 @@ Evidence: `aruvii-tools/…/application/DbConnectionService.java:69-85` @772736b
 **Bad** (neutral)
 ```java
 try {
-    JsonNode root = MAPPER.readTree(body);
-    JsonNode currencies = root.path("currencies");
-    if (currencies.isArray()) {
-        for (JsonNode currencyNode : currencies) {
-            String code = currencyNode.path("code").asString();
-            if (currency.equals(code)) {
-                currencySupported = true;
-                break;
-            }
+    JsonNode currencies = MAPPER.readTree(body).path("currencies");
+    for (JsonNode currencyNode : currencies) {
+        if (currency.equals(currencyNode.path("code").asString())) {
+            currencySupported = true;
+            break;
         }
     }
 } catch (Exception failure) {
@@ -416,6 +412,7 @@ private void logStatusChange(final OrderStatusChange change) {
     try {
         auditLog.record(OrderAuditEntry.of(change, clock.instant()));
     } catch (final RuntimeException auditFailure) {
+        // best effort: a lost audit row must never block the order change
         log.warn(
                 "action=order.status.audit_failed orderId={} statusAction={} cause={} message={}",
                 change.orderId(),
@@ -436,7 +433,10 @@ Evidence: `aruvii-agents/…/application/AgentService.java:62-70` @772736bf (Bad
 @ExceptionHandler(DataIntegrityViolationException.class)
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public ApiResponse<Void> handleDataIntegrity(DataIntegrityViolationException violation) {
-    return ApiResponse.error("Invalid reference: " + violation.getMostSpecificCause().getMessage());
+    return ApiResponse.error(
+            ErrorCode.VALIDATION_FAILED.code(),
+            "Invalid reference: " + violation.getMostSpecificCause().getMessage(),
+            currentTraceId());
 }
 ```
 What goes wrong: the handler sends the JDBC driver's message to the client: constraint names, column names, sometimes the offending value.
