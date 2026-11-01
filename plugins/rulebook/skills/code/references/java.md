@@ -56,99 +56,98 @@ Operator preference, 2026-10-31 (SRC2), in whole or in part: U4, JV2, JV9 and CV
 
 ### U4 — Take an injected Clock; never call the wall clock directly
 
-**Bad** (neutral)
+**Bad** (from plinth-pinned `321-frameworks-spring-boot-testing-unit-tests.md`:189)
 ```java
-        if (invoice.dueDate().isBefore(LocalDate.now())) {
-            invoiceRepository.save(invoice.withStatus(InvoiceStatus.OVERDUE));
-        }
-```
-The due-date check reads the wall clock, so a test cannot pin "due exactly today" against "due yesterday".
+final class InvoiceSchedule {
 
-**Good** (neutral)
-```java
-    public List<Invoice> overdueInvoices(final int graceDays) {
-        log.info("action=invoice_overdue_scan graceDays={}", graceDays);
-        final var today = LocalDate.now(clock);
-        final LocalDate cutoff = today.minusDays(graceDays);
-        return invoiceRepository.findOpen().stream()
-                .filter(invoice -> invoice.dueDate().isBefore(cutoff))
-                .toList();
+    boolean isOverdue(final Instant dueAt) {
+        return Instant.now().isAfter(dueAt);
     }
+}
 ```
-One date from the injected clock decides the cutoff, so a spec with `Clock.fixed(...)` pins the boundary exactly. (Pair:
-research/68b § U4 — Production logic takes an injected Clock; never calls the wall clock directly. Real evidence: ledger
-row U4.)
+The check reads the wall clock. A test cannot pin "due one second ago" against "due in one second".
+
+**Good** (from plinth-pinned `321-frameworks-spring-boot-testing-unit-tests.md`:133; JDK `Clock` Javadoc)
+```java
+final class InvoiceSchedule {
+
+    private final Clock clock;
+
+    InvoiceSchedule(final Clock clock) {
+        this.clock = clock;
+    }
+
+    boolean isOverdue(final Instant dueAt) {
+        return clock.instant().isAfter(dueAt);
+    }
+}
+```
+The clock comes in through the constructor. A test passes `Clock.fixed(...)` and pins the boundary exactly.
 
 ### JV1 — Time is an `Instant` or a `Duration`
 
-**Bad** (neutral)
+**Bad** (from plinth-java-skills `141-java-refactoring-with-modern-features.md`:291, Example 4)
 ```java
-final long chargeStartMillis = clock.millis();
-final ChargeReply reply = paymentGateway.charge(chargeRequest(invoice, customerId));
-final long elapsedMillis = clock.millis() - chargeStartMillis;
-log.info(
-        "action=invoice.charge.ok invoiceId={} orderId={} customerId={} durationMs={}",
-        invoice.id(),
-        invoice.orderId(),
-        customerId,
-        elapsedMillis);
-```
-Elapsed time is raw `long` subtraction of epoch millis, so the span is a bare number and not a `Duration`.
+private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-**Good** (neutral)
-```java
-final var chargeStart = clock.instant();
-final ChargeReply reply = paymentGateway.charge(chargeRequest(invoice, customerId));
-final var elapsed = Duration.between(chargeStart, clock.instant());
-log.info(
-        "action=invoice.charge.ok invoiceId={} orderId={} customerId={} durationMs={}",
-        invoice.id(),
-        invoice.orderId(),
-        customerId,
-        elapsed.toMillis());
+String reminderDate(final Date issuedAt) {
+    final Calendar calendar = Calendar.getInstance();
+    calendar.setTime(issuedAt);
+    calendar.add(Calendar.DAY_OF_MONTH, 30);
+    return FORMAT.format(calendar.getTime());
+}
 ```
-The time is an `Instant` from an injected `Clock` and the span a `Duration`. It becomes a `long` only for the log line.
-(Pair: research/68f § JV1 — Time is `Instant`/`Duration`; `Date`/zoned only at a library or display boundary. Real
-evidence: ledger row JV1.)
+The arithmetic runs on a mutable `Calendar`. The shared `SimpleDateFormat` is not synchronized, so two threads can
+corrupt each other's output.
+
+**Good** (from plinth-java-skills `141-java-refactoring-with-modern-features.md`:291, Example 4)
+```java
+private static final Duration PAYMENT_TERM = Duration.ofDays(30);
+private static final DateTimeFormatter FORMAT = DateTimeFormatter.ISO_LOCAL_DATE
+        .withZone(ZoneOffset.UTC);
+
+String reminderDate(final Instant issuedAt) {
+    final Instant remindAt = issuedAt.plus(PAYMENT_TERM);
+    return FORMAT.format(remindAt);
+}
+```
+The point is an `Instant` and the span a `Duration`. A zone enters only in the formatter, at the display boundary.
 
 ### JV5 — `final var` only when the right-hand side shows the type
 
-**Bad** (neutral)
+**Bad** (from plinth-java-skills `141-java-refactoring-with-modern-features.md`:457, Example 6; OpenJDK *LVTI Style
+Guidelines* G6)
 ```java
-final var customerId = UUID.fromString(principal.getName());
-final var placed = orderService.place(id, customerId).orThrow(ErrorCode.ORDER_NOT_FOUND);
-return ApiResponse.ok(placed);
+final var pending = new ArrayList<>();
+final var summary = summarise(pending);
 ```
-Neither `place` nor `orThrow` tells the reader the value is an `OrderResponse`.
+The diamond infers `ArrayList<Object>`. The name `summarise` does not tell the reader what type comes back.
 
-**Good** (neutral)
+**Good** (from plinth-java-skills `141-java-refactoring-with-modern-features.md`:457, Example 6)
 ```java
-public ApiResponse<OrderResponse> place(
-        @PathVariable final UUID id,
-        final Principal principal) {
-    final var customerId = UUID.fromString(principal.getName());
-    final OrderResponse placed = orderService.place(id, customerId)
-            .orThrow(ErrorCode.ORDER_NOT_FOUND);
-    return ApiResponse.ok(placed);
-}
+final var pending = new ArrayList<Invoice>();
+final var dueDate = LocalDate.parse(dueDateText);
+final InvoiceSummary summary = summarise(pending);
 ```
-`UUID.fromString` is a factory, so `var` stays. `place(…).orThrow(…)` names actions, not a type, so the type is written
-out. (Pair: research/68f § JV5 — `final var` only when the right-hand side shows the type. Real evidence: ledger row
-JV5.)
+A constructor and a factory show the type, so `var` stays. `summarise` names an action, not a type, so the type is
+written out.
 
 ### CV3 — TypeScript wrapping is Prettier's
 
-**Bad** (n/a) — the conflict is between two formatting rules, not in code.
+**Bad** (neutral)
+```ts
+const overdue = invoices.filter((invoice) => invoice.dueAt < today &&
+    invoice.status === "open");
+```
+The line is wrapped by hand, in a Java style. `prettier --check` flags the file, and the next format run rewrites it.
 
 **Good** (neutral)
 ```ts
-await expect(
-  page.getByRole('row', { name: invoiceId }),
-).toBeVisible();
+const overdue = invoices.filter(
+  (invoice) => invoice.dueAt < today && invoice.status === "open",
+);
 ```
-This is Prettier's own output. A Java wrapping rule forced onto it would fight the formatter. (Pair: research/68c
-§ CV3 — Wrapping: the formatter's configured length applies to Java/Groovy; TypeScript follows Prettier. Real evidence:
-ledger row CV3.)
+This is the shape Prettier prints. Nobody wraps TypeScript by hand, so the formatter and the reviewer never disagree.
 
 ## Decided edges
 
