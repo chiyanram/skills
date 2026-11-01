@@ -793,8 +793,7 @@ Evidence: `TriggerService.java:135-147` @772736bf (Bad, real; caller `ScheduledT
 **Bad** (neutral)
 ```java
 private void applyInvoicing(ImportOrdersRequest request, List<Order> created, UUID createdBy) {
-    InvoiceDestination destination = request.invoicing();
-    if (destination == null || invoiceService == null) {
+    if (invoiceService == null) {
         return;
     }
 ```
