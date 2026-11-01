@@ -104,11 +104,11 @@ path.)
 
 - **Skip when** callers sit outside the repo's control (a published API, stored data, a webhook URL): expand, migrate,
   then contract (ParallelChange): remove the old path only after every consumer has migrated (DS5). — **Do not skip
-  when** every caller is in the repo. — **Confidence** high (addy deprecation-and-migration :124; r48 :550-551)
+  when** every caller is in the repo. — **Confidence** high (addy deprecation-and-migration :124; r48 :556-557)
 - **Skip when** the value crosses a trust boundary, such as request input or a third-party response: validate it there
   (ER6, `../code/references/errors.md`). — **Do not skip when** the guarded value comes from an injected field or an
   in-repo caller (DS8). — **Confidence** high (ctk :13; ADDY api: validation does not belong between internal
-  functions, r48 :559; ER6, r48 :428)
+  functions, r48 :565; ER6, r48 :434)
 
 ## Review checks
 
@@ -129,15 +129,15 @@ Walk every hunk of the branch diff (`git diff $(git merge-base <default-branch> 
 
 `ctk` is cursor-team-kit `skills/deslop/SKILL.md` and `addy <name>` is addy `skills/<name>/SKILL.md`; `:N` is the line.
 `r48` is agent-factory `research/48-industry-recheck-code.md` and `r48 :N` its line, where the source is quoted with
-the repository path it was read at; source keys are those of r48's source table (r48 :357-377).
+the repository path it was read at; source keys are those of r48's source table (r48 :363-383).
 
 | rule | sources |
 |---|---|
-| DS13 | CTK deslop · ADDY code-simplification, code-review-and-quality (r48 :545) |
-| DS5 | PS migrate-callers, rubric · ADDY deprecation-and-migration, code-review-and-quality (r48 :550) |
-| DS7 | ADDY code-review-and-quality · CCJS · SONAR S1144, PMD UnusedFormalParameter, UnusedPrivateMethod (r48 :555) |
-| DS8 | PS fix-root-causes (CTK is the same org) · ADDY api-and-interface-design · PMD AvoidCatchingNPE (r48 :559) |
-| DS9 | ADDY code-simplification · PMD AvoidDeeplyNestedIfStmts · SONAR S3358, S134 · CTK deslop (r48 :564) |
+| DS13 | CTK deslop · ADDY code-simplification, code-review-and-quality (r48 :551) |
+| DS5 | PS migrate-callers, rubric · ADDY deprecation-and-migration, code-review-and-quality (r48 :556) |
+| DS7 | ADDY code-review-and-quality · CCJS · SONAR S1144, PMD UnusedFormalParameter, UnusedPrivateMethod (r48 :561) |
+| DS8 | PS fix-root-causes (CTK is the same org) · ADDY api-and-interface-design · PMD AvoidCatchingNPE (r48 :565) |
+| DS9 | ADDY code-simplification · PMD AvoidDeeplyNestedIfStmts · SONAR S3358, S134 · CTK deslop (r48 :570) |
 
 The categories come from ctk :12-16. Category rules point at their owner references and do not restate them; test
 shape cites U2 only.
