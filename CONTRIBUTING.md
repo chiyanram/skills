@@ -39,6 +39,8 @@ flowchart TD
   prevents.
 - Good/Bad examples use a neutral domain, never a real project's names. The project-specific values stay in that
   project's `AGENTS.md`.
+- Read SonarSource rule pages for calibration only; never copy their text into a reference, because Sonar's
+  source-available licence does not permit it.
 - Add a new reference to its domain's `SKILL.md` router and to the table in
   [`plugins/rulebook/README.md`](plugins/rulebook/README.md). An agent reaches a reference only through its router, and
   a project's `AGENTS.md` points at it as "use the `<domain>` skill (rulebook plugin) and read its `<reference>`

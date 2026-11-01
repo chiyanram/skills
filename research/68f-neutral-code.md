@@ -717,12 +717,9 @@ Evidence: `DataRetentionJob.java:69-74` + `DataErasureController.java:117-122` @
 
 **Bad** (neutral)
 ```java
-private void recordPaymentSafely(UUID paymentId, Customer customer,
-                                 UUID orderId, UUID invoiceId, String method,
-                                 String requestJson, String responseJson, long latencyMillis,
-                                 PaymentStatus status, ErrorCode errorCode,
+private void recordPaymentSafely(PaymentIds ids, GatewayExchange exchange, PaymentStatus status,
                                  boolean requiresReview, UUID reviewId,
-                                 String traceId, boolean sandbox, String sandboxSource) {
+                                 boolean sandbox, String sandboxSource) {
 ```
 What goes wrong: sandbox mode arrived as a boolean plus a string that only means something when it is true; review repeats that shape.
 
@@ -752,16 +749,10 @@ Evidence: `ChatOrchestrator.java:201-206` @772736bf (Bad, real) · source 56b-g9
 
 **Bad** (neutral)
 ```java
-/** Returns all invoices whose reminder is due right now. */
 public List<Invoice> findDueReminders() {
     return invoiceRepository.findDueReminders();
 }
 
-/**
- * Atomic optimistic-lock claim. Advances next_reminder_at only when the expected value still matches.
- *
- * @return true if this instance won the race and should send the reminder
- */
 public boolean claimAndAdvance(UUID invoiceId, Instant expectedNextReminderAt, Instant newNextReminderAt) {
     return invoiceRepository.claimAndAdvance(invoiceId, expectedNextReminderAt, newNextReminderAt);
 }
