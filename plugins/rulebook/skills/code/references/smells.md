@@ -49,39 +49,39 @@ The baseline (SM1): one row per smell, with its cure. Where a rule owns the cure
 
 | the diff shows | use | why |
 |---|---|---|
-| a name that does not say what it holds or does | **Mysterious Name**: rename it (NM1) | mp :45 (r48 :523) |
-| the same logic shape in two hunks or files | **Duplicated Code**: extract it when it is a rule (DS12), not otherwise (DS14) | mp :46 (r48 :486, :491) |
-| a method that reads another object's data more than its own | **Feature Envy**: move the method to that data; for a record, FW6 | mp :47 (r48 :514) |
-| the same fields or parameters travelling together | **Data Clumps**: bundle them into one type | mp :48 (r48 :448) |
-| a primitive or string standing for a domain concept | **Primitive Obsession**: give it its own small type (TY8, `types.md`) | mp :49 (r48 :448) |
-| the same `switch` or `if` cascade on one type at several sites | **Repeated Switches**: one sealed type or one shared map (DS3) | mp :50 (r48 :466) |
-| one logical change that edits many scattered files | **Shotgun Surgery**: gather what changes together into one module | mp :51 (r48 :448) |
-| one module edited for several unrelated reasons | **Divergent Change**: split it so each part changes for one reason | mp :52 (r48 :448) |
-| a parameter, hook or abstraction that no current need uses | **Speculative Generality**: delete it (DS6) | mp :53 (r48 :481) |
-| a caller walking `a.b().c().d()` | **Message Chains**: hide the walk behind one method (FW8) | mp :54 (r48 :476) |
-| a class or method that mostly delegates | **Middle Man**: call the real target (DS4, FW8) | mp :55 (r48 :476) |
-| a subclass or implementer that ignores most of what it inherits | **Refused Bequest**: drop the inheritance and use composition | mp :56 (r48 :448) |
-| a function you must read to understand | **Long Function**: extract and name the fragment (FW5) | F 3 (r48 :448, :455) |
-| a long parameter list | **Long Parameter List**: more than 7 is FW1 | F 4 (r48 :455) · CS ParameterNumber, SONAR S107 default 7 (r48 :501) |
-| data that any code can write, such as a mutable static field | **Global Data**: give it one owner that controls writes | F 5 · LUZ 2e list (r48 :448) |
-| data that changes after it is set | **Mutable Data**: Encapsulate Variable, Remove Setting Method; a `final` field (TY4, `types.md`) | F 6 · LUZ 2e list (r48 :448) |
-| a loop that computes a value | **Loops**: replace it with a pipeline (Replace Loop with Pipeline); the stream then only computes (JV3, `java.md`) | F 13 · LUZ 2e list (r48 :448) |
-| a class or function that adds no meaning of its own | **Lazy Element**: inline it after the deletion test (DS4) | F 14 · LUZ 2e list (r48 :448) |
-| a field set in some cases and empty in the others | **Temporary Field**: move it to the case that needs it (Extract Class, Introduce Special Case), as a sealed variant (DS3) | F 16 (r48 :448) |
-| a module that reads another module's internals | **Insider Trading**: Move Function or Move Field to cut the trade, or Hide Delegate | F 19 · LUZ 2e list (r48 :448) |
-| a class doing too much: many fields, many responsibilities | **Large Class**: Extract Class; a file past 1000 lines is DS2 | F 20 (r48 :448) · 1000 lines (r48 :496) |
-| two types that do one job with different method names | **Alternative Classes with Different Interfaces**: align them (NM4) | F 21 · MP, LUZ (r48 :533) |
-| a record or class whose callers decide from its fields | **Data Class**: move the logic onto it (FW6) | F 22 (r48 :455) · PMD DataClass (r48 :514) |
-| a comment that explains what the code does | **Comments**: extract and name the fragment (FW5); comment rules are in `comments.md` | F 24 · LUZ what-comment (r48 :510) |
-| nested or compound conditionals | **Conditional Complexity**: model the cases (DS3); nesting is DS9 (`../../deslop/SKILL.md`) | Kerievsky per SM1; LUZ credits Steve Smith (2013) and maps it to Repeated Switching (r48 :449) |
-| one problem solved two different ways in one code base | **Oddball Solution**: keep one way (NM4) | Kerievsky 2005 via LUZ (r48 :448) |
-| a class or method visible beyond the code that needs it | **Indecent Exposure**: narrow its visibility | Kerievsky 2005 via LUZ (r48 :448) |
-| an unused private member or an unreachable branch | **Dead Code**: delete it (DS7, `../../deslop/SKILL.md`) | SONAR S1144 · PMD UnusedPrivateMethod · CCJS (r48 :453) |
+| a name that does not say what it holds or does | **Mysterious Name**: rename it (NM1) | mp :45 (r48 :529) |
+| the same logic shape in two hunks or files | **Duplicated Code**: extract it when it is a rule (DS12), not otherwise (DS14) | mp :46 (r48 :492, :497) |
+| a method that reads another object's data more than its own | **Feature Envy**: move the method to that data; for a record, FW6 | mp :47 (r48 :520) |
+| the same fields or parameters travelling together | **Data Clumps**: bundle them into one type | mp :48 (r48 :454) |
+| a primitive or string standing for a domain concept | **Primitive Obsession**: give it its own small type (TY8, `types.md`) | mp :49 (r48 :454) |
+| the same `switch` or `if` cascade on one type at several sites | **Repeated Switches**: one sealed type or one shared map (DS3) | mp :50 (r48 :472) |
+| one logical change that edits many scattered files | **Shotgun Surgery**: gather what changes together into one module | mp :51 (r48 :454) |
+| one module edited for several unrelated reasons | **Divergent Change**: split it so each part changes for one reason | mp :52 (r48 :454) |
+| a parameter, hook or abstraction that no current need uses | **Speculative Generality**: delete it (DS6) | mp :53 (r48 :487) |
+| a caller walking `a.b().c().d()` | **Message Chains**: hide the walk behind one method (FW8) | mp :54 (r48 :482) |
+| a class or method that mostly delegates | **Middle Man**: call the real target (DS4, FW8) | mp :55 (r48 :482) |
+| a subclass or implementer that ignores most of what it inherits | **Refused Bequest**: drop the inheritance and use composition | mp :56 (r48 :454) |
+| a function you must read to understand | **Long Function**: extract and name the fragment (FW5) | F 3 (r48 :454, :461) |
+| a long parameter list | **Long Parameter List**: more than 7 is FW1 | F 4 (r48 :461) · CS ParameterNumber, SONAR S107 default 7 (r48 :507) |
+| data that any code can write, such as a mutable static field | **Global Data**: give it one owner that controls writes | F 5 · LUZ 2e list (r48 :454) |
+| data that changes after it is set | **Mutable Data**: Encapsulate Variable, Remove Setting Method; a `final` field (TY4, `types.md`) | F 6 · LUZ 2e list (r48 :454) |
+| a loop that computes a value | **Loops**: replace it with a pipeline (Replace Loop with Pipeline); the stream then only computes (JV3, `java.md`) | F 13 · LUZ 2e list (r48 :454) |
+| a class or function that adds no meaning of its own | **Lazy Element**: inline it after the deletion test (DS4) | F 14 · LUZ 2e list (r48 :454) |
+| a field set in some cases and empty in the others | **Temporary Field**: move it to the case that needs it (Extract Class, Introduce Special Case), as a sealed variant (DS3) | F 16 (r48 :454) |
+| a module that reads another module's internals | **Insider Trading**: Move Function or Move Field to cut the trade, or Hide Delegate | F 19 · LUZ 2e list (r48 :454) |
+| a class doing too much: many fields, many responsibilities | **Large Class**: Extract Class; a file past 1000 lines is DS2 | F 20 (r48 :454) · 1000 lines (r48 :502) |
+| two types that do one job with different method names | **Alternative Classes with Different Interfaces**: align them (NM4) | F 21 · MP, LUZ (r48 :539) |
+| a record or class whose callers decide from its fields | **Data Class**: move the logic onto it (FW6) | F 22 (r48 :461) · PMD DataClass (r48 :520) |
+| a comment that explains what the code does | **Comments**: extract and name the fragment (FW5); comment rules are in `comments.md` | F 24 · LUZ what-comment (r48 :516) |
+| nested or compound conditionals | **Conditional Complexity**: model the cases (DS3); nesting is DS9 (`../../deslop/SKILL.md`) | Kerievsky per SM1; LUZ credits Steve Smith (2013) and maps it to Repeated Switching (r48 :455) |
+| one problem solved two different ways in one code base | **Oddball Solution**: keep one way (NM4) | Kerievsky 2005 via LUZ (r48 :454) |
+| a class or method visible beyond the code that needs it | **Indecent Exposure**: narrow its visibility | Kerievsky 2005 via LUZ (r48 :454) |
+| an unused private member or an unreachable branch | **Dead Code**: delete it (DS7, `../../deslop/SKILL.md`) | SONAR S1144 · PMD UnusedPrivateMethod · CCJS (r48 :459) |
 
 `mp` is mattpocock `skills/engineering/code-review/SKILL.md` (plugin 1.2.3). `F n` is _Refactoring_ 2e ch. 3 at
 [InformIT](https://www.informit.com/articles/article.aspx?p=2952392), `seqNum=n`. `:N` is the line. `r48` is
 agent-factory `research/48-industry-recheck-code.md` and `r48 :N` its line, where the source is quoted with the
-repository path it was read at; source keys are those of r48's source table (r48 :357-377). Smell names checked
+repository path it was read at; source keys are those of r48's source table (r48 :363-383). Smell names checked
 against refactoring.com; the 2e smell-to-cure pairs were not checked against the book text.
 
 ## Good / Bad
@@ -164,17 +164,17 @@ mode. (Real evidence: ledger row DS3. Pair: 68f § DS3 — No one-off `if` or se
 
 - **Skip when** a tool the project runs already fails the smell, such as a file-length or parameter-count gate: the
   gate reports it (SM1). — **Do not skip when** the tool only warns or does not run on that file: nothing enforces the
-  smell there. — **Confidence** high (mp :41; r48 :448)
+  smell there. — **Confidence** high (mp :41; r48 :454)
 - **Skip when** a documented repo rule endorses what the baseline would flag: point to that rule, not the smell
   (SM1; one owner per fact). — **Do not skip when** the repo rule is not written down, or it and a rule here
   disagree: no file wins, and the disagreement is a bug fixed in the same change. —
-  **Confidence** high (mp :40; r48 :444)
+  **Confidence** high (mp :40; r48 :450)
 - **Skip when** a file past 1000 lines stays clearly organised for a structural reason stated in the change (DS2). —
   **Do not skip when** the reason is missing. — **Confidence** medium (the number 1000 comes from PS and ADDY, possibly
-  one lineage; tools default to 750 and 2000, r48 :496-497)
+  one lineage; tools default to 750 and 2000, r48 :502-503)
 - **Skip when** the adapter has a second implementation, such as a fake a test uses: two adapters make a real seam,
   not a pass-through (LY2, `services.md`). — **Do not skip when** it has one implementation and no fake (DS4). —
-  **Confidence** high (MP codebase-design: one adapter means a hypothetical seam, r48 :471)
+  **Confidence** high (MP codebase-design: one adapter means a hypothetical seam, r48 :477)
 
 ## Review checks
 
