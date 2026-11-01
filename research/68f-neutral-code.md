@@ -892,7 +892,7 @@ Why: the two builders stay apart because each timeout belongs to its own setting
 
 Evidence: no Bad in Aruvii code @772736bf; both sides adapted from https://refactoring.com/catalog/removeFlagArgument.html:137-146 (Bad) and :170-171 (Good), placed on `CustomPiiEndpointClient.java:46-51` + `LlmFakeGenerator.java:42-45` · source 56b-g9b-good-bad-shape-spring.md:229-274 · fix from 56b:253-270
 
-### MS6 — Answer "runs twice / crashed halfway"; reconcile when leftovers matter
+### MS6 — Safe to run twice: claim the work atomically in the change's transaction
 
 **Bad** (neutral)
 ```java

@@ -72,7 +72,7 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 | [deslop](skills/deslop/SKILL.md) | an implemented branch needs a behaviour-neutral cleanup of its diff before review |
 | [errors](skills/code/references/errors.md) | ER | you write or review a `throw`, a `catch`, an exception handler or request validation |
 | [java](skills/code/references/java.md) | U4, JV, CV3 | you write or review Java production code |
-| [messaging](skills/code/references/messaging.md) | MS | you write or review a message consumer, a scheduled job, or an operation that can run twice |
+| [messaging](skills/code/references/messaging.md) | MS6, MSN1, MSN2, MS4 | you write or review a message consumer, a scheduled job, or an operation that can run twice |
 | [security](skills/code/references/security.md) | SE, SS | code takes outside input, stores or checks a secret, or touches the security filter chain, a guard, a token or a security test |
 | [services](skills/code/references/services.md) | LY1–LY3 | you write or review a controller, a service, an interface or a use case that makes two calls |
 | [smells](skills/code/references/smells.md) | DS, FW, NM, SM | you write or review production code: the smell baseline, and the shape and naming rules behind it |
