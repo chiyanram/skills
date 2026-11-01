@@ -35,49 +35,40 @@ Sources, all read at a pinned commit or at the URL named; `:N` is a line:
 
 ### MS6 — Runs twice, or crashed halfway: the answer is in the code
 
-**Bad** (neutral)
+**Bad** (from addy api :176-180)
 ```java
-@Override
-@Transactional
-public CancelOutcome cancel(final UUID orderId, final UUID requestedBy, final String reason) {
-
-    final Optional<OrderCancellation> completed = cancellationPort.findCompletedByOrderId(orderId);
-    if (completed.isPresent()) {
-        return new CancelOutcome.AlreadyCancelled(completed.orElseThrow());
+@KafkaListener(topics = "charge-requests")
+void onChargeRequested(final ChargeRequested event) {
+    if (!chargeLog.existsByKey(event.chargeKey())) {
+        gateway.charge(event.chargeKey(), event.amount());
+        chargeLog.insert(event.chargeKey());
     }
-    … // PENDING cancellation row, audit row, void the invoice, order CANCELLED, row COMPLETED
-    } catch (RuntimeException failure) {
-        log.error("order_cancel FAILED orderId={} cancellationId={}: {}: {}", …, failure);
-        cancellationEntity.setStatus(CancellationStatus.FAILED);
-        cancellationRepository.save(cancellationEntity);
-        throw failure;
-    }
-```
-Two concurrent cancels both pass the check-then-act guard, and the FAILED row is rolled back with the transaction it
-lives in.
-
-**Good** (neutral)
-```java
-@Override
-@Transactional
-public CancelOutcome cancel(final CancelRequest request) {
-    lockOrder(request.orderId());
-    return cancellationPort.findCompletedByOrderId(request.orderId())
-            .<CancelOutcome>map(CancelOutcome.AlreadyCancelled::new)
-            .orElseGet(() -> cancelLocked(request));
-}
-
-private void lockOrder(final UUID orderId) {
-    jdbc.queryForObject("SELECT id FROM orders WHERE id = ? FOR UPDATE", UUID.class, orderId);
 }
 ```
-The row lock makes a second run wait and then see COMPLETED; one transaction means a crash leaves nothing to reconcile.
-(Real evidence: ledger row MS6.)
+Two deliveries of the same record both read "not seen" and both charge. A crash between the charge and the insert
+leaves no trace, so the redelivery charges again.
+
+**Good** (from addy api :182-190)
+```java
+@KafkaListener(topics = "charge-requests")
+void onChargeRequested(final ChargeRequested event) {
+    try {
+        chargeLog.insertInProgress(event.chargeKey(), event.requestHash());
+    } catch (final DuplicateKeyException alreadyClaimed) {
+        replayOrReconcile(event);
+        return;
+    }
+    final ChargeResult result = gateway.charge(event.chargeKey(), event.amount());
+    chargeLog.markSucceeded(event.chargeKey(), result);
+}
+```
+The unique key picks one winner. A rerun finds the row: SUCCEEDED replays the stored result, and IN_PROGRESS is the
+marker a crash left, so `replayOrReconcile` asks the gateway about that key.
 
 ## Decided edges
 
 - **Skip** the reconcile step **when** every write of the operation commits in one transaction: a crash leaves nothing
-  to reconcile; the "runs twice" question still applies (MS6; the MS6 Good above; ps idempotent :22). — **Do not
+  to reconcile; the "runs twice" question still applies (MS6; ps idempotent :22). — **Do not
   skip when** an effect sits outside that transaction, such as a broker ack or a call out: the ack and the side effect
   are not in one transaction (addy api :335). — **Confidence** medium
 

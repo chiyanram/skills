@@ -59,150 +59,128 @@ Operator preference, 2026-10-31 (SRC2), in whole or in part: ER1, ER2, ER7, ER3,
 
 ## Good / Bad
 
+Plinth `126` below is jabrena/plinth `skills/126-java-exception-handling/references/126-java-exception-handling.md`
+(`exc` above); `:N` is the line.
+
 ### ER1 — A foreseeable non-success is a sealed outcome; only faults throw
 
 **Bad** (neutral)
 ```java
-public Invoice issue(final UUID orderId, final IssueCommand command) {
-    LOG.info("action=invoice_issue orderId={}", orderId);
-
-    invoiceRepository.findByOrderId(orderId).ifPresent(existing -> {
-        throw new OrderException(ErrorCode.INVOICE_ALREADY_ISSUED,
-            "orderId=" + orderId + " invoiceId=" + existing.id());
-    });
-
-    final Invoice saved = invoiceRepository.save(Invoice.open(orderId, command.total(), command.dueDate()));
+public Order cancel(final OrderId id) {
+    final Order order = orders.findById(id)
+            .orElseThrow(() -> new ServiceException(ErrorCode.NOT_FOUND));
+    if (order.isShipped()) {
+        throw new ServiceException(ErrorCode.CONFLICT);
+    }
+    return orders.save(order.cancelled());
+}
 ```
-"This order already has an invoice" is a normal answer, yet it leaves as an exception from a lambda. The signature
-promises an `Invoice`.
+"No such order" and "already shipped" are normal answers. The signature promises an `Order`, so the caller learns of
+the other two cases only at runtime.
 
 **Good** (neutral)
 ```java
-public InsertionResult<Invoice> issue(final UUID orderId, final IssueCommand command) {
-    log.info("action=invoice_issue orderId={}", orderId);
-    if (invoiceRepository.findByOrderId(orderId).isPresent()) {
-        return new InsertionResult.Duplicate<>(orderId.toString());
-    }
-    final Invoice saved = invoiceRepository.save(Invoice.open(
-            orderId,
-            command.total(),
-            command.dueDate()));
-    log.info("action=invoice_issue_ok orderId={} invoiceId={}", orderId, saved.id());
-    return new InsertionResult.Created<>(saved);
+public sealed interface CancelResult {
+    record Cancelled(Order order) implements CancelResult {}
+    record NotFound(OrderId id) implements CancelResult {}
+    record AlreadyShipped(OrderId id) implements CancelResult {}
+}
+public CancelResult cancel(final OrderId id) {
+    return orders.findById(id)
+            .map(this::cancelIfOpen)
+            .orElseGet(() -> new CancelResult.NotFound(id));
+}
+private CancelResult cancelIfOpen(final Order order) {
+    return order.isShipped()
+            ? new CancelResult.AlreadyShipped(order.id())
+            : new CancelResult.Cancelled(orders.save(order.cancelled()));
 }
 ```
-The duplicate is a case of the return type. The controller answers `.orThrow(ErrorCode.INVOICE_ALREADY_ISSUED)`, and
-a database fault still throws. (Real evidence: ledger row ER1.)
+Each foreseeable case is in the return type, so the caller's `switch` must name all three. A database fault still
+throws.
 
 ### ER4 — Catch the narrowest type
 
-**Bad** (neutral)
+**Bad** (from plinth 126:2387-2395)
 ```java
 try {
-    JsonNode root = MAPPER.readTree(body);
-    JsonNode currencies = root.path("currencies");
-    if (currencies.isArray()) {
-        for (JsonNode currencyNode : currencies) {
-            String code = currencyNode.path("code").asString();
-            if (currency.equals(code)) {
-                currencySupported = true;
-                break;
-            }
-        }
-    }
-} catch (Exception failure) {
-    log.warn(
-            "action=gateway.health.status_unreadable cause={} message={}",
-            failure.getClass().getSimpleName(),
-            failure.getMessage());
+    insert(order);
+} catch (Throwable failure) {
+    log.error("order insert failed", failure);
 }
 ```
-Only the JSON parse can fail here, yet the catch takes every exception. A loop bug reads as "currency not supported".
+`Throwable` also takes `OutOfMemoryError`, and the caller goes on as if the insert worked.
 
-**Good** (neutral)
+**Good** (from plinth 126:2376-2384)
 ```java
-private boolean supportsCurrency(final String statusBody) {
-    try {
-        for (final JsonNode entry : MAPPER.readTree(statusBody).path("currencies")) {
-            if (entry.path("code").asString().equals(currency)) {
-                return true;
-            }
-        }
-        return false;
-    } catch (final JacksonException unexpectedShape) {
-        log.warn(
-                "action=gateway.health.status_unreadable cause={} message={}",
-                unexpectedShape.getClass().getSimpleName(),
-                unexpectedShape.getMessage());
-        return false;
-    }
+try {
+    insert(order);
+} catch (final SQLException failure) {
+    throw new ServiceException(ErrorCode.INTERNAL_ERROR, failure);
 }
 ```
-`JacksonException` is the one failure the parse can raise, so it is the one caught and logged with its
-class and message. Any other exception now surfaces. (Real evidence: ledger row ER4.)
+Only the failure the `try` can raise is caught, and it is rethrown with its cause (ER3). A JVM error propagates.
 
-### ER8 — A best-effort call logs at WARN with the exception class
+### ER8 — A best-effort call logs at WARN with the exception
 
-**Bad** (neutral)
+**Bad** (from plinth 126:1944-1950)
 ```java
-private void logStatusChange(final OrderStatusChange change) {
+private void audit(final OrderEvent event) {
     try {
-        auditLog.record(OrderAuditEntry.of(change, clock.instant()));
-    } catch (Exception ignored) { /* never block the order on audit failures */ }
+        auditLog.record(event);
+    } catch (RuntimeException e) {
+        // audit is best effort
+    }
 }
 ```
 Catching is allowed because the audit is best effort, but the block is silent, so a broken audit trail is invisible.
 
-**Good** (neutral)
+**Good** (from plinth 126:1910-1919)
 ```java
-private void logStatusChange(final OrderStatusChange change) {
+private void audit(final OrderEvent event) {
     try {
-        auditLog.record(OrderAuditEntry.of(change, clock.instant()));
-    } catch (final RuntimeException auditFailure) {
-        log.warn(
-                "action=order.status.audit_failed orderId={} statusAction={} cause={} message={}",
-                change.orderId(),
-                change.action(),
-                auditFailure.getClass().getSimpleName(),
-                auditFailure.getMessage());
+        auditLog.record(event);
+    } catch (final RuntimeException failure) {
+        // must-not-fail boundary: a lost audit row never blocks the order; the order id is in the MDC (LG1)
+        log.warn("order audit failed", failure);
     }
 }
 ```
-The order change still never blocks, but each lost audit row leaves one WARN line that names the exception class
-and message, with no stack. (Real evidence: ledger row ER8.)
+The order still never blocks, and each lost audit row leaves one WARN line with the exception as the last argument
+(LG3).
 
-### ER10 — An error response carries the `ErrorCode` message only
+### ER10 — An error response carries the error code's message only
 
-**Bad** (neutral)
+**Bad** (from plinth 126:2220-2230)
 ```java
-@ExceptionHandler(DataIntegrityViolationException.class)
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-public ApiResponse<Void> handleDataIntegrity(DataIntegrityViolationException violation) {
-    return ApiResponse.error("Invalid reference: " + violation.getMostSpecificCause().getMessage());
+@GetMapping("/orders/{id}")
+ResponseEntity<?> get(@PathVariable final String id) {
+    try {
+        return ResponseEntity.ok(orderService.get(id));
+    } catch (Exception e) {
+        return ResponseEntity.status(500).body(e.getMessage());
+    }
 }
 ```
-The handler sends the JDBC driver's message to the client: constraint names, column names, sometimes the offending
-value.
+The client gets whatever the library wrote: SQL, table names, host names.
 
-**Good** (neutral)
+**Good** (from plinth 126:2189-2215 and 126:410-415)
 ```java
-@ExceptionHandler(DataIntegrityViolationException.class)
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-public ApiResponse<Void> handleDataIntegrity(final DataIntegrityViolationException violation) {
-    final String traceId = currentTraceId();
-    log.warn(
-            "action=api.data_integrity traceId={} cause={} message={}",
-            traceId,
-            violation.getMostSpecificCause().getClass().getSimpleName(),
-            violation.getMostSpecificCause().getMessage());
-    return ApiResponse.error(
-            ErrorCode.VALIDATION_FAILED.code(),
-            ErrorCode.VALIDATION_FAILED.defaultMessage(),
-            traceId);
+@RestControllerAdvice
+public final class ApiExceptionHandler {
+    private static final Logger log = LoggerFactory.getLogger(ApiExceptionHandler.class);
+
+    @ExceptionHandler(DataAccessException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiError handleDataAccess(final DataAccessException failure) {
+        // the trace id is in the MDC (LG1)
+        log.error("data access failed", failure);
+        return ApiError.of(ErrorCode.INTERNAL_ERROR);
+    }
 }
 ```
-The body says only what the error catalogue says. The operator gets the trace id, the cause class and its message
-in the log. The method lives in the one central exception handler (ER11). (Real evidence: ledger row ER10.)
+The body holds the error code, its generic message and the trace id. The driver text stays in the log. The method
+lives in the one central exception handler (ER11).
 
 ## Decided edges
 
