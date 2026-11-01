@@ -1,306 +1,291 @@
 # Spring — Good / Bad examples
 
 Every approved Good/Bad pair for the Spring rules, one per rule that has one. The rules, the decision table and the
-review checks are in [`../spring.md`](../spring.md). Each pair is in one neutral domain (orders and billing); `68f § ID
-— title` is a heading of `research/68f-neutral-code.md`.
+review checks are in [`../spring.md`](../spring.md). Each pair is in one neutral domain (a shop: orders, stock,
+payments). Labels use the source names of `../spring.md`: plinth 301 / 311 = jabrena-plinth
+`skills/301-frameworks-spring-boot-core/references/301-frameworks-spring-boot-core.md` and
+`skills/311-frameworks-spring-jdbc/references/311-frameworks-spring-jdbc.md`; SF / SB = the Spring Framework / Spring
+Boot reference.
 
 Contents: LY6 · LY7 · SC6 · SC4 · SC15 · SC16 · SC19 · SC21
 
 ### LY6 — One constructor; an optional collaborator is an `ObjectProvider<T>` resolved at use
 
-**Bad** (neutral)
+**Bad** (from plinth 301 :791, Example 7)
 ```java
-@Bean
-public OverdueReminder overdueReminder(
-        InvoiceRepository invoiceRepository,
-        ObjectProvider<EmailSender> emailSenderProvider) {
-    EmailSender emailSender = emailSenderProvider.getIfAvailable(
-            () -> email -> { throw new UnsupportedOperationException("EmailSender not available in this context"); });
-    return new OverdueReminder(invoiceRepository, emailSender);
+@Service
+class OrderService {
+    private OrderRepository orders;
+    private LoyaltyService loyalty;
+
+    @Autowired
+    void setOrders(OrderRepository orders) { this.orders = orders; }
+    @Autowired(required = false)
+    void setLoyalty(LoyaltyService loyalty) { this.loyalty = loyalty; }
+
+    void place(Order order) {
+        orders.save(order);
+        loyalty.award(order);
+    }
 }
 ```
-The provider is resolved while the bean is built, so in orders-api (no EmailSender) it bakes in a throwing stub at
-startup.
+With no `LoyaltyService` bean, `loyalty` stays null, so every order fails after it is saved. SF §Constructor-based or
+setter-based DI: with setters, not-null checks must be done everywhere.
 
 **Good** (neutral)
 ```java
-@Bean
-OverdueReminder overdueReminder(final InvoiceRepository invoiceRepository,
-                                final ObjectProvider<EmailSender> emailSenders) {
-    return new OverdueReminder(invoiceRepository, emailSenders);
-}
+@Service
+class OrderService {
+    private final OrderRepository orders;
+    private final ObjectProvider<LoyaltyService> loyalty;
+    OrderService(final OrderRepository orders,
+                 final ObjectProvider<LoyaltyService> loyalty) {
+        this.orders = orders;
+        this.loyalty = loyalty;
+    }
 
-// OverdueReminder — resolved where a reminder is sent
-private void send(final ReminderEmail email) {
-    emailSenders.getObject().send(email);
+    void place(final Order order) {
+        orders.save(order);
+        loyalty.ifAvailable(service -> service.award(order));
+    }
 }
 ```
-The bean holds the provider and resolves it per send, so a missing EmailSender fails at that call, naming the type.
-(Pair: 68f § LY6 — One constructor; an optional collaborator is an `ObjectProvider<T>` resolved at use. Real evidence:
-ledger row LY6.)
+One constructor takes every collaborator. The optional one is resolved where it is used, so its absence is a decision
+in the code, not a null.
 
 ### LY7 — Grouped settings in one validated record; each key bound in one place
 
-**Bad** (neutral)
+**Bad** (from plinth 301 :486, Example 4)
 ```java
-// orders-api — CheckoutFraudClient
-public CheckoutFraudClient(
-        @Value("${example.fraud-check.base-url}") String baseUrl,
-        @Value("${example.fraud-check.ruleset:default}") String ruleset,
-        @Value("${example.fraud-check.timeout:5s}") Duration timeout) {
-// billing — PaymentFraudClient
-public PaymentFraudClient(
-        @Value("${example.fraud-check.base-url}") String baseUrl,
-        @Value("${example.fraud-check.ruleset:default}") String ruleset,
-        @Value("${example.fraud-check.timeout:1500ms}") Duration timeout) {
-```
-One key has two defaults, 5000 and 1500 ms, so unset, the two modules run "the same" setting differently.
+@Configuration
+class PaymentGatewayConfig {
+    @Value("${shop.payment-gateway.base-url}")
+    private String baseUrl;
+    @Value("${shop.payment-gateway.connect-timeout:5s}")
+    private Duration connectTimeout;
+    @Value("${shop.payment-gateway.max-connections:10}")
+    private int maxConnections;
 
-**Good** (neutral)
+    @Bean
+    PaymentGatewayClient paymentGatewayClient() {
+        return new PaymentGatewayClient(baseUrl, connectTimeout, maxConnections);
+    }
+}
+```
+Three related keys are read one by one, each with its own default. A second class that reads one of them can choose a
+different default, and no value is checked at startup.
+
+**Good** (from plinth 301 :462, Example 4)
 ```java
 @Validated
-@ConfigurationProperties("example.fraud-check")
-public record FraudCheckProperties(@NotNull URI baseUrl,
-                                   @NotBlank String ruleset,
-                                   @NotNull Duration connectTimeout,
-                                   @NotNull Duration checkoutTimeout,
-                                   @NotNull Duration paymentTimeout) {
+@ConfigurationProperties("shop.payment-gateway")
+public record PaymentGatewayProperties(@NotNull URI baseUrl,
+                                       @NotNull Duration connectTimeout,
+                                       @Min(1) int maxConnections) {
 }
 
-public CheckoutFraudClient(final FraudCheckProperties fraudCheck) {
-    this.http = restClient(fraudCheck.baseUrl(), fraudCheck.connectTimeout(), fraudCheck.checkoutTimeout());
+@Configuration(proxyBeanMethods = false)
+@EnableConfigurationProperties(PaymentGatewayProperties.class)
+class PaymentGatewayConfig {
+    @Bean
+    PaymentGatewayClient paymentGatewayClient(final PaymentGatewayProperties gateway) {
+        return new PaymentGatewayClient(gateway);
+    }
 }
 ```
-One record is bound once and read by both clients; two real timeouts are two named keys, not one key with two defaults.
-(Pair: 68f § LY7 — Grouped settings in one validated record; each key bound in one place. Real evidence: ledger row
-LY7.)
+One record binds the group once and validates it at startup. Every class that needs a key reads it from the record.
 
 ### SC6 — A `@Bean` method returns the most specific type it builds
 
-**Bad** (neutral)
+**Bad** (from SF §Using the @Bean Annotation, Declaring a Bean)
 ```java
 @Bean
-public OrderRepository orderRepository(OrderJpaRepository jpaRepository) {
-    return new OrderRepositoryAdapter(jpaRepository);
+PaymentService paymentService(final PaymentRepository payments) {
+    return new CardPaymentService(payments);
 }
 ```
-The method builds the adapter but declares the port, so before creation the container and type conditions see only the
-port.
+The method builds a `CardPaymentService` but declares the interface. Before creation, the container and type-based
+conditions see only `PaymentService`.
 
-**Good** (neutral)
+**Good** (from SF §Using the @Bean Annotation, "declare the most specific return type possible")
 ```java
 @Bean
-OrderRepositoryAdapter orderRepository(final OrderJpaRepository jpaRepository) {
-    return new OrderRepositoryAdapter(jpaRepository);
+CardPaymentService paymentService(final PaymentRepository payments) {
+    return new CardPaymentService(payments);
 }
 ```
-The declared type is what is built; callers still inject `OrderRepository`, because Spring matches every type the bean
-has. (Pair: 68f § SC6 — A `@Bean` method returns the most specific type it builds. Real evidence: ledger row SC6.)
+The declared type is the built type. Callers still inject `PaymentService`, because Spring matches every type the bean
+has.
 
 ### SC4 — Several implementations: `@ConditionalOnProperty` per value, exactly one matches, missing fails startup
 
-**Bad** (neutral)
+**Bad** (from plinth 301 :1091, Example 10)
 ```java
-@Bean
-@ConditionalOnMissingBean(TaxCalculator.class)
-public TaxCalculator taxCalculator(TaxProperties tax) {
-    Path ratesPath = Path.of(tax.rateTable().ratesPath());
-    Path regionsPath = Path.of(tax.rateTable().regionsPath());
-    if (Files.exists(ratesPath) && Files.exists(regionsPath)) {
-        … // load RateTableTaxCalculator
-        } catch (Exception failure) {
-            log.warn("rate table init failed ({}: {}), falling back to a flat rate",
-                    failure.getClass().getSimpleName(), failure.getMessage());
-        }
-    } … // else: WARN "using flat-rate tax"
-    return new FlatRateTaxCalculator();
+@Configuration
+class OrderNotifierConfig {
+    @Bean
+    @Primary
+    EmailOrderNotifier emailOrderNotifier() {
+        return new EmailOrderNotifier();
+    }
+
+    @Bean
+    SmsOrderNotifier smsOrderNotifier() {
+        return new SmsOrderNotifier();
+    }
 }
 ```
-A file's existence picks between two real implementations, any failure falls back silently, and the stub depends on load
-order.
+Every start builds both notifiers, and `@Primary` puts the choice of email in code. A move to SMS needs a release, not
+a setting.
 
-**Good** (neutral)
+**Good** (from plinth 301 :645, Example 6)
 ```java
-@Bean
-@ConditionalOnProperty(name = "example.tax.mode", havingValue = "rate-table", matchIfMissing = false)
-RateTableTaxCalculator rateTableTax(final TaxProperties tax) {
-    return RateTableTaxCalculator.load(tax.rateTable().ratesPath(), tax.rateTable().regionsPath());
-}
+@Configuration(proxyBeanMethods = false)
+class OrderNotifierConfig {
+    @Bean
+    @ConditionalOnProperty(name = "shop.notifier.channel", havingValue = "email", matchIfMissing = false)
+    EmailOrderNotifier emailOrderNotifier() {
+        return new EmailOrderNotifier();
+    }
 
-@Bean
-@ConditionalOnProperty(name = "example.tax.mode", havingValue = "flat", matchIfMissing = false)
-FlatRateTaxCalculator flatRateTax() {
-    log.warn("action=tax.mode mode=flat accuracy=low key=example.tax.mode");
-    return new FlatRateTaxCalculator();
+    @Bean
+    @ConditionalOnProperty(name = "shop.notifier.channel", havingValue = "sms", matchIfMissing = false)
+    SmsOrderNotifier smsOrderNotifier() {
+        return new SmsOrderNotifier();
+    }
 }
-
-@Validated @ConfigurationProperties("example.tax")
-record TaxProperties(@NotNull TaxMode mode, @Valid RateTableFiles rateTable) {}
 ```
-Each implementation carries its own value, exactly one matches, and an unset mode fails startup naming the key. (Pair:
-68f § SC7 — Several implementations: `@ConditionalOnProperty` per value, exactly one matches, missing fails startup.
-Real evidence: ledger row SC7.)
+Each value builds exactly one notifier. An unset channel builds none, so the bean that needs an `OrderNotifier` fails
+startup.
 
 ### SC15 — A settings record rejects bad values at startup, naming the key; a runner spec proves it
 
-**Bad** (neutral)
+**Bad** (from plinth 301 :1212, Example 11)
 ```java
-@ConfigurationProperties(prefix = "example.notifications.streams")
-public record NotificationStreamsProperties(Stream ordersPlaced,
-                                            Stream invoicesOverdue,
-                                            Stream paymentsReceived,
-                                            Duration drainTimeout) {
-
-    public NotificationStreamsProperties {
-        if (drainTimeout.isZero() || drainTimeout.isNegative()) {
-            throw new IllegalArgumentException(PREFIX + "drain-timeout must be more than zero, but was " + …);
-        }
-        for (final NotificationStream stream : NotificationStream.values()) {
-            requireCap(capOf(stream, ordersPlaced, invoicesOverdue, paymentsReceived), stream);
-        }
-    }
-```
-A wrong value is rejected, but a missing one makes the constructor dereference null: a bare NullPointerException naming
-no key.
-
-**Good** (neutral)
-```java
-@Validated
-@ConfigurationProperties("example.notifications.streams")
-public record NotificationStreamsProperties(@NotNull @Valid Stream ordersPlaced,
-                                            @NotNull @Valid Stream invoicesOverdue,
-                                            @NotNull @Valid Stream paymentsReceived,
-                                            @NotNull @DurationMin(millis = 1) Duration drainTimeout) {
-
-    public record Stream(@Min(1) int maxInFlight) {
-    }
+@ConfigurationProperties("shop.shipping")
+public record ShippingProperties(URI baseUrl,
+                                 Duration readTimeout) {
 }
 ```
-Each field carries its own constraint, so Boot's bind-validation failure names the property; the runner spec adds the
-missing case. (Pair: 68f § SC15 — A settings record rejects bad values at startup, naming the key; a runner spec proves
-it. Real evidence: ledger row SC15.)
+A missing `base-url` binds as null. The first shipment then fails with a NullPointerException that names no key.
+
+**Good** (record from plinth 301 :1188, Example 11; spec from rrezartprebreza/spring-boot-skills
+`spring-boot-4/configuration-properties/SKILL.md:44-46`)
+```java
+@Validated
+@ConfigurationProperties("shop.shipping")
+public record ShippingProperties(@NotNull URI baseUrl,
+                                 @NotNull Duration readTimeout) {
+}
+```
+```groovy
+def "should fail startup naming baseUrl when base-url is missing"() {
+    expect:
+    runner.withPropertyValues("shop.shipping.read-timeout=2s")
+            .run { context ->
+                assert getRootCause(context.startupFailure).message.contains("baseUrl")
+            }
+}
+```
+Each field carries its own constraint, so the bind-validation failure names the field. The runner spec proves the
+missing case.
 
 ### SC16 — No default for a secret or required endpoint; fail, or a named degraded mode at WARN
 
-**Bad** (neutral)
+**Bad** (from plinth 301 :510, Example 4)
 ```java
 @Bean
-public CredentialEncryptor credentialEncryptor(@Value("${example.master-key:}") String masterKey) {
-    return new CredentialEncryptor(masterKey);
+PaymentGatewayClient paymentGatewayClient(
+        final PaymentGatewayProperties gateway,
+        @Value("${shop.payment-gateway.api-key:test-key}") final String apiKey) {
+    return new PaymentGatewayClient(gateway, apiKey);
 }
-// CredentialEncryptor
-public CredentialEncryptor(String secretKey) {
-    if (secretKey == null || secretKey.isBlank()) {
-        this.keyBytes    = null;
-        this.passthrough = true;
-        return;
-    }
 ```
-```yaml
-example:
-  master-key: ${EXAMPLE_MASTER_KEY:${master_key:}}
-```
-A missing master key defaults to `""` twice, which silently stores every PaymentGateway credential in plaintext, with no
-failure or log.
+The source hard-codes the password. This default does the same behind a placeholder: an unset key starts the shop with
+the test key, and no log says so.
 
 **Good** (neutral)
 ```java
 @Bean
-CredentialEncryptor credentialEncryptor(final Environment environment, final CredentialProperties credentials) {
-    return Optional.ofNullable(environment.getProperty("example.master-key"))
-            .filter(not(String::isBlank))
-            .<CredentialEncryptor>map(AesGcmCredentialEncryptor::new)
-            .orElseGet(() -> plaintextIfAllowed(credentials));
-}
-
-private static CredentialEncryptor plaintextIfAllowed(final CredentialProperties credentials) {
-    if (!credentials.plaintextAllowed()) {
-        throw new InvalidConfigurationPropertyValueException("example.master-key", "", "required for credentials");
-    }
-    log.warn("action=credentials.mode mode=plaintext key=example.credentials.plaintext-allowed");
-    return new PlaintextCredentialEncryptor();
+PaymentGatewayClient paymentGatewayClient(
+        final PaymentGatewayProperties gateway,
+        @Value("${shop.payment-gateway.api-key}") final String apiKey) {
+    return new PaymentGatewayClient(gateway, apiKey);
 }
 ```
-Absence fails startup naming the key; plaintext is only a named mode, set outside the shipped yml, that warns once.
-(Pair: 68f § SC16 — No default for a secret or required endpoint; fail, or a named degraded mode at WARN. Real evidence:
-ledger row SC16.)
+The key has no default. If it is unset, startup fails with "Could not resolve placeholder
+'shop.payment-gateway.api-key'".
 
 ### SC19 — Work that must finish before traffic runs in an `ApplicationRunner`; later work goes to a thread from ready
 
-**Bad** (neutral)
+**Bad** (from plinth 301 :366, Example 3)
 ```java
-@Service
-public class TaxRateTable implements TaxCalculator {
-    …
-    @PostConstruct
-    void initialise() {
-        reload();
-    }
-```
-`reload()` reads every tax rate row while the bean is created, so a database outage fails startup inside unrelated bean
-construction.
+@Component
+class PriceCatalogueLoader {
+    … // one constructor: PriceCatalogue catalogue
 
-**Good** (neutral)
+    @EventListener
+    void onApplicationReady(final ApplicationReadyEvent event) {
+        catalogue.loadAll();
+    }
+}
+```
+A long load runs inside an event listener, on the thread that publishes the event. SB §Application Events and Listeners:
+listeners should not run lengthy tasks.
+
+**Good** (from SB §Using the ApplicationRunner or CommandLineRunner)
 ```java
-@Service
-public class TaxRateTable implements TaxCalculator, ApplicationRunner {
-    … // fields and the one constructor unchanged
+@Component
+class PriceCatalogueLoader implements ApplicationRunner {
+    private final PriceCatalogue catalogue;
+
+    PriceCatalogueLoader(final PriceCatalogue catalogue) {
+        this.catalogue = catalogue;
+    }
 
     @Override
     public void run(final ApplicationArguments arguments) {
-        reload();
+        catalogue.loadAll();
     }
+}
 ```
-Rates must be loaded before any order is priced, and a runner finishes after context refresh but before the app accepts
-traffic. (Pair: 68f § SC19 — Work that must finish before traffic runs in an `ApplicationRunner`; later work goes to a
-thread from ready. Real evidence: ledger row SC19.)
+Orders need prices before the first request. A runner finishes after context refresh, before the app accepts traffic.
 
 ### SC21 — A proxied annotation works only on a call from another bean; never through `this`
 
-**Bad** (neutral)
+**Bad** (from plinth 311 :1073, Example 14)
 ```java
-@Transactional
-public String getOrGenerateWebhookSecret() {
-    String stored = settings.get(KEY_WEBHOOK_SECRET);
-    if (!stored.isBlank()) {
-        return decryptSafe(stored);
-    }
-    String generated = generateSecureKey();
-    settings.set(KEY_WEBHOOK_SECRET, encryptor.encrypt(generated));
-    return generated;
-}
+@Service
+class OrderService {
+    … // one constructor: JdbcClient jdbc
 
-/** WebhookSecretPort implementation — env var takes precedence over DB. */
-@Override
-public String getEffectiveWebhookSecret() {
-    String fromEnvironment = environment.getProperty("example.webhook-secret");
-    if (fromEnvironment != null && !fromEnvironment.isBlank()) {
-        return fromEnvironment;
+    void placeOrder(final long productId) {
+        this.reserveStock(productId);
     }
-    return getOrGenerateWebhookSecret();
-```
-The port method reaches the `@Transactional` method through `this`, so the proxy is bypassed and the read-then-write has
-no transaction.
 
-**Good** (neutral)
-```java
-@Component
-class WebhookSecretStore {
-    … // one constructor: BillingSettingsPort settings, CredentialEncryptor encryptor
     @Transactional
-    String loadOrCreate() {
-        final String stored = settings.get(KEY_WEBHOOK_SECRET);
-        return stored.isBlank() ? create() : decryptSafe(stored);
+    void reserveStock(final long productId) {
+        jdbc.sql("UPDATE stock SET on_hand = on_hand - 1 WHERE product_id = ?").param(productId).update();
+        jdbc.sql("INSERT INTO reservations (product_id) VALUES (?)").param(productId).update();
     }
 }
-// BillingSettingsService implements WebhookSecretPort
-@Override
-public String loadOrCreateWebhookSecret() {
-    return Optional.ofNullable(environment.getProperty("example.webhook-secret"))
-            .filter(not(String::isBlank))
-            .orElseGet(webhookSecretStore::loadOrCreate);
 ```
-The transactional method lives on a second bean, so the call crosses the proxy, with no self-injection and no
-`AopContext`. (Pair: 68f § SC21 — A proxied annotation works only on a call from another bean; never through `this`.
-Real evidence: ledger row SC21.)
+The call goes through `this`, not the proxy, so no transaction starts. A failed insert leaves the stock reduced.
 
+**Good** (from plinth 311 :1049, Example 14)
+```java
+@Service
+class OrderService {
+    private final StockService stock;
+
+    OrderService(final StockService stock) {
+        this.stock = stock;
+    }
+
+    void placeOrder(final long productId) {
+        stock.reserve(productId);
+    }
+}
+// StockService: a second @Service; its @Transactional reserve(productId) holds both writes
+```
+The transactional method lives on a second bean, so the call crosses the proxy. No self-injection, no `AopContext`.
