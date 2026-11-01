@@ -7,45 +7,53 @@ Contents: Rules · When X, use Y · Good / Bad (ER1, ER4, ER8, ER10) · Decided 
 
 ## Rules
 
-- **ER1** — A foreseeable non-success (not found, already exists, over limit) is a sealed outcome in the return
-  type; only faults throw, because an expected case that is thrown lets callers ignore it until runtime.
-- **ER2** — A fault throws the project's base exception with a catalogue `ErrorCode`; no checked exceptions; never a
-  bare `ResponseEntity…build()`, because a bare `ResponseEntity…build()` returns an empty body with no `traceId`.
-- **ER7** — Do not use `Either` or VAVR; a domain-named sealed outcome carries the non-success case, because an
-  `Either` left never reaches the handler, so the error loses its `traceId`.
-- **ER10** — An error response carries the `ErrorCode` message only; never `getMessage()` from a library, driver or
-  JDK exception, a stack, or SQL, because a driver's `getMessage()` in the body leaked database text to clients.
+- **ER1** (operator preference, 2026-10-31) — A foreseeable non-success (not found, already exists, over limit) is a
+  sealed outcome in the return type; only faults throw, because an expected case that is thrown lets callers ignore it
+  until runtime.
+- **ER2** (operator preference, 2026-10-31) — A fault throws one base exception type with a machine-readable error
+  code; no checked exceptions; never a bare `ResponseEntity…build()`, because a bare `build()` returns an empty body
+  with no error code.
+- **ER7** (operator preference, 2026-10-31) — Do not use `Either` or VAVR; a domain-named sealed outcome carries the
+  non-success case, because a domain-named sealed type says what failed; an `Either` left says only "left".
+- **ER10** — An error response carries the error code's generic message only; never `getMessage()` from a library,
+  driver or JDK exception, a stack, or SQL, because those expose internal details to the client.
 - **ER11** — Map exceptions to responses only in the one central exception handler; a controller declares no
-  `@ExceptionHandler`, because a per-controller handler leaked database driver text to the client.
-- **ER3** — A rethrow chains its cause; a caught exception is handled, rethrown or logged with its class name, never
-  left empty, because a dropped cause ends the stack trace and an empty catch hides bugs.
-- **ER4** — Catch the narrowest type; `catch (Exception)` only at a must-not-fail boundary, with a comment; never
-  `Throwable`, because a broad catch hides failures; `Throwable` even swallows `OutOfMemoryError`.
-- **ER5** — When you catch `InterruptedException`, restore the flag with `Thread.currentThread().interrupt()` or
-  rethrow, because a swallowed interrupt causes a quiet hang.
-- **ER6** — Validate request input at the boundary with Bean Validation; inside, trust the types and use
-  `requireNonNull` only for programming errors, because a service re-validating what the boundary checked is
-  duplicated logic that drifts.
-- **ER8** — A best-effort metric or audit call may catch, log at WARN (LG3: class and message) and continue; never
-  an empty block, because a failure logged at DEBUG or not at all is invisible in production.
+  `@ExceptionHandler`, because each extra handler is one more place that can return internal details to the client.
+- **ER3** (operator preference, 2026-10-31) — A rethrow chains its cause; a caught exception is handled, rethrown or
+  logged with its class name, never left empty, because a dropped cause ends the stack trace and an empty catch hides
+  bugs.
+- **ER4** (operator preference, 2026-10-31) — Catch the narrowest type; `catch (Exception)` only at a must-not-fail
+  boundary, with a comment; never `Throwable`, because a broad catch hides failures; `Throwable` even swallows
+  `OutOfMemoryError`.
+- **ER5** (operator preference, 2026-10-31) — When you catch `InterruptedException`, restore the flag with
+  `Thread.currentThread().interrupt()` or rethrow, because a swallowed interrupt causes a quiet hang.
+- **ER6** — Validate request input at the boundary with Bean Validation; inside, trust the types, because a service
+  re-validating what the boundary checked is duplicated logic that drifts.
+- **ER8** — A best-effort metric or audit call may catch, log at WARN with the exception (LG3) and continue; never an
+  empty block, because an empty catch hides the failure.
 
 ## When X, use Y
 
 | the code meets | use | why |
 |---|---|---|
-| a case the caller can foresee: not found, already exists, over limit | a sealed outcome in the return type (ER1), never an `Either` (ER7) | a case the types let you ignore becomes a runtime failure the compiler could have stopped (types :9) |
-| a fault: a non-success the caller cannot foresee | throw the project's base exception with a catalogue `ErrorCode` (ER2) | every error response follows one shape with a machine-readable code (api :61-86) |
-| an exception that must become an HTTP response | the one central exception handler (ER11), with the `ErrorCode` message as the body (ER10) | translate at the boundary with centralized handlers (exc :32, :2184); log the detail, give users a generic message (exc :26) |
-| a caught exception that is rethrown | the caught exception passed as the cause (ER3) | chaining keeps the full error context (exc :27) |
-| an `InterruptedException` | `Thread.currentThread().interrupt()`, or a rethrow (ER5) | restore the interrupted status (exc :28) |
-| a `catch` clause | the narrowest type the `try` can raise (ER4) | specific types, not generic `Exception` (exc :23); `Throwable` or `Error` can mask `OutOfMemoryError` (exc :2374) |
-| a best-effort metric or audit call that fails | catch, log at WARN, continue (ER8); what a WARN line carries (class and message) is LG3 (`../../obs/references/logging.md`) | WARN means degraded but handled (obs :75) |
-| request input | Bean Validation at the boundary, no second check inside (ER6) | validate at the boundary, trust the types inside (boundary :14-15, :24) |
+| a case the caller can foresee: not found, already exists, over limit | a sealed outcome in the return type (ER1), never an `Either` (ER7) | operator preference; a case the types let you ignore becomes a runtime failure the compiler could have stopped (types :9) |
+| a fault: a non-success the caller cannot foresee | throw the one base exception type with a machine-readable error code (ER2) | operator preference; every error response follows one shape with a machine-readable code (api :61-86) |
+| an exception that must become an HTTP response | the one central exception handler (ER11), with the error code's generic message as the body (ER10) | translate at the boundary with centralized handlers (exc :32, :2184) · define a global error handler (OWASP) · never expose stack traces or internal error details (sec :73, :98) · log the detail, give users a generic message (exc :26) |
+| a caught exception that is rethrown | the caught exception passed as the cause (ER3) | operator preference; chaining keeps the full error context (exc :27) |
+| a caught exception that is not rethrown | handle it or log it, never an empty block (ER3) | an empty catch block hides the problem (exc :1948) · errors silently swallowed (rubric :10) |
+| an `InterruptedException` | `Thread.currentThread().interrupt()`, or a rethrow (ER5) | operator preference; restore the interrupted status (exc :28) |
+| a `catch` clause | the narrowest type the `try` can raise (ER4) | operator preference for the narrowest type and the must-not-fail boundary; specific types, not generic `Exception` (exc :23) · `Throwable` or `Error` can mask `OutOfMemoryError` (exc :2374); an `Error` is a problem a reasonable application should not try to catch (JDK `Error`) |
+| a best-effort metric or audit call that fails | catch, log at WARN with the exception (LG3, `../../obs/references/logging.md`), continue (ER8) | WARN means degraded but handled (obs :75) · an empty catch block hides the problem (exc :1948) |
+| request input | Bean Validation at the boundary, no second check inside (ER6) | validate at the boundary, trust the types inside (boundary :14-15, :24) · validate at system edges (api :90) · Bean Validation of web input (Spring Framework, Validation) |
 
 `types` is pstack `skills/principle-type-system-discipline/SKILL.md`, `boundary` is pstack
-`skills/principle-boundary-discipline/SKILL.md`, `exc` is plinth `126-java-exception-handling.md`, `api` is addy
-`skills/api-and-interface-design/SKILL.md` and `obs` is addy `skills/observability-and-instrumentation/SKILL.md`; `:N`
-is the line.
+`skills/principle-boundary-discipline/SKILL.md`, `rubric` is pstack `skills/interrogate/references/rubric.md`, `exc` is
+plinth `126-java-exception-handling.md`, `api` is addy `skills/api-and-interface-design/SKILL.md`, `sec` is addy
+`skills/security-and-hardening/SKILL.md` and `obs` is addy `skills/observability-and-instrumentation/SKILL.md`; `:N`
+is the line. OWASP is the Error Handling Cheat Sheet,
+https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html. JDK `Error` is the Java SE Javadoc of
+`java.lang.Error`. Spring Framework, Validation is
+https://docs.spring.io/spring-framework/reference/core/validation/beanvalidation.html.
 
 ## Good / Bad
 
@@ -201,9 +209,6 @@ in the log. The method lives in the one central exception handler (ER11). (Real 
   skip when** the block is empty or logs below WARN (ER8), the broad catch has no comment (ER4), or the catch takes
   `Throwable` or `Error` (ER4; exc :2374). —
   **Confidence** high
-- **Skip when** a value can be wrong only through a programming error: `requireNonNull` inside the boundary is allowed
-  (ER6). — **Do not skip when** the boundary already validated the value: write no second check inside (boundary
-  :24). A guard that silences a failure on a trusted path is DS8 (`../../deslop/SKILL.md`). — **Confidence** high
 
 ## Review checks
 
@@ -212,21 +217,21 @@ type (`grep -nE "throw |catch \(|@ExceptionHandler|ResponseEntity"`).
 
 - [ ] ER1 — For each `throw`, the case is a fault. A throw for a not-found, already-exists or over-limit case is a
   finding.
-- [ ] ER2 — Each fault throws the project's base exception with a catalogue `ErrorCode`. A new checked exception in a
+- [ ] ER2 — Each fault throws the one base exception type with a machine-readable error code. A new checked exception in a
   `throws` clause is a finding, and so is a `ResponseEntity…build()` with no body (`grep -n "build()"`).
 - [ ] ER7 — `Either` or VAVR (`grep -nE "Either<|io\.vavr"`) is a finding.
-- [ ] ER10 — For each error response, the body message comes from the `ErrorCode`. A `getMessage()` of a library,
+- [ ] ER10 — For each error response, the body message is the error code's generic message. A `getMessage()` of a library,
   driver or JDK exception, a stack trace or SQL text in the body is a finding.
 - [ ] ER11 — An `@ExceptionHandler` outside the one central exception handler (`grep -n "@ExceptionHandler"`) is a
   finding.
 - [ ] ER3 — For each `catch`, a rethrow passes the caught exception as its cause, and any other block handles it or
   logs its class name. A rethrow without the cause is a finding, and so is an empty block, even one that holds a
-  comment (ledger R37-D7).
+  comment (operator preference).
 - [ ] ER4 — Each `catch` names the narrowest type its `try` can raise. A `catch (Exception)` away from a must-not-fail
   boundary or without a comment is a finding, and so is any catch of `Throwable` or `Error`.
 - [ ] ER5 — Each catch of `InterruptedException` calls `Thread.currentThread().interrupt()` or rethrows. Neither is a
   finding.
 - [ ] ER6 — Each request type carries Bean Validation at the boundary. A check inside the service that repeats a
-  boundary check is a finding, and so is a `requireNonNull` on a value the boundary validated.
-- [ ] ER8 — Each catch around a best-effort metric or audit call logs at WARN with the exception class and message
-  (LG3). An empty block, or a log below WARN, is a finding.
+  boundary check is a finding.
+- [ ] ER8 — Each catch around a best-effort metric or audit call logs at WARN with the exception (LG3). An empty
+  block, or a log below WARN, is a finding.
