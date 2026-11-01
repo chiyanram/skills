@@ -16,9 +16,9 @@ Contents: Rules · When X, use Y · Good / Bad · Decided edges · Review checks
 
 | the code has | use | why |
 |---|---|---|
-| a decision to make | a function that does no I/O (SEAM1) | business logic lives in pure functions (pstack `principle-boundary-discipline`, r48 :279); return results, don't produce side effects (mattpocock `codebase-design`, r48 :279) |
-| I/O to do | a thin method that does the I/O and chooses no outcome (SEAM1) | the shell is thin and mechanical (pstack `principle-boundary-discipline`, r48 :279) |
-| a method with many branches | guard clauses or extracted helpers, under the project's gate or cyclomatic 10 (DSN1) | Sonar S1541 defaults to 10 (r48 :288); extract conditions into guard clauses or helper functions (addy `code-simplification`, r48 :288) |
+| a decision to make | a function that does no I/O (SEAM1) | business logic lives in pure functions (pstack `principle-boundary-discipline`, r48 :285); return results, don't produce side effects (mattpocock `codebase-design`, r48 :285) |
+| I/O to do | a thin method that does the I/O and chooses no outcome (SEAM1) | the shell is thin and mechanical (pstack `principle-boundary-discipline`, r48 :285) |
+| a method with many branches | guard clauses or extracted helpers, under the project's gate or cyclomatic 10 (DSN1) | Sonar S1541 defaults to 10 (r48 :294); extract conditions into guard clauses or helper functions (addy `code-simplification`, r48 :294) |
 
 `r48 :N` is the line in agent-factory `research/48-industry-recheck-code.md` that quotes the source, read at the
 commit it names.
