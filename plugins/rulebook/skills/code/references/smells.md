@@ -109,76 +109,75 @@ Every rule's approved pair: [examples/smells.md](examples/smells.md).
 
 **Bad** (neutral)
 ```java
-// OverdueReminder.java — the job decodes the sentinel …
-final int graceDays = resolveGraceDays(customer.graceDays(), defaultGraceDays);
-if (graceDays == 0) {
-    log.debug("overdue_reminder customerId={} never_overdue — skipped", customer.id());
-    continue;
+// CheckoutService.java
+if (policy.isOpenEnded(member)) {
+    return Loan.openEnded(member.id(), book.id());
 }
-Instant cutoff = Instant.now(clock).minus(graceDays, ChronoUnit.DAYS);
-// InvoicePreviewController.java — … and the preview decodes it again
-int graceDays = resolveGraceDays(customer.graceDays(), defaultGraceDays);
-if (graceDays == 0) {
-    return new OverduePreview(customer.id(), 0, null, 0L);
+return Loan.due(member.id(), book.id(), today.plusDays(policy.loanDays(member)));
+
+// RenewalService.java
+if (policy.isOpenEnded(member)) {
+    return loan;
 }
-Instant cutoff = Instant.now(clock).minus(graceDays, ChronoUnit.DAYS);
+return loan.withDueDate(today.plusDays(policy.loanDays(member)));
 ```
-The "0 means never overdue" rule and the cutoff arithmetic are written twice, so the preview can disagree with the job.
+The open-ended check moved into `LoanPolicy`, but each caller still branches on it. A third caller must remember the
+branch, and the copies can disagree.
 
 **Good** (neutral)
 ```java
-public sealed interface GracePeriod {
-    record NeverOverdue() implements GracePeriod {}
-    record Days(int count) implements GracePeriod {}   // compact ctor rejects count <= 0, unchanged
+public sealed interface LoanTerm {
+    record OpenEnded() implements LoanTerm {}
+    record Days(int count) implements LoanTerm {}
 
-    default Optional<Instant> overdueBefore(final Instant now) {
+    default DueDate dueFrom(final LocalDate start) {
         return switch (this) {
-            case NeverOverdue _ -> Optional.empty();
-            case Days days -> Optional.of(now.minus(days.count(), ChronoUnit.DAYS));
+            case OpenEnded _ -> new DueDate.None();
+            case Days days -> new DueDate.On(start.plusDays(days.count()));
         };
     }
 }
-// job:     period.overdueBefore(clock.instant()).ifPresent(cutoff -> remind(customer.id(), cutoff));
-// preview: final long invoiceCount = period.overdueBefore(clock.instant())
-//                  .map(cutoff -> invoiceRepository.countOpenDueBefore(customer.id(), cutoff))
-//                  .orElse(0L);
+// DueDate is sealed: None() or On(LocalDate date).
+// checkout: return new Loan(member.id(), book.id(), member.term().dueFrom(today));
+// renewal:  return loan.withDue(member.term().dueFrom(today));
 ```
-The cutoff rule lives on the type, so both callers lose their branch instead of each switching on it. (Real evidence:
-ledger row DS1. Pair: 68f § DS1 — Look for a restructure that deletes branches, not one that moves them.)
+The term decides the due date once. Both callers lose their branch instead of each one taking it.
 
 ### DS3 — Model the case; add no second boolean
 
-**Bad** (neutral)
+**Bad** (from martinfowler.com bliki FlagArgument, adapted)
 ```java
-private void recordPaymentSafely(UUID paymentId, Customer customer,
-                                 UUID orderId, UUID invoiceId, String method,
-                                 String requestJson, String responseJson, long latencyMillis,
-                                 PaymentStatus status, ErrorCode errorCode,
-                                 boolean requiresReview, UUID reviewId,
-                                 String traceId, boolean sandbox, String sandboxSource) {
+public Loan checkout(Member member, Book book, boolean isReference, boolean isInterLibrary, String lenderCode) {
+    if (isInterLibrary) {
+        return interLibraryLoan(member, book, lenderCode);
+    }
+    if (isReference) {
+        return readingRoomLoan(member, book);
+    }
+    return regularLoan(member, book);
+}
+// caller: checkout(member, book, false, true, "N12");
 ```
-Sandbox mode arrived as a boolean plus a string that means something only when it is true. Review repeats that shape.
+Inter-library loans arrived as a second boolean plus a string that means something only when it is true. The caller
+cannot tell what `false, true` means.
 
 **Good** (neutral)
 ```java
-sealed interface GatewayRun {
-    record Live() implements GatewayRun {}
-    record Sandbox(SandboxSource source) implements GatewayRun {}
+public sealed interface LoanKind {
+    record Regular() implements LoanKind {}
+    record ReadingRoom() implements LoanKind {}
+    record InterLibrary(LenderCode lender) implements LoanKind {}
 }
 
-sealed interface ReviewGate {
-    record NotRequired() implements ReviewGate {}
-    record Required(UUID reviewId) implements ReviewGate {}
+public Loan checkout(final LoanRequest request) {
+    return switch (request.kind()) {
+        case LoanKind.Regular _ -> regularLoan(request);
+        case LoanKind.ReadingRoom _ -> readingRoomLoan(request);
+        case LoanKind.InterLibrary interLibrary -> interLibraryLoan(request, interLibrary.lender());
+    };
 }
-
-record PaymentAttempt(PaymentIds ids, PaymentMethod method, GatewayExchange exchange, PaymentStatus status,
-                      ReviewGate review, GatewayRun run) {
-}
-
-private void recordPaymentAttempt(final PaymentAttempt attempt) {
 ```
-Each mode is a sealed case that carries only its own data, so a sandbox source or a review id cannot exist without its
-mode. (Real evidence: ledger row DS3. Pair: 68f § DS3 — No one-off `if` or second boolean in a flow; model the case.)
+Each kind is a sealed case that carries only its own data. A lender code cannot exist without an inter-library loan.
 
 ## Decided edges
 

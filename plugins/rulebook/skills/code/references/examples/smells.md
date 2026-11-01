@@ -1,8 +1,8 @@
 # Smells — Good / Bad examples
 
 Every approved Good/Bad pair for the smells rules, one per rule that can be misread. The rules, the baseline and the
-review checks are in [`../smells.md`](../smells.md). Each pair is in one neutral domain (orders, invoices and
-payments). The other rules state themselves and have no pair.
+review checks are in [`../smells.md`](../smells.md). Each pair is in one neutral domain (a lending library: members,
+books and loans). The other rules state themselves and have no pair.
 
 Contents: DS1 · DS3 · DS4 · DS12 · DS14
 
@@ -10,183 +10,162 @@ Contents: DS1 · DS3 · DS4 · DS12 · DS14
 
 **Bad** (neutral)
 ```java
-// OverdueReminder.java — the job decodes the sentinel …
-final int graceDays = resolveGraceDays(customer.graceDays(), defaultGraceDays);
-if (graceDays == 0) {
-    log.debug("overdue_reminder customerId={} never_overdue — skipped", customer.id());
-    continue;
+// CheckoutService.java
+if (policy.isOpenEnded(member)) {
+    return Loan.openEnded(member.id(), book.id());
 }
-Instant cutoff = Instant.now(clock).minus(graceDays, ChronoUnit.DAYS);
-// InvoicePreviewController.java — … and the preview decodes it again
-int graceDays = resolveGraceDays(customer.graceDays(), defaultGraceDays);
-if (graceDays == 0) {
-    return new OverduePreview(customer.id(), 0, null, 0L);
+return Loan.due(member.id(), book.id(), today.plusDays(policy.loanDays(member)));
+
+// RenewalService.java
+if (policy.isOpenEnded(member)) {
+    return loan;
 }
-Instant cutoff = Instant.now(clock).minus(graceDays, ChronoUnit.DAYS);
+return loan.withDueDate(today.plusDays(policy.loanDays(member)));
 ```
-The "0 means never overdue" rule and the cutoff arithmetic are written twice, so the preview can disagree with the job.
+The open-ended check moved into `LoanPolicy`, but each caller still branches on it. A third caller must remember the
+branch, and the copies can disagree.
 
 **Good** (neutral)
 ```java
-public sealed interface GracePeriod {
-    record NeverOverdue() implements GracePeriod {}
-    record Days(int count) implements GracePeriod {}   // compact ctor rejects count <= 0, unchanged
+public sealed interface LoanTerm {
+    record OpenEnded() implements LoanTerm {}
+    record Days(int count) implements LoanTerm {}
 
-    default Optional<Instant> overdueBefore(final Instant now) {
+    default DueDate dueFrom(final LocalDate start) {
         return switch (this) {
-            case NeverOverdue _ -> Optional.empty();
-            case Days days -> Optional.of(now.minus(days.count(), ChronoUnit.DAYS));
+            case OpenEnded _ -> new DueDate.None();
+            case Days days -> new DueDate.On(start.plusDays(days.count()));
         };
     }
 }
-// job:     period.overdueBefore(clock.instant()).ifPresent(cutoff -> remind(customer.id(), cutoff));
-// preview: final long invoiceCount = period.overdueBefore(clock.instant())
-//                  .map(cutoff -> invoiceRepository.countOpenDueBefore(customer.id(), cutoff))
-//                  .orElse(0L);
+// DueDate is sealed: None() or On(LocalDate date).
+// checkout: return new Loan(member.id(), book.id(), member.term().dueFrom(today));
+// renewal:  return loan.withDue(member.term().dueFrom(today));
 ```
-The cutoff rule lives on the type, so both callers lose their branch instead of each switching on it. (Real evidence:
-ledger row DS1. Pair: 68f § DS1 — Look for a restructure that deletes branches, not one that moves them.)
+The term decides the due date once. Both callers lose their branch instead of each one taking it.
 
 ### DS3 — Model the case; add no second boolean
 
-**Bad** (neutral)
+**Bad** (from martinfowler.com bliki FlagArgument, adapted)
 ```java
-private void recordPaymentSafely(UUID paymentId, Customer customer,
-                                 UUID orderId, UUID invoiceId, String method,
-                                 String requestJson, String responseJson, long latencyMillis,
-                                 PaymentStatus status, ErrorCode errorCode,
-                                 boolean requiresReview, UUID reviewId,
-                                 String traceId, boolean sandbox, String sandboxSource) {
+public Loan checkout(Member member, Book book, boolean isReference, boolean isInterLibrary, String lenderCode) {
+    if (isInterLibrary) {
+        return interLibraryLoan(member, book, lenderCode);
+    }
+    if (isReference) {
+        return readingRoomLoan(member, book);
+    }
+    return regularLoan(member, book);
+}
+// caller: checkout(member, book, false, true, "N12");
 ```
-Sandbox mode arrived as a boolean plus a string that means something only when it is true. Review repeats that shape.
+Inter-library loans arrived as a second boolean plus a string that means something only when it is true. The caller
+cannot tell what `false, true` means.
 
 **Good** (neutral)
 ```java
-sealed interface GatewayRun {
-    record Live() implements GatewayRun {}
-    record Sandbox(SandboxSource source) implements GatewayRun {}
+public sealed interface LoanKind {
+    record Regular() implements LoanKind {}
+    record ReadingRoom() implements LoanKind {}
+    record InterLibrary(LenderCode lender) implements LoanKind {}
 }
 
-sealed interface ReviewGate {
-    record NotRequired() implements ReviewGate {}
-    record Required(UUID reviewId) implements ReviewGate {}
+public Loan checkout(final LoanRequest request) {
+    return switch (request.kind()) {
+        case LoanKind.Regular _ -> regularLoan(request);
+        case LoanKind.ReadingRoom _ -> readingRoomLoan(request);
+        case LoanKind.InterLibrary interLibrary -> interLibraryLoan(request, interLibrary.lender());
+    };
 }
-
-record PaymentAttempt(PaymentIds ids, PaymentMethod method, GatewayExchange exchange, PaymentStatus status,
-                      ReviewGate review, GatewayRun run) {
-}
-
-private void recordPaymentAttempt(final PaymentAttempt attempt) {
 ```
-Each mode is a sealed case that carries only its own data, so a sandbox source or a review id cannot exist without its
-mode. (Real evidence: ledger row DS3. Pair: 68f § DS3 — No one-off `if` or second boolean in a flow; model the case.)
+Each kind is a sealed case that carries only its own data. A lender code cannot exist without an inter-library loan.
 
 ### DS4 — Remove the pass-through; apply the deletion test
 
-**Bad** (neutral)
+**Bad** (from refactoring.com catalog Remove Middle Man, adapted)
 ```java
-/** Returns all invoices whose reminder is due right now. */
-public List<Invoice> findDueReminders() {
-    return invoiceRepository.findDueReminders();
-}
+public final class Member {
+    private final Branch branch;
 
-/**
- * Atomic optimistic-lock claim. Advances next_reminder_at only when the expected value still matches.
- *
- * @return true if this instance won the race and should send the reminder
- */
-public boolean claimAndAdvance(UUID invoiceId, Instant expectedNextReminderAt, Instant newNextReminderAt) {
-    return invoiceRepository.claimAndAdvance(invoiceId, expectedNextReminderAt, newNextReminderAt);
+    public Librarian librarian() { return branch.librarian(); }
+    public OpeningHours openingHours() { return branch.openingHours(); }
+    public Address returnAddress() { return branch.returnAddress(); }
 }
+// caller
+final var librarian = member.librarian();
 ```
-Two one-line forwards whose only caller is the reminder job add a layer to trace and hide nothing.
+`Member` forwards three calls to `Branch` and adds nothing. Each new `Branch` query adds one more forward to trace.
 
-**Good** (neutral)
+**Good** (from refactoring.com catalog Remove Middle Man, adapted)
 ```java
-@Component
-class OverdueReminder {
-
-    private final InvoiceRepository invoices;
-    // … other collaborators unchanged
-
-    ReminderOutcome remind(final Invoice invoice, final ClaimWindow window) {
-        return switch (invoices.claimAndAdvance(invoice.id(), window)) {
-            case ReminderClaim.Won _ -> send(invoice);
-            case ReminderClaim.Lost _ -> ReminderOutcome.NOT_CLAIMED;
-        };
-    }
+public record Member(MemberId id, Branch branch) {
 }
+// caller
+final Librarian librarian = member.branch().librarian();
 ```
-The job depends on the port that does the work. The forwards are deleted, and the claim returns a sealed `Won` or
-`Lost`. (Real evidence: ledger row DS4. Pair: 68f § DS4 — Remove pass-throughs and single-caller wrappers; apply the
-deletion test.)
+The forwards are deleted. The caller asks the branch directly, and `Member` changes only for member data.
 
 ### DS12 — Define the rule once, call it everywhere
 
 **Bad** (neutral)
-```ts
-const smokeOrders = orders.filter(order => order.reference?.startsWith('smoke-') || order.reference?.startsWith('rate-limit-smoke-'));
-const staleInvoices = invoices.filter(invoice => invoice.reference.startsWith('smoke-'));
-const smoke = customers.filter(customer => (customer.email ?? '').startsWith('smoke-') || (customer.name ?? '').startsWith('smoke-'));
+```java
+// OverdueNotifier.java
+if (loan.dueDate().isBefore(today.minusDays(3))) {
+    notifier.remind(loan);
+}
+// FineCalculator.java
+final var overdue = loan.dueDate().plusDays(3).isBefore(today);
+// BorrowingLimit.java
+final var overdueCount = loans.stream().filter(loan -> today.isAfter(loan.dueDate().plusDays(2))).count();
 ```
-"What counts as smoke data" lives in three lambdas that already disagree, so numbered prefixes such as `smoke77-` leak
-on every run.
+"What counts as overdue" lives at three sites that already disagree: the limit uses two grace days, the others three.
 
 **Good** (neutral)
-```ts
-// playwright/support/smoke-name.ts
-const SMOKE_NAME = /^(rate-limit-)?smoke\d*[-_]/;
+```java
+public record Loan(LoanId id, MemberId member, String title, LocalDate dueDate) {
+    private static final int GRACE_DAYS = 3;
 
-export function isSmokeName(name: string | null | undefined): boolean {
-  return SMOKE_NAME.test(name ?? '');
+    public boolean isOverdueOn(final LocalDate today) {
+        return today.isAfter(dueDate.plusDays(GRACE_DAYS));
+    }
 }
-
-// playwright/global-setup.ts — every purge site calls the one predicate
-const smokeOrders = orders.filter((order) => isSmokeName(order.reference));
-const smokeInvoices = invoices.filter((invoice) => isSmokeName(invoice.reference));
-const smokeCustomers = customers.filter(
-  (customer) => isSmokeName(customer.email) || isSmokeName(customer.name),
-);
+// OverdueNotifier: if (loan.isOverdueOn(today)) { notifier.remind(loan); }
+// FineCalculator:  final boolean overdue = loan.isOverdueOn(today);
+// BorrowingLimit:  final long overdueCount = loans.stream().filter(loan -> loan.isOverdueOn(today)).count();
 ```
-The rule has one home, so a new prefix is one edit and every purge site learns it. (Real evidence: ledger row DS12.
-Pair: 68f § DS12 — A rule-encoding predicate or literal is defined once, called everywhere.)
+The rule has one home. A change to the grace period is one edit, and every site learns it.
 
 ### DS14 — No shared helper for lines that share no rule
 
 **Bad** (neutral)
 ```java
-static RestClient restClient(final String kind, final Duration timeout, final String baseUrl) {
-    final var requestFactory = new SimpleClientHttpRequestFactory();
-    if ("tax".equals(kind)) {
-        requestFactory.setConnectTimeout(timeout);
-        requestFactory.setReadTimeout(timeout);
-        return RestClient.builder().requestFactory(requestFactory).build();
+static String notice(final String kind, final Member member, final String title, final LocalDate date) {
+    final var greeting = "Dear " + member.name() + ",";
+    if ("overdue".equals(kind)) {
+        return greeting + " please return " + title + " (due " + date + ").";
     }
-    requestFactory.setConnectTimeout(Duration.ofSeconds(1));
-    requestFactory.setReadTimeout(timeout);
-    return RestClient.builder().baseUrl(baseUrl).requestFactory(requestFactory).build();
+    return greeting + " " + title + " is ready to collect until " + date + ".";
 }
 ```
-One "shared" factory serves two callers that share no rule, so it needs a mode argument at once and grows one per
-caller.
+Two messages that share a greeting get one "shared" helper. It needs a mode argument at once and grows one branch per
+new notice.
 
 **Good** (neutral)
 ```java
-// TaxRateClient — its own setting, its own policy
-static RestClient restClient(final TaxServiceProperties tax) {
-    final var requestFactory = new SimpleClientHttpRequestFactory();
-    requestFactory.setConnectTimeout(tax.timeout());
-    requestFactory.setReadTimeout(tax.timeout());
-    return RestClient.builder().requestFactory(requestFactory).build();
+// OverdueReminder — its wording follows the lending policy
+static String reminderText(final Member member, final Loan loan) {
+    return "Dear %s, please return %s (due %s).".formatted(
+        member.name(),
+        loan.title(),
+        loan.dueDate());
 }
 
-// PaymentGatewayClient — looks alike, answers to a different setting
-static RestClient restClient(final PaymentGatewayProperties gateway) {
-    final var requestFactory = new SimpleClientHttpRequestFactory();
-    requestFactory.setConnectTimeout(gateway.connectTimeout());
-    requestFactory.setReadTimeout(gateway.chargeTimeout());
-    return RestClient.builder().baseUrl(gateway.baseUrl().toString()).requestFactory(requestFactory).build();
+// HoldNotice — its wording follows the reservation policy
+static String readyText(final Member member, final Hold hold) {
+    return "Dear %s, %s is ready to collect until %s.".formatted(
+        member.name(),
+        hold.title(),
+        hold.collectBy());
 }
 ```
-The two builders stay apart: each timeout belongs to its own settings record and changes for a different reason.
-(Real evidence: ledger row DS14. Pair: 68f § DS14 — Do not extract a helper for 2–3 similar lines with no shared rule.)
+The two texts stay apart. They look alike, but each one changes for a different reason.
