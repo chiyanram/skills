@@ -4,7 +4,7 @@ Every approved Good/Bad pair for the Spring rules, one per rule that has one. Th
 review checks are in [`../spring.md`](../spring.md). Each pair is in one neutral domain (orders and billing); `68f § ID
 — title` is a heading of `research/68f-neutral-code.md`.
 
-Contents: LY6 · LY7 · SC6 · SC7 · SC15 · SC16 · SC19 · SC21
+Contents: LY6 · LY7 · SC6 · SC4 · SC15 · SC16 · SC19 · SC21
 
 ### LY6 — One constructor; an optional collaborator is an `ObjectProvider<T>` resolved at use
 
@@ -97,7 +97,7 @@ OrderRepositoryAdapter orderRepository(final OrderJpaRepository jpaRepository) {
 The declared type is what is built; callers still inject `OrderRepository`, because Spring matches every type the bean
 has. (Pair: 68f § SC6 — A `@Bean` method returns the most specific type it builds. Real evidence: ledger row SC6.)
 
-### SC7 — Several implementations: `@ConditionalOnProperty` per value, exactly one matches, missing fails startup
+### SC4 — Several implementations: `@ConditionalOnProperty` per value, exactly one matches, missing fails startup
 
 **Bad** (neutral)
 ```java
