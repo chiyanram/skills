@@ -11,30 +11,30 @@ Contents: Rules · When X, use Y · Good / Bad (TY1, TY3, TY8, TY9) · Decided e
   enum, because nullable fields let contradictory field combinations compile.
 - **TY2** — Make a closed set of two or more cases sealed or an enum, and switch over it with no `default` arm,
   because a `default` arm lets a new case compile and be silently mishandled.
-- **TY3** (operator preference, 2026-10-31) — Model forbidden combinations away with sealed variants first; let a record's compact constructor reject
+- **TY3** — Model forbidden combinations away with sealed variants first; let a record's compact constructor reject
   only the combinations the variants cannot exclude, because a record that admits forbidden combinations leaves
   every caller guessing which are legal.
-- **TY7** (operator preference, 2026-10-31) — Return an empty collection, never `null`, from a method that returns a collection, because a `null`
+- **TY7** — Return an empty collection, never `null`, from a method that returns a collection, because a `null`
   collection forces every caller to null-check and causes bugs.
-- **TY9** (operator preference, 2026-10-31) — Strengthen a type only where partiality appears: a cast, a null check, a "never happens" throw; elsewhere
+- **TY9** — Strengthen a type only where partiality appears: a cast, a null check, a "never happens" throw; elsewhere
   keep the plain type, because only there is the type too weak to stop a runtime failure.
-- **TY12** (operator preference, 2026-10-31) — Allow `null` only while mapping a wire DTO; turn it into an `Optional`, a sealed case or an enum in the
+- **TY12** — Allow `null` only while mapping a wire DTO; turn it into an `Optional`, a sealed case or an enum in the
   adapter, because an escaped null becomes a runtime failure the compiler could stop.
 - **TY8** — Wrap a primitive in a domain type when two same-typed values could swap places, or when it carries an
   invariant, because two same-typed ids can swap places at a call site and still compile.
-- **TY4** (operator preference, 2026-10-31) — Mark fields `final` always; mark locals and parameters `final` in new code; never edit an old line only
+- **TY4** — Mark fields `final` always; mark locals and parameters `final` in new code; never edit an old line only
   to add `final`, because final fields keep an object immutable and safe to share across threads.
 - **TY5** — Type money, cost and price as `BigDecimal` with explicit scale and rounding, and use `double` only for
   latencies and scores, because `double` arithmetic adds binary rounding errors to money.
-- **TY6** (operator preference, 2026-10-31) — Model a closed set of states, roles or modes as an enum, never a string
+- **TY6** — Model a closed set of states, roles or modes as an enum, never a string
   literal, and persist it as `EnumType.STRING`, because an ordinal breaks when the enum is reordered.
-- **TY11** (operator preference, 2026-10-31) — Make an `equals` between an enum and a `String` fail the build (ErrorProne
+- **TY11** — Make an `equals` between an enum and a `String` fail the build (ErrorProne
   `EqualsIncompatibleType` or an ArchUnit rule), never leave it to review, because an equality test between
   incompatible types always returns false.
 - **TY10** — Write no raw generic types; put `@SuppressWarnings("unchecked")` on one statement with the reason it is
   safe, never on a method or class, because a raw type bypasses generic checks and throws `ClassCastException` at
   runtime.
-- **TY13** (operator preference, 2026-10-31) — Build a value with its record constructor or a static
+- **TY13** — Build a value with its record constructor or a static
   factory; name a single implementation `Default<Name>`, never `<Name>Impl`, because a builder is a second
   construction API to maintain, and `Impl` names no role.
 
@@ -63,6 +63,8 @@ TY4, TY6, TY7, TY9, TY11 and TY12 are operator preferences. TY7 follows pl121m :
 pstack :18, TY6 pl121-enums Example 2, and TY11 ErrorProne `EqualsIncompatibleType`.
 TY3's sealed-variants part and TY13's constructor-or-factory part are industry; TY3's compact-constructor clause
 and TY13's `Default<Name>` naming are operator preference.
+
+Operator preference, 2026-10-31 (SRC2), in whole or in part: TY3, TY7, TY9, TY12, TY4, TY6, TY11 and TY13.
 
 ## Good / Bad
 

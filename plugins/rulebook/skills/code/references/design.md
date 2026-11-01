@@ -5,7 +5,7 @@ or review an interface a caller depends on, or a method that implements one.
 
 ## Rules
 
-- **SEAM1** (operator preference, 2026-10-31) — Give every seam one job, a record in, a sealed result out, pure decisions, I/O that decides nothing
+- **SEAM1** — Give every seam one job, a record in, a sealed result out, pure decisions, I/O that decides nothing
   and rule lists at cyclomatic complexity ≤5, because a branching method hides paths no test reaches.
 
 ## When X, use Y
@@ -24,6 +24,8 @@ or review an interface a caller depends on, or a method that implements one.
 `pstack` is cursor-plugins pstack `skills/principle-type-system-discipline/SKILL.md`. `pl121p` is plinth
 `121-java-object-oriented-design-principles.md` and `pl142` is plinth `142-java-functional-programming.md`. `:N` is
 the line. The sealed result and the pure decision are industry rules; the other SEAM1 parts are operator preference.
+
+Operator preference, 2026-10-31 (SRC2), in whole or in part: SEAM1.
 
 ## Good / Bad
 

@@ -8,24 +8,24 @@ Contents: Rules · When X, use Y · Good / Bad (CC3, CC4, CC9) · Decided edges 
 
 ## Rules
 
-- **CC1** (operator preference, 2026-10-31) — Use virtual threads for blocking I/O fan-out, never pooled;
+- **CC1** — Use virtual threads for blocking I/O fan-out, never pooled;
   `synchronized` is fine on Java 25; avoid blocking in a class initialiser or a callback from native or FFM code,
   because those still pin the carrier.
-- **CC2** (operator preference, 2026-10-31) — Submit blocking async work to an explicit, named executor, never no-arg
+- **CC2** — Submit blocking async work to an explicit, named executor, never no-arg
   `supplyAsync`/`runAsync`, because no-arg `supplyAsync` puts blocking I/O on the common pool and starves it.
 - **CC3** — Give every remote call a timeout that stops the work; `orTimeout` alone only abandons the future, because a
   call with no stopping timeout can hang forever and keep running.
-- **CC9** (operator preference, 2026-10-31) — Treat a remote call as success, failure or unknown; record intent
+- **CC9** — Treat a remote call as success, failure or unknown; record intent
   before it; the idempotency key comes from the initiator, never the retrying layer, because a timed-out effect may
   have applied; retries then duplicate it.
 - **CC8** — Retry only a transient failure of an idempotent call, with bounded attempts and jittered backoff, and only
   after a timeout exists (CC3), because retrying a non-idempotent call repeats its side effect.
 - **CC4** — Give a bounded pool a bounded queue and a stated rejection behaviour, because an unbounded queue never
   rejects; it grows memory until the process fails.
-- **CC5** (operator preference, 2026-10-31) — Remove the shared write target (one key or file per actor) before
+- **CC5** — Remove the shared write target (one key or file per actor) before
   locking; a lock still needed has one owner and one documented order, because shared writes race intermittently and
   opposite lock orders deadlock.
-- **CC6** (operator preference, 2026-10-31) — Never call `join()`/`get()` mid-pipeline in request-serving code; compose
+- **CC6** — Never call `join()`/`get()` mid-pipeline in request-serving code; compose
   with `thenApply`/`thenCompose`/`allOf`, because a mid-pipeline `join()` blocks a thread and undoes the reason for
   async.
 - **CC7** — Carry request- or call-scoped context (depth, tenant, principal) in a `ScopedValue` or an explicit
@@ -68,6 +68,8 @@ Sources, all read at a pinned commit or at the URL named; `:N` is a line:
 - Resilience4j bulkhead: https://resilience4j.readme.io/docs/bulkhead.
 - Stripe idempotent requests: https://docs.stripe.com/api/idempotent_requests.
 - Caffeine Eviction: https://github.com/ben-manes/caffeine/wiki/Eviction §Size-based.
+
+Operator preference, 2026-10-31 (SRC2), in whole or in part: CC1, CC2, CC9, CC5 and CC6.
 
 ## Good / Bad
 

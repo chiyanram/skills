@@ -42,6 +42,8 @@ Amended 2026-10-17 (G23 #93 Q3). Rules 2–3 before this date said "Bad = real c
 rewritten" (#37 correction, 2026-10-03); that is superseded.
 Amended 2026-10-31 (agent-factory#32 source audit): rules 2 and 4 now take examples from the rule's sources and
 admit a rule by two independent sources or the operator-preference label (SRC2).
+Amended 2026-11-01 (agent-factory#32): a rule line holds the rule only. The operator-preference mark moved off the
+rule line into one "Operator preference" line under the reference's When X, use Y table.
 
 1. A Good obeys **every** approved rule and house style, not only its own (GB1a, `31-good-bad-v2-BRIEF.md:9`).
 2. **Bad and Good come from the reference that sources the rule**, adapted into one neutral domain. Where no source
@@ -52,7 +54,8 @@ admit a rule by two independent sources or the operator-preference label (SRC2).
    never as the start of an example.
 4. **A rule enters the rulebook in one of two ways (SRC2).** (a) Two independent sources state it, each read at
    `path:line` or URL and section. Pages from one company or project count as one source. (b) The operator states it
-   as a preference, and the rule line carries `(operator preference, YYYY-MM-DD)` after its id. Our repo supplies
+   as a preference, and the reference lists the rule id in one line under its When X, use Y table:
+   `Operator preference, YYYY-MM-DD (SRC2), in whole or in part: <ids>.` The rule line holds the rule only. Our repo supplies
    evidence that a rule is needed, never the rule itself.
 5. House style in examples: test names are "should …" sentences; `final var` in Java, `def` in Groovy; one argument per
    line with the closing parenthesis on the last argument; Spock for new tests (CV1–CV6, `31e-conventions.md`).
@@ -119,8 +122,8 @@ Why this is right. (Real evidence: ledger row V1.)
 [ ] 4  Rules: no rule a hook/Checkstyle/ArchUnit already fails — cite the gate instead
 [ ] 5  When X, use Y: X is an observable predicate (file type, annotation, tier, path), never a judgement
 [ ] 6  Good/Bad taken from the rule's source, in one neutral domain, no project names; the real Aruvii path:line is
-       ledger evidence (re-verified at write time), never reference text; the rule has two sources or the
-       preference label (SRC2)
+       ledger evidence (re-verified at write time), never reference text; the rule has two sources or is
+       listed on the Operator preference line (SRC2)
 [ ] 7  Good/Bad: one pair per rule that can be misread; none for rules whose sentence says it all
 [ ] 8  Decided edges: Skip when / Do not skip when / Confidence
 [ ] 9  Decided edges: exceptions live here as their own predicate, never inside a Rule

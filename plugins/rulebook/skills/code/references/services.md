@@ -9,7 +9,7 @@ Contents: Rules · When X, use Y · Good / Bad (LY1, LY2) · Decided edges · Re
 
 - **LY1** — Keep a controller to binding, delegating and shaping the response; put any branch that chooses an outcome
   in a service, because logic in a controller cannot be tested without the web framework.
-- **LY2** (operator preference, 2026-10-31) — Add an interface only for a boundary dependency a test fakes, or a type
+- **LY2** — Add an interface only for a boundary dependency a test fakes, or a type
   another module calls, with one package-private implementation named `Default<Name>`, because a one-implementation
   interface is indirection with no real seam.
 - **LY3** — Put two operations that must not be split (a write and its audit record) behind one method and one
@@ -29,6 +29,8 @@ Sources: pstack = cursor-plugins `pstack/skills` (`principle-boundary-discipline
 jabrena-plinth `skills/*/references`; Jeffallan = Jeffallan claude-skills `spring-boot-engineer/SKILL.md`.
 `68f § ID — title` is a heading of `research/68f-neutral-code.md`. How a bean takes its dependencies (LY6) and binds
 its settings (LY7) is in `spring.md`.
+
+Operator preference, 2026-10-31 (SRC2), in whole or in part: LY2.
 
 ## Good / Bad
 
