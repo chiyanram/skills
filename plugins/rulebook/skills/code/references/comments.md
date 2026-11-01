@@ -14,10 +14,10 @@ Contents: Rules · When X, use Y · Good / Bad (CM3, CM4, CM7) · Decided edges 
 - **CM3** — Keep a comment only for what code cannot show (external dependency or protocol, public-API contract,
   license, issue/RFC link, must-not-fail boundary catch (ER4)); else reshape, because a why-comment about our code
   rots into a false claim.
-- **CM4** — Check each comment's claim before it lands; replace a 'do not remove' note with a type, test or lint,
-  because a false comment gets believed and a 'keep in sync' note never fails.
-- **CM5** — Write Javadoc on an interface only when its contract is not obvious from the signature, and none on its
-  implementation, because Javadoc on the implementation is a second copy that goes stale.
+- **CM4** (operator preference, 2026-10-31) — Check each comment's claim before it lands; replace a 'do not remove' note
+  with a type, test or lint, because a false comment gets believed and a 'keep in sync' note never fails.
+- **CM5** (operator preference, 2026-10-31) — Write Javadoc on an interface only when its contract is not obvious from
+  the signature, and none on its implementation, because Javadoc on the implementation is a second copy that goes stale.
 - **CM7** — Fix the type instead of suppressing a lint or compiler rule that protects correctness or safety
   (`eslint-disable`, `@ts-expect-error`, `@SuppressWarnings`); style-only rules may be suppressed, because a suppressed
   correctness rule stops catching the bugs it targets.
@@ -39,8 +39,6 @@ Contents: Rules · When X, use Y · Good / Bad (CM3, CM4, CM7) · Decided edges 
 `sicko` is pstack `agents/comment-sicko.md`, `no-comments` is pstack `skills/no-comments/SKILL.md`, `simplification`
 is addy `skills/code-simplification/SKILL.md` and `codebase-design` is mattpocock
 `skills/engineering/codebase-design/SKILL.md`; `:N` is the line.
-
-CM2's reason comes from agent-factory research/31:34 (approved, agent-factory#21 Part A); the ledger row has none.
 
 ## Good / Bad
 
@@ -168,14 +166,14 @@ CM7.)
 - **Skip when** the comment fits a keep clause of CM3 that is proven true today on a live path (sicko :26). — **Do not
   skip when** you are not sure a keep clause applies: the comment goes (sicko :22). — **Confidence** high
 - **Skip when** the why names a constraint the code cannot show (CM3). — **Do not skip when** the why is about our own
-  code, even though addy keeps such comments (simplification :145): delete it and ask for a reshape (ledger X1, :378). —
-  **Confidence** high
-- **Skip when** a member's contract is obvious from its signature: write no Javadoc, though Google Java Style 7.3 asks
-  for it on every visible member (ledger CM5 source). — **Do not skip when** the interface has an invariant, ordering
-  constraint or error mode the signature cannot show (codebase-design :16). — **Confidence** high
-- **Skip when** the suppression is a Java unchecked cast: TY10 (`types.md`) owns that one exception to CM7 (ledger CM7
-  source). — **Do not skip when** the rule is `no-explicit-any` or another correctness rule: fix the type (NGA2,
-  `angular-ui.md`; ledger X6). — **Confidence** high
+  code, even though addy keeps such comments (simplification :145): delete it and ask for a reshape (operator
+  preference, 2026-10-31). — **Confidence** high
+- **Skip when** a member's contract is obvious from its signature: write no Javadoc (Google Java Style §7.3.1 makes it
+  optional for a simple, obvious member, and §7.3.2 for an override). — **Do not skip when** the interface has an
+  invariant, ordering constraint or error mode the signature cannot show (codebase-design :16). — **Confidence** high
+- **Skip when** the suppression is a Java unchecked cast: TY10 (`types.md`) owns that one exception to CM7. — **Do not
+  skip when** the rule is `no-explicit-any` or another correctness rule: fix the type (NGA2, `angular-ui.md`;
+  typescript-eslint `ban-ts-comment`). — **Confidence** high
 
 ## Review checks
 
