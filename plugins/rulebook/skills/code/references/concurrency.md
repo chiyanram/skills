@@ -77,109 +77,101 @@ Operator preference, 2026-10-31 (SRC2), in whole or in part: CC1, CC2, CC9, CC5 
 
 **Bad** (neutral)
 ```java
-@Bean
-public HttpPaymentGateway paymentGateway(GatewayCredentials credentials) {
-    RestClient restClient = RestClient.builder().build();
-    return new HttpPaymentGateway(credentials, restClient);
-}
-// InvoiceService.pay:
-return CompletableFuture.supplyAsync(() -> paymentGateway.charge(request), chargeExecutor)
-    .orTimeout(limits.timeout().toMillis(), TimeUnit.MILLISECONDS)
+final var client = HttpClient.newHttpClient();
+final var request = HttpRequest.newBuilder(ratesUri).GET().build();
+return CompletableFuture
+        .supplyAsync(() -> fetchRates(client, request), ioExecutor)
+        .orTimeout(2, TimeUnit.SECONDS);
 ```
-The gateway `RestClient` has no connect or read timeout, so after `orTimeout` fires the charge request keeps running on
-a pool thread.
+After two seconds `orTimeout` completes the future. The blocking `send` inside `fetchRates` has no timeout, so it
+keeps its thread on the socket.
 
 **Good** (neutral)
 ```java
-@Bean
-public HttpPaymentGateway paymentGateway(
-        final GatewayCredentials credentials,
-        final GatewayHttpProperties gatewayHttp) {
-    final HttpClient httpClient = HttpClient.newBuilder()
-            .connectTimeout(gatewayHttp.connectTimeout())
-            .build();
-    final var requestFactory = new JdkClientHttpRequestFactory(httpClient);
-    requestFactory.setReadTimeout(gatewayHttp.readTimeout());
-    final RestClient restClient = RestClient.builder().requestFactory(requestFactory).build();
-    return new HttpPaymentGateway(credentials, restClient);
-}
+final var client = HttpClient.newBuilder()
+        .connectTimeout(Duration.ofSeconds(1))
+        .build();
+final var request = HttpRequest.newBuilder(ratesUri)
+        .timeout(Duration.ofSeconds(2))
+        .GET()
+        .build();
+return client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
 ```
-The deadline is on the socket, so a stuck gateway read ends and frees its thread; `orTimeout` may stay as the caller's
-wait. (Real evidence: ledger row CC3.)
+The connect timeout and the request timeout end the exchange itself, so a stuck provider frees the thread.
 
 ### CC4 — A bounded pool has a bounded queue and a stated rejection
 
-**Bad** (neutral)
+**Bad** (from jabrena/plinth `skills/125-java-concurrency/references/125-java-concurrency.md`:1596)
 ```java
-@Bean(destroyMethod = "shutdownNow")
-ScheduledExecutorService orderStreamHeartbeatScheduler() {
-    return Executors.newScheduledThreadPool(4,
-        Thread.ofPlatform().name("order-stream-heartbeat-", 0).factory());
+final class ReceiptDispatcher {
+    private final ExecutorService pool = Executors.newFixedThreadPool(8);
+
+    void dispatch(final Runnable sendReceipt) {
+        pool.submit(sendReceipt);
+    }
 }
 ```
-Four threads look bounded, but every open order-status stream adds its own periodic task, and nothing says what happens
-past capacity.
+Eight threads look bounded, but `newFixedThreadPool` queues on an unbounded `LinkedBlockingQueue`. A burst of
+receipts is never rejected, and the heap grows.
 
-**Good** (neutral)
+**Good** (from jabrena/plinth `skills/125-java-concurrency/references/125-java-concurrency.md`:1562)
 ```java
-@Bean
-SseHeartbeats sseHeartbeats(final SseProperties sseProperties) {
-    return new SseHeartbeats(new ArrayBlockingQueue<>(sseProperties.maxOpenStreams()));
-}
+final class ReceiptDispatcher {
+    private final ThreadPoolExecutor pool = new ThreadPoolExecutor(
+            4,
+            8,
+            60,
+            TimeUnit.SECONDS,
+            new ArrayBlockingQueue<>(200),
+            new ThreadPoolExecutor.CallerRunsPolicy());
 
-@Bean(destroyMethod = "shutdownNow")
-ScheduledThreadPoolExecutor orderStreamHeartbeatTicker(final SseHeartbeats heartbeats) {
-    final var ticker = new ScheduledThreadPoolExecutor(
-            1,
-            Thread.ofPlatform().name("order-stream-heartbeat").factory());
-    ticker.scheduleAtFixedRate(heartbeats::sendToAll, HEARTBEAT_SECONDS, HEARTBEAT_SECONDS, TimeUnit.SECONDS);
-    return ticker;
+    void dispatch(final Runnable sendReceipt) {
+        pool.execute(sendReceipt);
+    }
 }
 ```
-One thread runs one task over a queue of `maxOpenStreams`; `register` returns `Registered | Refused`, so the stream past
-the cap is refused out loud. (Real evidence: ledger row CC4.)
+The queue holds 200 tasks. When it is full, the caller's thread runs the task, which slows the producer instead of
+growing memory.
 
 ### CC9 — Success, failure or unknown; intent before the call; the initiator's key
 
-**Bad** (neutral)
+**Bad** (from addyosmani/agent-skills `skills/api-and-interface-design/SKILL.md`:163)
 ```java
-for (int attempt = 0; attempt < MAX_RETRIES; attempt++) {
+for (int attempt = 1; attempt <= 3; attempt++) {
+    final var request = chargeRequest(order, UUID.randomUUID().toString());
     try {
-        HttpRequest request = HttpRequest.newBuilder()
-            // … gateway url, signature, Idempotency-Key = payment id, timeout(15 s), POST body …
-            .build();
-        HttpResponse<Void> response = HTTP.send(request, HttpResponse.BodyHandlers.discarding());
-        int status = response.statusCode();
-        // … 2xx → return; 4xx → return; 5xx → retry …
-    } catch (IOException failure) {
-        log.warn("PaymentGateway charge failed paymentId={} attempt={}: {}: {}",
-            payment.id(), attempt + 1, failure.getClass().getSimpleName(), failure.getMessage());
+        return ChargeResult.fromStatus(http.send(request, discarding()).statusCode());
+    } catch (final HttpTimeoutException timedOut) {
+        log.warn("Charge attempt {} failed: {}: {}",
+                attempt,
+                timedOut.getClass().getSimpleName(),
+                timedOut.getMessage());
     }
-    // … sleep, next attempt …
 }
+return ChargeResult.FAILED;
 ```
-A read timeout after the charge was sent is logged as "failed" and sent again, though the gateway may already have
-taken the money.
+Each attempt mints a new key, and a read timeout counts as a failure. The provider may have taken the money, so the
+next attempt charges again.
 
-**Good** (neutral)
+**Good** (from addyosmani/agent-skills `skills/api-and-interface-design/SKILL.md`:167, :213)
 ```java
-public ChargeOutcome charge(final Payment payment) {
-    paymentLog.recordCharging(payment.id());
+public ChargeOutcome charge(final ChargeIntent intent) {
+    intents.recordPending(intent.idempotencyKey(), intent.orderId());
     try {
-        final HttpResponse<Void> response = http.send(signedCharge(payment), discarding());
-        return ChargeOutcome.fromStatus(payment.id(), response.statusCode());
-    } catch (final HttpConnectTimeoutException | ConnectException notConnected) {
-        return new ChargeOutcome.NotSent(payment.id(), notConnected.getClass().getSimpleName());
+        final HttpResponse<Void> response = http.send(chargeRequest(intent), discarding());
+        return ChargeOutcome.fromStatus(intent.idempotencyKey(), response.statusCode());
+    } catch (final HttpConnectTimeoutException notSent) {
+        return new ChargeOutcome.Failed(intent.idempotencyKey(), notSent.getClass().getSimpleName());
     } catch (final IOException afterConnect) {
-        return new ChargeOutcome.Unknown(payment.id(), afterConnect.getClass().getSimpleName());
+        return new ChargeOutcome.Unknown(intent.idempotencyKey(), afterConnect.getClass().getSimpleName());
     } catch (final InterruptedException interrupted) {
         Thread.currentThread().interrupt();
-        return new ChargeOutcome.Unknown(payment.id(), "interrupted");
+        return new ChargeOutcome.Unknown(intent.idempotencyKey(), "interrupted");
     }
 }
 ```
-Intent is recorded first; anything after connect is `Unknown`; the caller resends only `NotSent`, with the same
-payment-id key. (Real evidence: ledger row CC9.)
+The order mints the key once, inside `ChargeIntent`, and every retry reuses it. The intent is recorded before the
+call. A failed connect is `Failed`; anything after connect is `Unknown`, for a reconciler to resolve.
 
 ## Decided edges
 

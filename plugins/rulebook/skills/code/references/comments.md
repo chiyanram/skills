@@ -48,120 +48,84 @@ Operator preference, 2026-10-31 (SRC2), in whole or in part: CM4 and CM5.
 
 **Bad** (neutral)
 ```java
-// Metric: payment.charge.duration tagged by method + status. Bounded cardinality —
-// payment methods are an enum, statuses are a small fixed set. Operators get a graph
-// of "is the gateway getting slower?" and "is the PAID rate dropping?"
-try {
-    meters.timer("payment.charge.duration",
-        "method", method,
-        "status", status.toString())
-        .record(latency);
-} catch (RuntimeException meterFailure) {
-    log.warn(
-            "action=payment.charge.metric_failed cause={} message={}",
-            meterFailure.getClass().getSimpleName(),
-            meterFailure.getMessage());
+// The carrier label API accepts a weight with at most one decimal place.
+final BigDecimal labelWeight = parcel.weightKg().setScale(1, RoundingMode.HALF_UP);
+// Status 3 means the parcel left the depot. We check the flag because
+// the printer must not print a second label for the same parcel.
+if (parcel.status() == 3 && !parcel.labelPrinted()) {
+    printer.print(parcel.id(), labelWeight);
+    parcel.setLabelPrinted(true);
 }
 ```
-The comment defends our own tag choice instead of the code showing it, and it is false: `method` is a `String`.
+The second comment explains our own code. A magic number and a loose flag need it.
 
 **Good** (neutral)
 ```java
-private void recordChargeDuration(
-        final PaymentMethod method,
-        final ChargeStatus status,
-        final Duration latency) {
-    try {
-        meters.timer("payment.charge.duration", "method", method.name(), "status", status.name())
-                .record(latency);
-    } catch (final RuntimeException meterFailure) {
-        log.warn(
-                "action=payment.charge.metric_failed method={} cause={} message={}",
-                method,
-                meterFailure.getClass().getSimpleName(),
-                meterFailure.getMessage());
-    }
+// The carrier label API accepts a weight with at most one decimal place.
+final BigDecimal labelWeight = parcel.weightKg().setScale(1, RoundingMode.HALF_UP);
+if (parcel.stage() == ParcelStage.LEFT_DEPOT) {
+    labels.printOnce(parcel.id(), labelWeight);
 }
 ```
-Two enum parameters now show the bounded cardinality, so the comment has nothing left to say. Operator questions
-belong in the metrics docs. (Real evidence: ledger row CM3.)
+An enum names the stage, and `printOnce` owns the guard, so the second comment goes. The first comment stays: it
+names a constraint of an outside API.
 
 ### CM4 — Check a comment's claim; encode a constraint note
 
 **Bad** (neutral)
 ```java
-// Mandatory anti-buffering headers — without these, nginx + corporate proxies stall
-// SSE responses for 30s+ at a time. Stays in sync with docs/architecture.md §Streaming.
-response.setHeader("Cache-Control",     "no-cache, no-transform");
-response.setHeader("X-Accel-Buffering", "no");
+// Do not change this text: the mobile app parses it.
+static final String PARCEL_LOST = "Parcel lost in transit";
+
+record ParcelEventResponse(String message) {
+}
 ```
-The doc section holds no header text, so the claim is false. The same two headers are hand-copied into two other
-stream endpoints.
+No type, test or lint holds the note. A reworded message passes review and the build, and the app breaks.
 
 **Good** (neutral)
 ```java
-final class SseHeaders {
-    private SseHeaders() {
-    }
+enum ParcelEventCode {
+    LOST_IN_TRANSIT,
+    DELIVERED
+}
 
-    // nginx and corporate proxies hold text/event-stream frames unless these two headers are set
-    static void disableProxyBuffering(final HttpServletResponse response) {
-        response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-transform");
-        response.setHeader("X-Accel-Buffering", "no");
-    }
+record ParcelEventResponse(
+        ParcelEventCode code,
+        String message) {
 }
 ```
-```groovy
-def "should tell proxies not to buffer the order event stream"() {
-    given: "a response for an order event stream, before any frame is written"
-    def response = new MockHttpServletResponse()
-    when: "the endpoint prepares the stream"
-    SseHeaders.disableProxyBuffering(response)
-    then: "nginx and caching proxies pass each frame on at once instead of holding it"
-    response.getHeader("X-Accel-Buffering") == "no"
-    response.getHeader(HttpHeaders.CACHE_CONTROL) == "no-cache, no-transform"
-}
-```
-Every stream endpoint calls one helper and a spec pins the headers, so the sync note goes. The proxy sentence stays:
-it is an outside constraint. (Real evidence: ledger row CM4.)
+First check the claim in the app. Then send a code for the app to match on. The text is free to change, so the note
+goes.
 
 ### CM7 — Fix the type instead of suppressing a correctness rule
 
 **Bad** (neutral)
 ```ts
-interface ConfirmEntry {
-  id: string;
-  options: ConfirmOptions;
-  mode: 'confirm' | 'prompt';
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  resolve: (value: any) => void;
-}
-// … "Pay invoice" asks before charging …
-ask(options: ConfirmOptions): Promise<boolean> {
-  return this.enqueue(options, 'confirm') as Promise<boolean>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function trackingNumber(payload: any): string {
+  return payload.shipment.trackingNumber;
 }
 ```
-Silencing `no-explicit-any` lets `accept()` hand a string to the "Pay invoice" confirm, and the cast hides it.
+The suppression turns off the check on each property access. A payload without `shipment` throws at run time.
 
 **Good** (neutral)
 ```ts
-type ConfirmEntry =
-  | { id: string; options: ConfirmOptions; mode: 'confirm'; resolve: (accepted: boolean) => void }
-  | { id: string; options: ConfirmOptions; mode: 'prompt'; resolve: (input: string | null) => void };
-
-ask(options: ConfirmOptions): Promise<boolean> {
-  return new Promise((resolve) => this.enqueue({ id: newId(), options, mode: 'confirm', resolve }));
+interface CarrierPayload {
+  shipment: { trackingNumber: string };
 }
 
-accept(inputValue = ''): void {
-  const entry = this._current();
-  if (entry?.mode === 'confirm') entry.resolve(true);
-  if (entry?.mode === 'prompt') entry.resolve(inputValue);
-  this._current.set(this.queue.shift() ?? null);
+function isCarrierPayload(value: unknown): value is CarrierPayload {
+  if (typeof value !== 'object' || value === null || !('shipment' in value)) return false;
+  const shipment = value.shipment;
+  return typeof shipment === 'object' && shipment !== null && 'trackingNumber' in shipment
+    && typeof shipment.trackingNumber === 'string';
+}
+
+function trackingNumber(payload: unknown): string | undefined {
+  return isCarrierPayload(payload) ? payload.shipment.trackingNumber : undefined;
 }
 ```
-The union ties each `mode` to its `resolve` type, so the suppression and the cast go. (Real evidence: ledger row
-CM7.)
+`unknown` and a type guard let the compiler check each access, so the suppression goes.
 
 ## Decided edges
 

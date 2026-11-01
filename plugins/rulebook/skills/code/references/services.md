@@ -27,8 +27,7 @@ Contents: Rules · When X, use Y · Good / Bad (LY1, LY2) · Decided edges · Re
 Sources: pstack = cursor-plugins `pstack/skills` (`principle-boundary-discipline/SKILL.md`,
 `architect/references/design-red-flags.md`); mattpocock = mattpocock-skills `skills/engineering`; plinth =
 jabrena-plinth `skills/*/references`; Jeffallan = Jeffallan claude-skills `spring-boot-engineer/SKILL.md`.
-`68f § ID — title` is a heading of `research/68f-neutral-code.md`. How a bean takes its dependencies (LY6) and binds
-its settings (LY7) is in `spring.md`.
+How a bean takes its dependencies (LY6) and binds its settings (LY7) is in `spring.md`.
 
 Operator preference, 2026-10-31 (SRC2), in whole or in part: LY2.
 
@@ -38,91 +37,71 @@ Operator preference, 2026-10-31 (SRC2), in whole or in part: LY2.
 
 **Bad** (neutral)
 ```java
-Invoice invoice = invoiceService.get(id);
-// … caller id, trace id, 6 comment lines on ordering …
-if (invoice.status() != InvoiceStatus.OPEN) {
-    throw new OrderException(ErrorCode.INVOICE_ALREADY_PAID,
-        "invoice " + invoice.id() + " is " + invoice.status());
+@PostMapping("/books/{isbn}/loans")
+public ResponseEntity<LoanResponse> borrow(
+        @PathVariable final String isbn,
+        @RequestBody final BorrowRequest request) {
+    final var book = catalog.find(isbn);
+    if (book.copiesOnShelf() == 0) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    }
+    if (loans.countOpen(request.memberId()) >= MAX_OPEN_LOANS) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
+    }
+    return ResponseEntity.ok(LoanResponse.of(loans.open(isbn, request.memberId())));
 }
-// … 4 comment lines on charging before recording …
-if (paymentGateway.charge(invoice.id(), invoice.total())
-        instanceof ChargeDecision.Declined declined) {
-    throw new OrderException(ErrorCode.PAYMENT_DECLINED,
-        "gateway declined: " + declined.reason());
-}
-paymentService.record(invoice.id(), invoice.total());
 ```
-The controller decides whether an invoice may be paid and in what order, so that contract lives where no service test
-reaches.
+The controller decides whether a member may borrow. A test of that rule needs the web layer.
 
 **Good** (neutral)
 ```java
-@PostMapping("/{id}/payments")
-@PreAuthorize("@invoiceAuth.canPay(#id)")
-public ApiResponse<PaymentResponse> pay(
-        @PathVariable final UUID id,
-        @RequestBody final PayInvoiceRequest request,
-        final Authentication authentication) {
-    final PayOutcome outcome = invoicePayer.pay(id, callerOf(authentication), request);
-    return switch (outcome) {
-        case PayOutcome.Paid paid -> ApiResponse.ok(PaymentResponse.of(paid));
-        case PayOutcome.AlreadyPaid already ->
-                throw new OrderException(ErrorCode.INVOICE_ALREADY_PAID, already.detail());
-        case PayOutcome.Declined declined ->
-                throw new OrderException(ErrorCode.PAYMENT_DECLINED, declined.detail());
+@PostMapping("/books/{isbn}/loans")
+public ResponseEntity<LoanResponse> borrow(
+        @PathVariable final String isbn,
+        @RequestBody final BorrowRequest request) {
+    return switch (lending.borrow(isbn, request.memberId())) {
+        case BorrowOutcome.Lent lent -> ResponseEntity.ok(LoanResponse.of(lent.loan()));
+        case BorrowOutcome.NoCopyOnShelf _ -> ResponseEntity.status(HttpStatus.CONFLICT).build();
+        case BorrowOutcome.LoanLimitReached _ ->
+                ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
     };
 }
 ```
-The service checks status, charges and records in order, returning a sealed outcome; an exhaustive switch over it is
-shaping, which is allowed. (Pair: 68f § LY1 — A controller binds, delegates and shapes; a branch that chooses an outcome
-lives in a service. Real evidence: ledger row LY1.)
+The service checks the shelf and the loan limit and returns a sealed outcome. The exhaustive switch maps each case to
+a status, which is shaping.
 
 ### LY2 — An interface only for a faked boundary or a module boundary; its one implementation is `Default<Name>`
 
 **Bad** (neutral)
 ```java
+public interface LateFeeCalculator {
+    Money feeFor(Loan loan, LocalDate returnedOn);
+}
+
 @Service
-public class PaymentGatewayRegistryImpl implements PaymentGatewayRegistry {
-    private final List<PaymentGateway> gateways;
-
-    public PaymentGatewayRegistryImpl(List<PaymentGateway> gateways) {
-        this.gateways = gateways;
-    }
-
+public class LateFeeCalculatorImpl implements LateFeeCalculator {
     @Override
-    public PaymentGateway forMethod(String method) {
-        for (PaymentGateway gateway : gateways) {
-            if (gateway.supports(method)) {
-                return gateway;
-            }
-        }
-        throw new UnsupportedPaymentMethodException(method);
+    public Money feeFor(final Loan loan, final LocalDate returnedOn) {
+        final long daysLate = Math.max(0L, ChronoUnit.DAYS.between(loan.dueOn(), returnedOn));
+        return DAILY_FEE.times(daysLate);
     }
+}
 ```
-A public `*Impl` behind an interface in a shared module, though every caller is in billing and the real boundary is
-`PaymentGateway`.
+The calculator is pure arithmetic with one implementation, and no test fakes it. The interface is a seam that nothing
+uses.
 
 **Good** (neutral)
 ```java
 @Service
-public class PaymentGatewayRegistry {
-
-    private final List<PaymentGateway> gateways;
-
-    public PaymentGatewayRegistry(final List<PaymentGateway> gateways) {
-        this.gateways = List.copyOf(gateways);
+public class LateFeeCalculator {
+    public Money feeFor(final Loan loan, final LocalDate returnedOn) {
+        final long daysLate = Math.max(0L, ChronoUnit.DAYS.between(loan.dueOn(), returnedOn));
+        return DAILY_FEE.times(daysLate);
     }
-
-    public PaymentGateway forMethod(final String method) {
-        return gateways.stream()
-                .filter(gateway -> gateway.supports(method))
-                .findFirst()
-                .orElseThrow(() -> new UnsupportedPaymentMethodException(method));
-    }
+}
 ```
-One concrete class in billing; tests build it with `FakePaymentGateway`s instead of mocking the selection logic. (Pair:
-68f § LY2 — An interface only for a faked boundary or a module boundary; its one implementation is `Default<Name>`. Real
-evidence: ledger row LY2.)
+Tests call the concrete class with real loans. An interface stays for a boundary such as `MemberNotifier`, which tests
+replace with a fake. Its one implementation is the package-private `DefaultMemberNotifier`.
 
 ## Decided edges
 

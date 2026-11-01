@@ -64,45 +64,35 @@ Operator preference, 2026-10-31 (SRC2), in whole or in part: NGA7 and NGC1.
 
 **Bad** (neutral)
 ```ts
-customerId = '';
-allInvoices = signal<InvoiceResponse[]>([]);
-customerInvoices = signal<InvoiceResponse[]>([]);
-…
-        this.customerId = payment.customerId;
-        this.filterInvoices(payment.customerId);
-…
-onCustomerChange(customerId: string) {
-  this.filterInvoices(customerId);
-  this.allocations.update((allocations) => allocations.map((allocation) => ({ ...allocation, invoiceId: '' })));
-}
+readonly shipments = signal<Shipment[]>([]);
+readonly carrier = signal('all');
+readonly visibleShipments = signal<Shipment[]>([]);
 
-private filterInvoices(customerId: string) {
-  this.customerInvoices.set(this.allInvoices().filter((invoice) => invoice.customerId === customerId && invoice.status === 'OPEN'));
-}
-```
-The open-invoice list is a hand-synced copy. If the payment loads before the invoices, it filters an empty list and
-stays empty.
-
-**Good** (neutral)
-```ts
-readonly customerId = signal('');
-readonly allInvoices = signal<InvoiceResponse[]>([]);
-readonly customerInvoices = computed(() =>
-  this.allInvoices().filter(
-    (invoice) => invoice.customerId === this.customerId() && invoice.status === 'OPEN',
-  ),
-);
-// on load: this.customerId.set(payment.customerId);  — nothing to re-filter
-
-onCustomerChange(customerId: string): void {
-  this.customerId.set(customerId);
-  this.allocations.update((allocations) =>
-    allocations.map((allocation) => ({ ...allocation, invoiceId: '' })),
+onCarrierChange(carrier: string): void {
+  this.carrier.set(carrier);
+  this.visibleShipments.set(
+    this.shipments().filter((shipment) => carrier === 'all' || shipment.carrier === carrier),
   );
 }
 ```
-The filtered list is derived from both signals, so it is right whichever request lands first, and `filterInvoices`
-is deleted. (Real evidence: ledger row NGB3.)
+`visibleShipments` is a copy that one handler syncs. When the shipments load after the user picks a carrier, the list
+stays empty until the next pick. An `effect()` that calls `.set()` here makes the same copy.
+
+**Good** (neutral)
+```ts
+readonly shipments = signal<Shipment[]>([]);
+readonly carrier = signal('all');
+readonly visibleShipments = computed(() =>
+  this.shipments().filter(
+    (shipment) => this.carrier() === 'all' || shipment.carrier === this.carrier(),
+  ),
+);
+
+onCarrierChange(carrier: string): void {
+  this.carrier.set(carrier);
+}
+```
+The list is derived from both signals, so it is correct whichever value changes first.
 
 ## Decided edges
 
