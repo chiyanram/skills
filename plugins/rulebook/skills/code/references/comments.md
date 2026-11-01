@@ -27,15 +27,15 @@ Contents: Rules · When X, use Y · Good / Bad (CM3, CM4, CM7) · Decided edges 
 
 | the comment is | use | why |
 |---|---|---|
-| a banner or divider | delete it (CM1) | avoid positional markers; let names and formatting give the structure (clean-code-javascript, r48 :295); banners are on the kill list (pstack `comment-sicko` :12, r48 :295) |
-| a restatement of the code, a name or a config value | delete it; rename instead (CM2) | delete a comment that explains "what" (addy `code-simplification` :144, r48 :300); a first sentence redundant with the name could be deleted (Martin and Ousterhout, aposd-vs-clean-code, r48 :300) |
-| commented-out code | delete it (CMN1) | don't leave commented-out code in your codebase (clean-code-javascript, r48 :332); commented-out blocks: remove (addy `code-simplification` :152, r48 :332); also Sonar S125 (r48 :332) |
-| prose a rename, an extracted method or a type could replace | the rename, method or type, then no comment (CM3) | implementation code only needs comments when the code is nonobvious (Ousterhout and Martin, aposd-vs-clean-code, r48 :306) |
-| a non-obvious reason, outside constraint, contract, license or link | keep it (CM3) | keep "why" comments: they carry intent the code can't express (addy `code-simplification` :145, r48 :306); a comment is for important information not obvious from the code (Ousterhout, r48 :306) |
-| a factual claim | check it against the code; fix or delete it if false (CM4) | every comment is potential misinformation (Martin, aposd-vs-clean-code, r48 :313); run `/how` or `/why` on the named symbol when the claim is not obvious (pstack `comment-sicko` :26, r48 :313) |
-| a public interface method | a doc comment on its contract: nulls, errors, side effects (CM5) | a header comment describes the method's interface, all a caller needs (Ousterhout, r48 :320); doc comments that define a public API contract survive (pstack `comment-sicko` :19, r48 :320) |
-| a simple, obvious member or an override | no doc comment (CM5) | Javadoc is optional for simple, obvious members and not always present on an override (Google Java Style §7.3.1, §7.3.2, r48 :320) |
-| a lint or compiler suppression | the code fixed; a proven-safe one scoped to one declaration, with a comment saying why (CM7) | eliminate warnings; when the code is proven safe, suppress and comment on why it is safe (Effective Java Item 27, r48 :327); a suppression needs a comment explaining why the warning is safe to ignore (Error Prone `SuppressWarningsWithoutExplanation`, r48 :190) |
+| a banner or divider | delete it (CM1) | avoid positional markers; let names and formatting give the structure (clean-code-javascript, r48 :301); banners are on the kill list (pstack `comment-sicko` :12, r48 :301) |
+| a restatement of the code, a name or a config value | delete it; rename instead (CM2) | delete a comment that explains "what" (addy `code-simplification` :144, r48 :306); a first sentence redundant with the name could be deleted (Martin and Ousterhout, aposd-vs-clean-code, r48 :306) |
+| commented-out code | delete it (CMN1) | don't leave commented-out code in your codebase (clean-code-javascript, r48 :338); commented-out blocks: remove (addy `code-simplification` :152, r48 :338); also Sonar S125 (r48 :338) |
+| prose a rename, an extracted method or a type could replace | the rename, method or type, then no comment (CM3) | implementation code only needs comments when the code is nonobvious (Ousterhout and Martin, aposd-vs-clean-code, r48 :312) |
+| a non-obvious reason, outside constraint, contract, license or link | keep it (CM3) | keep "why" comments: they carry intent the code can't express (addy `code-simplification` :145, r48 :312); a comment is for important information not obvious from the code (Ousterhout, r48 :312) |
+| a factual claim | check it against the code; fix or delete it if false (CM4) | every comment is potential misinformation (Martin, aposd-vs-clean-code, r48 :319); run `/how` or `/why` on the named symbol when the claim is not obvious (pstack `comment-sicko` :26, r48 :319) |
+| a public interface method | a doc comment on its contract: nulls, errors, side effects (CM5) | a header comment describes the method's interface, all a caller needs (Ousterhout, r48 :326); doc comments that define a public API contract survive (pstack `comment-sicko` :19, r48 :326) |
+| a simple, obvious member or an override | no doc comment (CM5) | Javadoc is optional for simple, obvious members and not always present on an override (Google Java Style §7.3.1, §7.3.2, r48 :326) |
+| a lint or compiler suppression | the code fixed; a proven-safe one scoped to one declaration, with a comment saying why (CM7) | eliminate warnings; when the code is proven safe, suppress and comment on why it is safe (Effective Java Item 27, r48 :333); a suppression needs a comment explaining why the warning is safe to ignore (Error Prone `SuppressWarningsWithoutExplanation`, r48 :196) |
 
 `r48 :N` is the line in agent-factory `research/48-industry-recheck-code.md` that quotes the source, read at the
 commit it names.
@@ -162,9 +162,9 @@ CM7.)
 ## Decided edges
 
 - **Skip when** the suppression is a Java unchecked cast proven safe: TY10 (`types.md`) sets its form, on the smallest
-  declaration with a comment saying why (Effective Java Item 27, r48 :190). — **Do not skip when** the warning is
+  declaration with a comment saying why (Effective Java Item 27, r48 :196). — **Do not skip when** the warning is
   TypeScript `no-explicit-any`: type the value `unknown` and narrow it instead (NGA2, `angular-ui.md`;
-  typescript-eslint `no-explicit-any`, r48 :1247). — **Confidence** high
+  typescript-eslint `no-explicit-any`, r48 :1253). — **Confidence** high
 
 ## Review checks
 
