@@ -36,21 +36,21 @@ Contents: Rules · When X, use Y · Good / Bad (ER1, ER4, ER8, ER10) · Decided 
 
 | the code meets | use | why |
 |---|---|---|
-| a case the caller can foresee: not found, already exists, over limit | a case of a sealed return type (ER1) | return a `Result` when failure is expected (RUST) · never use exceptions for ordinary control flow (EJ §57) · exceptions as flow control obscure it (PMD ExceptionAsFlowControl) (r48 :390) |
-| a fault: a non-success the caller cannot foresee | an exception carrying a code from the one error catalogue (ER2) | a problem detail carries machine-readable details; consumers use its `type` (RFC9457) · every error response has one shape with a machine-readable `code` (ADDY api) (r48 :396) · avoid unnecessary checked exceptions (EJ §59) (r48 :397) |
-| an error response | a body every time (ER2), with a 4xx status for a client error and 500 for an unforeseen fault, never a 2xx (ERN1) | include details in the body of error responses (SPRING) (r48 :396) · 4xx for a client error, 5xx for an unforeseen bug (OWASP-EH) · 500 never exposes internal details (ADDY api) · the problem's status is the response's status (RFC9457) (r48 :437) |
-| an exception that must become an HTTP response | one global `@RestControllerAdvice` (ER11) | configure a global error handler (OWASP-EH) · one error strategy everywhere (ADDY api) · global handlers apply after local ones (SPRING ann-advice) (r48 :408) |
-| an error body | the catalogue message only; the detail goes to the server log (ER10) | a generic response; details logged server side (OWASP-EH) · no stack dump through the HTTP interface (RFC9457) · never expose stack traces or internal error details (ADDY security) (r48 :403) |
-| a caught exception that is rethrown | the caught exception passed as the cause (ER3) | pass the lower-level exception to the higher-level one (EJ §61) · the original stack trace could be lost (PMD PreserveStackTrace) · log it or pass it forward (SONAR S1166) · the stack trace restarts at the current method (NET) (r48 :413) |
-| a caught exception that is not rethrown | handle or log it; an empty block only with a comment saying why (ER3) | it is very rarely correct to do nothing (GJS §6.2) · don't ignore caught errors (CCJS) (r48 :413) · an empty catch explained in a comment is allowed (GJS §6.2, CS EmptyCatchBlock) (r48 :414) |
-| a `catch` clause | the narrowest type the `try` can raise (ER4) | catching `Exception`, `Error` or `RuntimeException` is almost never acceptable (CS IllegalCatch) · a generic catch can hide real problems; `Throwable` includes `OutOfMemoryError` (PMD) · `Throwable` or `Error` also catches `OutOfMemoryError` (SONAR S1181) · an `Error` is not for an application to catch (JDK) (r48 :418) |
-| an `InterruptedException` | a rethrow, or `Thread.currentThread().interrupt()` (ER5) | rethrow it or restore the interrupted status (JDK) · logging alone loses the interrupt (SONAR S2142) · interruption must be handled for correctness (GOOG EP) (r48 :423) |
-| a method that changes state and can fail | every check and computation before the first change (ERN2) | a failed call leaves the object as it was (EJ §64) · callers assume no side effects when an exception is thrown (NET) (r48 :438) |
-| request input | Bean Validation at the boundary, no second check inside (ER6) | trust the types inside; no re-validation (PS boundary-discipline) · validate at system edges, not between internal functions (ADDY api) · validate before processing or storage (OWASP-IV) (r48 :428) |
-| a best-effort metric or audit call that fails | catch, log at WARN with class and message (LG3, `../../obs/references/logging.md`), continue (ER8) | WARN is degraded but handled (ADDY observability) · WARN is more important than an informational event (OTEL) · typical responses are to log it (GJS §6.2) (r48 :433) |
+| a case the caller can foresee: not found, already exists, over limit | a case of a sealed return type (ER1) | return a `Result` when failure is expected (RUST) · never use exceptions for ordinary control flow (EJ §57) · exceptions as flow control obscure it (PMD ExceptionAsFlowControl) (r48 :396) |
+| a fault: a non-success the caller cannot foresee | an exception carrying a code from the one error catalogue (ER2) | a problem detail carries machine-readable details; consumers use its `type` (RFC9457) · every error response has one shape with a machine-readable `code` (ADDY api) (r48 :402) · avoid unnecessary checked exceptions (EJ §59) (r48 :403) |
+| an error response | a body every time (ER2), with a 4xx status for a client error and 500 for an unforeseen fault, never a 2xx (ERN1) | include details in the body of error responses (SPRING) (r48 :402) · 4xx for a client error, 5xx for an unforeseen bug (OWASP-EH) · 500 never exposes internal details (ADDY api) · the problem's status is the response's status (RFC9457) (r48 :443) |
+| an exception that must become an HTTP response | one global `@RestControllerAdvice` (ER11) | configure a global error handler (OWASP-EH) · one error strategy everywhere (ADDY api) · global handlers apply after local ones (SPRING ann-advice) (r48 :414) |
+| an error body | the catalogue message only; the detail goes to the server log (ER10) | a generic response; details logged server side (OWASP-EH) · no stack dump through the HTTP interface (RFC9457) · never expose stack traces or internal error details (ADDY security) (r48 :409) |
+| a caught exception that is rethrown | the caught exception passed as the cause (ER3) | pass the lower-level exception to the higher-level one (EJ §61) · the original stack trace could be lost (PMD PreserveStackTrace) · log it or pass it forward (SONAR S1166) · the stack trace restarts at the current method (NET) (r48 :419) |
+| a caught exception that is not rethrown | handle or log it; an empty block only with a comment saying why (ER3) | it is very rarely correct to do nothing (GJS §6.2) · don't ignore caught errors (CCJS) (r48 :419) · an empty catch explained in a comment is allowed (GJS §6.2, CS EmptyCatchBlock) (r48 :420) |
+| a `catch` clause | the narrowest type the `try` can raise (ER4) | catching `Exception`, `Error` or `RuntimeException` is almost never acceptable (CS IllegalCatch) · a generic catch can hide real problems; `Throwable` includes `OutOfMemoryError` (PMD) · `Throwable` or `Error` also catches `OutOfMemoryError` (SONAR S1181) · an `Error` is not for an application to catch (JDK) (r48 :424) |
+| an `InterruptedException` | a rethrow, or `Thread.currentThread().interrupt()` (ER5) | rethrow it or restore the interrupted status (JDK) · logging alone loses the interrupt (SONAR S2142) · interruption must be handled for correctness (GOOG EP) (r48 :429) |
+| a method that changes state and can fail | every check and computation before the first change (ERN2) | a failed call leaves the object as it was (EJ §64) · callers assume no side effects when an exception is thrown (NET) (r48 :444) |
+| request input | Bean Validation at the boundary, no second check inside (ER6) | trust the types inside; no re-validation (PS boundary-discipline) · validate at system edges, not between internal functions (ADDY api) · validate before processing or storage (OWASP-IV) (r48 :434) |
+| a best-effort metric or audit call that fails | catch, log at WARN with class and message (LG3, `../../obs/references/logging.md`), continue (ER8) | WARN is degraded but handled (ADDY observability) · WARN is more important than an informational event (OTEL) · typical responses are to log it (GJS §6.2) (r48 :439) |
 
 `r48` is agent-factory `research/48-industry-recheck-code.md` and `:N` its line, where the source is quoted with the
-repository path it was read at. Source keys are those of r48's source table (r48 :357-377).
+repository path it was read at. Source keys are those of r48's source table (r48 :363-383).
 
 ## Good / Bad
 
@@ -203,11 +203,11 @@ in the log. The method lives in the one global exception handler (ER11). (Real e
 ## Decided edges
 
 - **Skip when** the catch sits at a must-not-fail boundary, such as a best-effort metric or audit call: a broad catch
-  that logs at WARN and continues is allowed there, with a comment (ER4, ER8; WARN is degraded but handled, r48 :433).
+  that logs at WARN and continues is allowed there, with a comment (ER4, ER8; WARN is degraded but handled, r48 :439).
   — **Do not skip when** the block is empty or logs below WARN (ER8), the broad catch has no comment (ER4), or the
-  catch takes `Throwable` or `Error` (ER4; r48 :418). — **Confidence** high
+  catch takes `Throwable` or `Error` (ER4; r48 :424). — **Confidence** high
 - **Skip when** an empty catch carries a comment saying why doing nothing is safe (ER3; GJS §6.2 and CS EmptyCatchBlock,
-  r48 :414). — **Do not skip when** the catch wraps a best-effort metric or audit call: it logs at WARN (ER8), or when
+  r48 :420). — **Do not skip when** the catch wraps a best-effort metric or audit call: it logs at WARN (ER8), or when
   it catches `InterruptedException`: it rethrows or restores the flag (ER5). — **Confidence** high
 
 ## Review checks
