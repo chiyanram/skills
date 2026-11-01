@@ -16,7 +16,7 @@ approved Good/Bad pair, `references/examples/<name>.md` holds them all.
 | [concurrency](references/concurrency.md) | CC | you start threads, submit async work, call a remote service, retry, lock, or build a pool or a cache |
 | [design](references/design.md) | SEAM | you write or review an interface a caller depends on, or a method that implements one |
 | [errors](references/errors.md) | ER | you write or review a `throw`, a `catch`, an exception handler or request validation |
-| [java](references/java.md) | U4, JV, CV3 | you write or review Java production code |
+| [java](references/java.md) | U4, JV | you write or review Java production code |
 | [messaging](references/messaging.md) | MS | you write or review a message consumer, a scheduled job, or an operation that can run twice |
 | [security](references/security.md) | SE, SS | code takes outside input, stores or checks a secret, or touches the security filter chain, a guard, a token or a security test |
 | [services](references/services.md) | LY1–LY3 | you write or review a controller, a service, an interface or a use case that makes two calls |

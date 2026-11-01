@@ -23,7 +23,7 @@ What goes wrong: elapsed time is raw `long` subtraction of epoch millis, so the 
 
 **Good** (neutral)
 ```java
-final var chargeStart = clock.instant();
+final Instant chargeStart = clock.instant();
 final ChargeReply reply = paymentGateway.charge(chargeRequest(invoice, customerId));
 final var elapsed = Duration.between(chargeStart, clock.instant());
 log.info(
