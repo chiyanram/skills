@@ -29,6 +29,9 @@ No rule goes in without the operator's explicit yes and a row in `research/19-ap
 `research/00-reference-format.md`, then link the new file from its domain's `SKILL.md` router and from the table in
 `plugins/rulebook/README.md`; `check_routers.py` and `check_index.py` fail until you do.
 
+Read Sonar rules for calibration only. Never copy their text into a reference, because Sonar's source-available
+licence does not permit vendoring its rule text.
+
 ## Releases
 
 semantic-release cuts every release from the commits on `main` (`release.config.mjs`). Never bump a `version` or edit
