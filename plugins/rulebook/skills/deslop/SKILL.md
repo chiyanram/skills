@@ -105,13 +105,23 @@ path.)
 
 - **Skip when** callers sit outside the repo's control (a published API, stored data, a webhook URL): expand, migrate,
   then contract (ParallelChange) instead of one-change deletion (DS5). — **Do not skip when** every caller is in the
-  repo. — **Confidence** high (ledger X4 / DS5a, :535)
+  repo. — **Confidence** high (addy deprecation-and-migration :124, Strangler Pattern)
 - **Skip when** the value crosses a trust boundary, such as request input or a third-party response: validate it there
   (ER6, `../code/references/errors.md`). — **Do not skip when** the guarded value comes from an injected field or an
-  in-repo caller (DS8). — **Confidence** high (ledger ER6)
+  in-repo caller (DS8). — **Confidence** high (ctk :13; openclaw :15)
 
 ## Sources
 
-Rules: ledger `research/19-approved-rules.md` rows DS13, DS5, DS7, DS8, DS9. The categories come from openclaw
-`.agents/skills/deslop/SKILL.md` and ctk `skills/deslop/SKILL.md` (ledger DS13, DS8, DS9). Category rules point at
-their owner references and do not restate them (DS15); test shape cites U2 only.
+`openclaw` is openclaw `.agents/skills/deslop/SKILL.md`, `ctk` is cursor-team-kit `skills/deslop/SKILL.md`, and
+`addy <name>` is addy `skills/<name>/SKILL.md`; `:N` is the line.
+
+| rule | sources |
+|---|---|
+| DS13 | openclaw :12, :20, :24 · ctk :8, :20 |
+| DS5 | addy deprecation-and-migration :110 · openclaw :18 |
+| DS7 | addy code-review-and-quality :47 · addy code-simplification :152 · refactoring.guru Dead Code |
+| DS8 | ctk :13 · openclaw :15 |
+| DS9 | addy code-simplification :131, :133 · ctk :15 |
+
+The categories come from openclaw :14-19 and ctk :12-16. Category rules point at their owner references and do not
+restate them; test shape cites U2 only.
