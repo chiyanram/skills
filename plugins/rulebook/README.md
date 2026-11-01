@@ -77,7 +77,7 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 | [services](skills/code/references/services.md) | LY1–LY3 | you write or review a controller, a service, an interface or a use case that makes two calls |
 | [smells](skills/code/references/smells.md) | DS, FW, NM, SM | you write or review production code: the smell baseline, and the shape and naming rules behind it |
 | [spring](skills/code/references/spring.md) | LY6, LY7, SC, X6, SX | you write or review a bean, a configuration class, a settings record, a startup hook or a proxied method |
-| [types](skills/code/references/types.md) | TY | you write or review a field, parameter, return type, record, enum, sealed type or generic type |
+| [types](skills/code/references/types.md) | TY1–TY8, TY10–TY13, TYN1 | you write or review a field, parameter, return type, record, enum, sealed type or generic type |
 
 `make lint` fails when a reference is missing from these tables.
 

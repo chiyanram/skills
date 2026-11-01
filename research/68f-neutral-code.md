@@ -164,7 +164,7 @@ Why: `issue(customerId, orderId, …)` no longer compiles; the id records check 
 
 Evidence: `aruvii-agents/…/application/TaskService.java:29-30` @772736bf (Bad, real) · source 56a-g9b-good-bad-java-errors.md:172-205 · fix from 56a:184-205
 
-### TY9 — Strengthen a type only where partiality shows (a cast, a null check, a "never happens" throw)
+### TY12 — Parse external data into domain types in its adapter (pair moved from TY9)
 
 **Bad** (neutral)
 ```java
@@ -184,7 +184,7 @@ private int appendBetween(final List<String> whereParts,
     return index + 2;
 }
 ```
-What goes wrong: in the invoice search builder an `Object` stands in for "two due dates"; the `instanceof`, size check and `get(0)` are partiality.
+What goes wrong: in the invoice search builder an unparsed request value, an `Object`, stands in for "two due dates", so the `instanceof`, size check and `get(0)` run deep in the logic.
 
 **Good** (neutral)
 ```java
@@ -203,7 +203,7 @@ private int appendBetween(
     return index + 2;
 }
 ```
-Why: the check moves to where the filter is parsed, which builds `BetweenBounds` once; `appendIn` keeps its plain list, being total.
+Why: the filter value is parsed once into `BetweenBounds` where the request filter is read, so the SQL builder needs no cast and no size check.
 
 Evidence: `aruvii-tools/…/infrastructure/compiler/PickerCompiler.java:260-277` @772736bf (Bad, real) · source 56a-g9b-good-bad-java-errors.md:207-252 · fix from 56a:232-252
 
