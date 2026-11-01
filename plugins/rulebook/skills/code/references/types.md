@@ -41,20 +41,20 @@ Contents: Rules · When X, use Y · Good / Bad (TY1, TY3, TY12, TY8) · Decided 
 
 | the code has | use | why |
 |---|---|---|
-| a method that may have no result | an `Optional` return type (TY1) | `Optional` is meant for a return type where `null` "is likely to cause errors" (OpenJDK `Optional` apiNote, r48 :117) |
-| a field that may be absent and would pick a branch | a sealed case or an enum (TY1) | a boolean plus optionals lets contradictory states exist (pstack `typescript-best-practices` patterns.md :33, r48 :117) |
-| a closed set of cases | a sealed type or an enum, switched over arrow-form with every case and no `default` (TY2) | removing the default lets Error Prone enforce that every case stays handled (Error Prone `UnnecessaryDefaultInEnumSwitch`, r48 :124); `default` over a sealed type is almost never necessary (OpenJDK amber exhaustiveness guide, r48 :124) |
-| a record whose fields are legal only in some combinations | one record per legal shape under a sealed interface; the compact constructor for what the shapes cannot exclude (TY3) | build the shape so the illegal value cannot be constructed (pstack `typescript-best-practices` :16, r48 :131); invariants enforced by the constructor can be relied on (OpenJDK records-and-sealed note, r48 :131) |
-| external data: a request body, a row, config | a parse into domain types in its adapter (TY12) | have a parse function at every boundary (pstack `principle-type-system-discipline`, r48 :149); validate external data at system boundaries before use in logic (addy `code-review-and-quality` :75, r48 :149) |
-| a method whose type is a collection or an array | an empty one for "none", never `null` (TY7) | always return an empty array or collection instead (Effective Java Item 54, r48 :136); also Sonar S1168 (r48 :136) |
-| a method whose type is `Optional` | `Optional.empty()` for "none", never `null` (TYN1) | a variable of type `Optional` should never itself be `null` (OpenJDK `Optional` apiNote, r48 :202); also Sonar S2789 (r48 :202) |
-| two parameters of one primitive or `String` type that mean different things | one small wrapping record per meaning (TY8) | two arguments that share a primitive type but mean different things are branded (pstack `principle-type-system-discipline`, r48 :155); a primitive standing in for a domain concept gets its own small type (mattpocock `code-review` :49, r48 :155) |
-| a field | `final`, unless it is reassigned after construction (TY4) | make all fields final (Effective Java Item 17, r48 :161); also Sonar S9438 (r48 :161) |
-| an amount of money | `BigDecimal` built from a `String` or `valueOf`, or a `long` of minor units (TY5) | float and double are not suited for monetary calculations; use BigDecimal, int or long (Effective Java Item 60, r48 :169); `new BigDecimal(0.1)` is not exactly 0.1 (Error Prone `BigDecimalLiteralDouble`, r48 :169) |
-| a closed set of states, roles or modes | an enum, persisted by name (TY6) | `int` constants for enum types are obsolete (Effective Java Item 34, r48 :176); an ordinal is not stable across builds (Error Prone `EnumOrdinal`, r48 :176) |
-| an enum comparison | `==`, and a compile-time check on `equals` between unrelated types (TY11) | `equals` between incompatible types always returns false (Error Prone `EqualsIncompatibleType`, r48 :183); also Sonar S4551 (r48 :183) |
-| an unchecked warning | the generic type fixed; else `@SuppressWarnings("unchecked")` on the smallest declaration, with a comment saying why it is safe (TY10); any other suppression is CM7, `comments.md` | raw types will probably fail at runtime (Effective Java Item 26, r48 :190); suppress as close to the declaration as possible and comment on why it is safe (Effective Java Item 27, r48 :190) |
-| a simple value to construct | its record constructor or a static factory; a builder only for many optional parts (TY13) | static factories have names, and a builder suits a constructor with many arguments (Effective Java Items 1–2, r48 :197); also Sonar S6206 (r48 :197) |
+| a method that may have no result | an `Optional` return type (TY1) | `Optional` is meant for a return type where `null` "is likely to cause errors" (OpenJDK `Optional` apiNote, r48 :123) |
+| a field that may be absent and would pick a branch | a sealed case or an enum (TY1) | a boolean plus optionals lets contradictory states exist (pstack `typescript-best-practices` patterns.md :33, r48 :123) |
+| a closed set of cases | a sealed type or an enum, switched over arrow-form with every case and no `default` (TY2) | removing the default lets Error Prone enforce that every case stays handled (Error Prone `UnnecessaryDefaultInEnumSwitch`, r48 :130); `default` over a sealed type is almost never necessary (OpenJDK amber exhaustiveness guide, r48 :130) |
+| a record whose fields are legal only in some combinations | one record per legal shape under a sealed interface; the compact constructor for what the shapes cannot exclude (TY3) | build the shape so the illegal value cannot be constructed (pstack `typescript-best-practices` :16, r48 :137); invariants enforced by the constructor can be relied on (OpenJDK records-and-sealed note, r48 :137) |
+| external data: a request body, a row, config | a parse into domain types in its adapter (TY12) | have a parse function at every boundary (pstack `principle-type-system-discipline`, r48 :155); validate external data at system boundaries before use in logic (addy `code-review-and-quality` :75, r48 :155) |
+| a method whose type is a collection or an array | an empty one for "none", never `null` (TY7) | always return an empty array or collection instead (Effective Java Item 54, r48 :142); also Sonar S1168 (r48 :142) |
+| a method whose type is `Optional` | `Optional.empty()` for "none", never `null` (TYN1) | a variable of type `Optional` should never itself be `null` (OpenJDK `Optional` apiNote, r48 :208); also Sonar S2789 (r48 :208) |
+| two parameters of one primitive or `String` type that mean different things | one small wrapping record per meaning (TY8) | two arguments that share a primitive type but mean different things are branded (pstack `principle-type-system-discipline`, r48 :161); a primitive standing in for a domain concept gets its own small type (mattpocock `code-review` :49, r48 :161) |
+| a field | `final`, unless it is reassigned after construction (TY4) | make all fields final (Effective Java Item 17, r48 :167); also Sonar S9438 (r48 :167) |
+| an amount of money | `BigDecimal` built from a `String` or `valueOf`, or a `long` of minor units (TY5) | float and double are not suited for monetary calculations; use BigDecimal, int or long (Effective Java Item 60, r48 :175); `new BigDecimal(0.1)` is not exactly 0.1 (Error Prone `BigDecimalLiteralDouble`, r48 :175) |
+| a closed set of states, roles or modes | an enum, persisted by name (TY6) | `int` constants for enum types are obsolete (Effective Java Item 34, r48 :182); an ordinal is not stable across builds (Error Prone `EnumOrdinal`, r48 :182) |
+| an enum comparison | `==`, and a compile-time check on `equals` between unrelated types (TY11) | `equals` between incompatible types always returns false (Error Prone `EqualsIncompatibleType`, r48 :189); also Sonar S4551 (r48 :189) |
+| an unchecked warning | the generic type fixed; else `@SuppressWarnings("unchecked")` on the smallest declaration, with a comment saying why it is safe (TY10); any other suppression is CM7, `comments.md` | raw types will probably fail at runtime (Effective Java Item 26, r48 :196); suppress as close to the declaration as possible and comment on why it is safe (Effective Java Item 27, r48 :196) |
+| a simple value to construct | its record constructor or a static factory; a builder only for many optional parts (TY13) | static factories have names, and a builder suits a constructor with many arguments (Effective Java Items 1–2, r48 :203); also Sonar S6206 (r48 :203) |
 
 `r48 :N` is the line in agent-factory `research/48-industry-recheck-code.md` that quotes the source, read at the
 commit it names.
@@ -210,11 +210,11 @@ swap. (Real evidence: ledger row TY8.)
 
 - **Skip when** the code maps a wire DTO inside its adapter: a `null` check there is the parse (TY12). — **Do not skip
   when** the value has left the adapter: external data is untyped until it is parsed at the boundary (pstack
-  `principle-type-system-discipline`, r48 :149), so TY1 applies. — **Confidence** high
+  `principle-type-system-discipline`, r48 :155), so TY1 applies. — **Confidence** high
 - **Skip when** the switch is an old-style colon statement under a Checkstyle `MissingSwitchDefault` gate: that check
-  asks for a `default` there and skips switch expressions (r48 :125). — **Do not skip when** the switch can be written
+  asks for a `default` there and skips switch expressions (r48 :131). — **Do not skip when** the switch can be written
   arrow-form over a sealed type or an enum: write it so, with no `default` (TY2; Google Java Style §4.8.4.3 counts an
-  enum switch that covers every value as exhaustive, r48 :125). — **Confidence** medium
+  enum switch that covers every value as exhaustive, r48 :131). — **Confidence** medium
 
 ## Review checks
 
