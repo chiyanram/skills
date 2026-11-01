@@ -70,147 +70,115 @@ Operator preference, 2026-10-31 (SRC2), in whole or in part: TY3, TY7, TY9, TY12
 
 ### TY1 — No `null` decides a case
 
-**Bad** (neutral)
+**Bad** (from plinth-java-skills `141-java-refactoring-with-modern-features.md`:203, Example 3)
 ```java
-private final FraudCheck fraudCheck;
-
-OrderScreening(@Autowired(required = false) final FraudCheck fraudCheck) { this.fraudCheck = fraudCheck; }
-// …
-private Screening screen(final Order order, final boolean fraudCheckEnabled) {
-    final RuleVerdict rules = orderRules.assess(order);
-    // …
-    if (fraudCheckEnabled && fraudCheck != null) {
-        final List<FraudSignal> signals = fraudCheck.signalsFor(order);
-        // … merge, return
-    }
-    return new Screening(rules, List.of());
+public Address findShippingAddress(final String customerId) {
+    return addressesByCustomer.get(customerId);
 }
-```
-A `null` field and a boolean together choose the path. With the flag on and no fraud-check bean, the check is skipped
-in silence.
 
-**Good** (neutral)
+final Address address = addressBook.findShippingAddress(customerId);
+if (address == null) {
+    return Label.pickUpInStore();
+}
+return Label.shipTo(address);
+```
+The `null` return chooses the path. A caller that forgets the check compiles and fails at runtime.
+
+**Good** (from plinth-java-skills `141-java-refactoring-with-modern-features.md`:203, Example 3)
 ```java
-public enum FraudCheckMode { OFF, ON }
-
-private final OrderRules orderRules;
-private final ObjectProvider<FraudCheck> fraudCheck;
-
-private Screening screen(final Order order, final FraudCheckMode mode) {
-    final RuleVerdict ruleVerdict = orderRules.assess(order);
-    final List<FraudSignal> signals = switch (mode) {
-        case OFF -> List.of();
-        case ON -> fraudCheck.getObject().signalsFor(order);
-    };
-    return withSignals(ruleVerdict, signals);
+public Optional<Address> findShippingAddress(final String customerId) {
+    return Optional.ofNullable(addressesByCustomer.get(customerId));
 }
+
+return addressBook.findShippingAddress(customerId)
+        .map(Label::shipTo)
+        .orElseGet(Label::pickUpInStore);
 ```
-The flag is an enum the switch must name. "ON but no fraud-check bean" now fails loudly instead of skipping. (Real
-evidence: ledger row TY1.)
+The return type states that the address can be absent. The caller must handle both cases to get a `Label`.
 
 ### TY3 — Sealed variants exclude forbidden combinations
 
-**Bad** (neutral)
+**Bad** (from cursor-plugins pstack `principle-type-system-discipline/SKILL.md`:15)
 ```java
-if (request.pickupPointId() != null && !request.pickupPointId().isBlank()) {
-    saved = service.shipToPickupPoint(request.orderId(), request.pickupPointId(), request.note(), userId);
-} else if (request.street() != null && request.postcode() != null) {
-    saved = service.shipToAddress(request.orderId(), request.street(), request.postcode(),
-        request.note(), userId);
-} else {
-    throw new IllegalArgumentException("Either 'pickupPointId' or both 'street' + 'postcode' must be supplied");
-}
-```
-The request record has nullable fields, so every reader works out the two legal shapes again. "Street without
-postcode" still compiles.
+public record Delivery(boolean delivered, Instant deliveredAt) {}
 
-**Good** (neutral)
+final var delivery = new Delivery(true, null);
+```
+"Delivered, but at no time" compiles. Every reader must work out again which combinations are legal.
+
+**Good** (from cursor-plugins pstack `principle-type-system-discipline/SKILL.md`:15)
 ```java
-public sealed interface ShippingRequest {
-    record Pickup(
-            @NotNull UUID orderId,
-            @NotBlank String pickupPointId,
-            @Size(max = 500) String note) implements ShippingRequest {}
-    record Address(
-            @NotNull UUID orderId,
-            @NotBlank String street,
-            @NotBlank String postcode,
-            @Size(max = 500) String note) implements ShippingRequest {}
+public sealed interface Delivery {
+    record Pending() implements Delivery {}
+    record Delivered(Instant at) implements Delivery {}
+}
+
+static String describe(final Delivery delivery) {
+    return switch (delivery) {
+        case Delivery.Pending pending -> "on its way";
+        case Delivery.Delivered delivered -> "delivered at " + delivered.at();
+    };
 }
 ```
-"Pickup point, or street and postcode" is two records, so a forbidden mix cannot be built. The service switches over
-both, with no `default`. (Real evidence: ledger row TY3.)
+Each legal shape is its own record, so the forbidden mix cannot be built. The switch names both cases, with no
+`default`.
 
 ### TY8 — Wrap a primitive when same-typed values could swap
 
-**Bad** (neutral)
+**Bad** (from cursor-plugins pstack `principle-type-system-discipline/SKILL.md`:17)
 ```java
-public Invoice issue(final long orderId, final long customerId, final long issuedBy,
-                     final String note, final String notifyEmail) {
-```
-Three `long` ids and two `String`s in one signature. Any two ids can swap places at the caller, and the build stays
-green.
-
-**Good** (neutral)
-```java
-public record OrderId(long value) {}
-public record CustomerId(long value) {}
-public record UserId(long value) {}
-public sealed interface NotifyTarget {
-    record None() implements NotifyTarget {}
-    record Email(String address) implements NotifyTarget {}
+public void cancel(final String customerId, final String orderId) {
+    // …
 }
-public Invoice issue(
-        final OrderId orderId,
-        final CustomerId customerId,
-        final UserId issuedBy,
-        final String note,
-        final NotifyTarget notify) {
+
+orders.cancel(orderId, customerId);
 ```
-`issue(customerId, orderId, …)` no longer compiles. The id records check nothing, because the reason to wrap is the
-swap. (Real evidence: ledger row TY8.)
+Both ids are a `String`. The swapped call compiles, and the build stays green.
+
+**Good** (from cursor-plugins pstack `principle-type-system-discipline/SKILL.md`:17; plinth-java-skills
+`122-java-type-design.md`:241, Example 4)
+```java
+public record CustomerId(String value) {}
+public record OrderId(String value) {}
+
+public void cancel(
+        final CustomerId customerId,
+        final OrderId orderId) {
+    // …
+}
+```
+`orders.cancel(orderId, customerId)` no longer compiles. The records check nothing, because the reason to wrap is the
+swap.
 
 ### TY9 — Strengthen a type only where partiality shows
 
-**Bad** (neutral)
+**Bad** (from cursor-plugins pstack `principle-type-system-discipline/SKILL.md`:22)
 ```java
-private int appendBetween(final List<String> whereParts,
-                            final List<String> placeholderOrder,
-                            final Map<String, Object> placeholderValues,
-                            final int index,
-                            final String quotedColumn,
-                            final Object value) {
-    if (!(value instanceof List<?> bounds) || bounds.size() != 2) {
-        throw new IllegalArgumentException(
-            "BETWEEN operator on " + quotedColumn + " requires a 2-tuple value");
+public LineItem firstItem(final List<LineItem> items) {
+    if (items.isEmpty()) {
+        throw new IllegalStateException("an order always has an item");
     }
-    // … two placeholder names, the BETWEEN fragment …
-    placeholderValues.put(lowPlaceholder, bounds.get(0));
-    placeholderValues.put(highPlaceholder, bounds.get(1));
-    return index + 2;
+    return items.get(0);
 }
 ```
-An `Object` stands in for "two due dates". The `instanceof`, the size check and `get(0)` are partiality.
+The "never happens" throw marks partiality: the plain list is too weak for this operation.
 
-**Good** (neutral)
+**Good** (from cursor-plugins pstack `principle-type-system-discipline/SKILL.md`:16, :22)
 ```java
-record BetweenBounds(Object low, Object high) {}
+public record NonEmptyItems(LineItem first, List<LineItem> rest) {}
 
-private int appendBetween(
-        final WhereClause where,
-        final int index,
-        final String quotedColumn,
-        final BetweenBounds bounds) {
-    final String lowPlaceholder = FILTER_PLACEHOLDER_PREFIX + index;
-    final String highPlaceholder = FILTER_PLACEHOLDER_PREFIX + (index + 1);
-    where.add(quotedColumn + " BETWEEN :" + lowPlaceholder + " AND :" + highPlaceholder);
-    where.bind(lowPlaceholder, bounds.low());
-    where.bind(highPlaceholder, bounds.high());
-    return index + 2;
+public LineItem firstItem(final NonEmptyItems items) {
+    return items.first();
+}
+
+public BigDecimal total(final List<LineItem> items) {
+    return items.stream()
+            .map(LineItem::price)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
 }
 ```
-The check moves to where the filter is parsed, which builds `BetweenBounds` once. An operation that takes any list
-keeps its plain list, because it is total. (Real evidence: ledger row TY9.)
+A non-empty list is a first item plus the rest, so `firstItem` cannot fail. `total` has an answer for an empty list,
+so it keeps the plain list.
 
 ## Decided edges
 
