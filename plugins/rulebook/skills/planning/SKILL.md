@@ -1,6 +1,6 @@
 ---
 name: planning
-description: Use when you write or review a design, a plan or a build order before code exists, or when the build needs to change what a design approved. Lists each planning reference and when to read it.
+description: Use when you write or review a spec, its acceptance criteria, a design or a work item before any code exists. Lists each planning reference and when to read it.
 ---
 
 # Planning
@@ -11,4 +11,5 @@ approved Good/Bad pair, `references/examples/<name>.md` holds them all.
 
 | reference | rule IDs | read it when |
 |---|---|---|
+| [acceptance-criteria](references/acceptance-criteria.md) | GA1–GA6, CV1, AC7–AC10 | you write or review the acceptance criteria of a spec as Gherkin scenarios |
 | [program-design](references/program-design.md) | PD | you write or review a design's call trees, file trees, types and signatures, build slices and their proof, or change an approved design during the build phase |
