@@ -13,3 +13,4 @@ approved Good/Bad pair, `references/examples/<name>.md` holds them all.
 |---|---|---|
 | [acceptance-criteria](references/acceptance-criteria.md) | GA1–GA6, CV1, AC7–AC10 | you write or review the acceptance criteria of a spec as Gherkin scenarios |
 | [diagrams](references/diagrams.md) | DG | you draw or review a diagram in a design, a spec, a decision record, a Markdown doc, a chat reply or a change-request comment |
+| [spec-review](references/spec-review.md) | SR1–SR4, SR6 | you write, revise or review a spec or its design before the approval gate |
