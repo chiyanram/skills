@@ -1,7 +1,7 @@
 # Acceptance criteria
 
 How a work item's acceptance criteria are written as Gherkin scenarios in its spec: home, ids, tags, titles, steps and
-Outlines. Read it when you write or review the acceptance criteria of a spec.
+Outlines. Read it when you write or review the acceptance criteria of a spec as Gherkin scenarios.
 
 Contents: Rules · When X, use Y · Good / Bad (GA3–GA6, CV1, AC7–AC9) · Decided edges · Review checks
 

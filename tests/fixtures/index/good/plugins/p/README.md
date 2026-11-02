@@ -1,6 +1,5 @@
 # p
 
-| reference | read it when |
+| skill | read it when you |
 |---|---|
-| [alpha](skills/demo/references/alpha.md) | a |
-| [beta](skills/demo/references/beta.md) | b |
+| [demo](skills/demo/SKILL.md) | test the index check |

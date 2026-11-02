@@ -9,6 +9,8 @@ Read only the references the task needs. Each one holds Rules, When X use Y, Goo
 checks, so a writer reads it top to bottom and a reviewer starts at Review checks. Where a reference cannot hold every
 approved Good/Bad pair, `references/examples/<name>.md` holds them all.
 
-| reference | rule IDs | read it when |
+<!-- index: built by `make index` from each reference; do not edit by hand -->
+| reference | rule IDs | read it |
 |---|---|---|
-| [writing-references](references/writing-references.md) | SRC2 | you write or review a rule, a sources paragraph or a Good / Bad pair in any reference |
+| [writing-references](references/writing-references.md) | SRC2 | when you write or review a rule, a sources paragraph or a Good / Bad pair in any reference |
+<!-- /index -->

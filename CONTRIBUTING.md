@@ -39,15 +39,19 @@ flowchart TD
   prevents.
 - Good/Bad examples use a neutral domain, never a real project's names. The project-specific values stay in that
   project's `AGENTS.md`.
-- Add a new reference to its domain's `SKILL.md` router and to the table in
-  [`plugins/rulebook/README.md`](plugins/rulebook/README.md). An agent reaches a reference only through its router, and
-  a project's `AGENTS.md` points at it as "use the `<domain>` skill (rulebook plugin) and read its `<reference>`
-  reference". `make lint` fails until both rows exist.
+- Open a new reference with a title, then one paragraph that says what it covers and holds one sentence starting
+  "Read it when …" or "Read it before …". Run `make index`: it rebuilds the table in the domain's `SKILL.md` router
+  from each reference's rule IDs and that sentence. Never edit the table by hand. `make lint` fails while it is stale.
+  When two pull requests in one domain conflict on the table, take either side and run `make index` again.
+- An agent reaches a reference only through its router, and a project's `AGENTS.md` points at it as "use the
+  `<domain>` skill (rulebook plugin) and read its `<reference>` reference". A new domain also gets one row in
+  [`plugins/rulebook/README.md`](plugins/rulebook/README.md).
 
 ## Checks
 
 ```bash
-make lint   # frontmatter, one version, links, size budgets, packaging, README index, skill routers, claude plugin validate --strict
+make index  # rebuild each skill router's reference table
+make lint   # frontmatter, one version, links, size budgets, packaging, router index, skill routers, claude plugin validate --strict
 make test   # each check against its planted fixtures, and each review/ builder
 ```
 
@@ -62,7 +66,7 @@ every push to `main`.
 | `check_links.py` | a relative markdown link points at nothing |
 | `check_sizes.py` | root `AGENTS.md` reaches 200 lines, a rule is over 35 words, or an `AGENTS.md` chain is over 32 KiB |
 | `check_plugin.py` | a plugin is not under `plugins/`, has no README or icon, or the repo has no LICENSE |
-| `check_index.py` | a plugin README does not link every reference its skills ship |
+| `check_index.py` | a plugin README does not link every skill router, or a router's table differs from what `make index` builds |
 | `check_routers.py` | a skill folder ships references but has no `SKILL.md`, or its `SKILL.md` does not link each one |
 
 `make test` also checks `scripts/set_version.py`, which the release runs, and that `release.config.mjs` still matches

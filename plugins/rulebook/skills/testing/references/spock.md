@@ -1,7 +1,7 @@
 # Spock
 
-How to write interactions, data tables, shared state, cleanup and assertions in a Spock specification. Read it when
-you write or review a Spock spec, unit or integration.
+How to write interactions, data tables, shared state, cleanup and assertions in a Spock specification. Read it when you
+write or review a Spock spec, unit or integration: its interactions, data tables, shared state, cleanup or assertions.
 
 Contents: Rules · When X, use Y · Good / Bad (K1, K2, K11, K13, K19) · Decided edges · Review checks
 

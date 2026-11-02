@@ -1,8 +1,8 @@
 # LLM live tests
 
-How to test against a real model: what earns a live test, how the live job runs, what a live test may assert, and how
-an eval scores quality. Read it when you write or review a test that calls a real provider, or an eval. Tests with a
-fake model are in `llm-tests.md`; the tier decision is TM3 in `strategy.md`.
+How to test against a real model: what earns a live test, how the live job runs, what a live test may assert, and how an
+eval scores quality. Read it when you write or review a test that calls a real model provider, or an eval that scores
+model quality. Tests with a fake model are in `llm-tests.md`; the tier decision is TM3 in `strategy.md`.
 
 Contents: Rules · When X, use Y · Good / Bad (LT14, LT15, LT17) · Decided edges · Review checks
 

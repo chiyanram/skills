@@ -9,10 +9,12 @@ Read only the references the task needs. Each one holds Rules, When X use Y, Goo
 checks, so a writer reads it top to bottom and a reviewer starts at Review checks. Where a reference cannot hold every
 approved Good/Bad pair, `references/examples/<name>.md` holds them all.
 
-| reference | rule IDs | read it when |
+<!-- index: built by `make index` from each reference; do not edit by hand -->
+| reference | rule IDs | read it |
 |---|---|---|
-| [acceptance-criteria](references/acceptance-criteria.md) | GA1–GA6, CV1, AC7–AC10 | you write or review the acceptance criteria of a spec as Gherkin scenarios |
-| [diagrams](references/diagrams.md) | DG | you draw or review a diagram in a design, a spec, a decision record, a Markdown doc, a chat reply or a change-request comment |
-| [program-design](references/program-design.md) | PD | you write or review a design's call trees, file trees, types and signatures, build slices and their proof, or change an approved design during the build phase |
-| [spec-review](references/spec-review.md) | SR1–SR4, SR6 | you write, revise or review a spec or its design before the approval gate |
-| [writing-docs](references/writing-docs.md) | WD1, WD2, WD4, WD5, WD7 | you write or review a design, a spec, a guide or a README, or decide which spec a change updates |
+| [acceptance-criteria](references/acceptance-criteria.md) | GA1–GA6, CV1, AC7–AC10 | when you write or review the acceptance criteria of a spec as Gherkin scenarios |
+| [diagrams](references/diagrams.md) | DG1–DG6 | when you draw or review a diagram in a design, a spec, a decision record, a Markdown doc or a chat reply |
+| [program-design](references/program-design.md) | PD1–PD7 | when you write or review a design's call trees, file trees, types and signatures, or its build slices and their proof, or when the build phase needs to change what the design approved |
+| [spec-review](references/spec-review.md) | SR1–SR4, SR6 | when you write, revise or review a spec or a design before the approval gate |
+| [writing-docs](references/writing-docs.md) | WD1–WD2, WD4–WD5, WD7 | when you write or review a design, a spec, a guide or a README, or decide which spec a change updates |
+<!-- /index -->

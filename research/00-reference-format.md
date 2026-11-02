@@ -3,13 +3,14 @@
 Draft consolidated 2026-10-02 from decisions already taken. Each line cites where it was decided. G10 (#37) owns this file; its checklist and proof method are decided there.
 Amended 2026-10-17: Rule line (G21 #91), Good/Bad examples and location (G23 #93).
 Amended 2026-10-29: `references/examples/<topic>.md` holds every approved pair when a reference cannot (operator, #31).
+Amended 2026-11-02: the router table is built by `make index` from each reference (agent-factory#46).
 
 ## Where a reference sits
 
 ```
 chiyanram/skills  (plugin marketplace — generic, installed as a plugin, never copied)
 ├── <domain>/                            knowledge skill: testing · code · obs · migrations · delivery · planning
-│   ├── SKILL.md                         router: frontmatter + "which reference to load" table, nothing else
+│   ├── SKILL.md                         router: frontmatter + "which reference to load" table (`make index`)
 │   ├── references/<topic>.md            ← THIS TEMPLATE (neutral-domain examples)
 │   ├── references/examples/<topic>.md   every approved Good/Bad pair, when the reference cannot hold them all
 │   └── scripts/                         mechanical checks the references name
@@ -25,6 +26,11 @@ agent-platform  (Aruvii only)
 The plugin's exact directory layout is build work (skills #99, map #9 G24). Sources: G1 (#5, 4 layers), #643 design
 (hybrid: workflows flat, knowledge in domains), G5 (#13, one file per topic), G1b skills #72 (`.claude/rules/` deleted →
 nested AGENTS.md), G23 #93 (generic vs project; crq is generic).
+
+## Above the five sections
+
+A title, then one paragraph: what the reference covers, and one sentence starting "Read it when …" or "Read it
+before …". `make index` copies that sentence and the rule IDs into the domain router's table (agent-factory#46).
 
 ## The five sections, in this order
 

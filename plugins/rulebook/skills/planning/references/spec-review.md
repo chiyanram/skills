@@ -1,7 +1,7 @@
 # Spec review
 
-How a reviewer checks a spec and its design before the approval gate: one round, cited claims, no open question
-without a decider, and complete stories. Read it when you write, revise or review a spec or a design.
+How a reviewer checks a spec and its design before the approval gate: one round, cited claims, no open question without
+a decider, and complete stories. Read it when you write, revise or review a spec or a design before the approval gate.
 
 Contents: Rules · When X, use Y · Good / Bad (SR2, SR3, SR4) · Decided edges · Review checks
 

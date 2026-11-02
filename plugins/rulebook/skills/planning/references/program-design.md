@@ -1,8 +1,8 @@
 # Program design
 
 How a design shows the shape of the code before anyone writes it: call trees, file trees, types and signatures, the
-build order and the proof of each step. Read it when you write or review a design, or when the build phase needs to
-change what the design approved.
+build order and the proof of each step. Read it when you write or review a design's call trees, file trees, types and
+signatures, or its build slices and their proof, or when the build phase needs to change what the design approved.
 
 Contents: Rules · When X, use Y · Good / Bad (PD1–PD5) · Decided edges · Review checks
 
