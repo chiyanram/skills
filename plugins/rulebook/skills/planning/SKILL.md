@@ -15,3 +15,4 @@ approved Good/Bad pair, `references/examples/<name>.md` holds them all.
 | [diagrams](references/diagrams.md) | DG | you draw or review a diagram in a design, a spec, a decision record, a Markdown doc, a chat reply or a change-request comment |
 | [program-design](references/program-design.md) | PD | you write or review a design's call trees, file trees, types and signatures, build slices and their proof, or change an approved design during the build phase |
 | [spec-review](references/spec-review.md) | SR1–SR4, SR6 | you write, revise or review a spec or its design before the approval gate |
+| [writing-docs](references/writing-docs.md) | WD1, WD2, WD4, WD5, WD7 | you write or review a design, a spec, a guide or a README, or decide which spec a change updates |
