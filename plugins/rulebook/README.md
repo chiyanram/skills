@@ -101,6 +101,7 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 
 | reference | rule IDs | read it when |
 |---|---|---|
+| [acceptance-criteria](skills/planning/references/acceptance-criteria.md) | GA1–GA6, CV1, AC7–AC10 | you write or review the acceptance criteria of a spec as Gherkin scenarios |
 | [writing-docs](skills/planning/references/writing-docs.md) | WD1, WD2, WD4, WD5, WD7 | you write or review a design, a spec, a guide or a README, or decide which spec a change updates |
 
 ## Where a rule comes from
