@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.19.0](https://github.com/chiyanram/skills/compare/rulebook--v0.18.0...rulebook--v0.19.0) (2026-11-02)
+
+### Features
+
+* **planning:** program-design reference from industry sources ([#194](https://github.com/chiyanram/skills/issues/194)) ([7dee76f](https://github.com/chiyanram/skills/commit/7dee76f11a9f83fa5f25611dec6b9f96d39bce99)), closes [agent-factory#33](https://github.com/chiyanram/agent-factory/issues/33)
+
 ## [0.18.0](https://github.com/chiyanram/skills/compare/rulebook--v0.17.0...rulebook--v0.18.0) (2026-11-02)
 
 ### Features
