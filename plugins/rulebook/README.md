@@ -97,6 +97,12 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 | [metrics](skills/obs/references/metrics.md) | MX1–MX3, MX5, MXN1–MXN3 | you write or review a meter, a tag, a timer or histogram setting, or the metrics of an endpoint, an outbound dependency, a pool, a queue or a job |
 | [tracing](skills/obs/references/tracing.md) | TR1–TR3, TR5, TRN1–TRN3 | you write or review a span or observation, a message producer or consumer, a thread hand-off, or the tracing configuration |
 
+## Planning references
+
+| reference | rule IDs | read it when |
+|---|---|---|
+| [spec-review](skills/planning/references/spec-review.md) | SR1–SR4, SR6 | you write, revise or review a spec or its design before the approval gate |
+
 ## Where a rule comes from
 
 Each rule has a source. A rule goes in only after the operator says yes; the
