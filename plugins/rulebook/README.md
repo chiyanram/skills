@@ -3,7 +3,7 @@
 Generic engineering rules for coding agents. The agent that writes the code and the agent that reviews it read the same
 file. Project-specific values (commands, paths, module names) stay in each project's own `AGENTS.md`.
 
-Each domain is one skill: `testing`, `code`, `migrations` and `obs`. Its `SKILL.md` lists every reference in the
+Each domain is one skill: `testing`, `code`, `migrations`, `obs`, `planning` and `meta`. Its `SKILL.md` lists every reference in the
 domain and when to read it, and the agent opens only the references the task needs. From a project's nested
 `AGENTS.md`, point at a reference by name, never by path, because the plugin's install folder differs per machine and
 per version:
@@ -96,6 +96,12 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 | [logging](skills/obs/references/logging.md) | LG1–LG6, LG8, LGN1 | you write or review a log call, a logger field, a `catch` that logs, or the logging configuration |
 | [metrics](skills/obs/references/metrics.md) | MX1–MX3, MX5, MXN1–MXN3 | you write or review a meter, a tag, a timer or histogram setting, or the metrics of an endpoint, an outbound dependency, a pool, a queue or a job |
 | [tracing](skills/obs/references/tracing.md) | TR1–TR3, TR5, TRN1–TRN3 | you write or review a span or observation, a message producer or consumer, a thread hand-off, or the tracing configuration |
+
+## Meta references
+
+| reference | rule IDs | read it when |
+|---|---|---|
+| [writing-references](skills/meta/references/writing-references.md) | SRC2 | you write or review a rule, a sources paragraph or a Good / Bad pair in any reference |
 
 ## Where a rule comes from
 
