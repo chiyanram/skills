@@ -3,6 +3,14 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.20.0](https://github.com/chiyanram/skills/compare/rulebook--v0.19.0...rulebook--v0.20.0) (2026-11-02)
+
+### Features
+
+* **meta:** writing-references reference from industry sources ([#197](https://github.com/chiyanram/skills/issues/197)) ([314a934](https://github.com/chiyanram/skills/commit/314a9349bdab212164f6f8d7bdc106ec01f871ac)), closes [agent-factory#33](https://github.com/chiyanram/agent-factory/issues/33)
+* **planning:** diagrams reference from industry sources ([#195](https://github.com/chiyanram/skills/issues/195)) ([b4b67ff](https://github.com/chiyanram/skills/commit/b4b67ff7fa6a329673b00dabbd42900fa2847414)), closes [agent-factory#33](https://github.com/chiyanram/agent-factory/issues/33)
+* **planning:** writing-docs reference from industry sources ([#196](https://github.com/chiyanram/skills/issues/196)) ([519f082](https://github.com/chiyanram/skills/commit/519f08256f89db537408b15f94015c6152afd97b)), closes [agent-factory#33](https://github.com/chiyanram/agent-factory/issues/33)
+
 ## [0.19.0](https://github.com/chiyanram/skills/compare/rulebook--v0.18.0...rulebook--v0.19.0) (2026-11-02)
 
 ### Features
