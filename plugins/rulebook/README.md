@@ -3,7 +3,7 @@
 Generic engineering rules for coding agents. The agent that writes the code and the agent that reviews it read the same
 file. Project-specific values (commands, paths, module names) stay in each project's own `AGENTS.md`.
 
-Each domain is one skill: `testing`, `code`, `migrations` and `obs`. Its `SKILL.md` lists every reference in the
+Each domain is one skill: `testing`, `code`, `migrations`, `obs`, `planning` and `meta`. Its `SKILL.md` lists every reference in the
 domain and when to read it, and the agent opens only the references the task needs. From a project's nested
 `AGENTS.md`, point at a reference by name, never by path, because the plugin's install folder differs per machine and
 per version:
@@ -106,6 +106,12 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 | [program-design](skills/planning/references/program-design.md) | PD | you write or review a design's call trees, file trees, types and signatures, build slices and their proof, or change an approved design during the build phase |
 | [spec-review](skills/planning/references/spec-review.md) | SR1–SR4, SR6 | you write, revise or review a spec or its design before the approval gate |
 | [writing-docs](skills/planning/references/writing-docs.md) | WD1, WD2, WD4, WD5, WD7 | you write or review a design, a spec, a guide or a README, or decide which spec a change updates |
+
+## Meta references
+
+| reference | rule IDs | read it when |
+|---|---|---|
+| [writing-references](skills/meta/references/writing-references.md) | SRC2 | you write or review a rule, a sources paragraph or a Good / Bad pair in any reference |
 
 ## Where a rule comes from
 
