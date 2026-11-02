@@ -103,6 +103,7 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 |---|---|---|
 | [acceptance-criteria](skills/planning/references/acceptance-criteria.md) | GA1–GA6, CV1, AC7–AC10 | you write or review the acceptance criteria of a spec as Gherkin scenarios |
 | [program-design](skills/planning/references/program-design.md) | PD | you write or review a design's call trees, file trees, types and signatures, build slices and their proof, or change an approved design during the build phase |
+| [spec-review](skills/planning/references/spec-review.md) | SR1–SR4, SR6 | you write, revise or review a spec or its design before the approval gate |
 
 ## Where a rule comes from
 
