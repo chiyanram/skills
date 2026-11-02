@@ -97,6 +97,12 @@ ID. When a reference cannot fit every approved pair, the rest sit in `references
 | [metrics](skills/obs/references/metrics.md) | MX1–MX3, MX5, MXN1–MXN3 | you write or review a meter, a tag, a timer or histogram setting, or the metrics of an endpoint, an outbound dependency, a pool, a queue or a job |
 | [tracing](skills/obs/references/tracing.md) | TR1–TR3, TR5, TRN1–TRN3 | you write or review a span or observation, a message producer or consumer, a thread hand-off, or the tracing configuration |
 
+## Planning references
+
+| reference | rule IDs | read it when |
+|---|---|---|
+| [acceptance-criteria](skills/planning/references/acceptance-criteria.md) | GA1–GA6, CV1, AC7–AC10 | you write or review the acceptance criteria of a spec as Gherkin scenarios |
+
 ## Meta references
 
 | reference | rule IDs | read it when |
