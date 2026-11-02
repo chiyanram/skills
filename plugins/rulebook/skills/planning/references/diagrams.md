@@ -1,0 +1,152 @@
+# Diagrams
+
+Which form a diagram takes, what it names, and where it lives. Read it when you draw or review a diagram in a design,
+a spec, a decision record, a Markdown doc or a chat reply.
+
+Contents: Rules · When X, use Y · Good / Bad (DG2, DG3, DG5) · Decided edges · Review checks
+
+## Rules
+
+- **DG1** — Draw a diagram in a committed Markdown file as a `mermaid` fence, and a diagram in chat or a
+  terminal as plain fenced text, because a terminal shows Mermaid source as raw text.
+- **DG2** — Draw a call tree or file tree in a design as fenced `diff` text; use Mermaid for component, sequence,
+  state, entity-relationship and class diagrams, because boxes and arrows cannot mark new or removed calls.
+- **DG3** — Label each node with a class, module, table or endpoint name that a search finds on the main branch,
+  except `+` lines in a design diff, because a node naming deleted code teaches replaced behaviour.
+- **DG4** — Make each diagram answer one question from the When X, use Y table, and draw a second diagram for a second
+  question, because a diagram that answers several questions serves none of its readers.
+- **DG5** — Give a diagram at most a one-line caption; when it needs more prose to be understood, redraw it smaller,
+  because a diagram that needs a paragraph does not show its point.
+- **DG6** — Put a diagram in the decision record, spec or design doc it illustrates, never in a standalone diagrams
+  file, because a separate diagrams file is not linked from the decision it shows.
+
+## When X, use Y
+
+| the diagram answers | use | why |
+|---|---|---|
+| which components call which | a Mermaid `flowchart` (DG2) | show-me :47; html-report :63 |
+| in which order messages pass between parts | a Mermaid `sequenceDiagram` (DG2) | show-me :47 |
+| which states one thing moves through | a Mermaid `stateDiagram-v2` (DG2) | operator preference |
+| which tables relate, and how | a Mermaid `erDiagram` (DG2) | operator preference |
+| which types extend or hold which | a Mermaid `classDiagram` (DG2) | operator preference |
+| which calls a change adds or removes | a fenced `diff` call tree (DG2) | show-me :59, :85 |
+| which files a change adds, moves or removes | a fenced `diff` file tree (DG2) | show-me :59 |
+
+| the diagram sits in | use | why |
+|---|---|---|
+| a committed Markdown file | a `mermaid` fence, or a `diff` fence for a tree (DG1, DG2) | GitHub diagrams; pr :47 |
+| a chat reply or a terminal | plain fenced text (DG1) | pr :47; explainer :40 |
+| a doc that one decision, spec or design owns | that doc, next to the text it supports (DG6) | show-me :126 |
+
+`show-me` is humanlayer-skills `plugins/show-me/skills/show-me/SKILL.md`, `pr` is mattpocock
+`docs/engineering/pr.md`, `html-report` is mattpocock `skills/engineering/improve-codebase-architecture/HTML-REPORT.md`,
+`teach` is pstack `skills/teach/SKILL.md` and `explainer` is pstack `skills/how/references/explainer-prompt.md`; `:N`
+is the line. `GitHub diagrams` is GitHub Docs, "Creating diagrams", §About creating diagrams. DG4 rests on show-me :126
+and teach :17. DG5 rests on html-report :55 and show-me :126.
+
+Operator preference, 2026-10-31 (SRC2), in whole or in part: DG1, DG2, DG3 and DG6.
+
+## Good / Bad
+
+### DG2 — A call tree that a design changes is a `diff`
+
+**Bad** (neutral)
+```mermaid
+flowchart TD
+    A["LoanController.borrow"] --> B["LoanService.borrow"]
+    B --> C["CopyRepository.reserve"]
+    B --> D["HoldQueue.release"]
+    B --> E["LoanNotifier.sendDueDate"]
+```
+The design adds `HoldQueue.release` and removes `FinePolicy.check`. The chart shows neither change.
+
+**Good** (from humanlayer-skills plugins/show-me/skills/show-me/SKILL.md:85)
+```diff
+ LoanController.borrow
+   LoanService.borrow
+-    FinePolicy.check
+     CopyRepository.reserve
++    HoldQueue.release
+     LoanNotifier.sendDueDate
+```
+The `-` and `+` marks show what the design removes and adds. Indent shows who calls whom.
+
+### DG3 — Each label is a name the code has
+
+**Bad** (neutral)
+```mermaid
+flowchart LR
+    A["Borrow flow"] --> B["Lending engine"]
+    B --> C["Fine checker"]
+    B --> D["Mailer"]
+```
+No label is a name in the code. The fine check was removed, and a search cannot show that the box is stale.
+
+**Good** (neutral)
+```mermaid
+flowchart LR
+    A["LoanController"] --> B["LoanService"]
+    B --> C["CopyRepository"]
+    B --> D["LoanNotifier"]
+    C --> E[("copies")]
+```
+A search on the main branch finds each class and the `copies` table. A deleted name fails that search.
+
+### DG5 — Redraw the diagram instead of explaining it
+
+**Bad** (neutral)
+```mermaid
+sequenceDiagram
+    LoanService->>CopyRepository: reserve
+    LoanService->>HoldQueue: release
+    LoanService->>LoanNotifier: sendDueDate
+```
+Its caption is a paragraph: borrow a copy. `release` runs only when the copy had a hold. When it had none, the
+service skips that call and goes on to `sendDueDate`.
+
+**Good** (neutral)
+```mermaid
+sequenceDiagram
+    LoanService->>CopyRepository: reserve
+    alt the copy had a hold
+        LoanService->>HoldQueue: release
+    end
+    LoanService->>LoanNotifier: sendDueDate
+```
+Caption: borrow a copy. The `alt` block shows the condition, so the paragraph goes.
+
+## Decided edges
+
+- **Skip when** the diagram is a call tree or file tree in a committed Markdown file: it is a `diff` fence, not a
+  `mermaid` fence (DG2 over DG1). — **Do not skip when** it is a component, sequence, state, entity-relationship or
+  class diagram: it is a `mermaid` fence (DG1). — **Confidence** high
+- **Skip when** the diagram shows which components call which, and the change adds or removes no call: a Mermaid
+  `flowchart` is right (html-report :63). — **Do not skip when** the design adds, removes or moves a call: draw a
+  `diff` call tree (DG2). — **Confidence** medium
+- **Skip when** a node names an actor outside the code, such as a user or an outside service: name its role. Skip also
+  for a `+` line in a design diff (DG3). — **Do not skip when** a node names a part of the code with a description
+  instead of its name. — **Confidence** medium
+- **Skip when** a sequence diagram shows the failure branch of the same flow in an `alt` block: it is still one
+  question (DG4). — **Do not skip when** a second request, flow or actor's view enters the same diagram: draw it
+  apart. — **Confidence** medium
+- **Skip when** the text around the diagram is the doc's own argument, such as a decision record's reasons: DG5 bounds
+  the caption, not the doc. — **Do not skip when** the text explains what a box, arrow or branch means: redraw the
+  diagram. — **Confidence** high
+- **Skip when** one diagram serves several docs: put it in the doc that owns the decision and link it from the others
+  (DG6). — **Do not skip when** the diagram would sit in a file that holds only diagrams. — **Confidence** high
+
+## Review checks
+
+Walk every diagram that the change adds or edits, in every Markdown file, design, spec, decision record and comment.
+
+- [ ] DG1 — A diagram in a committed `.md` file that is plain text and not a tree is a finding. A `mermaid` fence in a
+  chat reply is a finding.
+- [ ] DG2 — A call tree or file tree in a design drawn as a Mermaid chart is a finding. A component, sequence, state,
+  entity-relationship or class diagram drawn as plain text in a committed file is a finding.
+- [ ] DG3 — Search the main branch for each node label. A label that matches no class, module, table or endpoint is
+  a finding, unless it is a `+` line in a design diff or an outside actor.
+- [ ] DG4 — Name the one question each diagram answers, from the When X, use Y table. A diagram with two questions is
+  a finding.
+- [ ] DG5 — A caption longer than one line, or prose that explains a box, arrow or branch, is a finding: ask for a
+  smaller diagram.
+- [ ] DG6 — A diagram in a file that holds only diagrams, or in a doc other than the one it illustrates, is a finding.

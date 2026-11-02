@@ -1,0 +1,14 @@
+---
+name: planning
+description: Use when you write or review a spec, a design, a decision record or a diagram in one of them, before code exists. Lists each planning reference and when to read it.
+---
+
+# Planning
+
+Read only the references the task needs. Each one holds Rules, When X use Y, Good / Bad, Decided edges and Review
+checks, so a writer reads it top to bottom and a reviewer starts at Review checks. Where a reference cannot hold every
+approved Good/Bad pair, `references/examples/<name>.md` holds them all.
+
+| reference | rule IDs | read it when |
+|---|---|---|
+| [diagrams](references/diagrams.md) | DG | you draw or review a diagram in a design, a spec, a decision record, a Markdown doc, a chat reply or a change-request comment |
