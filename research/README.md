@@ -14,6 +14,7 @@ was looked at, what was decided and why.
 | [69-llm-testing-in-agent-sdks.md](69-llm-testing-in-agent-sdks.md) | how 10 agent SDKs and Spring repos test LLM features: fakes, recordings, real-model tests, evals; candidates LT1–LT18 (R40, #131) |
 | [70-agent-scenario-tests.md](70-agent-scenario-tests.md) | how to test each agent scenario at each tier (unit, IT, smoke, live), what the references live-test and why, Aruvii's proposed tests; candidates LS1–LS20 (R41, #153) |
 | [71-llm-testing-good-bad.md](71-llm-testing-good-bad.md) | neutral Good/Bad pairs for the LLM-testing rules (LT1–LT11, LS1–LS10), each beside the reference project's own test code (G34, #133) |
+| [72-planning-sources.md](72-planning-sources.md) | two-source audit (SRC2) of the 36 planning and meta rules T3 writes: verdict, sources at `path:line@sha`, wording, what stays preference (agent-factory#33) |
 | [64-core-design.md](64-core-design.md) | the core design from first principles, with the *why* of each reference repo in `64a`–`64e` |
 | [repos/INDEX.md](repos/INDEX.md) | one deep report per reference repo: mattpocock, pstack, superpowers, addyosmani, openclaw and others |
 
