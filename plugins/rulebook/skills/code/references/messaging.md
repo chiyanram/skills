@@ -55,9 +55,9 @@ both runs cancel.
 @Transactional
 public CancelOutcome cancel(final CancelRequest request) {
     lockOrder(request.orderId());
-    return cancellationPort.findCompletedByOrderId(request.orderId())
-            .<CancelOutcome>map(CancelOutcome.AlreadyCancelled::new)
-            .orElseGet(() -> cancelLocked(request));
+    final CancelPlan plan = CancelPolicy.plan(cancellationPort.stateOf(request.orderId()), request);
+    plan.writes().forEach(cancellationWriter::apply);
+    return plan.outcome();
 }
 
 private void lockOrder(final UUID orderId) {
@@ -65,6 +65,7 @@ private void lockOrder(final UUID orderId) {
 }
 ```
 The row lock makes a second run wait and then see COMPLETED; one transaction means a crash leaves nothing to reconcile.
+`CancelPolicy.plan` decides with no I/O, and `cancel` only locks, reads, writes the plan and returns (SEAM1).
 
 ## Decided edges
 

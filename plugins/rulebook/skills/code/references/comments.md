@@ -127,8 +127,7 @@ function trackingNumber(payload: unknown): string | undefined {
 
 ## Review checks
 
-Walk every comment, Javadoc block and suppression that the change adds or edits, in every file type. CM6 is a
-review check only, not an author rule.
+Walk every comment, Javadoc block and suppression that the change adds or edits, in every file type.
 
 - [ ] CM1 — A banner or divider comment (`grep -nE "(//|#|/\*|<!--) *([=*#-]){4,}|(//|#) *-{2,} .+ -{2,}"`) is a
   finding.
@@ -144,5 +143,3 @@ review check only, not an author rule.
 - [ ] CM7 — For each suppression (`grep -nE "eslint-disable|@ts-expect-error|@ts-ignore|@SuppressWarnings|NOSONAR"`),
   look up the rule. A suppressed correctness warning the code could fix is a finding, and so is a suppression wider
   than one declaration or with no comment saying why.
-- [ ] CM6 — A long justification comment is a finding: ask for a reshape or the reason the code cannot say (CM3),
-  because a long justification usually defends a branch that should be deleted.

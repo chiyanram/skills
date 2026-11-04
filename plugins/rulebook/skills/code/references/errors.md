@@ -86,21 +86,27 @@ public sealed interface CancelResult {
         return Optional.empty();
     }
 }
+public sealed interface OrderLookup {
+    record Found(Order order) implements OrderLookup {}
+    record Missing(OrderId id) implements OrderLookup {}
+}
 public CancelResult cancel(final OrderId id) {
-    final CancelResult result = orders.findById(id)
-            .map(OrderService::decideCancel)
-            .orElseGet(() -> new CancelResult.NotFound(id));
+    final CancelResult result = decideCancel(orders.lookup(id));
     result.changed().ifPresent(orders::save);
     return result;
 }
-static CancelResult decideCancel(final Order order) {
-    return order.isShipped()
-            ? new CancelResult.AlreadyShipped(order.id())
-            : new CancelResult.Cancelled(order.cancelled());
+static CancelResult decideCancel(final OrderLookup lookup) {
+    return switch (lookup) {
+        case OrderLookup.Missing missing -> new CancelResult.NotFound(missing.id());
+        case OrderLookup.Found found when found.order().isShipped() ->
+                new CancelResult.AlreadyShipped(found.order().id());
+        case OrderLookup.Found found -> new CancelResult.Cancelled(found.order().cancelled());
+    };
 }
 ```
 Each foreseeable case is in the return type, so the caller's `switch` must name all three. A database fault still
-throws. `decideCancel` does no I/O, and `cancel` only reads and saves what the decision changed (SEAM1, `design.md`).
+throws. `decideCancel` makes every choice, absence included, and does no I/O; `cancel` only reads and saves what
+the decision changed (SEAM1, `design.md`).
 
 ### ER4 — Catch the narrowest type
 
