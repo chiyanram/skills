@@ -3,7 +3,7 @@
 Which tier a test belongs in, what it may fake, and what it asserts. Read it when you choose where a new test goes,
 when you fix a bug, or when you review the tier and the doubles of a changed test.
 
-Contents: Rules · When X, use Y · Good / Bad (S1, S2, TM1, TM2, S3, S5) · Decided edges · Review checks
+Contents: Rules · When X, use Y · Good / Bad (S1, S2, TM1, TM2, S5) · Decided edges · Review checks
 
 ## Rules
 
@@ -23,6 +23,8 @@ Contents: Rules · When X, use Y · Good / Bad (S1, S2, TM1, TM2, S3, S5) · Dec
   seen only after the change cannot be told from one already red.
 - **S4** — Start a bug fix with a test that fails for the bug's reason, landed before the fix in the MR, because a
   regression test that never failed proves the mock, not the fix.
+- **S6** — Run a bug fix's failing test locally, before you push, and paste its command and failure output in the pull
+  request, because a red run sent to CI costs minutes and proves no more.
 
 ## When X, use Y
 
@@ -38,9 +40,14 @@ Contents: Rules · When X, use Y · Good / Bad (S1, S2, TM1, TM2, S3, S5) · Dec
 | an IT or smoke spec reaches the LLM | a scripted fake model | we do not own it (TM2) · ledger :38 |
 | an IT or smoke spec reaches third-party HTTP | WireMock at the wire, or the vendor's container sandbox when it ships one (IT5) | we do not own it (TM2) · ledger :38 |
 | an IT or smoke spec reaches our own service, repository or Redis consumer | the real one | a fake of our own code leaves its real query untested (TM2) · ledger :38 |
+| a bug fix's failing test | run it locally first, then paste its command and failure in the pull request (S6) | the red run is a cheap local target, run before the fix (pstack `tdd` :3, :18); one command, already run, in seconds (mattpocock `diagnosing-bugs` :59, :63) · ledger :681 |
 
 Ledger is `research/19-approved-rules.md` in this repo; plinth `321`, `322` and `058` are the pinned plinth-java-skills
 files of those numbers; `:N` is a line.
+`pstack` is cursor/plugins `pstack/skills/tdd/SKILL.md`; `mattpocock` is mattpocock/skills
+`skills/engineering/diagnosing-bugs/SKILL.md`.
+
+Operator preference, 2026-11-04 (SRC2), in whole or in part: S6.
 
 ## Good / Bad
 
@@ -199,28 +206,6 @@ An IT fakes our own repository, which our database backs, so its real query is n
 ```
 Only the payment gateway and the fraud-check service are faked, at the wire; our services, repositories and Postgres run for real. (Real evidence: ledger row TM2.)
 
-### S3 — Run the existing tests before changing code
-
-**Bad** (neutral)
-```text
-./mvnw -pl orders-api -am -Dtest='InvoiceServiceTest+OrderServiceTest' ... test
-→ [INFO] BUILD SUCCESS
-→ zero tests executed
-```
-A hand-rolled baseline run whose filter matched nothing; nothing ran, yet "green" was noted before editing.
-
-**Good** (neutral)
-```text
-./gradlew :orders-api:test --tests '*InvoiceServiceTest*'
-./gradlew :orders-api:test --tests '*OrderServiceTest*'
-
-Baseline before editing InvoiceService, at main <sha>:
-  InvoiceServiceTest   <n> tests, 0 failed
-  OrderServiceTest     <n> tests, 0 failed
-```
-It goes through the build's own test task, one pattern per run so an empty match fails, and the note records counts proving tests ran. (Real evidence: ledger row S3.)
-S3's reason comes from agent-factory research/31:19, approved by the operator; the ledger row has none.
-
 ### S5 — Pick the tier by what fails, not by the error path
 
 **Bad** (neutral)
@@ -272,6 +257,10 @@ The error comes from pure logic, so it is a unit spec; `0 *` on the `Mock()` rep
   when** prompt or provider code changes, or before a release: the real-model tier must pass then (TM3, ledger :39).
   — **Confidence** high
 
+- **Skip when** the failing test of a bug fix runs locally in a few seconds: it is not a CI job or a gate (S6). —
+  **Do not skip when** an acceptance criterion asks for CI proof, or the bug reproduces only in a clean CI environment.
+  — **Confidence** medium
+
 ## Review checks
 
 Walk every changed test file, and the MR that carries it.
@@ -297,3 +286,5 @@ Walk every changed test file, and the MR that carries it.
   green. No note is a finding.
 - [ ] S4 — For a bug fix, find the test that fails for the bug's reason, and check that it lands before the fix.
   A fix with no such test is a finding. Where that one test sits is V4 (`value-bar.md`).
+- [ ] S6 — For a bug fix, find the failing test's command and failure output in the pull request. A red run made only
+  as a CI job, with no acceptance criterion asking for it, is a finding.

@@ -22,7 +22,7 @@ approved Good/Bad pair, `references/examples/<name>.md` holds them all.
 | [scenario-to-tests](references/scenario-to-tests.md) | GT1–GT6, CV2 | when you write or review a test for a scenario in a work item's acceptance criteria |
 | [smoke-specs](references/smoke-specs.md) | EA1–EA6, EB2–EB4, EC1–EC5, ED3 | when you write or review a Playwright smoke spec, or a fixture that such specs import |
 | [spock](references/spock.md) | K1–K2, K2b, K3–K20 | when you write or review a Spock spec, unit or integration: its interactions, data tables, shared state, cleanup or assertions |
-| [strategy](references/strategy.md) | S1–S4, TM1–TM3, AT1 | when you choose where a new test goes, when you fix a bug, or when you review the tier and the doubles of a changed test |
+| [strategy](references/strategy.md) | S1–S4, S6, TM1–TM3, AT1 | when you choose where a new test goes, when you fix a bug, or when you review the tier and the doubles of a changed test |
 | [unit-tests](references/unit-tests.md) | U1–U3 | when you write or review a unit test or a Spock spec |
 | [value-bar](references/value-bar.md) | V1–V5 | before you add a test, when you fix a bug, and when you review or remove a test |
 <!-- /index -->
