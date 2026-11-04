@@ -21,20 +21,18 @@ logic that takes one of them gets a case or a skip line for each letter (B2).
 
 | the logic takes | use | why |
 |---|---|---|
-| a number | Range: each bound, and just below and just above it | testing only one side of an edge lets an off-by-one comparison pass (B3) · plinth :94 |
-| a collection | Cardinality: 0, 1 and many items · Ordering: sorted: assert exact order; unordered: assert without order | with only one item a correct and an inverted offset both pass (B1) · plinth :176 · ordering tests match the contract (plinth :67) |
-| a string with a format, an enum or a sealed set | Conformance: one valid and one invalid value; assert the domain error | the assertion checks the domain error, not only a generic failure (plinth :42) |
-| a time value | Time: before, at and after the cut-off, from a controllable time source | plinth :211 |
-| an optional or nullable input | Existence: null, blank and empty; `Optional.empty()`; a missing record | null, blank and empty have distinct domain meanings (plinth :149) |
-| an id it looks up, or a dependency it calls | Reference: the record is missing; for an unavailable dependency, see C2 (`coverage-design.md`) | the missing referenced entity is tested (plinth :119) |
-
-Plinth is `130-java-testing-strategies-correct.md`, the CORRECT source of B1; `:N` is its line.
+| a number | Range: each bound, and just below and just above it | testing only one side of an edge lets an off-by-one comparison pass (B3) |
+| a collection | Cardinality: 0, 1 and many items · Ordering: sorted: assert exact order; unordered: assert without order | with only one item a correct and an inverted offset both pass (B1) · ordering tests match the contract |
+| a string with a format, an enum or a sealed set | Conformance: one valid and one invalid value; assert the domain error | the assertion checks the domain error, not only a generic failure |
+| a time value | Time: before, at and after the cut-off, from a controllable time source | testing only one side of an edge lets an off-by-one comparison pass (B3) |
+| an optional or nullable input | Existence: null, blank and empty; `Optional.empty()`; a missing record | null, blank and empty have distinct domain meanings |
+| an id it looks up, or a dependency it calls | Reference: the record is missing; for an unavailable dependency, see C2 (`coverage-design.md`) | the missing referenced entity is tested |
 
 ## Good / Bad
 
 ### B1 — Check every CORRECT boundary for each input
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "should record the invoice's paid amount"() {
         when: "a payment of 30.00 EUR is allocated to one open invoice of 20.00 EUR"
@@ -46,7 +44,7 @@ Plinth is `130-java-testing-strategies-correct.md`, the CORRECT source of B1; `:
 ```
 Cardinality 1 only. With one invoice the remainder always starts full, so oldest-first and newest-first both pass.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should pay the oldest invoices first when a payment covers #scenario"() {
         when: "a payment of 30.00 EUR is allocated across open invoices of 20.00 EUR each"
@@ -63,12 +61,11 @@ Cardinality 1 only. With one invoice the remainder always starts full, so oldest
         "three, the last unpaid" | [1, 2, 3] || ["20.00", "10.00", "0.00"]
     }
 ```
-Cardinality 0, 1 and many, with Ordering reversed in one row, so a wrong allocation order fails. (Real evidence:
-ledger row B1.)
+Cardinality 0, 1 and many, with Ordering reversed in one row, so a wrong allocation order fails.
 
 ### B2 — One case or one skip line per CORRECT letter
 
-**Bad** (neutral)
+**Bad**
 ```java
     void parse_valid_import_returns_lines() {
     void parse_null_returns_empty() {
@@ -83,7 +80,7 @@ ledger row B1.)
 Range is tried only from outside, and Cardinality only past the limit. No line says why Ordering, Reference and Time
 are skipped.
 
-**Good** (neutral)
+**Good**
 ```groovy
 /**
  * CORRECT for parse: Conformance (SKU pattern, numeric quantity, ISO currency) · Range (quantity 1..99,
@@ -100,12 +97,11 @@ class OrderImportParserSpec extends Specification {
         count << [0, 1, 50]
     }
 ```
-The header names every letter, covered or skipped with a reason. Cardinality runs 0, 1 and the edge 50. (Real
-evidence: ledger row B2.)
+The header names every letter, covered or skipped with a reason. Cardinality runs 0, 1 and the edge 50.
 
 ### B3 — Test just inside and just outside each edge
 
-**Bad** (neutral)
+**Bad**
 ```java
     @Test
     void parse_quantity_exceeding_99_throws() {
@@ -119,7 +115,7 @@ evidence: ledger row B2.)
 ```
 Only 100 is tried. 99 is never shown to pass, so an off-by-one `>=` passes too.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should accept an import line with a quantity of #quantity, at an edge of 1..99"() {
         expect: "each limit itself is inside the range"
@@ -146,7 +142,7 @@ Only 100 is tried. 99 is never shown to pass, so an off-by-one `>=` passes too.
     }
 ```
 Each edge (1 and 99, accepted) and one past it (0 and 100, refused) gets a case, so `>` versus `>=` is decided at both
-ends. (Real evidence: ledger row B3.)
+ends.
 
 ## Decided edges
 

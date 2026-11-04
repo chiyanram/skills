@@ -7,7 +7,7 @@ Contents: SE1 · SE4 · SE5 · SS21
 
 ### SE1 — A URL not in code is fetched only after the URL check
 
-**Bad** (from addyosmani/agent-skills skills/security-and-hardening/references/hardening-patterns.md:126)
+**Bad**
 ```java
 void deliver(final URI callback, final InvoiceEvent event) {
     restClient.post()
@@ -19,7 +19,7 @@ void deliver(final URI callback, final InvoiceEvent event) {
 ```
 The subscriber chose the callback URL. It can name `169.254.169.254` or `localhost`, and the client follows redirects.
 
-**Good** (from addyosmani/agent-skills skills/security-and-hardening/references/hardening-patterns.md:129-147)
+**Good**
 ```java
 UrlCheck check(final URI url) {
     if (!Set.of("http", "https").contains(url.getScheme())) {
@@ -28,22 +28,22 @@ UrlCheck check(final URI url) {
     final List<InetAddress> addresses = dns.resolveAll(url.getHost());
     return addresses.stream().anyMatch(PublicAddress::isPrivateOrReserved)
             ? new UrlCheck.Refused("private or reserved address")
-            : new UrlCheck.Allowed(url);
+            : new UrlCheck.Allowed(url, addresses);
 }
 
 Delivery deliver(final URI callback, final InvoiceEvent event) {
     return switch (check(callback)) {
         case UrlCheck.Refused refused -> new Delivery.Refused(refused.reason());
-        case UrlCheck.Allowed allowed -> send(noRedirectClient, allowed.url(), event);
+        case UrlCheck.Allowed allowed -> send(noRedirectClient, allowed.url(), allowed.addresses(), event);
     };
 }
 ```
 The check allows http or https only and refuses the URL when any resolved address is private or reserved. The call
-then goes out on a client with redirects off.
+then connects to those checked addresses, not a fresh lookup, on a client with redirects off.
 
-### SE4 — Resolve a user-supplied path with `toRealPath()`, then check `startsWith(base)`
+### SE4 — Resolve a caller-supplied path with `toRealPath()`, check `Path.startsWith(base)`, prove ownership first
 
-**Bad** (neutral)
+**Bad**
 ```java
 void deleteExport(final Path exportRoot, final String requested) {
     final Path target = exportRoot.resolve(requested).normalize();
@@ -56,7 +56,7 @@ void deleteExport(final Path exportRoot, final String requested) {
 `normalize()` does not read the file system. A symlink inside the root that points at `/etc` passes the check, and
 nothing proves the caller owns the file.
 
-**Good** (from addyosmani/agent-skills references/security-checklist.md:80-92)
+**Good**
 ```java
 Deletion deleteExport(final Path realRoot, final String requested, final AccountId caller) {
     final Path target;
@@ -77,9 +77,9 @@ Deletion deleteExport(final Path realRoot, final String requested, final Account
 The check runs on the real path with symlinks followed. The target sits below the root, never the root itself, and
 its owner comes from server state read before the delete.
 
-### SE5 — Untrusted JSON binds to a fixed record; no `Map<String,Object>` past the adapter
+### SE5 — Untrusted JSON binds to a fixed DTO, with no default typing
 
-**Bad** (from jabrena/plinth skills/124-java-secure-coding/references/124-java-secure-coding.md:737-756)
+**Bad**
 ```java
 private final JsonMapper mapper = JsonMapper.builder()
         .activateDefaultTyping(LaissezFaireSubTypeValidator.instance)
@@ -95,7 +95,7 @@ PaymentReply parseReply(final String json) {
 Default typing lets the payload name the class to build. The untyped map then spreads casts and unchecked keys into
 the caller.
 
-**Good** (from jabrena/plinth skills/124-java-secure-coding/references/124-java-secure-coding.md:716-733)
+**Good**
 ```java
 private final JsonMapper mapper = JsonMapper.builder().build();
 
@@ -113,7 +113,7 @@ fails at the boundary.
 
 ### SS21 — Passwords via `DelegatingPasswordEncoder`; machine secrets via HMAC-SHA-256; never the encoder per request
 
-**Bad** (neutral)
+**Bad**
 ```java
 @Bean
 PasswordEncoder passwordEncoder() {
@@ -128,7 +128,7 @@ Optional<ApiClient> authenticate(final PresentedKey key) {
 ```
 The password encoder also checks API keys, so every API-key request pays a deliberately slow hash.
 
-**Good** (encoder from jabrena/plinth skills/304-frameworks-spring-boot-security/references/304-frameworks-spring-boot-security.md:184-203; HMAC half neutral)
+**Good**
 ```java
 @Bean
 PasswordEncoder passwordEncoder() {

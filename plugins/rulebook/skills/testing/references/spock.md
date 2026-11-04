@@ -54,30 +54,27 @@ Contents: Rules · When X, use Y · Good / Bad (K1, K2, K11, K13, K19) · Decide
 
 | the spec has | use | why |
 |---|---|---|
-| a mock argument with many fields to check | `verifyAll(it, Type){…}` inside the argument closure (K1) | every top-level line of a code constraint is asserted · notes :946 · ibt :253 |
-| one result with many fields to check | `verifyAll(obj){…}` to see every failing field; Spock `with(obj){…}` when the first failure is enough (K12) | primer :606-691 · notes :62-64 |
-| a call that returns a value and is counted | one interaction: `1 * x() >> v` (K2) | ibt :734-746 |
-| a collaborator that only returns values | `Stub()`; it answers empty values (`""`, `[]`, `0`), not null (K3; the Stub or Mock choice is U3, `unit-tests.md`) | ibt :788-797 |
-| "nothing else is called" as the promised behaviour | `0 * _` (K4) | ibt :290-306 |
-| a data table | `\|` between inputs, `\|\|` before expected values, `#var` in the feature name, no `@Unroll` (K6) | `\|\|` is visual only (ddt :118) · unrolling is the default since Spock 2.0 (ddt :166) |
-| a `where:` row that needs a mock | a plain discriminator in the table; the mock built in `given:` (K7) | only `@Shared` and static fields may be read from `where:` (ddt :100) |
-| a helper method that asserts | `@Verify` or `@VerifyAll` on the helper, or an explicit `assert` (K10) | primer :581-591 |
-| an interaction that reads the `when:` result | the value declared before `when:` or inside `interaction{}`; the result read in a plain condition (K11) | `then:` interactions are moved before `when:` (ibt :402-425) |
-| a call order that is the contract | one `then:` block per step, in order (K13) | ibt :513-536 |
-| a spec that changes process-wide state | `@spock.lang.Isolated` on the class, or `@ResourceLock` (K14) | Spock ignores `junit.jupiter.execution.parallel.*` (par :11-35) · `Isolated` targets a class only (Isolated.java:27) |
-| an expected exception | `def e = thrown(T)`, then a condition on what matters (K19) | primer :340-380 |
-| a block label | the scenario words and the why (K20); a scenario's own text is GT2, `scenario-to-tests.md` | labels are documentation, not report output (primer :791-830) |
-
-`ibt` is the Spock 2.4 doc `interaction_based_testing.adoc`, `primer` is `spock_primer.adoc`, `ddt` is
-`data_driven_testing.adoc`, `par` is `parallel_execution.adoc` and `notes` is `release_notes.adoc`; `:N` is the line.
+| a mock argument with many fields to check | `verifyAll(it, Type){…}` inside the argument closure (K1) | every top-level line of a code constraint is asserted |
+| one result with many fields to check | `verifyAll(obj){…}` to see every failing field; Spock `with(obj){…}` when the first failure is enough (K12) | Groovy `obj.with{}` gives one opaque condition, not one check per field (K12) |
+| a call that returns a value and is counted | one interaction: `1 * x() >> v` (K2) | a `given:` stub plus a `then:` count makes the call return null (K2) |
+| a collaborator that only returns values | `Stub()`; it answers empty values (`""`, `[]`, `0`), not null (K3; the Stub or Mock choice is U3, `unit-tests.md`) | a Stub given a call count throws `InvalidSpecException` (K3) |
+| "nothing else is called" as the promised behaviour | `0 * _` (K4) | here the absence of other calls is the promised behaviour (K4) |
+| a data table | `\|` between inputs, `\|\|` before expected values, `#var` in the feature name, no `@Unroll` (K6) | `\|\|` is visual only · unrolling is the default since Spock 2.0 |
+| a `where:` row that needs a mock | a plain discriminator in the table; the mock built in `given:` (K7) | only `@Shared` and static fields may be read from `where:` |
+| a helper method that asserts | `@Verify` or `@VerifyAll` on the helper, or an explicit `assert` (K10) | a helper's hidden interaction makes an empty `then:` still assert (K10) |
+| an interaction that reads the `when:` result | the value declared before `when:` or inside `interaction{}`; the result read in a plain condition (K11) | `then:` interactions are moved before `when:` |
+| a call order that is the contract | one `then:` block per step, in order (K13) | `and:` imposes no order, so calls in the wrong order still pass (K13) |
+| a spec that changes process-wide state | `@spock.lang.Isolated` on the class, or `@ResourceLock` (K14) | Spock ignores `junit.jupiter.execution.parallel.*` · `Isolated` targets a class only |
+| an expected exception | `def e = thrown(T)`, then a condition on what matters (K19) | an unbound `thrown()` passes for any exception, even an unrelated one (K19) |
+| a block label | the scenario words and the why (K20); a scenario's own text is GT2, `scenario-to-tests.md` | labels are documentation, not report output |
 
 ## Good / Bad
 
-Every rule's approved pair: [examples/spock.md](examples/spock.md).
+Every rule's pair: [examples/spock.md](examples/spock.md).
 
 ### K1 — Plain lines in a mock-argument closure, or verifyAll(it, Type)
 
-**Bad** (neutral)
+**Bad**
 ```groovy
         then: "the invoice is saved for the placed order"
         1 * invoiceRepository.save({ Invoice i ->
@@ -90,7 +87,7 @@ Every rule's approved pair: [examples/spock.md](examples/spock.md).
 ```
 The assert-then-true ritual stops at the first wrong field. One run never shows the other broken fields.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should save an open invoice for the placed order"() {
         when: "a placed order is invoiced"
@@ -108,11 +105,11 @@ The assert-then-true ritual stops at the first wrong field. One run never shows 
     }
 ```
 `verifyAll` checks each field of the argument and reports every failing one, with no `assert` and no trailing
-`true`. (Real evidence: ledger row K1.)
+`true`.
 
 ### K2 — Return-and-verify is one interaction
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "should keep the invoice total when the invoice is stored"() {
         given: "the repository hands back what it is given"
@@ -129,7 +126,7 @@ The assert-then-true ritual stops at the first wrong field. One run never shows 
 The `then:` interaction replaces the `given:` stub. `save` returns null, and `saved.total` throws a
 NullPointerException.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should keep the invoice total when the invoice is stored"() {
         when: "the invoice for a two-line order is stored"
@@ -144,12 +141,11 @@ NullPointerException.
         saved.total == eur("42.00")
     }
 ```
-One interaction carries the count, the argument check and the return value, so nothing overrides the stub. (Real
-evidence: ledger row K2.)
+One interaction carries the count, the argument check and the return value, so nothing overrides the stub.
 
 ### K11 — Variables an interaction uses exist before when:
 
-**Bad** (neutral)
+**Bad**
 ```groovy
         when: "the customer places a draft order"
         def placed = orderService.place(draftOrderId)
@@ -159,7 +155,7 @@ evidence: ledger row K2.)
 ```
 Spock moves `then:` interactions before `when:`, so `placed` is not set when the interaction is set up.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should send one confirmation for the order just placed"() {
         given: "a place to capture the order the confirmation is about"
@@ -176,12 +172,11 @@ Spock moves `then:` interactions before `when:`, so `placed` is not set when the
         confirmed == placed
     }
 ```
-The interaction reads only values that exist before `when:`. The `when:` result is read in plain conditions. (Real
-evidence: ledger row K11.)
+The interaction reads only values that exist before `when:`. The `when:` result is read in plain conditions.
 
 ### K13 — Call order with consecutive then: blocks
 
-**Bad** (neutral)
+**Bad**
 ```groovy
         then: "the gateway is charged before the invoice is marked paid"
         1 * paymentGateway.charge(invoiceId, amount) >> payment
@@ -191,7 +186,7 @@ evidence: ledger row K11.)
 ```
 `and:` imposes no order. Production code that marks the invoice paid first still passes.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should charge the gateway before the invoice is marked paid"() {
         when: "the customer pays an open invoice"
@@ -205,12 +200,11 @@ evidence: ledger row K11.)
         1 * invoiceRepository.markPaid(invoiceId, payment.id) >> true
     }
 ```
-Two consecutive `then:` blocks make Spock fail when the second call comes before the first. (Real evidence: ledger
-row K13.)
+Two consecutive `then:` blocks make Spock fail when the second call comes before the first.
 
 ### K19 — Bind the expected exception and assert what matters
 
-**Bad** (neutral)
+**Bad**
 ```groovy
         when: "the same order is invoiced a second time"
         insertInvoice(orderId)
@@ -221,7 +215,7 @@ row K13.)
 ```
 Any exception passes, including one that has nothing to do with the one-invoice-per-order key.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should refuse a second invoice for the same order"() {
         given: "an order that already has an invoice"
@@ -237,8 +231,7 @@ Any exception passes, including one that has nothing to do with the one-invoice-
         e.constraintName == "invoices_order_id_key"
     }
 ```
-The bound exception has the specific type, and its constraint name proves the key refused the row. (Real evidence:
-ledger row K19.)
+The bound exception has the specific type, and its constraint name proves the key refused the row.
 
 ## Decided edges
 

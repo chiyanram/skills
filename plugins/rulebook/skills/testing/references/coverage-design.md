@@ -23,23 +23,20 @@ Each row maps what the new logic has to the RIGHT-BICEP dimension it triggers an
 
 | the logic | use | why |
 |---|---|---|
-| has a main result: a method, parser, mapper or domain rule | Right results: one explicit expected value, written out (C3) | the expected value is explicit and independently understandable (plinth :41) |
-| takes an input of a kind B2 names (`boundaries.md`) | Boundary conditions: the CORRECT cases of B1–B3 (`boundaries.md`) | when boundary analysis is the main task, CORRECT gives the detailed categories (plinth :79) |
-| has two operations that undo or preserve each other: encode and decode, add and remove, write and read | Inverse relationships: run both directions; assert meaningful equality, not only a non-null result | plinth :102-103 |
-| has a result that is easy to compute wrongly, or a complex algorithm | Cross-checks: compare with an independent calculation, fixture, alternate implementation or property | the oracle must not reimplement the production algorithm with the same defect (plinth :134-135) |
-| can meet invalid input, illegal state, overflow, a missing resource or a denied operation | Error conditions: force the error directly; assert the exception type, and the message or error code when the contract names it | plinth :167-168 |
-| calls an external dependency | Error conditions: the unavailable case (C2); which of WARN and ERROR, see LG3 (`obs/references/logging.md`) | test how the code degrades when a dependency is unavailable (plinth 131:550) |
-| has performance in its contract, or a known performance risk | Performance: a deterministic proxy — query count, batch count, call count — not a wall-clock threshold | plinth :193 |
-| has a case you knowingly leave untested | a gap row in the MR description (C4) | missing boundary cases are recorded as explicit test gaps (plinth :79); a gap matrix names dimension, missing test and risk (plinth :227) |
-
-Plinth is `130-java-testing-strategies-right-bicep.md`, the RIGHT-BICEP source of C1; `:N` is its line. `131:N` is a
-line of `131-java-testing-unit-testing.md`, the source of C2.
+| has a main result: a method, parser, mapper or domain rule | Right results: one explicit expected value, written out (C3) | the expected value is explicit and independently understandable |
+| takes an input of a kind B2 names (`boundaries.md`) | Boundary conditions: the CORRECT cases of B1–B3 (`boundaries.md`) | when boundary analysis is the main task, CORRECT gives the detailed categories |
+| has two operations that undo or preserve each other: encode and decode, add and remove, write and read | Inverse relationships: run both directions; assert meaningful equality, not only a non-null result | a round trip checked only for non-null passes when one direction loses data (C1) |
+| has a result that is easy to compute wrongly, or a complex algorithm | Cross-checks: compare with an independent calculation, fixture, alternate implementation or property | the oracle must not reimplement the production algorithm with the same defect |
+| can meet invalid input, illegal state, overflow, a missing resource or a denied operation | Error conditions: force the error directly; assert the exception type, and the message or error code when the contract names it | an error that happens only incidentally leaves the error contract untested (C1) |
+| calls an external dependency | Error conditions: the unavailable case (C2); which of WARN and ERROR, see LG3 (`obs/references/logging.md`) | test how the code degrades when a dependency is unavailable |
+| has performance in its contract, or a known performance risk | Performance: a deterministic proxy — query count, batch count, call count — not a wall-clock threshold | a wall-clock threshold fails on normal machine variability (C1) |
+| has a case you knowingly leave untested | a gap row in the MR description (C4) | missing boundary cases are recorded as explicit test gaps; a gap matrix names dimension, missing test and risk |
 
 ## Good / Bad
 
 ### C1 — Decide the cases with RIGHT-BICEP before writing
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "a new order entity starts as a draft"() {
         expect: "Hibernate writes the field on every INSERT, so a default of PLACED would override V12's column default"
@@ -48,7 +45,7 @@ line of `131-java-testing-unit-testing.md`, the source of C2.
 ```
 One Right case, and nothing shows which other dimensions were considered or why they were skipped.
 
-**Good** (neutral)
+**Good**
 ```groovy
 /**
  * #123 AC-2: an order created through the app starts as a draft.
@@ -70,11 +67,11 @@ class OrderEntityStatusIT extends OrdersRepositoryIT {
         em.find(OrderEntity, id).status == OrderStatus.DRAFT
 ```
 Every RIGHT-BICEP letter is decided in the header. The case stores the order in `when:` and reads the stored row in
-`then:`, instead of a field default. (Real evidence: ledger row C1.)
+`then:`, instead of a field default.
 
 ### C2 — Test the unavailable case of every external dependency
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "reminder sends and tolerates an outage"() {
         when: "the overdue reminder runs"
@@ -89,7 +86,7 @@ Every RIGHT-BICEP letter is decided in the header. The case stores the order in 
 ```
 It proves only silence. No WARN is asserted, so code that swallows the outage without a log still passes.
 
-**Good** (neutral)
+**Good**
 ```groovy
     @Timeout(14)
     def "should warn the mail service unreachable, within a bound, when it never answers"() {
@@ -106,11 +103,11 @@ It proves only silence. No WARN is asserted, so code that swallows the outage wi
     }
 ```
 The dependency never answers. `@Timeout(14)` bounds the time with no wall-clock read, and the test asserts the logged
-outcome and its WARN level. (Real evidence: ledger row C2.)
+outcome and its WARN level.
 
 ### C3 — Write the expected value out, worked independently
 
-**Bad** (neutral)
+**Bad**
 ```java
     @Test
     void emailNormalisation_ignoresCase() {
@@ -122,19 +119,18 @@ outcome and its WARN level. (Real evidence: ledger row C2.)
 ```
 Both sides come from `normalise`, so a `normalise` that returns an empty string for every input still passes.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should normalise an email typed in mixed case to lower case"() {
         expect: "the lower-case form is written out by hand, never produced by normalise itself"
         CustomerEmail.normalise("Ann@Example.COM") == "ann@example.com"
     }
 ```
-The expected value is a literal worked out by hand, so a broken `normalise` cannot also produce it. (Real evidence:
-ledger row C3.)
+The expected value is a literal worked out by hand, so a broken `normalise` cannot also produce it.
 
 ### C4 — One gap row per knowingly untested case
 
-**Bad** (neutral)
+**Bad**
 ```markdown
 ## Verification
 
@@ -145,7 +141,7 @@ paid-invoice guard and letting a SHIPPED order cancel each turn the expected cas
 ```
 It lists what ran and nothing about what was not tested, so a decided gap looks like an oversight.
 
-**Good** (neutral)
+**Good**
 ```markdown
 ## Verification
 
@@ -159,17 +155,16 @@ It lists what ran and nothing about what was not tested, so a decided gap looks 
 | B — boundary | cancelling a DRAFT order with no lines | an empty cancellation email is sent |
 ```
 Each knowingly untested case is one `dimension · missing · risk` row, so a reviewer can tell a decision from an
-oversight. (Real evidence: ledger row C4.)
+oversight.
 
 ## Decided edges
 
-- **Skip when** the logic has nothing the dimension reads: no two operations that undo each other (plinth :103), or
-  no performance contract and no known performance risk (plinth :193). Write the one-line reason (C1). — **Do not
+- **Skip when** the logic has nothing the dimension reads: no two operations that undo each other, or
+  no performance contract and no known performance risk. Write the one-line reason (C1). — **Do not
   skip when** the reason is left out: a bare skip cannot be told from a forgotten dimension. — **Confidence** high
 - **Skip when** the only time bound is a hang guard (`@Timeout`) on an unavailable case (C2): a hang guard
   (`@Timeout`) is not a performance assertion, so it needs no Performance case. — **Do not skip when** the contract
   names a speed: decide Performance with a deterministic proxy, not a wall-clock threshold. — **Confidence** high
-  (operator decision, agent-factory#31 R3)
 
 ## Review checks
 

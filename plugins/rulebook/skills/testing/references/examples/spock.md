@@ -1,13 +1,13 @@
 # Spock — Good / Bad examples
 
-Every approved Good/Bad pair for the Spock rules, one per rule. The rules, the decision table and the review checks
-are in [`../spock.md`](../spock.md). Each pair is in one neutral domain (orders and invoices).
+Every Good/Bad pair for the Spock rules, one per rule. The rules, the decision table and the review checks
+are in [`../spock.md`](../spock.md). Each pair is in one domain (orders and invoices).
 
 Contents: K1 · K2 · K2b · K3 · K4 · K5 · K6 · K7 · K8 · K9 · K10 · K11 · K12 · K13 · K14 · K15 · K16 · K17 · K18 · K19 · K20
 
 ### K1 — Mock-argument closure: plain lines, or verifyAll(it, Type) for many fields
 
-**Bad** (neutral)
+**Bad**
 ```groovy
         then: "the invoice is saved for the placed order"
         1 * invoiceRepository.save({ Invoice i ->
@@ -20,7 +20,7 @@ Contents: K1 · K2 · K2b · K3 · K4 · K5 · K6 · K7 · K8 · K9 · K10 · K1
 ```
 The assert-then-true ritual stops at the first wrong field. One run never shows the other broken fields.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should save an open invoice for the placed order"() {
         when: "a placed order is invoiced"
@@ -38,11 +38,11 @@ The assert-then-true ritual stops at the first wrong field. One run never shows 
     }
 ```
 `verifyAll` checks each field of the argument and reports every failing one, with no `assert` and no trailing
-`true`. (Real evidence: ledger row K1.)
+`true`.
 
 ### K2 — Return-and-verify is one interaction: 1 * repo.save(…) >> saved
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "should keep the invoice total when the invoice is stored"() {
         given: "the repository hands back what it is given"
@@ -59,7 +59,7 @@ The assert-then-true ritual stops at the first wrong field. One run never shows 
 The `then:` interaction replaces the `given:` stub. `save` returns null, and `saved.total` throws a
 NullPointerException.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should keep the invoice total when the invoice is stored"() {
         when: "the invoice for a two-line order is stored"
@@ -74,12 +74,11 @@ NullPointerException.
         saved.total == eur("42.00")
     }
 ```
-One interaction carries the count, the argument check and the return value, so nothing overrides the stub. (Real
-evidence: ledger row K2.)
+One interaction carries the count, the argument check and the return value, so nothing overrides the stub.
 
 ### K2b — Verified interactions match real values or a field constraint; _ only when not promised
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "should replace the lines of this order only"() {
         when: "the clerk replaces the lines of a draft order"
@@ -92,7 +91,7 @@ evidence: ledger row K2.)
 ```
 The order id is known, but the wildcard lets a delete of another order's lines pass.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should replace the lines of this order only"() {
         given: "a repository that hands back the order it stores"
@@ -105,11 +104,12 @@ The order id is known, but the wildcard lets a delete of another order's lines p
         1 * orderRepository.deleteLinesOf(orderId)
     }
 ```
-The scope is the promise, so it is matched by its real value; the save belongs to another feature, so it is a stub in given:, never counted. (Real evidence: ledger row K2b.)
+The scope is the promise, so it is matched by its real value; the save belongs to another feature, so it is a stub in
+given:, never counted.
 
 ### K3 — A Stub() never gets a call count; a verified call needs a Mock()
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     PaymentGateway paymentGateway = Stub()
     ...
@@ -118,7 +118,7 @@ The scope is the promise, so it is matched by its real value; the save belongs t
 ```
 Spock rejects a call count on a Stub with InvalidSpecException when the spec runs.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should charge the gateway once for an open invoice"() {
         given: "a gateway whose calls are the assertion"
@@ -133,11 +133,11 @@ Spock rejects a call count on a Stub with InvalidSpecException when the spec run
         1 * paymentGateway.charge(invoiceId, amount) >> new Payment(paymentId, invoiceId, amount)
     }
 ```
-The call is the behaviour under test, so the gateway is a Mock; a collaborator that only answers stays a Stub. (Real evidence: ledger row K3.)
+The call is the behaviour under test, so the gateway is a Mock; a collaborator that only answers stays a Stub.
 
 ### K4 — Assert only the interactions the feature promises
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "should send the order confirmation to the customer's email"() {
         when: "the customer places a draft order"
@@ -152,7 +152,7 @@ The call is the behaviour under test, so the gateway is a Mock; a collaborator t
 ```
 The save is not what this feature promises, so a change to how the order is stored breaks an email test.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should send the order confirmation to the customer's email"() {
         given: "a repository that hands back the order it stores"
@@ -165,11 +165,11 @@ The save is not what this feature promises, so a change to how the order is stor
         1 * emailSender.sendConfirmation(customer.email, _)
     }
 ```
-Only the promised interaction is counted; the save is stubbed for the flow and owned by its own feature. (Real evidence: ledger row K4.)
+Only the promised interaction is counted; the save is stubbed for the flow and owned by its own feature.
 
 ### K5 — Exact count only when N is the contract; never count a read
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "should email exactly one receipt when an invoice is paid"() {
         when: "the customer pays an open invoice"
@@ -182,7 +182,7 @@ Only the promised interaction is counted; the save is stubbed for the flow and o
 ```
 Reading the invoice twice harms nothing, so counting the read breaks the test on a harmless refactor.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should email exactly one receipt when an invoice is paid"() {
         given: "an open invoice the service can find"
@@ -195,18 +195,18 @@ Reading the invoice twice harms nothing, so counting the read breaks the test on
         1 * emailSender.sendReceipt(customer.email, _)
     }
 ```
-The read is only stubbed; the count stays on the one email, because exactly one receipt is the contract. (Real evidence: ledger row K5.)
+The read is only stubbed; the count stays on the one email, because exactly one receipt is the contract.
 
 ### K6 — Data tables: | inputs, || before expected; #var in the name; no @Unroll
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     @Unroll
     def "should give a #tier customer #expected off an order of #subtotal"() {
 ```
 `@Unroll` is the default since Spock 2.0, so the annotation is noise that copies spread.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should give a #tier customer #expected off an order of #subtotal"() {
         expect: "only a gold customer at or above the threshold earns a discount"
@@ -219,11 +219,11 @@ The read is only stubbed; the count stays on the one email, because exactly one 
         CustomerTier.GOLD     | eur("100.00") || eur("10.00")
     }
 ```
-`||` splits inputs from the expected value, and #var names each iteration without @Unroll. (Real evidence: ledger row K6.)
+`||` splits inputs from the expected value, and #var names each iteration without @Unroll.
 
 ### K7 — where: reads only @Shared or static fields; build mocks in given:
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     InvoiceRepository invoiceRepository = Mock()
     ...
@@ -232,7 +232,7 @@ The read is only stubbed; the count stays on the one email, because exactly one 
 ```
 `where:` cannot read an instance field or a mock, so Spock rejects the spec.
 
-**Good** (neutral)
+**Good**
 ```groovy
     static final UUID INVOICE_ID = UUID.fromString("3f2a9c4e-7b1d-4e8a-9f60-2c5d8e1b7a43")
     def "should refuse #entryPoint on an invoice that is already paid"() {
@@ -250,11 +250,11 @@ The read is only stubbed; the count stays on the one email, because exactly one 
         entryPoint << ["pay", "remind"]
         call << [{ it.pay(INVOICE_ID) }, { it.remind(INVOICE_ID) }]
 ```
-The table reads only the static id and plain values; the mock stays an instance field, stubbed in given:. (Real evidence: ledger row K7.)
+The table reads only the static id and plain values; the mock stays an instance field, stubbed in given:.
 
 ### K8 — A data-driven feature tests one rule: no branch on a where: column
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "should read a line quantity of #quantity"() {
         when: "the clerk's quantity is read"
@@ -271,7 +271,7 @@ The table reads only the static id and plain values; the mock stays an instance 
 ```
 The branch on the valid column hides two rules in one feature, and a failure names neither.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should refuse a line quantity of #quantity, never round it"() {
         when: "a value outside a whole number 1-999 is read"
@@ -284,11 +284,11 @@ The branch on the valid column hides two rules in one feature, and a failure nam
         quantity << [0, 1000, -1, 2.5, "3", true]
     }
 ```
-Refused values get their own feature and accepted values another, so each failure names the one rule it broke. (Real evidence: ledger row K8.)
+Refused values get their own feature and accepted values another, so each failure names the one rule it broke.
 
 ### K9 — @Shared only for expensive read-only resources, never the subject
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     @Shared
     HttpPaymentGateway gateway
@@ -301,7 +301,7 @@ Refused values get their own feature and accepted values another, so each failur
 ```
 The class under test is shared by every feature, so state one feature leaves in it leaks into the next.
 
-**Good** (neutral)
+**Good**
 ```groovy
     @Shared
     @AutoCleanup("stop")
@@ -319,11 +319,11 @@ The class under test is shared by every feature, so state one feature leaves in 
         wireMock.resetAll()
     }
 ```
-Only the expensive server is shared and reset per feature; the cheap subject is built fresh for each feature. (Real evidence: ledger row K9.)
+Only the expensive server is shared and reset per feature; the cheap subject is built fresh for each feature.
 
 ### K10 — Interactions live in the feature's own blocks, never in helpers
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "should remind only the invoice that is overdue on the clock's date"() {
         given: "two open invoices, one due yesterday and one due tomorrow"
@@ -336,7 +336,7 @@ Only the expensive server is shared and reset per feature; the cheap subject is 
 ```
 The stubs the feature depends on are hidden in a helper, so the reader cannot see why the result holds.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should remind only the invoice that is overdue on the clock's date"() {
         given: "two open invoices, one due yesterday and one due tomorrow, and a clock fixed on the day"
@@ -352,11 +352,11 @@ The stubs the feature depends on are hidden in a helper, so the reader cannot se
         0 * emailSender.sendReminder(dueTomorrow)
     }
 ```
-Every stub, count and the fixed clock the feature relies on is visible in its own given: and then: blocks. (Real evidence: ledger row K10.)
+Every stub, count and the fixed clock the feature relies on is visible in its own given: and then: blocks.
 
 ### K11 — Variables an interaction uses are set before when:, never in when:
 
-**Bad** (neutral)
+**Bad**
 ```groovy
         when: "the customer places a draft order"
         def placed = orderService.place(draftOrderId)
@@ -366,7 +366,7 @@ Every stub, count and the fixed clock the feature relies on is visible in its ow
 ```
 Spock moves `then:` interactions before `when:`, so `placed` is not set when the interaction is set up.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should send one confirmation for the order just placed"() {
         given: "a place to capture the order the confirmation is about"
@@ -383,12 +383,11 @@ Spock moves `then:` interactions before `when:`, so `placed` is not set when the
         confirmed == placed
     }
 ```
-The interaction reads only values that exist before `when:`. The `when:` result is read in plain conditions. (Real
-evidence: ledger row K11.)
+The interaction reads only values that exist before `when:`. The `when:` result is read in plain conditions.
 
 ### K12 — Several fields of one result: verifyAll(obj){…}, never Groovy .with{}
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "should bill a placed order in euro, due 30 days after it was placed"() {
         expect: "the invoice for a two-line order placed on 1 November"
@@ -399,7 +398,7 @@ evidence: ledger row K11.)
 ```
 Groovy .with{} returns one chained boolean, so a failure shows one opaque condition instead of the wrong field.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should bill a placed order in euro, due 30 days after it was placed"() {
         when: "a two-line order placed on 1 November is invoiced"
@@ -413,11 +412,11 @@ Groovy .with{} returns one chained boolean, so a failure shows one opaque condit
         }
     }
 ```
-`verifyAll` asserts each line on its own and reports every field that is wrong. (Real evidence: ledger row K12.)
+`verifyAll` asserts each line on its own and reports every field that is wrong.
 
 ### K13 — Assert call order only when order is the contract, with consecutive then: blocks
 
-**Bad** (neutral)
+**Bad**
 ```groovy
         then: "the gateway is charged before the invoice is marked paid"
         1 * paymentGateway.charge(invoiceId, amount) >> payment
@@ -427,7 +426,7 @@ Groovy .with{} returns one chained boolean, so a failure shows one opaque condit
 ```
 `and:` imposes no order. Production code that marks the invoice paid first still passes.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should charge the gateway before the invoice is marked paid"() {
         when: "the customer pays an open invoice"
@@ -441,12 +440,11 @@ Groovy .with{} returns one chained boolean, so a failure shows one opaque condit
         1 * invoiceRepository.markPaid(invoiceId, payment.id) >> true
     }
 ```
-Two consecutive `then:` blocks make Spock fail when the second call comes before the first. (Real evidence: ledger
-row K13.)
+Two consecutive `then:` blocks make Spock fail when the second call comes before the first.
 
 ### K14 — Isolate a spec that touches global state with @spock.lang.Isolated
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 class OrderServiceSpec extends Specification {
     ...
@@ -460,7 +458,7 @@ class OrderServiceSpec extends Specification {
 ```
 The spec changes a process-wide logger with no isolation, so it breaks other specs once Spock runs in parallel.
 
-**Good** (neutral)
+**Good**
 ```groovy
 @spock.lang.Isolated("attaches an appender to OrderService's logback logger and changes its level")
 class OrderServiceSpec extends Specification {
@@ -473,11 +471,11 @@ class OrderServiceSpec extends Specification {
         logger.level = Level.DEBUG
     }
 ```
-Spock honours its own Isolated annotation; the Jupiter isolation annotations and parallel settings are ignored by Spock. (Real evidence: ledger row K14.)
+Spock honours its own Isolated annotation; the Jupiter isolation annotations and parallel settings are ignored by Spock.
 
 ### K15 — Spring-context specs use the shared fake ports; no per-class override of an owned port
 
-**Bad** (neutral)
+**Bad**
 ```java
 class InvoiceApiIT extends AbstractIT {
     ...
@@ -490,7 +488,7 @@ class InvoiceApiIT extends AbstractIT {
 ```
 The class overrides a port the shared OutboundFakesConfig already fakes, so it forks its own uncached Spring context.
 
-**Good** (neutral)
+**Good**
 ```groovy
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableSharedContainers
@@ -500,11 +498,11 @@ class InvoiceApiIT extends Specification {
     @Autowired
     FakeEmailSender emailSender
 ```
-The shared config supplies the fake, so every IT with this setup reuses one cached context. (Real evidence: ledger row K15.)
+The shared config supplies the fake, so every IT with this setup reuses one cached context.
 
 ### K16 — cleanup: frees per-feature resources defensively
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def cleanup() {
         logger.detachAppender(appender)
@@ -512,7 +510,7 @@ The shared config supplies the fake, so every IT with this setup reuses one cach
 ```
 If setup() failed before logger was set, cleanup throws and hides the real failure; the DEBUG level is never restored.
 
-**Good** (neutral)
+**Good**
 ```groovy
 @spock.lang.Isolated("attaches an appender to OrderService's logback logger and changes its level")
 class OrderServiceSpec extends Specification {
@@ -530,11 +528,11 @@ class OrderServiceSpec extends Specification {
         logger?.setLevel(previousLevel)
     }
 ```
-Null-safe calls survive a failed setup(), and the process-wide logger gets its old level back. (Real evidence: ledger row K16.)
+Null-safe calls survive a failed setup(), and the process-wide logger gets its old level back.
 
 ### K17 — Never spy the class under test; double its outbound port instead
 
-**Bad** (neutral)
+**Bad**
 ```java
     @Test
     @DisplayName("quote never charges the customer or sends a receipt — AC-4")
@@ -552,7 +550,7 @@ Null-safe calls survive a failed setup(), and the process-wide logger gets its o
 ```
 The subject is partly faked and checks its own methods, so the test pins how OrderService is split, not what it does.
 
-**Good** (neutral)
+**Good**
 ```groovy
     PaymentGateway paymentGateway = Mock()
     EmailSender emailSender = Mock()
@@ -570,11 +568,11 @@ The subject is partly faked and checks its own methods, so the test pins how Ord
         0 * emailSender.sendReceipt(*_)
     }
 ```
-OrderService runs for real; the doubles sit at its outbound ports, which is where a charge or a receipt would leave. (Real evidence: ledger row K17.)
+OrderService runs for real; the doubles sit at its outbound ports, which is where a charge or a receipt would leave.
 
 ### K18 — Records and value objects are constructed, never doubled
 
-**Bad** (neutral)
+**Bad**
 ```groovy
         given: "the customer who owns the order"
         def owner = Spy(Customer)
@@ -582,7 +580,7 @@ OrderService runs for real; the doubles sit at its outbound ports, which is wher
 ```
 A plain data holder is doubled to fake one getter, so its equals, hashCode and toString can lie.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def owner = customer()
     def stranger = customer()
@@ -591,11 +589,11 @@ A plain data holder is doubled to fake one getter, so its equals, hashCode and t
         new Customer(UUID.randomUUID(), "customer@example.com", CustomerTier.STANDARD)
     }
 ```
-A real Customer carries the one value the features read, and behaves like the production object. (Real evidence: ledger row K18.)
+A real Customer carries the one value the features read, and behaves like the production object.
 
 ### K19 — Bind the expected exception and assert what matters
 
-**Bad** (neutral)
+**Bad**
 ```groovy
         when: "the same order is invoiced a second time"
         insertInvoice(orderId)
@@ -606,7 +604,7 @@ A real Customer carries the one value the features read, and behaves like the pr
 ```
 Any exception passes, including one that has nothing to do with the one-invoice-per-order key.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should refuse a second invoice for the same order"() {
         given: "an order that already has an invoice"
@@ -622,19 +620,18 @@ Any exception passes, including one that has nothing to do with the one-invoice-
         e.constraintName == "invoices_order_id_key"
     }
 ```
-The bound exception has the specific type, and its constraint name proves the key refused the row. (Real evidence:
-ledger row K19.)
+The bound exception has the specific type, and its constraint name proves the key refused the row.
 
 ### K20 — A block description says the scenario and the why, never the code
 
-**Bad** (neutral)
+**Bad**
 ```groovy
         when: "it is stored"
         invoiceRepository.save(invoice)
 ```
 The label repeats the method call, so it adds no fact the code does not already show.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should keep the due date of an invoice stored late in the evening"() {
         when: "the invoice for an order placed at 23:30 Berlin time is stored and read back"
@@ -645,6 +642,4 @@ The label repeats the method call, so it adds no fact the code does not already 
         stored.dueDate == invoice.dueDate
     }
 ```
-The when: text names the scenario and the then: text says why the date matters, which the code cannot say. (Real evidence: ledger row K20.)
-
-K20's reason comes from agent-factory research/31:21, approved by the operator; the ledger row has none.
+The when: text names the scenario and the then: text says why the date matters, which the code cannot say.
