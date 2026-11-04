@@ -31,29 +31,27 @@ Which types, keys and names a schema uses is in `postgres-design.md` (MG30–MG3
 
 | the migration, on a table that existed before it | use | why |
 |---|---|---|
-| runs a statement that locks it: `ALTER TABLE`, `CREATE`/`DROP INDEX`, `DROP TABLE`, `TRUNCATE`, or `CREATE TABLE … REFERENCES` it | `SET LOCAL lock_timeout` first (plain `SET` when non-transactional), and a rerun on timeout (MG5) | PG ALTER TABLE, client config, explicit locking, SET "outside of a transaction block … no effect"; squawk safe migrations; strong_migrations; GitLab style guide · r47 :160-163, :863-868 |
-| renames, drops or retypes a column or table the app reads | expand → dual-write → backfill → switch reads → drop in a later release (MG10) | GitLab avoiding downtime; strong_migrations; squawk renaming-table, ban-drop-column · r47 :203-205 |
-| creates or drops an index | `CONCURRENTLY`, in its own non-transactional migration, after `DROP INDEX CONCURRENTLY IF EXISTS` (MG41) | PG CREATE INDEX; squawk concurrent-index rules; strong_migrations; GitLab; Flyway transactional lock · r47 :169-172 |
-| adds `UNIQUE` or `PRIMARY KEY` | `CREATE UNIQUE INDEX CONCURRENTLY` in its own migration (MG41), then `ADD CONSTRAINT … USING INDEX` in the next (MGN1) | squawk disallowed-unique-constraint; strong_migrations · r47 :178-180 |
-| adds a `CHECK` or a foreign key | `NOT VALID` now, `VALIDATE CONSTRAINT` in a later migration (MG45) | PG ALTER TABLE; squawk constraint-missing-not-valid; strong_migrations; GitLab foreign keys · r47 :186-189 |
-| sets a column `NOT NULL` | a validated `CHECK (col IS NOT NULL)`, then `SET NOT NULL` (MG45) | PG ALTER TABLE "the table scan is skipped"; squawk adding-not-nullable-field; strong_migrations · r47 :186-188 |
-| adds a column | nullable, or `NOT NULL` with a constant `DEFAULT` (MG44) | PG ALTER TABLE; squawk adding-required-field, adding-field-with-default; strong_migrations · r47 :195-197 |
-| updates or deletes existing rows | its own migration or job, `WHERE`-bounded batches, each committed (MG22) | strong_migrations; GitLab style guide, batched migrations; Django; Flyway RG06, RG09 · r47 :211-214 |
-| fixes a migration that is merged or applied | a new versioned migration (MG1) | Flyway migrations, validate; Rails migrations guide · r47 :220-221 |
-
-`r47` is agent-factory `research/47-industry-migrations-obs.md`; `:N` is a line in that file.
+| runs a statement that locks it: `ALTER TABLE`, `CREATE`/`DROP INDEX`, `DROP TABLE`, `TRUNCATE`, or `CREATE TABLE … REFERENCES` it | `SET LOCAL lock_timeout` first (plain `SET` when non-transactional), and a rerun on timeout (MG5) | a queued `ACCESS EXCLUSIVE` request blocks every later query on the table; `SET LOCAL` outside a transaction block has no effect |
+| renames, drops or retypes a column or table the app reads | expand → dual-write → backfill → switch reads → drop in a later release (MG10) | running app versions still query the old shape |
+| creates or drops an index | `CONCURRENTLY`, in its own non-transactional migration, after `DROP INDEX CONCURRENTLY IF EXISTS` (MG41) | a plain build blocks writes, and a failed concurrent build leaves an INVALID index |
+| adds `UNIQUE` or `PRIMARY KEY` | `CREATE UNIQUE INDEX CONCURRENTLY` in its own migration (MG41), then `ADD CONSTRAINT … USING INDEX` in the next (MGN1) | the inline form builds the index while it blocks reads and writes |
+| adds a `CHECK` or a foreign key | `NOT VALID` now, `VALIDATE CONSTRAINT` in a later migration (MG45) | a direct add scans the table under lock; `VALIDATE CONSTRAINT` scans under a lighter lock |
+| sets a column `NOT NULL` | a validated `CHECK (col IS NOT NULL)`, then `SET NOT NULL` (MG45) | with a valid `CHECK (col IS NOT NULL)`, `SET NOT NULL` skips the table scan |
+| adds a column | nullable, or `NOT NULL` with a constant `DEFAULT` (MG44) | `NOT NULL` with no default breaks old-code inserts, and a volatile default rewrites the table |
+| updates or deletes existing rows | its own migration or job, `WHERE`-bounded batches, each committed (MG22) | a whole-table statement holds locks and one long transaction for its whole run |
+| fixes a migration that is merged or applied | a new versioned migration (MG1) | an edited migration fails its checksum on `validate`, and environments that ran the old text diverge |
 
 ## Good / Bad
 
 ### MG5 — A lock timeout before a lock on a live table
 
-**Bad** (neutral)
+**Bad**
 ```sql
 ALTER TABLE orders ADD COLUMN note text;
 ```
 It waits for the lock with no limit, and every query on `orders` queues behind it.
 
-**Good** (neutral)
+**Good**
 ```sql
 SET LOCAL lock_timeout = '2s';
 ALTER TABLE orders ADD COLUMN note text;
@@ -63,14 +61,14 @@ migration.
 
 ### MG10 — Rename through expand and contract
 
-**Bad** (neutral)
+**Bad**
 ```sql
 SET LOCAL lock_timeout = '2s';
 ALTER TABLE customers RENAME COLUMN name TO full_name;
 ```
 The running app still selects `customers.name` and fails until the new version is deployed everywhere.
 
-**Good** (neutral)
+**Good**
 ```sql
 -- Release N   (V30): expand
 SET LOCAL lock_timeout = '2s';
@@ -86,14 +84,14 @@ Every deployed version finds the columns it queries. The drop waits until no run
 
 ### MG41 — A concurrent index in its own migration
 
-**Bad** (neutral)
+**Bad**
 ```sql
 SET LOCAL lock_timeout = '2s';
 CREATE INDEX idx_orders_customer_id ON orders (customer_id);
 ```
 The build blocks every write to `orders` until it ends.
 
-**Good** (neutral)
+**Good**
 ```sql
 -- its own migration; Flyway runs a CONCURRENTLY script outside a transaction
 -- (set flyway.postgresql.transactional.lock=false once, in the Flyway config)
@@ -105,7 +103,7 @@ Writes go on during the build. A rerun first drops an INVALID index that a faile
 
 ### MG45 — `NOT VALID`, then validate in a later migration
 
-**Bad** (neutral)
+**Bad**
 ```sql
 -- V19, its own migration: CREATE INDEX CONCURRENTLY idx_invoices_order_id ON invoices (order_id)
 SET LOCAL lock_timeout = '2s';
@@ -116,7 +114,7 @@ ALTER TABLE invoices ALTER COLUMN order_id SET NOT NULL;
 ```
 Both statements scan `invoices` while they hold the lock, and the foreign key also blocks writes on `orders`.
 
-**Good** (neutral)
+**Good**
 ```sql
 -- V19, its own migration: CREATE INDEX CONCURRENTLY idx_invoices_order_id ON invoices (order_id)
 -- V20
@@ -138,7 +136,7 @@ its scan.
 
 ### MG44 — A new column on a populated table
 
-**Bad** (neutral)
+**Bad**
 ```sql
 SET LOCAL lock_timeout = '2s';
 ALTER TABLE payments ADD COLUMN currency text NOT NULL;
@@ -147,7 +145,7 @@ ALTER TABLE payments ADD COLUMN token uuid NOT NULL DEFAULT gen_random_uuid();
 The first fails on a populated table, and old code that inserts without `currency` fails too. The volatile default
 rewrites the whole table.
 
-**Good** (neutral)
+**Good**
 ```sql
 SET LOCAL lock_timeout = '2s';
 ALTER TABLE payments ADD COLUMN currency text NOT NULL DEFAULT 'EUR';
@@ -157,7 +155,7 @@ A constant default is a metadata change. The nullable column is backfilled later
 
 ### MG22 — A batched backfill, apart from the DDL
 
-**Bad** (neutral)
+**Bad**
 ```sql
 SET LOCAL lock_timeout = '2s';
 ALTER TABLE orders ADD COLUMN total_cents bigint;
@@ -165,7 +163,7 @@ UPDATE orders SET total_cents = (total * 100)::bigint;
 ```
 The DDL lock is held until the whole-table `UPDATE` ends, in one long transaction.
 
-**Good** (neutral)
+**Good**
 ```sql
 -- DDL in V50; this file only DML. The job runs it once per key range, commits each,
 -- and advances :from_id by 10000 until :from_id > max(id)
@@ -178,9 +176,8 @@ Each batch locks a bounded set of rows and commits. A rerun skips the rows alrea
 
 ## Decided edges
 
-- **Skip when** the index is on a table created in the same migration: a plain `CREATE INDEX` is fine (MG41; squawk
-  "This rule ignores indexes added to tables created in the same transaction", r47 :170). — **Do not skip when** the
-  table existed before this migration. — **Confidence** high
+- **Skip when** the index is on a table created in the same migration: a plain `CREATE INDEX` is fine (MG41). —
+  **Do not skip when** the table existed before this migration. — **Confidence** high
 
 ## Review checks
 
@@ -189,7 +186,7 @@ Walk every changed or added migration file, and every statement in it that touch
 - [ ] MG5 — In each migration with a statement that locks an existing table (`ALTER TABLE`, `CREATE`/`DROP INDEX`,
   `DROP TABLE`, `TRUNCATE`, or a `CREATE TABLE` whose `REFERENCES` names one), `grep -n "lock_timeout"` before the
   first such statement. A missing timeout is a finding, and so is `SET LOCAL lock_timeout` in a non-transactional
-  migration, where it has no effect (r47 :863).
+  migration, where it has no effect.
 - [ ] MG10 — `grep -n -i -E "RENAME|DROP +(COLUMN +)?|DROP +TABLE|TYPE +"`, then read each whole `ALTER TABLE`
   statement, since one can span lines. For each rename, drop or type change, find the earlier release that stopped
   the app reading the old shape. A rename, drop or type change with no such release is a finding.
