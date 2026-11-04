@@ -13,18 +13,16 @@ This file holds no rules of its own: it is the level table that `logging.md` use
 
 | the event | use | why |
 |---|---|---|
-| the process cannot go on (bad config at startup, out of memory) | ERROR (FATAL where the API has it), then exit | the event ends the process · OpenTelemetry exceptions in logs; Log4j `Level` · r47 :456 |
-| a failure that application code did not handle: it reaches the top-level handler (5xx), or a consumer gives up on a message | ERROR, with the throwable | someone must look at it · OpenTelemetry exceptions in logs, logs data model; Log4j `Level` · r47 :457 |
-| a dependency call failed and the code handled it (timeout, I/O error, retries used up, then a fallback) | WARN, once, with the throwable | not yet an error, but it may become one · OpenTelemetry exceptions in logs, logs data model; Log4j `Level` · r47 :458 |
-| a single retry attempt inside a retry loop | DEBUG; the final outcome gets the one WARN | logging every attempt multiplies one failure · OpenTelemetry exceptions in logs, recording errors · r47 :459 |
-| a client error: request validation fails (400), or authentication fails (401) | never ERROR; INFO or WARN is the project's choice | a client fault, not a server fault · OpenTelemetry HTTP spans; OWASP Logging and Logging Vocabulary · r47 :460, :467 |
-| authorization denied (403) | WARN or higher | a possible probe, which OWASP lists as an event to log · OWASP Logging and Logging Vocabulary · r47 :461 |
-| an exception that shows no real problem (the client cancelled the request) | DEBUG | nothing to act on · OpenTelemetry exceptions in logs; Log4j `Level` · r47 :462 |
-| a business or lifecycle event happened (order placed, job finished, service started) | INFO | it records that something happened · OpenTelemetry logs data model; Log4j `Level`; OWASP Logging Vocabulary · r47 :463 |
-| diagnostic detail that helps while debugging | DEBUG | off by default in production · OpenTelemetry logs data model; Log4j `Level` · r47 :464 |
-| fine-grained flow (method entry and exit, loop iterations) | TRACE | too noisy unless switched on for one logger · OpenTelemetry logs data model; Log4j `Level` · r47 :465 |
-
-`r47` is agent-factory `research/47-industry-migrations-obs.md`; `:N` is a line in that file.
+| the process cannot go on (bad config at startup, out of memory) | ERROR (FATAL where the API has it), then exit | the event ends the process |
+| a failure that application code did not handle: it reaches the top-level handler (5xx), or a consumer gives up on a message | ERROR, with the throwable | someone must look at it |
+| a dependency call failed and the code handled it (timeout, I/O error, retries used up, then a fallback) | WARN, once, with the throwable | not yet an error, but it may become one |
+| a single retry attempt inside a retry loop | DEBUG; the final outcome gets the one WARN | logging every attempt multiplies one failure |
+| a client error: request validation fails (400), or authentication fails (401) | never ERROR; INFO or WARN is the project's choice | a client fault, not a server fault |
+| authorization denied (403) | WARN or higher | a possible probe, and an event worth logging |
+| an exception that shows no real problem (the client cancelled the request) | DEBUG | nothing to act on |
+| a business or lifecycle event happened (order placed, job finished, service started) | INFO | it records that something happened |
+| diagnostic detail that helps while debugging | DEBUG | off by default in production |
+| fine-grained flow (method entry and exit, loop iterations) | TRACE | too noisy unless switched on for one logger |
 
 ## Good / Bad
 
@@ -32,9 +30,8 @@ None: each row of the table states its own case.
 
 ## Decided edges
 
-- **Skip when** a 400 or 401 log call is at INFO or WARN: both are allowed (r47 :460, :467). — **Do not skip when**
-  the failure is the server's: it reaches the top-level handler as a 5xx and logs at ERROR (r47 :457). —
-  **Confidence** high
+- **Skip when** a 400 or 401 log call is at INFO or WARN: both are allowed. — **Do not skip when** the failure is
+  the server's: it reaches the top-level handler as a 5xx and logs at ERROR. — **Confidence** high
 
 ## Review checks
 

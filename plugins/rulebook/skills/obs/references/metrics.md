@@ -27,24 +27,22 @@ Contents: Rules · When X, use Y · Good / Bad (MX1, MXN1, MX3) · Decided edges
 
 | the measurement is | use | why |
 |---|---|---|
-| a tag value | a closed set: route template, enum, exception class, `NOT_FOUND` (MX1) | Prometheus naming "Do not use labels to store dimensions with high cardinality"; Micrometer naming, Observation · r47 :548-550 |
-| an endpoint or an outbound dependency | rate, errors and duration (MX5) | Grafana dashboard best practices (RED, golden signals); Prometheus instrumentation · r47 :587-589 |
-| a pool or a queue | utilisation, saturation (depth, wait) and errors (MX5) | Grafana dashboard best practices (USE); Prometheus instrumentation "the number of queued requests" · r47 :587-588 |
-| success and failure of one operation | one meter with an `outcome` tag (MX3) | Micrometer naming; Prometheus instrumentation "create a single metric … with a `code` label"; OpenTelemetry recording errors · r47 :571-573 |
-| how long a completed operation took | a `Timer` (MX2) | Micrometer timers "you should use a `Timer` rather than a `DistributionSummary`"; counters · r47 :555-556 |
-| work still in progress | a `LongTaskTimer` (MX2) | Micrometer long task timers "A normal Timer only records the duration *after* the task is complete" · r47 :558 |
-| a value that can go down | a gauge on a strongly held object (MX2) | Prometheus instrumentation "if the value can go down, it is a gauge"; Micrometer gauges · r47 :557, :559 |
-| latency percentiles | `publishPercentileHistogram()` or SLO buckets (MXN1) | Micrometer histograms "aggregable (across dimensions)"; Prometheus histograms · r47 :562, :564-565 |
-| a unit | none in the name; a `Duration` for timers, `baseUnit` for summaries (MXN2) | OpenTelemetry metrics "SHOULD NOT include the units in the metric name"; Prometheus naming "base units" · r47 :580-582 |
-| a scheduled or batch job | a gauge of the last success as epoch seconds, plus a `LongTaskTimer` (MXN3) | Prometheus instrumentation "the last time it succeeded", alerting; Micrometer long task timers · r47 :594-596 |
-
-`r47` is agent-factory `research/47-industry-migrations-obs.md`; `:N` is a line in that file.
+| a tag value | a closed set: route template, enum, exception class, `NOT_FOUND` (MX1) | each new tag value is a new time series |
+| an endpoint or an outbound dependency | rate, errors and duration (MX5) | without them, overload stays invisible until users report it |
+| a pool or a queue | utilisation, saturation (depth, wait) and errors (MX5) | queue depth and wait show saturation before users see it |
+| success and failure of one operation | one meter with an `outcome` tag (MX3) | split meters make the error ratio unqueryable |
+| how long a completed operation took | a `Timer` (MX2) | a `DistributionSummary` mis-scales time |
+| work still in progress | a `LongTaskTimer` (MX2) | a plain `Timer` records the duration only after the task completes |
+| a value that can go down | a gauge on a strongly held object (MX2) | a value that can go down is a gauge, and a gauge on a weakly held object reports NaN |
+| latency percentiles | `publishPercentileHistogram()` or SLO buckets (MXN1) | histogram buckets aggregate across instances; client percentiles do not |
+| a unit | none in the name; a `Duration` for timers, `baseUnit` for summaries (MXN2) | the registry appends base units, and a hand-written `ms` mixes units |
+| a scheduled or batch job | a gauge of the last success as epoch seconds, plus a `LongTaskTimer` (MXN3) | a stalled job emits nothing an alert can see |
 
 ## Good / Bad
 
 ### MX1 — Bounded tag values only
 
-**Bad** (neutral)
+**Bad**
 ```java
 meterRegistry.counter(
         "invoices.sent",
@@ -54,7 +52,7 @@ meterRegistry.counter(
 ```
 Each customer and each raw path becomes a new time series.
 
-**Good** (neutral)
+**Good**
 ```java
 meterRegistry.counter(
         "invoices.sent",
@@ -66,7 +64,7 @@ Both tags are closed sets. The customer id belongs in a log field or a span attr
 
 ### MXN1 — An aggregable histogram
 
-**Bad** (neutral)
+**Bad**
 ```java
 final var timer = Timer.builder("payments.authorize")
     .publishPercentiles(0.5, 0.95, 0.99)
@@ -74,7 +72,7 @@ final var timer = Timer.builder("payments.authorize")
 ```
 Each instance computes its own percentiles, and they cannot be combined across instances.
 
-**Good** (neutral)
+**Good**
 ```java
 final var timer = Timer.builder("payments.authorize")
     .publishPercentileHistogram()
@@ -84,14 +82,14 @@ The backend gets buckets it can aggregate into any percentile.
 
 ### MX3 — The outcome as a tag on one meter
 
-**Bad** (neutral)
+**Bad**
 ```java
 meterRegistry.counter("orders.placed.success").increment();
 meterRegistry.counter("orders.placed.failed").increment();
 ```
 The error ratio needs two meters joined by hand.
 
-**Good** (neutral)
+**Good**
 ```java
 meterRegistry.counter(
         "orders.placed",
@@ -102,9 +100,8 @@ One meter. The error ratio is a filter on the `outcome` tag.
 
 ## Decided edges
 
-- **Skip when** an id is a span attribute or a `highCardinalityKeyValue`: it never reaches a meter (MX1; Micrometer
-  Observation "High cardinality key values are not included in meters", r47 :634). — **Do not skip when** it is a
-  meter tag or a `lowCardinalityKeyValue`, which becomes one (r47 :550). Ids in log lines are LG1 in `logging.md`.
+- **Skip when** an id is a span attribute or a `highCardinalityKeyValue`: it never reaches a meter (MX1). — **Do not skip
+  when** it is a meter tag or a `lowCardinalityKeyValue`, which becomes one. Ids in log lines are LG1 in `logging.md`.
   — **Confidence** high
 
 ## Review checks

@@ -31,30 +31,28 @@ Which level a log event gets is in `levels.md`.
 
 | the log call or config holds | use | why |
 |---|---|---|
-| a password, token, session id, auth or cookie header, key, connection string, card data or sensitive PII | nothing: drop it (LG4) | OWASP Logging "should usually not be recorded directly in the logs" · r47 :502 |
-| a request or response body | the id and allowlisted fields only (LG4) | OWASP Logging; OpenTelemetry HTTP "`url.full` … SHOULD be scrubbed" · r47 :502, :504 |
-| a `catch` that rethrows or wraps with the cause | no log call; the handler that decides the outcome logs it (LG2) | OpenTelemetry recording errors "NOT RECOMMENDED to record the same exception more than once"; exceptions in logs · r47 :486-487 |
-| an exception | the throwable as the last argument (LG3) | SLF4J FAQ "its stack trace will NOT be printed"; Log4j API "Don't use `Throwable#getMessage()`!" · r47 :494-495 |
-| a trace id or a business id | a key-value field: MDC or `addKeyValue` (LG1) | OWASP Logging "Interaction identifier"; OpenTelemetry logs data model; Spring Boot logging, tracing · r47 :476-479 |
-| any other variable value | a `{}` placeholder in a constant template (LG6) | SLF4J FAQ; Log4j API; OWASP Logging "Keep message templates constant" · r47 :517-519 |
-| an argument that is costly to build | a `Supplier` (Log4j API; SLF4J fluent `addArgument(Supplier)`), or a call behind `isXEnabled()` (LG6) | Log4j API "Use `Supplier`s"; SLF4J FAQ; SLF4J manual "pass arguments with a Supplier", `LoggingEventBuilder` · r47 :517-518, :869-875 |
-| a production log layout | a structured (JSON) encoder (LG5) | OWASP Logging "Do not use unstructured text log formats"; Log4j security FAQ · r47 :511-512 |
-| a logger field | `LoggerFactory.getLogger(DeclaringClass.class)` (LG8) | Log4j API; SLF4J FAQ · r47 :524-525 |
-| an appender | the console (stdout) only (LGN1) | Twelve-Factor "writes its event stream, unbuffered, to stdout"; Kubernetes logging; Spring Boot logging · r47 :532-534 |
-
-`r47` is agent-factory `research/47-industry-migrations-obs.md`; `:N` is a line in that file.
+| a password, token, session id, auth or cookie header, key, connection string, card data or sensitive PII | nothing: drop it (LG4) | logs leak data; these values should not be recorded in logs at all |
+| a request or response body | the id and allowlisted fields only (LG4) | logs leak data, and a whole body or URL can carry any of the values above |
+| a `catch` that rethrows or wraps with the cause | no log call; the handler that decides the outcome logs it (LG2) | logging before a rethrow records the same exception more than once |
+| an exception | the throwable as the last argument (LG3) | a message-only log loses the type and stack trace |
+| a trace id or a business id | a key-value field: MDC or `addKeyValue` (LG1) | an id in a field lets one request be rebuilt from interleaved lines |
+| any other variable value | a `{}` placeholder in a constant template (LG6) | a constant template stops input from rewriting the message, and concatenation runs while the level is off |
+| an argument that is costly to build | a `Supplier` (Log4j `Supplier` overloads; SLF4J fluent `addArgument(Supplier)`), or a call behind `isXEnabled()` (LG6) | a `Supplier` or a guard builds the argument only when the level is on |
+| a production log layout | a structured (JSON) encoder (LG5) | unstructured text is hard to query, and a newline in input forges a line in it |
+| a logger field | `LoggerFactory.getLogger(DeclaringClass.class)` (LG8) | levels are configured by class-name hierarchy, and a misnamed logger cannot be tuned |
+| an appender | the console (stdout) only (LGN1) | the app writes its event stream, unbuffered, to stdout; the platform owns routing and storage |
 
 ## Good / Bad
 
 ### LG1 — Ids as fields, not in the text
 
-**Bad** (neutral)
+**Bad**
 ```java
 log.info("order {} placed by customer {}", orderId, customerId);
 ```
 The ids sit inside the text, so no query can select one order's lines without parsing every message.
 
-**Good** (neutral)
+**Good**
 ```java
 // the trace id comes from the MDC
 log.atInfo()
@@ -67,7 +65,7 @@ The message is constant, and each id is a field the encoder writes beside it.
 
 ### LG2 — Log once, where the failure is handled
 
-**Bad** (neutral)
+**Bad**
 ```java
 try {
     paymentGateway.charge(invoice);
@@ -78,7 +76,7 @@ try {
 ```
 The top-level handler logs the same failure again, so one failure counts twice.
 
-**Good** (neutral)
+**Good**
 ```java
 try {
     paymentGateway.charge(invoice);
@@ -90,13 +88,13 @@ It wraps with the cause and logs nothing. The handler that decides the response 
 
 ### LG3 — The exception as the last argument
 
-**Bad** (neutral)
+**Bad**
 ```java
 log.warn("refund failed: {}", e.getMessage());
 ```
 Only the message is kept. The type and the stack are lost.
 
-**Good** (neutral)
+**Good**
 ```java
 // the payment id is in the MDC (LG1)
 log.warn("refund failed", e);
@@ -106,14 +104,12 @@ The throwable is the last argument, so the logger prints its type and stack.
 ## Decided edges
 
 - **Skip when** a value in a log message is not an id, such as a count, a duration or a status: a `{}` placeholder
-  is right (LG6; SLF4J FAQ, Log4j API, r47 :517-518). — **Do not skip when** the value is a trace id or a business
-  id: it is a field (LG1, r47 :476-479). — **Confidence** high
-- **Skip when** the logger field is an instance field rather than `static`: both are allowed (LG8; SLF4J leaves
-  static or instance "to the user", r47 :527). — **Do not skip when** the class passed is not the declaring class.
-  — **Confidence** high
+  is right (LG6). — **Do not skip when** the value is a trace id or a business id: it is a field (LG1). —
+  **Confidence** high
+- **Skip when** the logger field is an instance field rather than `static`: both are allowed (LG8). — **Do not
+  skip when** the class passed is not the declaring class. — **Confidence** high
 - **Skip when** the throwable is passed with `setCause(e)` on the SLF4J fluent builder: it is the event's cause, as
-  the last argument is (LG3; SLF4J `LoggingEventBuilder` "Set the cause for the logging event being built", r47
-  :873-875). — **Do not skip when** the fluent call passes `e.getMessage()` or adds the throwable with
+  the last argument is (LG3). — **Do not skip when** the fluent call passes `e.getMessage()` or adds the throwable with
   `addArgument`. — **Confidence** high
 
 ## Review checks
