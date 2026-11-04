@@ -44,7 +44,7 @@ Contents: Rules · When X, use Y · Good / Bad (U4, JV1, JV5, CV3) · Decided ed
 | a `toMap` | the three-argument form, with a merge function (JV4) | a duplicate key throws `IllegalStateException` at runtime |
 | two `BigDecimal` values to compare | `compareTo` (JVN1) | `equals` compares the scale as well as the value, so 2.0 and 2.00 differ |
 | a local variable | `var` when the initializer names the type; else the type written out; never `var` with `<>` (JV5) | the reader cannot see a type the initializer hides, and `var` with a diamond infers `Object` |
-| a value that can be absent | `Optional` as the return type only (JV6) | an `Optional` parameter has three states, and every callee must check all three |
+| a value that can be absent | `Optional` as the return type only (JV6); unwrapping it is MJ12, `modern-java.md` | an `Optional` parameter has three states, and every callee must check all three |
 | a multi-line SQL, JSON or HTML string | a text block (JV7) | escaped concatenation hides the text's shape and invites a missing newline |
 | an I/O-backed `AutoCloseable` opened in a method | a try-with-resources header (JV8) | a resource not closed when an exception fires leaks until the process runs out of handles |
 | an `if`, `else`, `for`, `do` or `while` body | braces, even for one statement (JV9) | a line added under a brace-less body looks guarded but always runs |
@@ -151,6 +151,9 @@ This is the shape Prettier prints. Nobody wraps TypeScript by hand, so the forma
 - **Skip when** a framework's own style guide bans `var` (for example Spring Framework's): that ban serves a library
   read without an IDE, and JV5 already stops `var` from hiding a type. — **Do not skip when** the initializer does
   not name the type: write the type (JV5). — **Confidence** high
+- **Skip when** a `var` is a local whose initializer names the type (JV5). — **Do not skip when** the `var` sits in a
+  record pattern (`case Paid(var amount, var paidAt)`): a pattern has no initializer to name the type, so write the
+  component type, or `_` when unused (JV5; MJ6, `modern-java.md`). — **Confidence** medium
 - **Skip when** the `AutoCloseable` is not backed by I/O, such as a `Stream` over a collection: try-with-resources is
   in general unnecessary there. — **Do not skip when** it holds a file, a socket or a connection: JV8 applies. —
   **Confidence** high
@@ -171,7 +174,7 @@ enforces JV2, JV6 or JV9, cite the gate and skip the manual check.
 - [ ] JV4 — `grep -nE "toMap\("`. A `toMap` with no merge function is a finding.
 - [ ] JVN1 — For each `equals` call (`grep -nE "\.equals\("`), one between two `BigDecimal` values is a finding.
 - [ ] JV5 — `grep -nE "\bvar "`. A `var` whose initializer does not name its type (a constructor, a factory, a
-  literal) is a finding, and so is `var` with `<>`.
+  literal) is a finding, and so is `var` with `<>` or in a record pattern.
 - [ ] JV6 — Only where no gate enforces it (Checkstyle `IllegalType`): an `Optional` field, parameter or collection
   element is a finding.
 - [ ] JV7 — A multi-line SQL, JSON or HTML string built with `+` and `\n` is a finding (a nit).

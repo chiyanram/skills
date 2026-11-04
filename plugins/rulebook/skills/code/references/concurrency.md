@@ -141,7 +141,7 @@ public ChargeOutcome charge(final ChargeIntent intent) {
         return new ChargeOutcome.Failed(intent.idempotencyKey(), notSent.getClass().getSimpleName());
     } catch (final IOException afterConnect) {
         return new ChargeOutcome.Unknown(intent.idempotencyKey(), afterConnect.getClass().getSimpleName());
-    } catch (final InterruptedException interrupted) {
+    } catch (final InterruptedException _) {
         Thread.currentThread().interrupt();
         return new ChargeOutcome.Unknown(intent.idempotencyKey(), "interrupted");
     }
@@ -163,8 +163,8 @@ anything after connect is `Unknown`, for a reconciler to resolve.
 - **Skip when** the `join()` or `get()` sits at the outer boundary of the flow, or runs on a virtual thread (CC6). —
   **Do not skip when** it blocks mid-flow on an event-loop or common-pool thread. — **Confidence** high
 - **Skip when** request context crosses a `CompletableFuture` or executor hop as a parameter, not a `ScopedValue`: a
-  `ScopedValue` reaches only threads forked in a `StructuredTaskScope` (CC7). — **Do not skip when** it crosses in a
-  `ThreadLocal`, copied by hand or not. — **Confidence** high
+  `ScopedValue` reaches no other thread without `--enable-preview`, because `StructuredTaskScope` is preview in JDK 25
+  (CC7). — **Do not skip when** it crosses in a `ThreadLocal`, copied by hand or not. — **Confidence** high
 
 ## Review checks
 
