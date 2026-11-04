@@ -30,7 +30,7 @@ Contents: Rules · When X, use Y · Good / Bad (S1, S2, TM1, TM2, S3, S5) · Dec
 |---|---|---|
 | the behaviour is pure logic | a unit spec, with no Spring context | a Spring context makes a plain service test very slow (S1) |
 | the behaviour crosses a real boundary: DB, Redis, HTTP, Spring wiring | an IT | the flow needs real collaborators (S1) |
-| the behaviour is a user journey | a smoke spec | S1 |
+| the behaviour is a user journey | a smoke spec | only a smoke spec drives the journey through the UI a user sees (S1) |
 | the case is an error or unhappy path | the tier of what fails | an IT for a pure error branch starts Postgres yet reaches no boundary (S5) |
 | a boundary the IT covers has branching it cannot reach cheaply: many input combinations, error mapping, edge values | a unit spec for that branching only | no unit test re-proves what the IT proves (TM1) |
 | an acceptance criterion is reached through the API | an IT | a `.feature` tier with no Gherkin runtime left an orphan copy of an IT (AT1) |

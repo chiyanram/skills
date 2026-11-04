@@ -25,11 +25,11 @@ Each row maps what the new logic has to the RIGHT-BICEP dimension it triggers an
 |---|---|---|
 | has a main result: a method, parser, mapper or domain rule | Right results: one explicit expected value, written out (C3) | the expected value is explicit and independently understandable |
 | takes an input of a kind B2 names (`boundaries.md`) | Boundary conditions: the CORRECT cases of B1–B3 (`boundaries.md`) | when boundary analysis is the main task, CORRECT gives the detailed categories |
-| has two operations that undo or preserve each other: encode and decode, add and remove, write and read | Inverse relationships: run both directions; assert meaningful equality, not only a non-null result | a reviewer cannot tell a skipped dimension from a forgotten one (C1) |
+| has two operations that undo or preserve each other: encode and decode, add and remove, write and read | Inverse relationships: run both directions; assert meaningful equality, not only a non-null result | a round trip checked only for non-null passes when one direction loses data (C1) |
 | has a result that is easy to compute wrongly, or a complex algorithm | Cross-checks: compare with an independent calculation, fixture, alternate implementation or property | the oracle must not reimplement the production algorithm with the same defect |
-| can meet invalid input, illegal state, overflow, a missing resource or a denied operation | Error conditions: force the error directly; assert the exception type, and the message or error code when the contract names it | a reviewer cannot tell a skipped dimension from a forgotten one (C1) |
+| can meet invalid input, illegal state, overflow, a missing resource or a denied operation | Error conditions: force the error directly; assert the exception type, and the message or error code when the contract names it | an error that happens only incidentally leaves the error contract untested (C1) |
 | calls an external dependency | Error conditions: the unavailable case (C2); which of WARN and ERROR, see LG3 (`obs/references/logging.md`) | test how the code degrades when a dependency is unavailable |
-| has performance in its contract, or a known performance risk | Performance: a deterministic proxy — query count, batch count, call count — not a wall-clock threshold | a reviewer cannot tell a skipped dimension from a forgotten one (C1) |
+| has performance in its contract, or a known performance risk | Performance: a deterministic proxy — query count, batch count, call count — not a wall-clock threshold | a wall-clock threshold fails on normal machine variability (C1) |
 | has a case you knowingly leave untested | a gap row in the MR description (C4) | missing boundary cases are recorded as explicit test gaps; a gap matrix names dimension, missing test and risk |
 
 ## Good / Bad
