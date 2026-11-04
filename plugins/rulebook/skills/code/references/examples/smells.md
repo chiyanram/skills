@@ -116,9 +116,7 @@ The forwards are deleted. The caller asks the branch directly, and `Member` chan
 **Bad**
 ```java
 // OverdueNotifier.java
-if (loan.dueDate().isBefore(today.minusDays(3))) {
-    notifier.remind(loan);
-}
+notifier.remindAll(loans.stream().filter(loan -> loan.dueDate().isBefore(today.minusDays(3))).toList());
 // FineCalculator.java
 final boolean overdue = loan.dueDate().plusDays(3).isBefore(today);
 // BorrowingLimit.java
@@ -136,9 +134,7 @@ public record Loan(LoanId id, MemberId member, String title, LocalDate dueDate) 
     }
 }
 // OverdueNotifier.java
-if (loan.isOverdueOn(today)) {
-    notifier.remind(loan);
-}
+notifier.remindAll(loans.stream().filter(loan -> loan.isOverdueOn(today)).toList());
 // FineCalculator.java
 final boolean overdue = loan.isOverdueOn(today);
 // BorrowingLimit.java
