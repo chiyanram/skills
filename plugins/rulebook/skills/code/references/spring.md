@@ -7,38 +7,38 @@ Contents: Rules · When X, use Y · Good / Bad (LY6, LY7, SC21) · Decided edges
 
 ## Rules
 
-- **LY6** — Take dependencies through one constructor; make an optional or
-  zero-or-more collaborator an `ObjectProvider<T>` resolved at use, never a setter, a no-arg constructor or
-  `@Autowired(required=false)`, because a setter-injected collaborator may be null at every use.
-- **SC1** — Never use `@Autowired` in production code; give each bean exactly one
-  constructor and no test-only second constructor, because a test-only constructor that accepts null hides a production
-  wiring mistake.
-- **SC2** — Cut a dependency cycle; if it cannot be cut, hold an `ObjectProvider<T>`
-  field, resolve it at call time and name the cycle in a comment, because a constructor cycle fails startup with
-  `BeanCurrentlyInCreationException`.
-- **SC3** — Never put `@Lazy` on an `ObjectProvider` and never enable
-  `spring.main.lazy-initialization`; let wiring fail at startup, because with laziness a missing bean fails at the first
-  request instead.
+- **LY6** — Take required dependencies through the constructor into `final` fields, never fields or setters; resolve
+  an optional collaborator from an `ObjectProvider<T>` at use, because field or setter injection lets a bean start
+  with a null dependency.
+- **SC1** — Give each bean exactly one constructor, without `@Autowired`, and no second one for tests, because with
+  several constructors the container picks by its own rules and tests exercise wiring production never uses.
+- **SC2** — Cut every bean dependency cycle; where it cannot be cut, inject `ObjectProvider<T>` and resolve it at call
+  time, because a constructor cycle fails startup with `BeanCurrentlyInCreationException` and an AOT context refuses it.
+- **SCN1** — Never inject a prototype-, request- or session-scoped bean straight into a singleton; inject
+  `ObjectProvider<T>` and resolve it per use, because the singleton keeps the first instance forever.
+- **SC3** — Never enable global lazy initialization (`spring.main.lazy-initialization` or `setLazyInitialization`),
+  because a misconfigured bean then fails only when it is first used, not at startup.
 - **SC4** — When only one implementation of an interface should run, select it with a
   config flag (`@ConditionalOnProperty`), never with `@Primary`, because `@Primary` builds both beans and leaves the
   choice in code, not configuration.
 - **SC9** — Give every property-selected bean an `ApplicationContextRunner` spec
   proving each value picks the right bean and a missing value fails startup, because a wrong bean choice otherwise ships
   with no failing test.
-- **SC5** — Write each configuration class `@Configuration(proxyBeanMethods = false)`
-  and take collaborators as `@Bean` method parameters, never another `@Bean` method call, because without the CGLIB
-  proxy a direct `@Bean` call builds a second instance of the bean.
+- **SC7** — Put `@ConditionalOnBean` and `@ConditionalOnMissingBean` only on auto-configuration classes, because these
+  conditions see only the bean definitions processed so far, and only auto-configuration loads after every user bean.
+- **SC5** — Declare each configuration class `@Configuration(proxyBeanMethods = false)` and pass collaborators as
+  `@Bean` parameters, never by calling another `@Bean` method, because proxying adds a CGLIB subclass and,
+  without it, a direct call builds a second instance.
 - **SC6** — Declare a `@Bean` method's return type as the most specific type it
   builds, because before creation the container and type-based conditions see only the declared type.
 - **SC8** — Put feature switches (`@EnableScheduling`, `@EnableAsync`, `@Enable*Auditing`) on a dedicated
   `@Configuration`, never on the `@SpringBootApplication` class, because every slice test loads the main class and so
   enables them.
-- **LY7** — Bind grouped settings to one `@ConfigurationProperties` record that validates at startup, each key in one
-  place; use `@Value` only for a single scalar no other class reads, because split reads give one key two defaults.
-- **SC12** — Move a key read in two classes into the record that owns it, because each `@Value` read carries its own
-  default, so two reads of one key can disagree.
-- **SC11** — Register a properties record with `@EnableConfigurationProperties` on the module's configuration class,
-  never also as `@Component` or `@Bean`, because constructor binding does not apply to a record created that way.
+- **LY7** — Bind related settings to one `@ConfigurationProperties` record, each key in one place; use `@Value` only
+  for a lone scalar no other class reads, because scattered `@Value` reads each carry their own default and skip
+  validation.
+- **SC11** — Register a settings record with `@EnableConfigurationProperties` or `@ConfigurationPropertiesScan`, never
+  as `@Component` or a `@Bean` method, because constructor binding does not apply to a record created that way.
 - **SC13** — Read configuration only through binding or the `Environment`, as
   kebab-case keys under the app's own prefix, never `System.getenv` or an env-var name in `@Value`, because
   `System.getenv` skips configtree secrets and tests cannot override it.
@@ -48,15 +48,16 @@ Contents: Rules · When X, use Y · Good / Bad (LY6, LY7, SC21) · Decided edges
 - **SC14** — Bind times and sizes as `Duration` or `DataSize` with a unit in the value
   (`2s`), never a `long` named `*-ms` or `*-seconds`, because a bare number hides its unit, so seconds bind silently as
   milliseconds.
-- **SC15** — Make a settings record reject bad values at startup with a message naming the key, and prove it with a
-  runner spec, because a missing key otherwise crashes with a bare NullPointerException naming nothing.
-- **SC16** — Give a secret or a required endpoint no default: its absence fails startup or selects a named degraded mode
-  that logs once at WARN, because a blank encryption-key default silently stores secrets unencrypted.
-- **SC17** — Keep a secret out of every `@ConfigurationProperties` record, because the
-  record's generated `toString` prints the secret.
-- **X6** — Never use `@PostConstruct` in main code; put a startup check in the constructor and startup work in an
-  `ApplicationRunner` or `SmartLifecycle`, because `@PostConstruct` runs inside the singleton creation lock and risks
-  deadlock.
+- **SC15** — Put `@Validated` and Jakarta constraints on each settings record, and prove with an
+  `ApplicationContextRunner` that a missing or invalid value fails startup, because otherwise a bad value surfaces only
+  when the code first reads it.
+- **SC16** — Give a secret or required endpoint no default value, so its absence fails startup, because a shipped
+  default credential or blank key silently runs production insecure.
+- **SC17** — Never hold a secret as a plain `String` component of a settings record; wrap it in a type whose
+  `toString` redacts it, because a record's generated `toString` prints every component value into logs.
+- **X6** — Limit `@PostConstruct` to checking injected state; move I/O, calls to other beans and thread or container
+  starts to an `ApplicationRunner` or `SmartLifecycle`, because `@PostConstruct` runs inside the singleton creation
+  lock and can deadlock.
 - **SC19** — Run startup work that must finish before traffic in an
   `ApplicationRunner`; hand later work to another thread from `@EventListener(ApplicationReadyEvent)`, which returns at
   once, because event listeners must not run lengthy tasks.
@@ -65,6 +66,8 @@ Contents: Rules · When X, use Y · Good / Bad (LY6, LY7, SC21) · Decided edges
   hand-started container misses the context's shutdown phases.
 - **SC21** — Call a method with a proxied annotation only from another bean; move it to a second bean, with no
   self-injection and no `AopContext`, because a `this` call bypasses the proxy, so the transaction never starts.
+- **SC22** — Put `@Retryable` on the `@Transactional` method or on a caller with no open transaction, never inside an
+  outer transaction, because each attempt then joins a transaction already marked rollback-only and repeats inside it.
 - **SC23** — Put `@Transactional(readOnly = true)` on a service class whose methods mostly read, and plain
   `@Transactional` on each write method, because without the read-only default every query pays for dirty checking.
 - **SX18** — Make a static-only class `final` with a private constructor, because Java
@@ -79,42 +82,44 @@ Contents: Rules · When X, use Y · Good / Bad (LY6, LY7, SC21) · Decided edges
 
 | the code has | use | why |
 |---|---|---|
-| a collaborator that may be absent, or zero or more of one type | an `ObjectProvider<T>` field, resolved where it is used, with no `@Lazy` (LY6, SC3) | SF §Constructor-based or setter-based DI: with setter injection "not-null checks must be performed everywhere" · plinth 301 :713 · Jeffallan :189 · resolve at use, no `@Lazy`: operator preference |
-| a dependency cycle that cannot be cut | an `ObjectProvider<T>` field resolved at call time, and a comment naming the cycle (SC2) | SF §Circular dependencies: a constructor cycle throws `BeanCurrentlyInCreationException` · the provider and comment: operator preference |
-| several implementations of one type, and only one should run | one `@ConditionalOnProperty` value per implementation, exactly one matching, an unset flag failing startup (SC4) | plinth 301 :598-599 (Example 6) selects by `@ConditionalOnProperty` · never `@Primary`: operator preference |
-| several settings that belong together | one `@ConfigurationProperties` record (LY7); `@Value` for one scalar no other class reads | SB §@ConfigurationProperties vs. @Value · plinth 301 :429 "avoid scattering many `@Value` fields" · Jeffallan :182 |
-| a check on one settings field | a Jakarta constraint, with `@Validated` on the record (SC15) | SB §@ConfigurationProperties Validation · plinth 301 :1170 · a compact-constructor check alone crashes on a missing key with an unnamed NullPointerException |
-| a rule across settings fields | a compact-constructor check, beside the field constraints (SC15) | operator preference |
-| a startup check on injected state | the constructor (X6) | SF §Initialization Callbacks: `@PostConstruct` runs in the singleton creation lock, "a risk for an initialization deadlock" · plinth 301 :317 "avoid heavy work in `@PostConstruct`" |
-| startup work that must finish before traffic | an `ApplicationRunner` (SC19) | SB §Application Events and Listeners: a runner finishes after context refresh, before the app accepts traffic |
-| startup work that may finish later | a thread started from an `@EventListener(ApplicationReadyEvent)` that returns at once (SC19) | SB §Application Events and Listeners: "Event listeners should not run potentially lengthy tasks" |
-| background work that starts and stops | a `SmartLifecycle` bean (SC20) | SF §Startup and Shutdown Callbacks: `SmartLifecycle` phases |
-| a proxied method (such as `@Transactional`) called from its own class | the method on a second bean (SC21) | SF §Understanding AOP Proxies: "self invocation … will bypass the advice" · plinth 311 :1006 (Example 14) |
-| a service whose methods mostly read | `@Transactional(readOnly = true)` on the class; plain `@Transactional` on each write method (SC23) | plinth 311 :665-668 (Example 10) · Jeffallan data.md :153 · Spring Data JPA §Transactionality: `SimpleJpaRepository` reads run read-only, so Hibernate skips dirty checks |
-
-Sources: SF = Spring Framework reference, SB = Spring Boot reference (docs.spring.io; one vendor, one source); plinth
-301 / 311 = jabrena-plinth `skills/301-frameworks-spring-boot-core` and `311-frameworks-spring-jdbc` references;
-Jeffallan = Jeffallan claude-skills `spring-boot-engineer/SKILL.md`. Rules without a row: SC1 one constructor (SF
-§Constructor-based DI, plinth 301 :713), the rest operator preference; SC5 SF §Java-based Configuration (CGLIB
-subclass); SC6 SF §Using the @Bean Annotation "declare the most specific return type"; SC8 SB §Detecting Test
-Configuration, plinth 301 :53; SC11 SB §Constructor Binding, plinth 301 :429, :1170; SC12 as LY7; SC13 and SC10 SB
-§Property Placeholders and §Relaxed Binding (kebab-case is canonical); SC14 SB §Converting Durations (a bare `long`
-binds as milliseconds); SC15 the runner spec: rrezartprebreza/spring-boot-skills
-`spring-boot-4/configuration-properties/SKILL.md:44-46`, giuseppe-trisciuoglio/developer-kit
-`unit-test-config-properties/SKILL.md:31,34`; SC16 plinth 301 :1407 "Do not commit secrets", Jeffallan :194 "Hardcode … credentials" (MUST
-NOT); SC17 JDK `java.lang.Record#toString` (the implicit string holds each component's name and value); SX18 Checkstyle
-`HideUtilityClassConstructor` and `FinalClass`, github/awesome-copilot `instructions/springboot.instructions.md:33`;
-SC9, SX14 and SX19 operator preference.
-
-Operator preference, 2026-10-31 (SRC2), in whole or in part: LY6, SC1, SC2, SC3, SC4, SC9, SC5, SC6, SC13, SC10, SC14, SC17, SC19, SC20, SX19 and SX14.
+| a required collaborator | a constructor parameter kept in a `final` field (LY6) | a field- or setter-injected bean can start with a null dependency |
+| a collaborator that may be absent | an `ObjectProvider<T>`, resolved where it is used (LY6) | its absence becomes a decision at the call, not a null |
+| a bean with more than one constructor | one constructor, with no `@Autowired` (SC1) | with several, the container picks by its own rules and tests run wiring production never uses |
+| a dependency cycle | cut it; where it cannot be cut, an `ObjectProvider<T>` resolved at call time (SC2) | a constructor cycle fails startup, and an AOT context refuses it |
+| a prototype-, request- or session-scoped bean used by a singleton | an `ObjectProvider<T>` resolved per use (SCN1) | a plain injection keeps the first instance forever |
+| the lazy-initialization switch | left at its default, off (SC3) | a misconfigured bean fails at startup, not at its first use |
+| several implementations of one type, and only one should run | one `@ConditionalOnProperty` value per implementation, exactly one matching, an unset flag failing startup (SC4, SC10) | the choice lives in configuration, and only the chosen bean is built |
+| a property-selected bean | an `ApplicationContextRunner` spec with a case per value and a missing-value case (SC9) | a wrong bean choice otherwise ships with no failing test |
+| a bean that backs off when the user defines one | `@ConditionalOnMissingBean` on an auto-configuration class (SC7) | only auto-configuration loads after every user bean, so the condition sees them all |
+| a `@Bean` method that needs another bean | the other bean as a method parameter, in a `proxyBeanMethods = false` class (SC5) | no CGLIB subclass, and no second instance from a direct call |
+| a `@Bean` method that builds an implementation of an interface | the concrete class as its return type (SC6) | the container and type-based conditions see only the declared type before creation |
+| an `@Enable*` feature switch | a dedicated `@Configuration` (SC8) | every slice test loads the main class |
+| several settings that belong together | one `@ConfigurationProperties` record (LY7); `@Value` for one scalar no other class reads | one key, one default, validated once |
+| a settings record to register | `@EnableConfigurationProperties` or `@ConfigurationPropertiesScan` (SC11) | constructor binding does not apply to a `@Component` or `@Bean` record |
+| a configuration value | binding or the `Environment`, kebab-case under the app's prefix (SC13) | `System.getenv` skips configtree secrets and tests cannot override it |
+| a time or size setting | `Duration` or `DataSize` (SC14) | a bare number hides its unit |
+| a check on a settings value | a Jakarta constraint with `@Validated`, and an `ApplicationContextRunner` spec for the failure (SC15) | a bad value fails startup instead of the first read |
+| a secret or a required endpoint | no default, so absence fails startup (SC16) | a shipped default credential runs production insecure |
+| a secret among the settings | a value type whose `toString` redacts it (SC17) | a record's `toString` prints every component |
+| a startup check on injected state | the constructor or a `@PostConstruct` that only checks (X6) | it fails startup without work inside the creation lock |
+| startup work beyond checking injected state | an `ApplicationRunner`, or a `SmartLifecycle` bean (X6) | `@PostConstruct` runs inside the singleton creation lock and can deadlock |
+| startup work that must finish before traffic | an `ApplicationRunner` (SC19) | a runner finishes after context refresh, before the app accepts traffic |
+| startup work that may finish later | a thread started from an `@EventListener(ApplicationReadyEvent)` that returns at once (SC19) | event listeners must not run lengthy tasks |
+| background work that starts and stops | a `SmartLifecycle` bean (SC20) | it joins the context's start and shutdown phases |
+| a proxied method (such as `@Transactional`) called from its own class | the method on a second bean (SC21) | a `this` call bypasses the proxy |
+| a retry around a transaction | `@Retryable` on the `@Transactional` method, or on a caller holding no transaction (SC22) | each attempt then starts a fresh transaction instead of joining a doomed one |
+| a service whose methods mostly read | `@Transactional(readOnly = true)` on the class; plain `@Transactional` on each write method (SC23) | read-only transactions skip dirty checking |
+| a class with only static members | `final`, with a private constructor (SX18) | no caller can build an instance that makes no sense |
+| console output | a logger call (SX19) | console output skips the logger's level and context |
+| a method in a package-private class | `public` only on an override (SX14) | a public method there widens visibility by accident |
 
 ## Good / Bad
 
 Every rule's approved pair: [examples/spring.md](examples/spring.md).
 
-### LY6 — One constructor; an optional collaborator is an `ObjectProvider<T>` resolved at use
+### LY6 — Required dependencies through the constructor; an optional one is an `ObjectProvider<T>` resolved at use
 
-**Bad** (from plinth 301 :791, Example 7)
+**Bad**
 ```java
 @Service
 class OrderService {
@@ -132,10 +137,9 @@ class OrderService {
     }
 }
 ```
-With no `LoyaltyService` bean, `loyalty` stays null, so every order fails after it is saved. SF §Constructor-based or
-setter-based DI: with setters, not-null checks must be done everywhere.
+With no `LoyaltyService` bean, `loyalty` stays null, so every order fails after it is saved.
 
-**Good** (neutral)
+**Good**
 ```java
 @Service
 class OrderService {
@@ -156,21 +160,17 @@ class OrderService {
 One constructor takes every collaborator. The optional one is resolved where it is used, so its absence is a decision
 in the code, not a null.
 
-### LY7 — Grouped settings in one validated record; each key bound in one place
+### LY7 — Related settings in one validated record; each key bound in one place
 
-**Bad** (from plinth 301 :486, Example 4)
+**Bad**
 ```java
-@Configuration
+@Configuration(proxyBeanMethods = false)
 class PaymentGatewayConfig {
-    @Value("${shop.payment-gateway.base-url}")
-    private String baseUrl;
-    @Value("${shop.payment-gateway.connect-timeout:5s}")
-    private Duration connectTimeout;
-    @Value("${shop.payment-gateway.max-connections:10}")
-    private int maxConnections;
-
     @Bean
-    PaymentGatewayClient paymentGatewayClient() {
+    PaymentGatewayClient paymentGatewayClient(
+            @Value("${shop.payment-gateway.base-url}") final String baseUrl,
+            @Value("${shop.payment-gateway.connect-timeout:5s}") final Duration connectTimeout,
+            @Value("${shop.payment-gateway.max-connections:10}") final int maxConnections) {
         return new PaymentGatewayClient(baseUrl, connectTimeout, maxConnections);
     }
 }
@@ -178,7 +178,7 @@ class PaymentGatewayConfig {
 Three related keys are read one by one, each with its own default. A second class that reads one of them can choose a
 different default, and no value is checked at startup.
 
-**Good** (from plinth 301 :462, Example 4)
+**Good**
 ```java
 @Validated
 @ConfigurationProperties("shop.payment-gateway")
@@ -200,7 +200,7 @@ One record binds the group once and validates it at startup. Every class that ne
 
 ### SC21 — A proxied annotation works only on a call from another bean; never through `this`
 
-**Bad** (from plinth 311 :1073, Example 14)
+**Bad**
 ```java
 @Service
 class OrderService {
@@ -219,7 +219,7 @@ class OrderService {
 ```
 The call goes through `this`, not the proxy, so no transaction starts. A failed insert leaves the stock reduced.
 
-**Good** (from plinth 311 :1049, Example 14)
+**Good**
 ```java
 @Service
 class OrderService {
@@ -243,70 +243,78 @@ The transactional method lives on a second bean, so the call crosses the proxy. 
   not skip when** the class is production code, including a second constructor only a test calls (SC1). —
   **Confidence** high
 - **Skip when** both implementations must exist at once and callers pick one: `@Primary` for the default or
-  `@Qualifier` at the injection point (plinth 301 :1072-1074, Example 10). — **Do not skip when** only one of them
-  should run; then a config flag selects it (SC4). — **Confidence** high
-- **Skip when** both implementations must exist at once (the edge above). — **Do not skip when** a
-  `@Fallback` bean or a `@ConditionalOnMissingBean` stub stands in for the one that should run: each hides the choice
-  as `@Primary` does, and a stub resolved by load order once beat the real bean (SC4, operator preference). —
-  **Confidence** high
-- **Skip when** a named degraded mode is chosen on purpose: its switch property is set only in test or local
-  configuration (SC16). — **Do not skip when** the switch is set in the shipped `application.yml`, or the mode starts
-  without its one WARN (SC16). — **Confidence** high
+  `@Qualifier` at the injection point (SC4). — **Do not skip when** only one of them should run; then a config flag
+  selects it (SC4). — **Confidence** high
+- **Skip when** both implementations must exist at once (the edge above). — **Do not skip when** a `@Fallback` bean or
+  a `@ConditionalOnMissingBean` stub stands in for the one that should run: each hides the choice as `@Primary` does,
+  and a stub resolved by load order can beat the real bean (SC4, SC7). — **Confidence** high
 - **Skip when** the settings are for tests: they live in `src/test/resources/application.yml`, and local overrides
-  come from environment variables or an untracked file outside the repo (operator preference). — **Do not skip when**
-  an environment needs other settings or another bean: no `@Profile` and no `application-<profile>.yml`; settings
-  differ by environment variables or a config tree, features by `@ConditionalOnProperty` (SC4), because profile
-  configuration leaks test doubles (operator preference). The industry allows `@Profile`: plinth prefers it over
-  `if (env == "prod")` branches in code (301:598-599), and so does this rule. — **Confidence** high
-- **Skip when** the static-only class is the `@SpringBootApplication` class: the gate ignores classes annotated with
-  it (SX18). — **Do not skip when** any other class holds only static members (SX18). — **Confidence** high
+  come from environment variables or an untracked file outside the repo. — **Do not skip when** an environment needs
+  other settings or another bean: no `@Profile` and no `application-<profile>.yml`; settings differ by environment
+  variables or a config tree, features by `@ConditionalOnProperty` (SC4), because profile configuration leaks test
+  doubles. — **Confidence** high
+- **Skip when** the static-only class is the `@SpringBootApplication` class: it is a full `@Configuration`, which
+  Spring subclasses with CGLIB, and a `final` class cannot be proxied (SX18). — **Do not skip when** any other class
+  holds only static members (SX18). — **Confidence** high
 - **Skip when** the console output sits in a `main` method (SX19). — **Do not skip when** it sits in any other
   main-code method (SX19). — **Confidence** high
 
 ## Review checks
 
-Walk every changed main-code Java file, every changed `application*.yml` and every changed configuration test.
+Walk every changed main-code Java file, every changed `application*.yml` or `application*.properties` and every changed
+configuration test.
 
-- [ ] LY6 — For each bean, find one constructor. A setter or field injection, a no-arg constructor beside setters, or
-  `@Autowired(required=false)` is a finding. An `ObjectProvider` resolved in a constructor or `@Bean` method is a
-  finding.
-- [ ] SC1 — A second constructor only a test calls is a finding. Only where no gate enforces it (Checkstyle
-  `IllegalImport`): `@Autowired` in production code is a finding.
-- [ ] SC2 — An `ObjectProvider` field that breaks a cycle without a comment naming the cycle is a finding.
-- [ ] SC3 — `@Lazy` on an `ObjectProvider` (`grep -rn "@Lazy"`), or `spring.main.lazy-initialization` set to true in any
-  `application*.yml`, is a finding.
+- [ ] LY6 — For each bean, find its constructor. `@Autowired`, `@Inject` or `@Value` on a field or setter
+  (`grep -rnE "@(Autowired|Inject|Value)\b"`, then read the next line) is a finding, and so is a required dependency
+  kept in a non-`final` field. An `ObjectProvider` resolved (`getObject`, `getIfAvailable`) in a constructor or `@Bean`
+  method is a finding.
+- [ ] SC1 — A bean with more than one constructor, or `@Autowired` on a bean's constructor, is a finding.
+- [ ] SC2 — For each changed constructor, follow its parameters' beans. A cycle back to the bean that is not cut and not
+  held by an `ObjectProvider<T>` resolved at call time is a finding.
+- [ ] SCN1 — For each prototype-, request- or session-scoped bean (`grep -rnE "@(RequestScope|SessionScope|Scope\()"`),
+  find where it is injected. A singleton that takes it as a plain constructor parameter or field is a finding; an
+  `ObjectProvider<T>` resolved per use is not.
+- [ ] SC3 — `spring.main.lazy-initialization` set to true in any `application*` file, or `setLazyInitialization(true)`
+  or `lazyInitialization(true)` in main code (`grep -rnE "lazy-initialization[:=] *true|azyInitialization\(true\)"`),
+  is a finding.
 - [ ] SC4 — `@Primary`, `@Fallback` or a `@ConditionalOnMissingBean` stub in main code
-  (`grep -rnE "@(Primary|Fallback|ConditionalOnMissingBean)"`) on one of several implementations where only one should run
-  is a finding. For each such type, each implementation carries `@ConditionalOnProperty` for its own value, exactly one
-  matches, and an unset flag fails startup; a gap is a finding.
+  (`grep -rnE "@(Primary|Fallback|ConditionalOnMissingBean)"`) on one of several implementations where only one should
+  run is a finding. For each such type, each implementation carries `@ConditionalOnProperty` for its own value, exactly
+  one matches, and an unset flag fails startup; a gap is a finding.
 - [ ] SC9 — For each property-selected bean, find an `ApplicationContextRunner` spec with a case per value and a case
   for the missing value. A value or the missing case without one is a finding.
+- [ ] SC7 — `@ConditionalOnBean` or `@ConditionalOnMissingBean` (`grep -rnE "@ConditionalOn(Missing)?Bean\b"`) in a
+  class that is not an auto-configuration class (`@AutoConfiguration`, or listed in
+  `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`) is a finding.
 - [ ] SC5 — A `@Configuration` without `proxyBeanMethods = false`, or a `@Bean` method that calls another `@Bean`
   method, is a finding.
 - [ ] SC6 — A `@Bean` method whose declared return type is wider than the type it builds is a finding.
 - [ ] SC8 — An `@Enable*` annotation on the `@SpringBootApplication` class is a finding.
-- [ ] LY7 — Two or more related keys read through `@Value`, or a `@Value` key that another class also reads, is a
-  finding. A record without startup validation is a finding (SC15).
-- [ ] SC12 — For each changed key, `grep -rn "<key>" src/main` across the modules. A key read in two classes is a
-  finding.
-- [ ] SC11 — A properties record also annotated `@Component` or returned from a `@Bean` method is a finding, and so is a
-  record not registered with `@EnableConfigurationProperties`.
+- [ ] LY7 — Two or more related keys read through `@Value` is a finding. For each changed key, `grep -rn "<key>"
+  src/main` across the modules; a key read in two classes is a finding.
+- [ ] SC11 — A settings record annotated `@Component` or returned from a `@Bean` method is a finding, and so is one
+  registered by neither `@EnableConfigurationProperties` nor `@ConfigurationPropertiesScan`.
 - [ ] SC13 — `System.getenv` in main code (`grep -rn "System.getenv"`), an upper-case env-var name in `@Value`, or a key
   that is not kebab-case under the app's own prefix, is a finding.
 - [ ] SC10 — An `@ConditionalOnProperty` whose key is not kebab-case under the app's own prefix, or that does not state
   both `havingValue` and `matchIfMissing`, is a finding.
 - [ ] SC14 — A time or size setting bound as a number, or a key ending `-ms` or `-seconds`, is a finding.
-- [ ] SC15 — For each settings record, a bad and a missing value fail startup with a message naming the key, and a
-  runner spec proves both. Either one unproven is a finding.
-- [ ] SC16 — A default for a secret or a required endpoint (`${…:}` or `@DefaultValue`) is a finding. A degraded mode
-  with no name or no WARN at startup is a finding.
-- [ ] SC17 — A secret (key, password, token) as a component of a `@ConfigurationProperties` record is a finding.
-- [ ] X6 — Only where no gate enforces it (Checkstyle `IllegalImport`): `@PostConstruct` in main code is a finding.
+- [ ] SC15 — A settings record without `@Validated`, or a field that must be present or bounded without its Jakarta
+  constraint, is a finding. A record with no `ApplicationContextRunner` spec proving that a missing and an invalid
+  value fail startup is a finding.
+- [ ] SC16 — A default for a secret or a required endpoint (`${key:…}` in `@Value` or yml, `@DefaultValue`, or a
+  fallback when the value is blank) is a finding.
+- [ ] SC17 — A secret (key, password, token) held as a plain `String` component of a settings record is a finding; a
+  component of a type whose `toString` redacts it is not.
+- [ ] X6 — A `@PostConstruct` method (`grep -rn "@PostConstruct"`) that does I/O, calls another bean, or starts a
+  thread or container is a finding; one that only checks injected state is not.
 - [ ] SC19 — Startup work that must finish before traffic outside an `ApplicationRunner` is a finding, and so is an
   `ApplicationReadyEvent` listener that runs the work itself instead of handing it to another thread.
 - [ ] SC20 — A listener container or consumer loop created with `new` and started by hand is a finding.
 - [ ] SC21 — For each method with a proxied annotation, find its callers. A call through `this`, a self-injected field,
   or `AopContext` is a finding.
+- [ ] SC22 — For each `@Retryable` method (`grep -rn "@Retryable"`), find its callers. A caller that already runs inside
+  a transaction, `@Transactional` on it or on a method up its call chain, is a finding.
 - [ ] SC23 — A service class whose methods mostly read without `@Transactional(readOnly = true)` at class level is a
   finding, and so is a write method in it without its own `@Transactional`.
 - [ ] SX18 — Only where no gate enforces it (Checkstyle `HideUtilityClassConstructor` and `FinalClass`): a static-only

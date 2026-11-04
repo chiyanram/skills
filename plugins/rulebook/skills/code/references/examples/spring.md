@@ -1,17 +1,13 @@
 # Spring — Good / Bad examples
 
-Every approved Good/Bad pair for the Spring rules, one per rule that has one. The rules, the decision table and the
-review checks are in [`../spring.md`](../spring.md). Each pair is in one neutral domain (a shop: orders, stock,
-payments). Labels use the source names of `../spring.md`: plinth 301 / 311 = jabrena-plinth
-`skills/301-frameworks-spring-boot-core/references/301-frameworks-spring-boot-core.md` and
-`skills/311-frameworks-spring-jdbc/references/311-frameworks-spring-jdbc.md`; SF / SB = the Spring Framework / Spring
-Boot reference.
+Every Good/Bad pair for the Spring rules, one per rule that has one. The rules, the decision table and the review
+checks are in [`../spring.md`](../spring.md). Each pair is in one domain (a shop: orders, stock, payments).
 
 Contents: LY6 · LY7 · SC6 · SC4 · SC15 · SC16 · SC19 · SC21
 
-### LY6 — One constructor; an optional collaborator is an `ObjectProvider<T>` resolved at use
+### LY6 — Required dependencies through the constructor; an optional one is an `ObjectProvider<T>` resolved at use
 
-**Bad** (from plinth 301 :791, Example 7)
+**Bad**
 ```java
 @Service
 class OrderService {
@@ -29,10 +25,9 @@ class OrderService {
     }
 }
 ```
-With no `LoyaltyService` bean, `loyalty` stays null, so every order fails after it is saved. SF §Constructor-based or
-setter-based DI: with setters, not-null checks must be done everywhere.
+With no `LoyaltyService` bean, `loyalty` stays null, so every order fails after it is saved.
 
-**Good** (neutral)
+**Good**
 ```java
 @Service
 class OrderService {
@@ -53,21 +48,17 @@ class OrderService {
 One constructor takes every collaborator. The optional one is resolved where it is used, so its absence is a decision
 in the code, not a null.
 
-### LY7 — Grouped settings in one validated record; each key bound in one place
+### LY7 — Related settings in one validated record; each key bound in one place
 
-**Bad** (from plinth 301 :486, Example 4)
+**Bad**
 ```java
-@Configuration
+@Configuration(proxyBeanMethods = false)
 class PaymentGatewayConfig {
-    @Value("${shop.payment-gateway.base-url}")
-    private String baseUrl;
-    @Value("${shop.payment-gateway.connect-timeout:5s}")
-    private Duration connectTimeout;
-    @Value("${shop.payment-gateway.max-connections:10}")
-    private int maxConnections;
-
     @Bean
-    PaymentGatewayClient paymentGatewayClient() {
+    PaymentGatewayClient paymentGatewayClient(
+            @Value("${shop.payment-gateway.base-url}") final String baseUrl,
+            @Value("${shop.payment-gateway.connect-timeout:5s}") final Duration connectTimeout,
+            @Value("${shop.payment-gateway.max-connections:10}") final int maxConnections) {
         return new PaymentGatewayClient(baseUrl, connectTimeout, maxConnections);
     }
 }
@@ -75,7 +66,7 @@ class PaymentGatewayConfig {
 Three related keys are read one by one, each with its own default. A second class that reads one of them can choose a
 different default, and no value is checked at startup.
 
-**Good** (from plinth 301 :462, Example 4)
+**Good**
 ```java
 @Validated
 @ConfigurationProperties("shop.payment-gateway")
@@ -97,7 +88,7 @@ One record binds the group once and validates it at startup. Every class that ne
 
 ### SC6 — A `@Bean` method returns the most specific type it builds
 
-**Bad** (from SF §Using the @Bean Annotation, Declaring a Bean)
+**Bad**
 ```java
 @Bean
 PaymentService paymentService(final PaymentRepository payments) {
@@ -107,7 +98,7 @@ PaymentService paymentService(final PaymentRepository payments) {
 The method builds a `CardPaymentService` but declares the interface. Before creation, the container and type-based
 conditions see only `PaymentService`.
 
-**Good** (from SF §Using the @Bean Annotation, "declare the most specific return type possible")
+**Good**
 ```java
 @Bean
 CardPaymentService paymentService(final PaymentRepository payments) {
@@ -119,9 +110,9 @@ has.
 
 ### SC4 — Several implementations: `@ConditionalOnProperty` per value, exactly one matches, missing fails startup
 
-**Bad** (from plinth 301 :1091, Example 10)
+**Bad**
 ```java
-@Configuration
+@Configuration(proxyBeanMethods = false)
 class OrderNotifierConfig {
     @Bean
     @Primary
@@ -138,7 +129,7 @@ class OrderNotifierConfig {
 Every start builds both notifiers, and `@Primary` puts the choice of email in code. A move to SMS needs a release, not
 a setting.
 
-**Good** (from plinth 301 :645, Example 6)
+**Good**
 ```java
 @Configuration(proxyBeanMethods = false)
 class OrderNotifierConfig {
@@ -158,9 +149,9 @@ class OrderNotifierConfig {
 Each value builds exactly one notifier. An unset channel builds none, so the bean that needs an `OrderNotifier` fails
 startup.
 
-### SC15 — A settings record rejects bad values at startup, naming the key; a runner spec proves it
+### SC15 — A settings record validates at startup; a runner spec proves a missing value fails it
 
-**Bad** (from plinth 301 :1212, Example 11)
+**Bad**
 ```java
 @ConfigurationProperties("shop.shipping")
 public record ShippingProperties(URI baseUrl,
@@ -169,8 +160,7 @@ public record ShippingProperties(URI baseUrl,
 ```
 A missing `base-url` binds as null. The first shipment then fails with a NullPointerException that names no key.
 
-**Good** (record from plinth 301 :1188, Example 11; spec from rrezartprebreza/spring-boot-skills
-`spring-boot-4/configuration-properties/SKILL.md:44-46`)
+**Good**
 ```java
 @Validated
 @ConfigurationProperties("shop.shipping")
@@ -190,9 +180,9 @@ def "should fail startup naming baseUrl when base-url is missing"() {
 Each field carries its own constraint, so the bind-validation failure names the field. The runner spec proves the
 missing case.
 
-### SC16 — No default for a secret or required endpoint; fail, or a named degraded mode at WARN
+### SC16 — No default for a secret or required endpoint; its absence fails startup
 
-**Bad** (from plinth 301 :510, Example 4)
+**Bad**
 ```java
 @Bean
 PaymentGatewayClient paymentGatewayClient(
@@ -201,10 +191,10 @@ PaymentGatewayClient paymentGatewayClient(
     return new PaymentGatewayClient(gateway, apiKey);
 }
 ```
-The source hard-codes the password. This default does the same behind a placeholder: an unset key starts the shop with
-the test key, and no log says so.
+The default is a hard-coded credential behind a placeholder: an unset key starts the shop with the test key, and no
+log says so.
 
-**Good** (neutral)
+**Good**
 ```java
 @Bean
 PaymentGatewayClient paymentGatewayClient(
@@ -218,7 +208,7 @@ The key has no default. If it is unset, startup fails with "Could not resolve pl
 
 ### SC19 — Work that must finish before traffic runs in an `ApplicationRunner`; later work goes to a thread from ready
 
-**Bad** (from plinth 301 :366, Example 3)
+**Bad**
 ```java
 @Component
 class PriceCatalogueLoader {
@@ -230,10 +220,10 @@ class PriceCatalogueLoader {
     }
 }
 ```
-A long load runs inside an event listener, on the thread that publishes the event. SB §Application Events and Listeners:
-listeners should not run lengthy tasks.
+A long load runs inside an event listener, on the thread that publishes the event, and event listeners must not run
+lengthy tasks.
 
-**Good** (from SB §Using the ApplicationRunner or CommandLineRunner)
+**Good**
 ```java
 @Component
 class PriceCatalogueLoader implements ApplicationRunner {
@@ -253,7 +243,7 @@ Orders need prices before the first request. A runner finishes after context ref
 
 ### SC21 — A proxied annotation works only on a call from another bean; never through `this`
 
-**Bad** (from plinth 311 :1073, Example 14)
+**Bad**
 ```java
 @Service
 class OrderService {
@@ -272,7 +262,7 @@ class OrderService {
 ```
 The call goes through `this`, not the proxy, so no transaction starts. A failed insert leaves the stock reduced.
 
-**Good** (from plinth 311 :1049, Example 14)
+**Good**
 ```java
 @Service
 class OrderService {
