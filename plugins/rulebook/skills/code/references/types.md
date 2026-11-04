@@ -182,8 +182,8 @@ swap.
   code needs a cast, a null check or a "never happens" throw to work. — **Confidence** high
 - **Skip when** the switch is an old-style colon statement under a Checkstyle `MissingSwitchDefault` gate: that check
   asks for a `default` there and skips switch expressions. — **Do not skip when** the switch can be written
-  arrow-form over a sealed type or an enum: write it so, with no `default` (TY2; Google Java Style §4.8.4.3 counts an
-  enum switch that covers every value as exhaustive). — **Confidence** medium
+  arrow-form over a sealed type or an enum: write it so, with no `default` (TY2; an enum switch that covers every value
+  is exhaustive). — **Confidence** medium
 
 ## Review checks
 
