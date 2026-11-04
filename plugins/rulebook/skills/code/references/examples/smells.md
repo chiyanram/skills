@@ -39,8 +39,12 @@ public sealed interface LoanTerm {
     }
 }
 // DueDate is sealed: None() or On(LocalDate date).
-// checkout: return new Loan(member.id(), book.id(), member.term().dueFrom(today));
-// renewal:  return loan.withDue(member.term().dueFrom(today));
+
+// CheckoutService.java
+return new Loan(member.id(), book.id(), member.term().dueFrom(today));
+
+// RenewalService.java
+return loan.withDue(member.term().dueFrom(today));
 ```
 The term decides the due date once. Both callers lose their branch instead of each one taking it.
 
@@ -94,7 +98,7 @@ public final class Member {
     public Address returnAddress() { return branch.returnAddress(); }
 }
 // caller
-final var librarian = member.librarian();
+final Librarian librarian = member.librarian();
 ```
 `Member` forwards three calls to `Branch` and adds nothing. Each new `Branch` query adds one more forward to trace.
 
@@ -131,9 +135,14 @@ public record Loan(LoanId id, MemberId member, String title, LocalDate dueDate) 
         return today.isAfter(dueDate.plusDays(GRACE_DAYS));
     }
 }
-// OverdueNotifier: if (loan.isOverdueOn(today)) { notifier.remind(loan); }
-// FineCalculator:  final boolean overdue = loan.isOverdueOn(today);
-// BorrowingLimit:  final long overdueCount = loans.stream().filter(loan -> loan.isOverdueOn(today)).count();
+// OverdueNotifier.java
+if (loan.isOverdueOn(today)) {
+    notifier.remind(loan);
+}
+// FineCalculator.java
+final boolean overdue = loan.isOverdueOn(today);
+// BorrowingLimit.java
+final long overdueCount = loans.stream().filter(loan -> loan.isOverdueOn(today)).count();
 ```
 The rule has one home. A change to the grace period is one edit, and every site learns it.
 

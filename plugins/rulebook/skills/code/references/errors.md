@@ -72,23 +72,35 @@ the other two cases only at runtime.
 **Good**
 ```java
 public sealed interface CancelResult {
-    record Cancelled(Order order) implements CancelResult {}
+    record Cancelled(Order order) implements CancelResult {
+        @Override
+        public Optional<Order> changed() {
+            return Optional.of(order);
+        }
+    }
     record NotFound(OrderId id) implements CancelResult {}
     record AlreadyShipped(OrderId id) implements CancelResult {}
+
+    /** The order this outcome changed, for the caller to save; empty when nothing changed. */
+    default Optional<Order> changed() {
+        return Optional.empty();
+    }
 }
 public CancelResult cancel(final OrderId id) {
-    return orders.findById(id)
-            .map(this::cancelIfOpen)
+    final CancelResult result = orders.findById(id)
+            .map(OrderService::decideCancel)
             .orElseGet(() -> new CancelResult.NotFound(id));
+    result.changed().ifPresent(orders::save);
+    return result;
 }
-private CancelResult cancelIfOpen(final Order order) {
+static CancelResult decideCancel(final Order order) {
     return order.isShipped()
             ? new CancelResult.AlreadyShipped(order.id())
-            : new CancelResult.Cancelled(orders.save(order.cancelled()));
+            : new CancelResult.Cancelled(order.cancelled());
 }
 ```
 Each foreseeable case is in the return type, so the caller's `switch` must name all three. A database fault still
-throws.
+throws. `decideCancel` does no I/O, and `cancel` only reads and saves what the decision changed (SEAM1, `design.md`).
 
 ### ER4 — Catch the narrowest type
 

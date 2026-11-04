@@ -79,7 +79,7 @@ cure, the row points at it.
 | two types that do one job with different method names | possible **Alternative Classes with Different Interfaces**: align them (NM4) | a mismatch reads as a difference that is not there |
 | a record or class whose callers decide from its fields | possible **Data Class**: move the logic onto it (FW6) | callers that decide put the record's behaviour elsewhere |
 | a comment that explains what the code does | possible **Comments**: extract and name the fragment (FW5); comment rules are in `comments.md` | a name says it and cannot drift from the code |
-| nested or compound conditionals | possible **Conditional Complexity**: model the cases (DS3); nesting is DS9 (`../../deslop/SKILL.md`) | two flags that must agree drift apart |
+| nested or compound conditionals | possible **Conditional Complexity**: model the cases (DS3); nesting is DS9 (`../../deslop/SKILL.md`) | every nested or combined condition is one more path a reader must trace and a test must reach |
 | one problem solved two different ways in one code base | possible **Oddball Solution**: keep one way (NM4) | a reader must learn both and guess which one applies |
 | a class or method visible beyond the code that needs it | possible **Indecent Exposure**: narrow its visibility (SX14, `spring.md`) | every extra caller pins its shape |
 | an unused private member or an unreachable branch | possible **Dead Code**: delete it (DS7, `../../deslop/SKILL.md`) | unused code misleads readers and must still be maintained |
@@ -121,8 +121,12 @@ public sealed interface LoanTerm {
     }
 }
 // DueDate is sealed: None() or On(LocalDate date).
-// checkout: return new Loan(member.id(), book.id(), member.term().dueFrom(today));
-// renewal:  return loan.withDue(member.term().dueFrom(today));
+
+// CheckoutService.java
+return new Loan(member.id(), book.id(), member.term().dueFrom(today));
+
+// RenewalService.java
+return loan.withDue(member.term().dueFrom(today));
 ```
 The term decides the due date once. Both callers lose their branch instead of each one taking it.
 

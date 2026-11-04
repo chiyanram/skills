@@ -57,12 +57,10 @@ The second comment explains our own code: a loose flag needs it, where a method 
 ```java
 // The carrier label API accepts a weight with at most one decimal place.
 final BigDecimal labelWeight = parcel.weightKg().setScale(1, RoundingMode.HALF_UP);
-if (parcel.stage() == ParcelStage.LEFT_DEPOT) {
-    labels.printOnce(parcel.id(), labelWeight);
-}
+parcel.labelDue(labelWeight).ifPresent(labels::print);
 ```
-`printOnce` owns the guard, so the second comment goes. The first comment stays: it names a constraint of an
-outside API.
+`labelDue` owns the guard (left the depot, no label yet) and does no I/O (SEAM1, `design.md`), so the second comment
+goes. The first comment stays: it names a constraint of an outside API.
 
 ### CM4 — Check a comment's claim before it lands
 

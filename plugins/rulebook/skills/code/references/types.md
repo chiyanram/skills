@@ -180,10 +180,10 @@ swap.
   applies. — **Confidence** high
 - **Skip when** the operation has an answer for every input: keep the plain type (TY9). — **Do not skip when** the
   code needs a cast, a null check or a "never happens" throw to work. — **Confidence** high
-- **Skip when** the switch is an old-style colon statement under a Checkstyle `MissingSwitchDefault` gate: that check
-  asks for a `default` there and skips switch expressions. — **Do not skip when** the switch can be written
-  arrow-form over a sealed type or an enum: write it so, with no `default` (TY2; an enum switch that covers every value
-  is exhaustive). — **Confidence** medium
+- **Skip when** the source level is below Java 14, so the switch must be an old-style colon statement, and a
+  Checkstyle `MissingSwitchDefault` gate asks for a `default` there: keep that `default`. — **Do not skip when** the
+  source level is Java 14 or later: write the switch arrow-form over a sealed type or an enum, with no `default` (TY2;
+  an enum switch that covers every value is exhaustive). — **Confidence** medium
 
 ## Review checks
 
@@ -210,7 +210,8 @@ Walk every changed Java file.
 - [ ] TY5 — Money held in `float` or `double` is a finding. For each `BigDecimal` constructor whose argument is not a
   string literal (`grep -nE 'new BigDecimal\([^"]'`), a `double` argument is a finding.
 - [ ] TY6 — A state, role or mode held or compared as a `String` or `int` constant is a finding. An enum persisted by
-  ordinal (`grep -nE "@Enumerated *(\(EnumType\.ORDINAL\))?$|\.ordinal\(\)"`) is a finding.
+  ordinal is a finding:
+  `grep -nE '@Enumerated( *$| +[A-Za-z@]|\( *(value *= *)?(EnumType\.)?ORDINAL *\))|\.ordinal\(\)'`.
 - [ ] TY11 — An enum compared with `equals` instead of `==` is a finding. A build without Error Prone
   `EqualsIncompatibleType` or an equivalent compile-time check is a finding.
 - [ ] TY10 — A raw generic type is a finding. `@SuppressWarnings("unchecked")`

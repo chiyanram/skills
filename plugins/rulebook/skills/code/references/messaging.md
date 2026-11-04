@@ -38,15 +38,16 @@ Contents: Rules · When X, use Y · Good / Bad (MS6) · Decided edges · Review 
 ```java
 @Override
 @Transactional
-public CancelOutcome cancel(final UUID orderId, final UUID requestedBy, final String reason) {
-    final Optional<OrderCancellation> completed = cancellationPort.findCompletedByOrderId(orderId);
+public CancelOutcome cancel(final CancelRequest request) {
+    final Optional<OrderCancellation> completed = cancellationPort.findCompletedByOrderId(request.orderId());
     if (completed.isPresent()) {
         return new CancelOutcome.AlreadyCancelled(completed.orElseThrow());
     }
     … // cancellation row, audit row, void the invoice, order CANCELLED, row COMPLETED
 }
 ```
-Two concurrent cancels both pass the check-then-act guard, and both cancel.
+A redelivered or retried cancel that starts before the first run commits passes the same check-then-act guard, and
+both runs cancel.
 
 **Good**
 ```java

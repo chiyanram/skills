@@ -184,27 +184,35 @@ missing case.
 
 **Bad**
 ```java
-@Bean
-PaymentGatewayClient paymentGatewayClient(
-        final PaymentGatewayProperties gateway,
-        @Value("${shop.payment-gateway.api-key:test-key}") final String apiKey) {
-    return new PaymentGatewayClient(gateway, apiKey);
+@Validated
+@ConfigurationProperties("shop.payment-gateway")
+public record PaymentGatewayProperties(@NotNull URI baseUrl,
+                                       @NotNull Duration connectTimeout,
+                                       @Min(1) int maxConnections,
+                                       @DefaultValue("test-key") ApiKey apiKey) {
 }
 ```
-The default is a hard-coded credential behind a placeholder: an unset key starts the shop with the test key, and no
-log says so.
+The default is a hard-coded credential: an unset key starts the shop with the test key, and no log says so.
 
 **Good**
 ```java
-@Bean
-PaymentGatewayClient paymentGatewayClient(
-        final PaymentGatewayProperties gateway,
-        @Value("${shop.payment-gateway.api-key}") final String apiKey) {
-    return new PaymentGatewayClient(gateway, apiKey);
+@Validated
+@ConfigurationProperties("shop.payment-gateway")
+public record PaymentGatewayProperties(@NotNull URI baseUrl,
+                                       @NotNull Duration connectTimeout,
+                                       @Min(1) int maxConnections,
+                                       @NotNull ApiKey apiKey) {
+}
+
+public record ApiKey(String value) {
+    @Override
+    public String toString() {
+        return "ApiKey[***]";
+    }
 }
 ```
-The key has no default. If it is unset, startup fails with "Could not resolve placeholder
-'shop.payment-gateway.api-key'".
+The key has no default. If it is unset, binding validation fails startup and names `apiKey`. The key sits in the
+record with the rest of its group (LY7), and `ApiKey` keeps it out of the logs (SC17).
 
 ### SC19 — Work that must finish before traffic runs in an `ApplicationRunner`; later work goes to a thread from ready
 

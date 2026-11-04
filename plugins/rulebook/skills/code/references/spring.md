@@ -245,17 +245,19 @@ The transactional method lives on a second bean, so the call crosses the proxy. 
 - **Skip when** both implementations must exist at once and callers pick one: `@Primary` for the default or
   `@Qualifier` at the injection point (SC4). — **Do not skip when** only one of them should run; then a config flag
   selects it (SC4). — **Confidence** high
-- **Skip when** both implementations must exist at once (the edge above). — **Do not skip when** a `@Fallback` bean or
-  a `@ConditionalOnMissingBean` stub stands in for the one that should run: each hides the choice as `@Primary` does,
-  and a stub resolved by load order can beat the real bean (SC4, SC7). — **Confidence** high
+- **Skip when** both implementations must exist at once (the edge above), or the default is a
+  `@ConditionalOnMissingBean` bean on an auto-configuration class that backs off when the user defines one (SC7). —
+  **Do not skip when** a `@Fallback` bean or a `@ConditionalOnMissingBean` stub outside auto-configuration stands in
+  for the one that should run: each hides the choice as `@Primary` does, and a stub resolved by load order can beat the
+  real bean (SC4, SC7). — **Confidence** high
 - **Skip when** the settings are for tests: they live in `src/test/resources/application.yml`, and local overrides
   come from environment variables or an untracked file outside the repo. — **Do not skip when** an environment needs
   other settings or another bean: no `@Profile` and no `application-<profile>.yml`; settings differ by environment
   variables or a config tree, features by `@ConditionalOnProperty` (SC4), because profile configuration leaks test
   doubles. — **Confidence** high
-- **Skip when** the static-only class is the `@SpringBootApplication` class: it is a full `@Configuration`, which
-  Spring subclasses with CGLIB, and a `final` class cannot be proxied (SX18). — **Do not skip when** any other class
-  holds only static members (SX18). — **Confidence** high
+- **Skip when** the static-only class is the `@SpringBootApplication` class: the context builds it as a configuration
+  bean, so an instance makes sense (SX18); SC5 still applies to it, so it takes `proxyBeanMethods = false`. — **Do
+  not skip when** any other class holds only static members (SX18). — **Confidence** high
 - **Skip when** the console output sits in a `main` method (SX19). — **Do not skip when** it sits in any other
   main-code method (SX19). — **Confidence** high
 
@@ -279,8 +281,9 @@ configuration test.
   is a finding.
 - [ ] SC4 — `@Primary`, `@Fallback` or a `@ConditionalOnMissingBean` stub in main code
   (`grep -rnE "@(Primary|Fallback|ConditionalOnMissingBean)"`) on one of several implementations where only one should
-  run is a finding. For each such type, each implementation carries `@ConditionalOnProperty` for its own value, exactly
-  one matches, and an unset flag fails startup; a gap is a finding.
+  run is a finding, except a `@ConditionalOnMissingBean` default on an auto-configuration class (SC7). For each such
+  type, each implementation carries `@ConditionalOnProperty` for its own value, exactly one matches, and an unset flag
+  fails startup; a gap is a finding.
 - [ ] SC9 — For each property-selected bean, find an `ApplicationContextRunner` spec with a case per value and a case
   for the missing value. A value or the missing case without one is a finding.
 - [ ] SC7 — `@ConditionalOnBean` or `@ConditionalOnMissingBean` (`grep -rnE "@ConditionalOn(Missing)?Bean\b"`) in a
