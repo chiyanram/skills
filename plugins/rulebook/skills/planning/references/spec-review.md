@@ -22,29 +22,20 @@ Contents: Rules · When X, use Y · Good / Bad (SR2, SR3, SR4) · Decided edges 
 
 | situation | use | why |
 |---|---|---|
-| the review finds more than one problem | report them all in this round (SR1) | review the whole change before you comment (circleci §Avoid Ad-Hoc Comments) |
-| a design sentence states how the code behaves today | a `file:line` cite on the main branch, opened by the reviewer (SR2) | check the request against the actual code and record `file:line` (create_plan :69, :79); a spec can say X while the code does Y (notion :42) |
-| a spec sentence states how the code behaves today | move the claim and its cite into the design (SR2) | a spec holds no file paths, because they go out of date fast (to-spec :55) |
+| the review finds more than one problem | report them all in this round (SR1) | findings raised one per round stretch one review over several rounds |
+| a design sentence states how the code behaves today | a `file:line` cite on the main branch, opened by the reviewer (SR2) | check the request against the actual code and record `file:line`; a spec can say X while the code does Y |
+| a spec sentence states how the code behaves today | move the claim and its cite into the design (SR2) | a spec holds no file paths, because they go out of date fast |
 | a design carries `file:line` cites | run a check that resolves each cite to its symbol (SR3) | a cite that drifts is a false claim the next reader believes |
-| the spec reaches the approval gate with open questions | resolve each, or name its decider and why it does not block (SR4) | no plan with unresolved questions (create_plan :341); no clarification markers remain (spec-kit :164); an unresolved question is held by an owner before the work counts as complete (hold :19) |
-| a story has no "as a … so that …" line | add actor, action and benefit (SR6) | to-spec :35; jvm-spec :36 |
-| a scenario says "works well" or "is fast" | rewrite it as a condition a test can check (SR6) | requirements are testable and unambiguous (spec-kit :165); success criteria are specific, testable conditions (spec-driven :144) |
-| a story has no out-of-scope list | add one (SR6) | to-spec :67; "out of scope" is non-negotiable (interview-me :111); what we are NOT doing (create_plan :331); scope is clearly bounded (spec-kit :170) |
-
-`circleci` is the CircleCI engineering practices reviewer guide (eng-practices.circle.com), section Avoid Ad-Hoc
-Comments. `create_plan` is humanlayer `.claude/commands/create_plan.md`. `notion` is pstack
-`skills/why/references/sources/notion.md`. `to-spec` is mattpocock `skills/engineering/to-spec/SKILL.md`. `jvm-spec`
-is jvm-skills `.claude/skills/spec/SKILL.md`. `spec-kit` is github/spec-kit `templates/commands/specify.md`.
-`spec-driven` and `interview-me` are addy `skills/spec-driven-development/SKILL.md` and
-`skills/interview-me/SKILL.md`. `hold` is firstmate `.agents/skills/captain-hold-lifecycle/SKILL.md`. `:N` is the line.
-
-Operator preference, 2026-10-31 (SRC2), in whole or in part: SR1, SR3.
+| the spec reaches the approval gate with open questions | resolve each, or name its decider and why it does not block (SR4) | an open question with no decider stays open after the build |
+| a story has no "as a … so that …" line | add actor, action and benefit (SR6) | without actor, action and benefit, the builder guesses who the story serves |
+| a scenario says "works well" or "is fast" | rewrite it as a condition a test can check (SR6) | a vague criterion such as "works well" gives no test a pass condition |
+| a story has no out-of-scope list | add one (SR6) | without an out-of-scope list, the builder guesses where the story ends |
 
 ## Good / Bad
 
 ### SR2 — Cite today's behaviour in the design, not the spec
 
-**Bad** (neutral)
+**Bad**
 ```markdown
 ## Design — overdue reminders
 
@@ -53,7 +44,7 @@ So the reminder job emails only members whose loan is overdue.
 ```
 The claim has no cite, so the reviewer cannot check it. If renewal is manual, the job misses every loan due today.
 
-**Good** (neutral)
+**Good**
 ```markdown
 ## Design — overdue reminders
 
@@ -66,7 +57,7 @@ the behaviour in words and names no path.
 
 ### SR3 — A drifted cite is a finding, found by a check
 
-**Bad** (neutral)
+**Bad**
 ```markdown
 Renewal skips a loan with a reservation (`loans/RenewalPolicy.java:42`, `canRenew`).
 ```
@@ -76,7 +67,7 @@ Renewal skips a loan with a reservation (`loans/RenewalPolicy.java:42`, `canRene
 `canRenew` moved to line 58 after a refactor. The cite now points at an import, and only a reader who opens it sees
 the drift.
 
-**Good** (neutral)
+**Good**
 ```text
 $ check-cites design.md
 design.md:12  loans/RenewalPolicy.java:42  canRenew  DRIFTED (found at :58)
@@ -86,7 +77,7 @@ A check resolves each cite to its symbol on every change. The reviewer reports t
 
 ### SR4 — Every open question names its decider
 
-**Bad** (neutral)
+**Bad**
 ```markdown
 ## Open questions
 
@@ -95,7 +86,7 @@ A check resolves each cite to its symbol on every change. The reviewer reports t
 ```
 Nobody owns either question. The build starts, and both are still open when it ends.
 
-**Good** (neutral)
+**Good**
 ```markdown
 ## Open questions
 
@@ -113,13 +104,12 @@ and why building can go on.
   high
 - **Skip when** the sentence states planned behaviour: there is no code to cite yet. — **Do not skip when** the
   sentence states what the code does today, with or without the word "today" (SR2). — **Confidence** high
-- **Skip when** the claim sits in the spec: move it to the design and cite it there; the spec names no paths
-  (to-spec :55). — **Do not skip when** the design restates that claim: the design cites it (SR2). — **Confidence**
-  high
+- **Skip when** the claim sits in the spec: move it to the design and cite it there; the spec names no paths. —
+  **Do not skip when** the design restates that claim: the design cites it (SR2). — **Confidence** high
 - **Skip when** a cite pins a commit (`file:line @commit`): it cannot drift. — **Do not skip when** the cite points at
   the main branch (SR3). — **Confidence** medium
-- **Skip when** the spec is still a draft: an open-questions section is normal then (spec-driven :146). — **Do not
-  skip when** the spec reaches the approval gate (SR4). — **Confidence** high
+- **Skip when** the spec is still a draft: an open-questions section is normal then. — **Do not skip
+  when** the spec reaches the approval gate (SR4). — **Confidence** high
 - **Skip when** a scenario is plain prose, not Gherkin: the bar is that a test can check it, not the format. — **Do not
   skip when** a scenario names no observable result (SR6). — **Confidence** high
 
