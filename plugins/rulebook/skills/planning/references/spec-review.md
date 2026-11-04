@@ -139,10 +139,10 @@ run without knowing it was chosen.
 The reminder job runs nightly and emails every member with an overdue loan.
 
 Alternative: send each reminder when its loan falls due. Lost because it needs a
-timer per loan and a scheduler we do not run.
+timer per loan, which our job runner cannot hold.
 
 Tradeoffs:
-- We accept a reminder up to a day late for one job and no scheduler.
+- We accept a reminder up to a day late for one nightly job and no per-loan timers.
 ```
 The reader sees the delay was chosen, and what it bought.
 
@@ -189,15 +189,16 @@ Each step names its failure, its rerun and its crash, so a retry needs no debugg
 - **Skip when** a scenario is plain prose, not Gherkin: the bar is that a test can check it, not the format. — **Do not
   skip when** a scenario names no observable result (SR6). — **Confidence** high
 - **Skip when** the design names its departure from an ADR and why, and records the new decision, as an ADR when SR15
-  applies and in the design otherwise: that is a decision, not a finding. — **Do not skip when** the departure is unnamed, or two documents disagree: report it and
-  leave the choice to the human, even when the answer looks plain (SR9). — **Confidence** medium
+  applies and in the design otherwise: that is a decision, not a finding. — **Do not skip when** the departure is
+  unnamed, or two documents disagree: report it and leave the choice to the human, even when the answer looks plain
+  (SR9). — **Confidence** medium
 - **Skip when** constraints forced the shape: the design names the constraint and says it was the only viable shape,
   with no invented rival. — **Do not skip when** a real alternative existed (SR10). — **Confidence** medium
 - **Skip when** a step only reads and changes no state: there is no rerun or crash to describe. — **Do not skip when**
   the step writes, sends or calls out, even if it "just retries" (SR11). — **Confidence** high
-- **Skip when** the change only adds, and old data and old clients keep working: say so in one line; there is no migration,
-  and the rollback is redeploying the previous version. — **Do not skip when** it deletes, renames or reshapes stored data or a public contract (SR12). — **Confidence**
-  medium
+- **Skip when** the change only adds, and old data and old clients keep working: say so in one line; there is no
+  migration, and the rollback is redeploying the previous version. — **Do not skip when** it deletes, renames or
+  reshapes stored data or a public contract (SR12). — **Confidence** medium
 - **Skip when** a second user of the seam exists today, or is built in this same spec. — **Do not skip when** the only
   second user is a future one (SR14). — **Confidence** high
 - **Skip when** the decision is easy to reverse or the obvious choice: one line in the design is enough. — **Do not
