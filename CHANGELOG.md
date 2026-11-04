@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.23.0](https://github.com/chiyanram/skills/compare/rulebook--v0.22.0...rulebook--v0.23.0) (2026-11-04)
+
+### Features
+
+* **planning:** design-review rules SR9–SR15 in spec-review; SR4 asks for options and a recommendation (SR8) ([#207](https://github.com/chiyanram/skills/issues/207)) ([d77e110](https://github.com/chiyanram/skills/commit/d77e1103a794bd54956c2de601d76afb1cc853ae))
+
 ## [0.22.0](https://github.com/chiyanram/skills/compare/rulebook--v0.21.4...rulebook--v0.22.0) (2026-11-04)
 
 ### Features
