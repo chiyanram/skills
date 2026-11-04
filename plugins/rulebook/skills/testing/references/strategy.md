@@ -256,10 +256,9 @@ The error comes from pure logic, so it is a unit spec; `0 *` on the `Mock()` rep
 - **Skip when** the run is the gate: the real-model tier is opt-in and stays out of it (TM3). — **Do not skip
   when** prompt or provider code changes, or before a release: the real-model tier must pass then (TM3, ledger :39).
   — **Confidence** high
-
 - **Skip when** the failing test of a bug fix runs locally in a few seconds: it is not a CI job or a gate (S6). —
-  **Do not skip when** an acceptance criterion asks for CI proof, or the bug reproduces only in a clean CI environment.
-  — **Confidence** medium
+  **Do not skip when** an acceptance criterion asks for CI proof, or the bug reproduces only in a clean CI environment
+  (S6, ledger :681). — **Confidence** medium
 
 ## Review checks
 
@@ -286,5 +285,6 @@ Walk every changed test file, and the MR that carries it.
   green. No note is a finding.
 - [ ] S4 — For a bug fix, find the test that fails for the bug's reason, and check that it lands before the fix.
   A fix with no such test is a finding. Where that one test sits is V4 (`value-bar.md`).
-- [ ] S6 — For a bug fix, find the failing test's command and failure output in the pull request. A red run made only
-  as a CI job, with no acceptance criterion asking for it, is a finding.
+- [ ] S6 — For a bug fix, find the failing test's command and failure output in the pull request. No command and
+  output is a finding. A red run made only as a CI job is a finding, unless an acceptance criterion asks for CI proof
+  or the bug reproduces only in a clean CI environment.

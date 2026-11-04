@@ -254,6 +254,7 @@ Baseline before editing InvoiceService, at main <sha>:
   OrderServiceTest     <n> tests, 0 failed
 ```
 It goes through the build's own test task, one pattern per run so an empty match fails, and the note records counts proving tests ran. (Real evidence: ledger row S3.)
+S3's reason comes from agent-factory research/31:19, approved by the operator; the ledger row has none.
 
 ## S4 — A bug fix starts with a test that fails for the bug's reason
 
@@ -295,6 +296,7 @@ The red state is proved by a 12-minute CI job, and the pull request holds only a
   PriceRoundingTest > should round a discounted total half-up FAILED
     expected 10.05 but was 10.04                           4 s
 Pull request body:
+  Baseline at main <sha>: PriceRoundingTest <n> tests, 0 failed.
   Red run, local, at a1b2c3d (test only): the command and the failure above.
   Green run at d4e5f6a (the fix): same command, passed.
 ```
