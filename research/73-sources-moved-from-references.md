@@ -427,5 +427,5 @@ and this section keeps what the old text cited.
 ## Pinned humanlayer cites (SR8, 2026-11-04)
 
 humanlayer/humanlayer deleted `.claude/commands/create_plan.md` in `d8197bab` (2026-10-22). Every `create_plan` cite
-above is pinned to `77c7fe99`, the last commit that has the file. Each line was re-read there on 2026-11-04 and still
+above is pinned to `77c7fe99`, the last commit that changed the file; its text there is what was deleted. Each line was re-read there on 2026-11-04 and still
 says what it is cited for.
