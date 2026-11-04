@@ -32,44 +32,42 @@ Contents: Rules · When X, use Y · Good / Bad (MS6) · Decided edges · Review 
 
 ## Good / Bad
 
-### MS6 — Safe to run twice: claim the work atomically
+### MS6 — Safe to run twice: claim the work atomically in the change's transaction
 
 **Bad**
 ```java
-@KafkaListener(topics = "charge-requests")
-void onChargeRequested(final ChargeRequested event) {
-    if (!chargeLog.existsByKey(event.chargeKey())) {
-        gateway.charge(event.chargeKey(), event.amount());
-        chargeLog.insert(event.chargeKey());
+@Override
+@Transactional
+public CancelOutcome cancel(final UUID orderId, final UUID requestedBy, final String reason) {
+    final Optional<OrderCancellation> completed = cancellationPort.findCompletedByOrderId(orderId);
+    if (completed.isPresent()) {
+        return new CancelOutcome.AlreadyCancelled(completed.orElseThrow());
     }
+    … // cancellation row, audit row, void the invoice, order CANCELLED, row COMPLETED
 }
 ```
-Two deliveries of the same record both read "not seen" and both charge. A crash between the charge and the insert
-leaves no trace, so the redelivery charges again.
+Two concurrent cancels both pass the check-then-act guard, and both cancel.
 
 **Good**
 ```java
-@KafkaListener(topics = "charge-requests")
-void onChargeRequested(final ChargeRequested event) {
-    try {
-        chargeLog.insertInProgress(event.chargeKey(), event.requestHash());
-    } catch (final DuplicateKeyException alreadyClaimed) {
-        replayOrReconcile(event);
-        return;
-    }
-    final ChargeResult result = gateway.charge(event.chargeKey(), event.amount());
-    chargeLog.markSucceeded(event.chargeKey(), result);
+@Override
+@Transactional
+public CancelOutcome cancel(final CancelRequest request) {
+    lockOrder(request.orderId());
+    return cancellationPort.findCompletedByOrderId(request.orderId())
+            .<CancelOutcome>map(CancelOutcome.AlreadyCancelled::new)
+            .orElseGet(() -> cancelLocked(request));
+}
+
+private void lockOrder(final UUID orderId) {
+    jdbc.queryForObject("SELECT id FROM orders WHERE id = ? FOR UPDATE", UUID.class, orderId);
 }
 ```
-The unique key picks one winner. A rerun finds the row: SUCCEEDED replays the stored result, and IN_PROGRESS is the
-marker a crash left, so `replayOrReconcile` asks the gateway about that key.
+The row lock makes a second run wait and then see COMPLETED; one transaction means a crash leaves nothing to reconcile.
 
 ## Decided edges
 
-- **Skip** the same-transaction claim **when** the change is a call outside the database, such as a payment gateway:
-  claim with a unique key first, record the call's result after it, and on a rerun reconcile a claim left in progress
-  (MS6). — **Do not skip when** every write of the operation can commit in one transaction: then the claim joins it,
-  and a crash leaves nothing to reconcile (MS6). — **Confidence** medium
+None.
 
 ## Review checks
 
