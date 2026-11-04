@@ -53,6 +53,8 @@ rule line into one "Operator preference" line under the reference's When X, use 
 Amended 2026-11-04 (agent-factory#59): a rule file holds only what an agent needs to act. Provenance (sources,
 citations, example credits, the operator-preference status, evidence notes, dates) lives only in the ledger and the
 research files; `scripts/check_provenance.py` fails a shipped skill file that carries any of it.
+Tool names stay in a reference when they are the action itself (operator, 2026-11-04); a name that only credits a
+source moves to the ledger.
 
 1. A Good obeys **every** approved rule and house style, not only its own (GB1a, `31-good-bad-v2-BRIEF.md:9`).
 2. **Bad and Good come from the reference that sources the rule**, adapted into one neutral domain. Where no source
@@ -63,7 +65,8 @@ research files; `scripts/check_provenance.py` fails a shipped skill file that ca
    never as the start of an example.
 4. **A rule enters the rulebook in one of two ways (SRC2).** (a) Two independent sources state it, each read at
    `path:line` or URL and section. Pages from one company or project count as one source. (b) The operator states it
-   as a preference, and the ledger row records it with the status `operator preference (SRC2)`. The reference
+   as a preference, and the ledger row's status contains `OPERATOR PREFERENCE (SRC2)`, followed by `in whole or in part`
+   when the preference may cover only part of the rule. The reference
    carries no mark of either way: the rule line holds the rule only. Our repo supplies
    evidence that a rule is needed, never the rule itself.
 5. House style in examples: test names are "should …" sentences; `final var` in Java, `def` in Groovy; one argument per

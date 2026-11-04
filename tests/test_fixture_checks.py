@@ -11,7 +11,8 @@ CASES = {
     "plugin": (["good"], ["source-is-root", "root-is-a-plugin", "no-readme", "no-icon", "no-license"]),
     "index": (["good"], ["unlisted", "stale", "no-block", "no-read-it"]),
     "routers": (["good"], ["unlisted", "no-router"]),
-    "provenance": (["good"], ["citation", "preference", "credit"]),
+    "provenance": (["good"], ["citation", "preference", "credit", "date", "evidence", "agent-factory", "neutral",
+                              "fileline", "section", "url", "nested-fence"]),
 }
 
 

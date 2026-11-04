@@ -68,7 +68,7 @@ every push to `main`.
 | `check_plugin.py` | a plugin is not under `plugins/`, has no README or icon, or the repo has no LICENSE |
 | `check_index.py` | a plugin README does not link every skill router, or a router's table differs from what `make index` builds |
 | `check_routers.py` | a skill folder ships references but has no `SKILL.md`, or its `SKILL.md` does not link each one |
-| `check_provenance.py` | a shipped skill file carries provenance: a source citation, an operator-preference line, a credit on an example, an evidence note, a date or an agent-factory reference |
+| `check_provenance.py` | a shipped skill file carries provenance outside code: a source citation (`name :N`, `file.md:N`, `§section`, a URL, `ADR-N`, `research/N`), an operator-preference line, a credit or label on an example, an evidence note, a date or an agent-factory reference |
 
 `make test` also checks `scripts/set_version.py`, which the release runs, and that `release.config.mjs` still matches
 the manifests and links each issue reference to its own repo.

@@ -26,6 +26,14 @@ Read it when you write a demo.
 switch (x) { case A -> a(); case B -> b(); }
 ```
 
+Inline code is not provenance: `a ? b :1` and `LocalDate.parse("2026-12-01")`.
+
+````markdown
+```java
+// pstack :15 inside nested code
+```
+````
+
 ## Decided edges
 
 None.

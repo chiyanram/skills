@@ -2,8 +2,8 @@
 
 On 2026-11-04 the operator decided that a rule file holds only what an agent needs to act; provenance lives in the
 ledger (`19-approved-rules.md`) and the research files. The strip removed citations from every reference. Most of them
-were already in each rule's ledger row. The ones below were not, so they are kept here, verbatim as they stood in the
-references on main at `52ae5e8`. A ledger row whose source cell ends "see research/73" points here.
+were already in each rule's ledger row. The ones below were not, so they are kept here, as they stood in the
+references on main at `52ae5e8`, with each file's short source names written out in full. A ledger row whose source cell ends "see research/73" points here.
 
 ## Planning and meta (spec-review, diagrams, program-design, writing-docs, acceptance-criteria)
 
@@ -32,3 +32,14 @@ references on main at `52ae5e8`. A ledger row whose source cell ends "see resear
 - GT6: agent-factory `research/31:22`, the source of GT6's reason (scenario-to-tests.md).
 - TM4: agent-factory `research/31:20`, the source of TM4's reason (integration-tests.md).
 - K20: agent-factory `research/31:21`, the source of K20's reason (examples/spock.md).
+- B1: plinth `130-java-testing-strategies-correct.md` :42, :67, :119, :149, :176, :211 (boundaries.md, CORRECT table).
+- C1: plinth `130-java-testing-strategies-right-bicep.md` :79, :102-103, :134, :167-168, :193 (coverage-design.md,
+  RIGHT-BICEP table).
+- V2, V3, V5: openclaw test-audit :31-33, :33, :71-73, :105-106, :108-109 (value-bar.md).
+- K3: Spock `interaction_based_testing.adoc` :788-797 (spock.md).
+- U3: mattpocock `tdd/mocking.md` :10-14 (unit-tests.md).
+- SP10, SP11: agent-factory-era neutral pair sources `68b` :602, :636 (integration-tests.md).
+
+## Migrations, line pointers
+
+- MG36: r47 :143 (postgres-design.md).
