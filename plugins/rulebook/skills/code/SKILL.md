@@ -20,7 +20,7 @@ approved Good/Bad pair, `references/examples/<name>.md` holds them all.
 | [java](references/java.md) | U4, JV1–JV9, CV3 | when you write or review Java production code |
 | [messaging](references/messaging.md) | MS4, MS6 | when you write or review a message consumer, a scheduled job, or an operation that can run twice |
 | [security](references/security.md) | SE1–SE7, SE7a, SE8, SE10, SS1–SS12, SS17, SS19–SS26 | when you write or review code that takes outside input, stores or checks a secret, or touches the security filter chain, a guard, a token or a security test |
-| [services](references/services.md) | LY1–LY3 | when you write or review a controller, a service, an interface or a use case that makes two calls |
+| [services](references/services.md) | LY1–LY3, LYN1 | when you write or review a controller, a service, an interface or a use case that makes two calls |
 | [smells](references/smells.md) | DS1–DS4, DS6, DS11–DS12, DS14, SM1–SM3, FW1–FW3, FW5–FW6, FW8–FW9, NM1–NM4 | when you write or review production code in any language: the smell baseline, and the shape and naming rules behind it |
 | [spring](references/spring.md) | LY6–LY7, SC1–SC11, SC13–SC17, SC19–SC23, SCN1, X6, SX14, SX18–SX19 | when you write or review a bean, a configuration class, a settings record, a startup hook or a proxied method |
 | [types](references/types.md) | TY1–TY13 | when you write or review a field, a parameter, a return type, a record, an enum, a sealed type or a generic type |
