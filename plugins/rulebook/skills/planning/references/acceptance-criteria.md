@@ -46,7 +46,7 @@ How each scenario becomes its tests is owned by `testing/references/scenario-to-
 | a scenario title | a "should …" sentence about behaviour (GA6) | test names read as sentences; describe behaviour, not implementation |
 | a change to stored data or a default | a Given with state from before the change (AC7) | existing rows need a backfill |
 | a noun in scenario text | the glossary's word; a new noun defined in the spec first (AC9) | one shared, ubiquitous language; the title becomes the test name, so a wrong word reaches the code |
-| an edit to approved acceptance-criteria text | a spec change that passes the approval gate again (AC10) | update the spec first, then implement |
+| an edit to approved acceptance-criteria text | a spec change that passes the approval gate again (AC10) | an approval covers only the text as it stood when it was approved |
 
 ## Good / Bad
 

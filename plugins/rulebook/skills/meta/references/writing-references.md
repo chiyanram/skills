@@ -49,6 +49,8 @@ One source admits the rule, and the reference carries its source twice: on the r
 
 ## When X, use Y
 
+| the call | use | why |
+|---|---|---|
 | a client retries a failed call | a delay with random jitter (RT1) | retries in step overload a recovering server |
 ```
 The reference holds the rule and its reason only. The ledger row for RT1 names library A's documentation, §Retries,
@@ -73,8 +75,8 @@ Walk every rule line, When X, use Y row, Good / Bad pair and ledger row that the
 
 - [ ] SRC2 — For each rule id, open its ledger row and find two sources from different companies or projects, each at
   `path:line` or URL §section, or a status recording the operator's preference. A row with neither is a finding.
-- [ ] SRC2 — Any source name, citation, credit, label, preference mark, evidence note or date in a reference is a
-  finding (`make lint` runs `check_provenance.py`).
+- [ ] SRC2 — Any source citation, credit, label, preference mark, evidence note or date in a reference, or a name
+  that only credits a source, is a finding (`make lint` runs `check_provenance.py`).
 - [ ] SRC2 — A project name, path or business term in a rule, a why cell or a Good / Bad pair is a finding
   (`rg -n -i '<project names>'` over the changed references).
 - [ ] SRC2 — A Good / Bad pair that renames project code is a finding.

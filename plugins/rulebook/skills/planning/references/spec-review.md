@@ -22,14 +22,14 @@ Contents: Rules · When X, use Y · Good / Bad (SR2, SR3, SR4) · Decided edges 
 
 | situation | use | why |
 |---|---|---|
-| the review finds more than one problem | report them all in this round (SR1) | review the whole change before you comment |
+| the review finds more than one problem | report them all in this round (SR1) | findings raised one per round stretch one review over several rounds |
 | a design sentence states how the code behaves today | a `file:line` cite on the main branch, opened by the reviewer (SR2) | check the request against the actual code and record `file:line`; a spec can say X while the code does Y |
 | a spec sentence states how the code behaves today | move the claim and its cite into the design (SR2) | a spec holds no file paths, because they go out of date fast |
 | a design carries `file:line` cites | run a check that resolves each cite to its symbol (SR3) | a cite that drifts is a false claim the next reader believes |
-| the spec reaches the approval gate with open questions | resolve each, or name its decider and why it does not block (SR4) | no plan goes ahead with unresolved questions; an unresolved question is held by an owner before the work counts as complete |
+| the spec reaches the approval gate with open questions | resolve each, or name its decider and why it does not block (SR4) | an open question with no decider stays open after the build |
 | a story has no "as a … so that …" line | add actor, action and benefit (SR6) | without actor, action and benefit, the builder guesses who the story serves |
-| a scenario says "works well" or "is fast" | rewrite it as a condition a test can check (SR6) | requirements are testable and unambiguous; success criteria are specific, testable conditions |
-| a story has no out-of-scope list | add one (SR6) | "out of scope" is non-negotiable: say what you are NOT doing, so the scope is clearly bounded |
+| a scenario says "works well" or "is fast" | rewrite it as a condition a test can check (SR6) | a vague criterion such as "works well" gives no test a pass condition |
+| a story has no out-of-scope list | add one (SR6) | without an out-of-scope list, the builder guesses where the story ends |
 
 ## Good / Bad
 

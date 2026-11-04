@@ -25,7 +25,7 @@ Contents: Rules · When X, use Y · Good / Bad (WD1, WD2, WD4, WD5) · Decided e
 | a claim about code, marked with a date, a tick or `[confirmed]` | drop the marker; cite the `path:line`, command or test that proves it (WD1) | a marker records one past check; a cite lets the next reader check again |
 | a count of things that grow: files, tests, endpoints, modules, rules | delete it, or name the command that counts them (WD2) | copied state rots; a one-command lookup belongs to the environment |
 | a value someone chose on purpose: a version, a port, a limit, a time-to-live | keep it (WD2) | it changes only by a deliberate edit |
-| a limit, a failure mode or a gap that a reader will hit | state it plainly, where the reader looks (WD4) | say the unflattering thing where it is true; document known gotchas |
+| a limit, a failure mode or a gap that a reader will hit | state it plainly, where the reader looks (WD4) | a reassuring false line is believed, and readers plan around it |
 | a fact that another file already holds | a link to that file (WD7) | one meaning, one source of truth; one file is the single owner |
 | a file a tool generates | edit the source and run the generator again (WD7) | generated output is read only, and the generator overwrites a hand edit |
 | a change that fixes a bug against a spec | correct that spec in place (WD5) | the spec is a living document, updated when decisions change |

@@ -28,7 +28,7 @@ Contents: Rules · When X, use Y · Good / Bad (PD1–PD5) · Decided edges · R
 | the design | use | why |
 |---|---|---|
 | adds, removes or reroutes a call | a call tree in a fenced `diff` (PD1) | an unshown call change gets decided late, in code review |
-| adds, changes or deletes a file | a file-tree `diff`, test files included, one purpose per file (PD2) | the test files sit in the list with the source files they test |
+| adds, changes or deletes a file | a file-tree `diff`, test files included, one purpose per file (PD2) | a plan with no test file gives the reviewer nothing to grade |
 | adds a type, an interface or a public signature | the caller's usage, then signatures with no bodies (PD3) | a type left out of the design gets settled ad hoc in code |
 | touches more than one layer | vertical slices, each one tried end-to-end (PD4) | a layer-only step hides a defect until the last layer lands |
 | makes one mechanical change across the whole codebase (a wide refactor) | expand, migrate in batches, contract, instead of slices (PD4 edge) | no slice of a wide mechanical change can land green on its own |

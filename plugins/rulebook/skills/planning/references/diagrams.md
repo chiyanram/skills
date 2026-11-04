@@ -24,11 +24,11 @@ Contents: Rules · When X, use Y · Good / Bad (DG2, DG3, DG5) · Decided edges 
 
 | the diagram answers | use | why |
 |---|---|---|
-| which components call which | a Mermaid `flowchart` (DG2) | a flowchart shows which part calls which |
-| in which order messages pass between parts | a Mermaid `sequenceDiagram` (DG2) | a sequence diagram shows the order in which messages pass |
-| which states one thing moves through | a Mermaid `stateDiagram-v2` (DG2) | a state diagram shows each state and the moves between them |
-| which tables relate, and how | a Mermaid `erDiagram` (DG2) | an entity-relationship diagram shows tables and their relations |
-| which types extend or hold which | a Mermaid `classDiagram` (DG2) | a class diagram shows which type extends or holds which |
+| which components call which | a Mermaid `flowchart` (DG2) | a flowchart shows call direction, which a list or a table hides |
+| in which order messages pass between parts | a Mermaid `sequenceDiagram` (DG2) | a sequence diagram keeps the order of messages, which a flowchart loses |
+| which states one thing moves through | a Mermaid `stateDiagram-v2` (DG2) | a state diagram shows the moves a thing cannot make, which prose leaves out |
+| which tables relate, and how | a Mermaid `erDiagram` (DG2) | an entity-relationship diagram shows each relation's cardinality, which a table list hides |
+| which types extend or hold which | a Mermaid `classDiagram` (DG2) | a class diagram shows inheritance and ownership at once, which a flowchart mixes up |
 | which calls a change adds or removes | a fenced `diff` call tree (DG2) | `+` and `-` lines mark the calls a change adds or removes |
 | which files a change adds, moves or removes | a fenced `diff` file tree (DG2) | `+` and `-` lines mark the files a change adds or removes |
 
