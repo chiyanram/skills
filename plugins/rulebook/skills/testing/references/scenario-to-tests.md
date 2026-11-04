@@ -31,19 +31,16 @@ Each row maps a part of the scenario to the test construct that carries it.
 
 | the scenario has | use | why |
 |---|---|---|
-| a `Scenario:` title | the test name, equal to the title: the Spock feature method name, the Playwright `test()` title (68c :672, :769) | a reworded name makes a search for the scenario title find no test (GT1, ledger :69) |
-| a `Given`, `When`, `Then` or `And` step | Spock block descriptions with the step's text; one Playwright `test.step("Given …")` per step (ledger :70; 68c :700-706, :772-779) | Given/When/Then kept in comments never appears in the test report (GT2, ledger :70) |
-| a `Scenario Outline` with `Examples` | Spock `where:` or Jest `test.each` with the Examples column names unchanged, ` — #placeholder` in the name; e2e one representative row (ledger :69, :71; 68c :729, :736-740) | a renamed column hid what the test fed (GT3, ledger :71) |
-| a work item and an AC id | Spock `@Issue(["#NNN", "AC-n"])` (ledger :139; 68c :883); a Playwright `issue` annotation (ledger :72; 68c :770) | a javadoc mention gives no work-item number a search can find (GT4, ledger :72); Spock does not report a comment naming the AC (CV2, ledger :139) |
-
-The ledger is `research/19-approved-rules.md` and 68c is `research/68c-neutral-testing-mutation-property-scenarios.md`,
-both in this repo; `:N` is a line.
+| a `Scenario:` title | the test name, equal to the title: the Spock feature method name, the Playwright `test()` title | a reworded name makes a search for the scenario title find no test (GT1) |
+| a `Given`, `When`, `Then` or `And` step | Spock block descriptions with the step's text; one Playwright `test.step("Given …")` per step | Given/When/Then kept in comments never appears in the test report (GT2) |
+| a `Scenario Outline` with `Examples` | Spock `where:` or Jest `test.each` with the Examples column names unchanged, ` — #placeholder` in the name; e2e one representative row | a renamed column hid what the test fed (GT3) |
+| a work item and an AC id | Spock `@Issue(["#NNN", "AC-n"])`; a Playwright `issue` annotation | a javadoc mention gives no work-item number a search can find (GT4); Spock does not report a comment naming the AC (CV2) |
 
 ## Good / Bad
 
 ### GT1 — The test name is the scenario title verbatim
 
-**Bad** (neutral)
+**Bad**
 ```gherkin
 Scenario Outline: A GOLD customer gets ten percent off, a STANDARD customer gets nothing
 ```
@@ -52,7 +49,7 @@ Scenario Outline: A GOLD customer gets ten percent off, a STANDARD customer gets
 ```
 The test rewords the title, so a search for the scenario title finds no test.
 
-**Good** (neutral)
+**Good**
 ```gherkin
 Scenario: should mark an invoice overdue once its due date has passed
 ```
@@ -60,11 +57,11 @@ Scenario: should mark an invoice overdue once its due date has passed
 @Issue(["#123", "AC-6"])
 def "should mark an invoice overdue once its due date has passed"() {
 ```
-The same string, byte for byte, so `grep -F` on the title finds the test. (Real evidence: ledger row GT1.)
+The same string, byte for byte, so `grep -F` on the title finds the test.
 
 ### GT2 — Block descriptions and test steps repeat the scenario's steps
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 @Issue(["#123", "AC-6"])
 def "should mark an invoice overdue once its due date has passed"() {
@@ -80,7 +77,7 @@ def "should mark an invoice overdue once its due date has passed"() {
 ```
 The block texts paraphrase the scenario, so the test report does not read as the agreed steps.
 
-**Good** (neutral)
+**Good**
 ```groovy
 @Issue(["#123", "AC-6"])
 def "should mark an invoice overdue once its due date has passed"() {
@@ -94,12 +91,11 @@ def "should mark an invoice overdue once its due date has passed"() {
     invoiceRepository.findById(invoice.id()).orElseThrow().status() == InvoiceStatus.OVERDUE
 }
 ```
-Each block label is the scenario step word for word, so the report reads as the scenario. (Real evidence: ledger
-row GT2.)
+Each block label is the scenario step word for word, so the report reads as the scenario.
 
 ### GT3 — An Outline keeps its Examples column names
 
-**Bad** (neutral)
+**Bad**
 ```groovy
         where:
         level    | amount || expected
@@ -109,7 +105,7 @@ row GT2.)
 ```
 The columns `tier | total | discount` were renamed, so the table no longer reads against the scenario's Examples.
 
-**Good** (neutral)
+**Good**
 ```groovy
 @Issue(["#123", "AC-5"])
 def "should give ten percent off to a GOLD customer on orders of 100.00 EUR or more — #tier #total"() {
@@ -127,11 +123,10 @@ def "should give ten percent off to a GOLD customer on orders of 100.00 EUR or m
 }
 ```
 The column names equal the Examples header, and the Given is the `where:` text because the table is the given.
-(Real evidence: ledger row GT3.)
 
 ### GT4 — Each scenario test links its work item and AC id
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 /**
  * #123 §Acceptance criteria. Every figure asserted here is the discount table's, and the
@@ -144,7 +139,7 @@ class DiscountPolicySpec extends Specification {
 ```
 Traceability is free javadoc, so no search finds the work item or scenario id on any feature.
 
-**Good** (neutral)
+**Good**
 ```groovy
 @Issue(["#123", "AC-6"])
 def "should mark an invoice overdue once its due date has passed"() {
@@ -169,27 +164,27 @@ test(
 );
 ```
 Both tests carry a machine-readable link to `#123` and the scenario id; the Playwright test also checks that the
-declined payment left no payment record. (Real evidence: ledger row GT4.)
+declined payment left no payment record.
 
 ### CV2 — One `@Issue` carries the work item and the AC id
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 // AC-3 of #123
 def "should refuse to pay an invoice that is already paid"() {
 ```
 Spock does not report a comment, and the comment drifts from the scenario unnoticed.
 
-**Good** (neutral)
+**Good**
 ```groovy
 @Issue(["#123", "AC-3"])
 def "should refuse to pay an invoice that is already paid"() {
 ```
-One annotation carries both links, and a search for `"AC-3"` finds the test. (Real evidence: ledger row CV2.)
+One annotation carries both links, and a search for `"AC-3"` finds the test.
 
 ### GT5 — One owning tier per scenario
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     @Issue(["#123", "AC-10"])
     def "should never make an invoice total negative with a discount"() {
@@ -203,7 +198,7 @@ One annotation carries both links, and a search for `"AC-3"` finds the test. (Re
 ```
 A unit spec already owns this rule; the IT repeats it against a real database and names no new risk.
 
-**Good** (neutral)
+**Good**
 ```groovy
 @Issue(["#123", "AC-3"])
 def "should refuse to pay an invoice that is already paid"() {
@@ -218,12 +213,11 @@ def "should refuse to pay an invoice that is already paid"() {
         .expectBody().jsonPath('$.type').isEqualTo("https://example.com/errors/INVOICE_ALREADY_PAID")
 }
 ```
-The scenario crosses HTTP and the database, so one IT owns it and no smoke spec replays it. (Real evidence: ledger
-row GT5.)
+The scenario crosses HTTP and the database, so one IT owns it and no smoke spec replays it.
 
 ### GT6 — The MR lists every scenario's test
 
-**Bad** (neutral)
+**Bad**
 ```text
 - Take each acceptance criterion from the REQ — or from the work item body, where the change has
   no REQ.
@@ -234,7 +228,7 @@ row GT5.)
 ```
 It maps criteria to code, never to tests, so a scenario with no test is invisible.
 
-**Good** (neutral)
+**Good**
 ```markdown
 | AC | scenario | tier | test |
 |---|---|---|---|
@@ -242,13 +236,12 @@ It maps criteria to code, never to tests, so a scenario with no test is invisibl
 | AC-3 | should refuse to pay an invoice that is already paid | IT | InvoiceControllerIT.groovy:41 |
 | AC-8 | should keep the invoice open on every payment call when the PaymentGateway is unreachable | — | not done |
 ```
-Every scenario has a row, so a missing test shows as "not done". (Real evidence: ledger row GT6.)
-GT6's reason comes from agent-factory research/31:22, approved by the operator; the ledger row has none.
+Every scenario has a row, so a missing test shows as "not done".
 
 ## Decided edges
 
 - **Skip when** the owning tier already asserts the scenario's Then: write no second-tier copy of it (GT5). —
-  **Do not skip when** the UI must show the refusal: add the smoke test beside the owning tier (ledger row GT5). —
+  **Do not skip when** the UI must show the refusal: add the smoke test beside the owning tier (GT5). —
   **Confidence** high
 
 ## Review checks

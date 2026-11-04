@@ -28,21 +28,17 @@ Contents: Rules · When X, use Y · Good / Bad (P1, P2, P3, P4, P6, P7, P8, P10)
 
 | situation | use | why |
 |---|---|---|
-| the requirement states a rule for any input: invariant, round-trip, idempotence, oracle, metamorphic | a property (P1) | one example leaves the rule unchecked for other inputs (P1) · `19:98` |
-| the requirement names a case: a CORRECT letter, or a value just inside or just outside an edge | an example test, also when a property covers the same input (P2) | the generators may never produce the named edge, such as null (P2) · `19:99` |
-| the property asserts only inside a branch on the generated case | a count of the cases that reach each branch, and a failure when a count is 0 (P3) | a property can pass while it never reaches its branch (P3) · `19:100` |
-| the generated value must have a shape, such as a format | a generator mapped or combined from smaller generators (P8) | a heavy filter discards most cases and the property passes vacuously (P8) · `19:104` |
-| the property runs in the UI (TypeScript) | fast-check with `numRuns` explicit, the seed printed, no retries (P10) | without the printed seed a failing run cannot be replayed (P10) · `19:105` |
-
-`19` is `research/19-approved-rules.md` (the ledger); `:N` is the line.
+| the requirement states a rule for any input: invariant, round-trip, idempotence, oracle, metamorphic | a property (P1) | one example leaves the rule unchecked for other inputs (P1) |
+| the requirement names a case: a CORRECT letter, or a value just inside or just outside an edge | an example test, also when a property covers the same input (P2) | the generators may never produce the named edge, such as null (P2) |
+| the property asserts only inside a branch on the generated case | a count of the cases that reach each branch, and a failure when a count is 0 (P3) | a property can pass while it never reaches its branch (P3) |
+| the generated value must have a shape, such as a format | a generator mapped or combined from smaller generators (P8) | a heavy filter discards most cases and the property passes vacuously (P8) |
+| the property runs in the UI (TypeScript) | fast-check with `numRuns` explicit, the seed printed, no retries (P10) | without the printed seed a failing run cannot be replayed (P10) |
 
 ## Good / Bad
 
-Each pair is copied from `research/68c-neutral-testing-mutation-property-scenarios.md`; `:N` is its heading line.
+### P1 — Property when the requirement says "for any input"; otherwise examples
 
-### P1 — Property when the requirement says "for any input"; otherwise examples (`68c:234`)
-
-**Bad** (neutral)
+**Bad**
 ```gherkin
 Scenario: No discount makes an invoice total negative
   Given any order with any number of lines
@@ -57,7 +53,7 @@ Scenario: No discount makes an invoice total negative
 ```
 The requirement says "any order", but the test checks one value.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should leave merged order lines unchanged when they are merged again"() {
     expect: "a second merge over any list of order lines returns the first merge unchanged"
@@ -68,13 +64,11 @@ def "should leave merged order lines unchanged when they are merged again"() {
 }
 ```
 Idempotence is a law for any input, so a property states it under `expect:`. The harness injects edge cases (P6)
-and prints a replayable seed (P4). (Real evidence: ledger row P1.)
+and prints a replayable seed (P4).
 
-### P2 — A property complements its examples; boundary cases stay beside it (`68c:265`)
+### P2 — A property complements its examples; boundary cases stay beside it
 
-**Bad** (n/a) — every property has example siblings to show.
-
-**Good** (neutral)
+**Good**
 ```groovy
 def "should give a zero total for absent order lines — #lines"() {
     expect: "absent lines yield a zero total, never an error"
@@ -84,12 +78,11 @@ def "should give a zero total for absent order lines — #lines"() {
     lines << [null, []]
 }
 ```
-CORRECT · Existence cases stay as examples beside the property, because its generators never produce `null`. (Real
-evidence: ledger row P2.)
+CORRECT · Existence cases stay as examples beside the property, because its generators never produce `null`.
 
-### P3 — A conditional property counts branch hits; fails if a branch is never reached (`68c:283`)
+### P3 — A conditional property counts branch hits; fails if a branch is never reached
 
-**Bad** (neutral)
+**Bad**
 ```java
     @Test
     @DisplayName("an applied discount never exceeds ten percent, whatever the order")
@@ -105,7 +98,7 @@ evidence: ledger row P2.)
 ```
 If no case ever reaches `Discount.Applied`, the property passes having checked nothing.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should keep an applied discount within ten percent of the order total"() {
     given: "a count of cases that reach each branch"
@@ -128,11 +121,11 @@ def "should keep an applied discount within ten percent of the order total"() {
 }
 ```
 Both branches are counted, so the feature fails when no case reached either one. The harness injects edge cases
-(P6) and prints a replayable seed (P4). (Real evidence: ledger row P3.)
+(P6) and prints a replayable seed (P4).
 
-### P4 — Seed random per run, printed on failure, replayable; never fixed, never retried (`68c:327`)
+### P4 — Seed random per run, printed on failure, replayable; never fixed, never retried
 
-**Bad** (neutral)
+**Bad**
 ```ts
 export function check<T>(
   gen: Gen<T>,
@@ -144,7 +137,7 @@ export function check<T>(
 ```
 The default seed is fixed, so every run explores the same 200 cases.
 
-**Good** (neutral)
+**Good**
 ```ts
 import fc from 'fast-check';
 
@@ -156,12 +149,11 @@ export function check<T>(
   fc.assert(fc.property(arb, predicate), { seed: opts.seed, numRuns: opts.runs ?? 200 });
 }
 ```
-With no seed given, fast-check draws one per run and prints it on failure; passing it back replays the case. (Real
-evidence: ledger row P4.)
+With no seed given, fast-check draws one per run and prints it on failure; passing it back replays the case.
 
-### P6 — Generators include edge cases (0, 1, min, max, empty) by default (`68c:357`)
+### P6 — Generators include edge cases (0, 1, min, max, empty) by default
 
-**Bad** (neutral)
+**Bad**
 ```java
  * <p>What this gives up against a real framework: stateful/model-based testing, exhaustive
  * generation, edge-case injection, statistics.
@@ -180,7 +172,7 @@ evidence: ledger row P4.)
 ```
 The harness gives up edge-case injection, so an empty SKU or maximum length appears only by chance.
 
-**Good** (neutral)
+**Good**
 ```ts
 const SKU = fc.constantFrom('', '   ', 'SKU-BOOK-0001', 'SKU-FOOD-9999');
 const QUANTITY = fc.constantFrom(0, 1, 2, 999);
@@ -189,14 +181,11 @@ const STATUS = fc.constantFrom('', 'DRAFT', 'draft', 'PLACED', 'PAID', 'SHIPPED'
 const LINE = fc.record({ sku: SKU, quantity: QUANTITY, unitPriceCents: UNIT_PRICE_CENTS });
 const LINES = fc.array(LINE, { maxLength: 10 });
 ```
-Every alphabet starts with its edge value, which fast-check shrinks toward, and the array also draws length 0. (Real
-evidence: ledger row P6.)
+Every alphabet starts with its edge value, which fast-check shrinks toward, and the array also draws length 0.
 
-### P7 — A JVM property is a unit test: runs in the main unit-test target, counts toward coverage (`68c:391`)
+### P7 — A JVM property is a unit test: runs in the main unit-test target, counts toward coverage
 
-**Bad** (n/a) — no property is tagged out of the gate to show.
-
-**Good** (neutral)
+**Good**
 ```groovy
 /** No tag: a unit test, so `./gradlew test` runs it and coverage counts it (#123). */
 class DiscountPolicyPropertySpec extends Specification {
@@ -213,11 +202,11 @@ class DiscountPolicyPropertySpec extends Specification {
 }
 ```
 It carries no tag, so the main gate runs it and coverage counts it like any unit test. The harness injects edge
-cases (P6) and prints a replayable seed (P4). (Real evidence: ledger row P7.)
+cases (P6) and prints a replayable seed (P4).
 
-### P8 — Build generators by mapping/combining, not filtering; never loosen discards to pass (`68c:415`)
+### P8 — Build generators by mapping/combining, not filtering; never loosen discards to pass
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 Property.forAll(Gen.asciiStrings(14)) { String rawSku ->
     if (!rawSku.startsWith("SKU-") || !(rawSku ==~ /SKU-[A-Z]{4}-\d{4}/)) {
@@ -228,7 +217,7 @@ Property.forAll(Gen.asciiStrings(14)) { String rawSku ->
 ```
 Random ASCII almost never has the SKU shape, so nearly every case is discarded and the property passes vacuously.
 
-**Good** (neutral)
+**Good**
 ```java
     private static Gen<String> skus() {
         final var families = Gen.oneOf("BOOK", "FOOD", "TOOL", "GIFT");
@@ -242,11 +231,11 @@ Random ASCII almost never has the SKU shape, so nearly every case is discarded a
             // shrink(...) unchanged
 ```
 Each SKU is composed from family and number generators, with the 0 and 9999 edges mixed into one draw in ten. So
-every case has the shape, the edges come up, and none is rejected. (Real evidence: ledger row P8.)
+every case has the shape, the edges come up, and none is rejected.
 
-### P10 — UI properties: fast-check, seed printed, numRuns explicit, no retries (`68c:445`)
+### P10 — UI properties: fast-check, seed printed, numRuns explicit, no retries
 
-**Bad** (neutral)
+**Bad**
 ```ts
   test('the order total and the sum of its line totals never disagree', () => {
     forAll('orderTotalCents === sumOf(lineTotalsCents)', LINES, lines =>
@@ -255,7 +244,7 @@ every case has the shape, the edges come up, and none is rejected. (Real evidenc
 ```
 The home-grown harness runs a default count with a fixed seed, so no run explores new cases.
 
-**Good** (neutral)
+**Good**
 ```ts
 test('should never let the order total and the sum of its line totals disagree', () => {
   fc.assert(
@@ -264,16 +253,15 @@ test('should never let the order total and the sum of its line totals disagree',
   );
 });
 ```
-`numRuns` is explicit, and with no seed passed fast-check draws one per run and prints it on failure. (Real evidence:
-ledger row P10.)
+`numRuns` is explicit, and with no seed passed fast-check draws one per run and prints it on failure.
 
 ## Decided edges
 
-- **P4** · **Skip when** you pass the printed seed back to replay a failing case (`19:101`). — **Do not skip when**
+- **P4** · **Skip when** you pass the printed seed back to replay a failing case. — **Do not skip when**
   that seed would be committed: a committed seed explores the same cases every run. — **Confidence** high
-- **P6** · **Skip when** a written reason turns the edge cases off (`19:102`). — **Do not skip when** the reason is
+- **P6** · **Skip when** a written reason turns the edge cases off. — **Do not skip when** the reason is
   left out. — **Confidence** high
-- **P8** · **Skip when** a filter rejects only rare cases (`19:104`). — **Do not skip when** the filter
+- **P8** · **Skip when** a filter rejects only rare cases. — **Do not skip when** the filter
   discards most cases, or when the discard limit is loosened to make the property pass. — **Confidence** high
 
 ## Review checks

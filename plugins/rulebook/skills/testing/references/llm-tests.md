@@ -60,35 +60,32 @@ Contents: Rules · When X, use Y · Good / Bad (LT2, LT4, LT8) · Decided edges 
 
 | situation | use | why |
 |---|---|---|
-| a unit spec, IT or smoke spec reaches the model | the shared `ScriptedChatModel`, scripted per test | one protocol, strict on extra and unused turns (LT1, LT2, TM2) · ledger :621, :622, :38 |
-| a test reaches a real provider client without opting in by name | a failure from the real-call guard | LT3 · ledger :623 · the opt-in tier: `llm-live-tests.md` |
-| the code builds the next request: history, tool results, system prompt | an assertion on `model.requests` | LT4 · ledger :624 |
-| the class under test is a provider adapter | the real SDK against a fake HTTP server, asserting the request JSON, inside the shared contract suite | LT5, LT6 · ledger :625, :626 |
-| a tool throws or the model's output fails validation | the error fed back as the tool result, and the run continues | LT7 · ledger :627 |
-| the code runs a tool loop | a turn or request cap, and a test where the script outlasts it | LT8 · ledger :628 |
-| the code streams | several scripted chunks and a bounded wait | LT9 · ledger :629 |
-| the provider fails mid-run | an injected failure, then the stored conversation and side effects | LT10 · ledger :630 · the case itself: C2 (`coverage-design.md`) · ledger :16 |
-| the test depends on time | a fixed clock (U1, `unit-tests.md`) | ledger :27 |
-| the test depends on which of two concurrent steps runs first | an explicit signal: a latch, an event, a scripted pause | LT11 · ledger :631 |
-| the agent keeps a memory window or compacts history | the real window or compactor class, message by message | LS1, LS2 · ledger :632, :633 |
-| the provider caches prompts | byte-prefix and cache-marker assertions on the requests | LS3, LS4 · ledger :634, :635 |
-| the agent caches responses | a key with tenant, system prompt and inputs; errors never cached | LS5 · ledger :636 |
-| the agent enforces a usage or spend limit | the crossing response kept and counted | LS6 · ledger :637 · rate limits before the call: SE8 (`code/references/security.md`) |
-| a guard or a human approval sits in the run | the guard before any model or tool call; approval resumed from saved state | LS7, LS8 · ledger :638, :639 |
-| a fallback model can answer | the primary fake failing, then name, attempt and price | LS9 · ledger :640 |
-| a tool returns text someone outside wrote | an injection test through the whole run | LS10 (ours) · ledger :641 |
-| the tests replay recorded provider traffic | strict replay and a pre-record scrub hook | LT12, LT13 · ledger :642, :643 |
-
-Ledger is `research/19-approved-rules.md` in this repo; `:N` is a line. LS10 is ours: no reference project tests
-injection through a tool result in a whole run (ledger :641).
+| a unit spec, IT or smoke spec reaches the model | the shared `ScriptedChatModel`, scripted per test | one protocol, strict on extra and unused turns (LT1, LT2, TM2) |
+| a test reaches a real provider client without opting in by name | a failure from the real-call guard | an unguarded path spends money, runs slowly and flakes (LT3) · the opt-in tier: `llm-live-tests.md` |
+| the code builds the next request: history, tool results, system prompt | an assertion on `model.requests` | lost tool results and broken history show up only in the next call's input (LT4) |
+| the class under test is a provider adapter | the real SDK against a fake HTTP server, asserting the request JSON, inside the shared contract suite | a model-level fake skips the request mapping that breaks in production (LT5, LT6) |
+| a tool throws or the model's output fails validation | the error fed back as the tool result, and the run continues | a swallowed error stalls the loop or yields a confident wrong answer (LT7) |
+| the code runs a tool loop | a turn or request cap, and a test where the script outlasts it | an unbounded tool loop turns one model misstep into a hung, billed run (LT8) |
+| the code streams | several scripted chunks and a bounded wait | streams lose, reorder or hang (LT9) |
+| the provider fails mid-run | an injected failure, then the stored conversation and side effects | a retry can store a partial reply or run a tool twice (LT10) · the case itself: C2 (`coverage-design.md`) |
+| the test depends on time | a fixed clock (U1, `unit-tests.md`) | a test tied to the clock fails without a defect (U1) |
+| the test depends on which of two concurrent steps runs first | an explicit signal: a latch, an event, a scripted pause | timing-based tests stop exercising the regression and still pass (LT11) |
+| the agent keeps a memory window or compacts history | the real window or compactor class, message by message | a tool call evicted without its result, or history rewritten every turn, breaks the next request (LS1, LS2) |
+| the provider caches prompts | byte-prefix and cache-marker assertions on the requests | a timestamp, rewritten history or extra breakpoints bust the prompt cache (LS3, LS4) |
+| the agent caches responses | a key with tenant, system prompt and inputs; errors never cached | a key on user text alone serves one persona's answer to another (LS5) |
+| the agent enforces a usage or spend limit | the crossing response kept and counted | dropping the crossing response under-counts spend, and re-requesting it bills twice (LS6) · rate limits before the call: SE8 (`code/references/security.md`) |
+| a guard or a human approval sits in the run | the guard before any model or tool call; approval resumed from saved state | a late guard lets side effects through, and a resume from scratch re-runs completed tools (LS7, LS8) |
+| a fallback model can answer | the primary fake failing, then name, attempt and price | cost reports book the wrong model (LS9) |
+| a tool returns text someone outside wrote | an injection test through the whole run | a guard on user input alone never sees text that enters through a tool result (LS10) |
+| the tests replay recorded provider traffic | strict replay and a pre-record scrub hook | a stale recording keeps passing, and an unscrubbed one is committed forever (LT12, LT13) |
 
 ## Good / Bad
 
-Every rule's approved pair: [examples/llm-tests.md](examples/llm-tests.md).
+Every rule's pair: [examples/llm-tests.md](examples/llm-tests.md).
 
 ### LT2 — The fake fails on an extra call and on unused steps
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 class ScriptedChatModel implements ChatModelPort {
     private final Deque<ChatReply> replies = new ArrayDeque<>()
@@ -101,7 +98,7 @@ class ScriptedChatModel implements ChatModelPort {
 A loop that runs one turn too many gets an empty answer, and the test still passes. A loop that
 stops one turn early leaves a scripted reply unused, and nothing notices.
 
-**Good** (neutral)
+**Good**
 ```groovy
 class ScriptedChatModel implements ChatModelPort {
     private final Deque<ChatReply> replies = new ArrayDeque<>()
@@ -119,11 +116,11 @@ class ScriptedChatModel implements ChatModelPort {
     }
 }
 ```
-An extra call throws, and `assertComplete()` fails a run that stopped early. (Real evidence: ledger row LT2.)
+An extra call throws, and `assertComplete()` fails a run that stopped early.
 
 ### LT4 — Assert on the request sent to the model, not only the answer
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should answer a follow-up about a second order"() {
     given:
@@ -143,7 +140,7 @@ def "should answer a follow-up about a second order"() {
 The answer comes from the script, so the test passes even if the history lost the first tool result.
 A real model would never have seen it.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should send the whole first exchange with the follow-up"() {
     given:
@@ -161,11 +158,11 @@ def "should send the whole first exchange with the follow-up"() {
                                      "assistant: A-17 has shipped.", "user: And B-02?"]
 }
 ```
-The request is where lost tool results and broken history show up. (Real evidence: ledger row LT4.)
+The request is where lost tool results and broken history show up.
 
 ### LT8 — Cap the loop and test the cap
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should stop the loop"() {
     given:
@@ -180,7 +177,7 @@ def "should stop the loop"() {
 The model stopped by itself, so the cap never fired. A model that always calls a tool would loop,
 and bill, forever.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should stop at the turn cap when the model keeps calling tools"() {
     given:
@@ -197,7 +194,7 @@ def "should stop at the turn cap when the model keeps calling tools"() {
     model.requests.size() == 2
 }
 ```
-The script asks for more turns than allowed, so the cap is what stops the run. (Real evidence: ledger row LT8.)
+The script asks for more turns than allowed, so the cap is what stops the run.
 
 ## Decided edges
 
@@ -208,8 +205,7 @@ The script asks for more turns than allowed, so the cap is what stops the run. (
   in the live tier, `llm-live-tests.md`, opted in by name (LT3). — **Do not skip when** the same flow has agent logic
   of its own: that logic is tested here, with the fake. — **Confidence** high
 - **Skip when** no tool returns text that someone outside the system wrote: LS10 does not apply. — **Do not skip
-  when** any tool result carries text from a customer, a web page, a file or another system. — **Confidence** medium:
-  an ours-rule, with no reference project behind it.
+  when** any tool result carries text from a customer, a web page, a file or another system. — **Confidence** medium
 
 ## Review checks
 

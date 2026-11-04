@@ -7,7 +7,7 @@ description: Use when you write, change or review a test, or choose a test's tie
 
 Read only the references the task needs. Each one holds Rules, When X use Y, Good / Bad, Decided edges and Review
 checks, so a writer reads it top to bottom and a reviewer starts at Review checks. Where a reference cannot hold every
-approved Good/Bad pair, `references/examples/<name>.md` holds them all.
+Good/Bad pair, `references/examples/<name>.md` holds them all.
 
 <!-- index: built by `make index` from each reference; do not edit by hand -->
 | reference | rule IDs | read it |

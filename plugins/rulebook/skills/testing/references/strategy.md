@@ -28,27 +28,24 @@ Contents: Rules · When X, use Y · Good / Bad (S1, S2, TM1, TM2, S3, S5) · Dec
 
 | situation | use | why |
 |---|---|---|
-| the behaviour is pure logic | a unit spec, with no Spring context | a Spring context makes a plain service test very slow (S1) · ledger :9 · plinth 321:47 |
-| the behaviour crosses a real boundary: DB, Redis, HTTP, Spring wiring | an IT | the flow needs real collaborators (S1) · ledger :9 · plinth 322:57 |
-| the behaviour is a user journey | a smoke spec | S1 · ledger :9 |
-| the case is an error or unhappy path | the tier of what fails | an IT for a pure error branch starts Postgres yet reaches no boundary (S5) · ledger :13 · plinth 058:36 |
-| a boundary the IT covers has branching it cannot reach cheaply: many input combinations, error mapping, edge values | a unit spec for that branching only | no unit test re-proves what the IT proves (TM1) · ledger :37 |
-| an acceptance criterion is reached through the API | an IT | a `.feature` tier with no Gherkin runtime left an orphan copy of an IT (AT1) · ledger :35 |
-| an acceptance criterion is reached through the UI | a smoke spec | AT1 · ledger :35 · tier choice: `scenario-to-tests.md` |
-| an IT or smoke spec reaches the LLM | a scripted fake model | we do not own it (TM2) · ledger :38 |
-| an IT or smoke spec reaches third-party HTTP | WireMock at the wire, or the vendor's container sandbox when it ships one (IT5) | we do not own it (TM2) · ledger :38 |
-| an IT or smoke spec reaches our own service, repository or Redis consumer | the real one | a fake of our own code leaves its real query untested (TM2) · ledger :38 |
-
-Ledger is `research/19-approved-rules.md` in this repo; plinth `321`, `322` and `058` are the pinned plinth-java-skills
-files of those numbers; `:N` is a line.
+| the behaviour is pure logic | a unit spec, with no Spring context | a Spring context makes a plain service test very slow (S1) |
+| the behaviour crosses a real boundary: DB, Redis, HTTP, Spring wiring | an IT | the flow needs real collaborators (S1) |
+| the behaviour is a user journey | a smoke spec | only a smoke spec drives the journey through the UI a user sees (S1) |
+| the case is an error or unhappy path | the tier of what fails | an IT for a pure error branch starts Postgres yet reaches no boundary (S5) |
+| a boundary the IT covers has branching it cannot reach cheaply: many input combinations, error mapping, edge values | a unit spec for that branching only | no unit test re-proves what the IT proves (TM1) |
+| an acceptance criterion is reached through the API | an IT | a `.feature` tier with no Gherkin runtime left an orphan copy of an IT (AT1) |
+| an acceptance criterion is reached through the UI | a smoke spec | a `.feature` tier with no Gherkin runtime left an orphan copy of an IT (AT1) · tier choice: `scenario-to-tests.md` |
+| an IT or smoke spec reaches the LLM | a scripted fake model | we do not own it (TM2) |
+| an IT or smoke spec reaches third-party HTTP | WireMock at the wire, or the vendor's container sandbox when it ships one (IT5) | we do not own it (TM2) |
+| an IT or smoke spec reaches our own service, repository or Redis consumer | the real one | a fake of our own code leaves its real query untested (TM2) |
 
 ## Good / Bad
 
-Every rule's approved pair: [examples/strategy.md](examples/strategy.md).
+Every rule's pair: [examples/strategy.md](examples/strategy.md).
 
 ### S1 — Pick the tier by what the behaviour depends on
 
-**Bad** (neutral)
+**Bad**
 ```java
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = OrderTotalTest.TestConfig.class)
@@ -67,7 +64,7 @@ class OrderTotalTest {
 ```
 A Spring context whose every bean is a mock wires plain logic, crosses no boundary, and only makes the test slow.
 
-**Good** (neutral)
+**Good**
 ```groovy
     OrderRepository orderRepository = Stub()
     FakePaymentGateway paymentGateway = new FakePaymentGateway()
@@ -82,11 +79,12 @@ A Spring context whose every bean is a mock wires plain logic, crosses no bounda
             Clock.fixed(NOW, ZoneOffset.UTC))
     }
 ```
-The service is built with `new`, only outbound ports are replaced (the gateway by its fake), our own TaxCalculator is real, and the clock is fixed. (Real evidence: ledger row S1.)
+The service is built with `new`, only outbound ports are replaced (the gateway by its fake), our own TaxCalculator is
+real, and the clock is fixed.
 
 ### S2 — Assert observable behaviour
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "the order line variants carry what they are given"() {
         given: "a unit price"
@@ -103,7 +101,7 @@ The service is built with `new`, only outbound ports are replaced (the gateway b
 ```
 Every line reads back the constructor argument, so it passes for any record and fails for no regression.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should refuse an order line with quantity #quantity, because a line orders at least one item"() {
         given: "the unit price a line would carry"
@@ -120,11 +118,11 @@ Every line reads back the constructor argument, so it passes for any record and 
         quantity << [0, -1]
     }
 ```
-It asserts what OrderLine does with a bad quantity, not what the test handed in, so a missing guard fails it. (Real evidence: ledger row S2.)
+It asserts what OrderLine does with a bad quantity, not what the test handed in, so a missing guard fails it.
 
 ### TM1 — At a boundary the IT is the primary test
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "the status filter is passed through as given, null included"() {
         when: "invoices are listed with and without a filter"
@@ -138,7 +136,7 @@ It asserts what OrderLine does with a bad quantity, not what the test handed in,
 ```
 It re-proves through a mock what the IT already proves on real rows; the SQL that does the filtering never runs.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should list only the requested status, and every invoice when no filter is given"() {
         given: "three invoices for one customer, two open and one paid"
@@ -157,11 +155,11 @@ It re-proves through a mock what the IT already proves on real rows; the SQL tha
         all.size() == 3
     }
 ```
-The filter lives in the SQL, so the IT against real Postgres is the primary proof, with `null` meaning unfiltered. (Real evidence: ledger row TM1.)
+The filter lives in the SQL, so the IT against real Postgres is the primary proof, with `null` meaning unfiltered.
 
 ### TM2 — Fake only what we do not own
 
-**Bad** (neutral)
+**Bad**
 ```java
 public class FakeInvoiceRepository implements InvoiceRepository, Resettable {
 
@@ -179,7 +177,7 @@ public class FakeInvoiceRepository implements InvoiceRepository, Resettable {
 ```
 An IT fakes our own repository, which our database backs, so its real query is never exercised.
 
-**Good** (neutral)
+**Good**
 ```groovy
     private void stubFraudCheck(String body) {
         wireMock.resetAll()
@@ -197,11 +195,12 @@ An IT fakes our own repository, which our database backs, so its real query is n
             .willReturn(okJson(CAPTURED)))
     }
 ```
-Only the payment gateway and the fraud-check service are faked, at the wire; our services, repositories and Postgres run for real. (Real evidence: ledger row TM2.)
+Only the payment gateway and the fraud-check service are faked, at the wire; our services, repositories and Postgres run
+for real.
 
 ### S3 — Run the existing tests before changing code
 
-**Bad** (neutral)
+**Bad**
 ```text
 ./mvnw -pl orders-api -am -Dtest='InvoiceServiceTest+OrderServiceTest' ... test
 → [INFO] BUILD SUCCESS
@@ -209,7 +208,7 @@ Only the payment gateway and the fraud-check service are faked, at the wire; our
 ```
 A hand-rolled baseline run whose filter matched nothing; nothing ran, yet "green" was noted before editing.
 
-**Good** (neutral)
+**Good**
 ```text
 ./gradlew :orders-api:test --tests '*InvoiceServiceTest*'
 ./gradlew :orders-api:test --tests '*OrderServiceTest*'
@@ -218,12 +217,12 @@ Baseline before editing InvoiceService, at main <sha>:
   InvoiceServiceTest   <n> tests, 0 failed
   OrderServiceTest     <n> tests, 0 failed
 ```
-It goes through the build's own test task, one pattern per run so an empty match fails, and the note records counts proving tests ran. (Real evidence: ledger row S3.)
-S3's reason comes from agent-factory research/31:19, approved by the operator; the ledger row has none.
+It goes through the build's own test task, one pattern per run so an empty match fails, and the note records counts
+proving tests ran.
 
 ### S5 — Pick the tier by what fails, not by the error path
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "a quantity outside the allowed range is refused"() {
         when: "a quantity the database would not accept is added"
@@ -242,7 +241,7 @@ S3's reason comes from agent-factory research/31:19, approved by the operator; t
 ```
 A pure `if` guard boots Postgres in an IT; the CHECK constraint it names is never reached, so no boundary is added.
 
-**Good** (neutral)
+**Good**
 ```groovy
     OrderRepository orderRepository = Mock()
 
@@ -261,15 +260,16 @@ A pure `if` guard boots Postgres in an IT; the CHECK constraint it names is neve
         quantity << [0, -1, 100, Integer.MIN_VALUE]
     }
 ```
-The error comes from pure logic, so it is a unit spec; `0 *` on the `Mock()` repository is the behaviour here because nothing may be reached. (Real evidence: ledger row S5.)
+The error comes from pure logic, so it is a unit spec; `0 *` on the `Mock()` repository is the behaviour here because
+nothing may be reached.
 
 ## Decided edges
 
-- **Skip when** an error case comes from pure logic: it stays a unit spec, not an IT (S5, ledger :13). — **Do not
-  skip when** what fails is a real boundary: that case is an IT, by what fails (S1, S5, ledger :9, :13).
+- **Skip when** an error case comes from pure logic: it stays a unit spec, not an IT (S5). — **Do not
+  skip when** what fails is a real boundary: that case is an IT, by what fails (S1, S5).
   — **Confidence** high
 - **Skip when** the run is the gate: the real-model tier is opt-in and stays out of it (TM3). — **Do not skip
-  when** prompt or provider code changes, or before a release: the real-model tier must pass then (TM3, ledger :39).
+  when** prompt or provider code changes, or before a release: the real-model tier must pass then (TM3).
   — **Confidence** high
 
 ## Review checks
