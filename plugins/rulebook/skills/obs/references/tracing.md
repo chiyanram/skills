@@ -29,13 +29,13 @@ Contents: Rules · When X, use Y · Good / Bad (TR1, TR2, TRN1, TRN2, TRN3) · D
 |---|---|---|
 | sends a message to another process | the propagator: an instrumented producer that writes trace headers (TR1) | a consumer span joins the producer's trace only through the propagated context |
 | hands work to another thread | a context-propagating executor (TR1) | a bare executor drops the context, so the span on the new thread starts a new trace |
-| measures one operation | `observation.observe(() -> …)` (TRN2) | every span that is created must also be ended |
+| measures one operation | `observation.observe(() -> …)` (TRN2) | an unended span leaks memory and never reaches the backend |
 | starts a span it cannot wrap in a lambda | `start()`, the scope in try-with-resources, `stop()` in `finally` (TRN2) | the span must be ended and the scope closed, even when the work throws |
 | needs a tracer or registry | the API or facade type, with no null check (TR2) | the API is a no-op without a backend, and SDK types tie code to a vendor |
 | names a span | the class of operation: a constant such as `orders.place`, or `{method} {route template}` (TRN1) | per-id names explode cardinality |
 | records an id | a high-cardinality key value (span attribute) (TRN1, TR3) | an id is a fine span attribute, and a high-cardinality key value never reaches a meter |
 | catches a failure it handles, retries or turns into a 4xx | no error status (TRN3) | false errors inflate error alerts |
-| sets the sampling ratio | a parent-based sampler, ratio in configuration (TR5) | a `ParentBased` sampler follows the root's decision, and Spring Boot sets the ratio with `management.tracing.sampling.probability` |
+| sets the sampling ratio | a parent-based sampler, ratio in configuration (TR5) | a `ParentBased` sampler follows the root's decision, so no trace loses spans to independent per-service ratios |
 
 Which tracer bridge sits under the facade is a project choice.
 
