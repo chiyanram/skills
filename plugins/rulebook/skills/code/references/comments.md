@@ -7,59 +7,53 @@ Contents: Rules · When X, use Y · Good / Bad (CM3, CM4, CM7) · Decided edges 
 
 ## Rules
 
-- **CM1** — Write no banner or divider comments, in any file type, because a divider stays after the section it
-  labelled is split or moved.
-- **CM2** — Write no comment that restates the code, a dependency or a config value, because a restating comment adds
-  nothing and is a second place to update, which goes stale once the code changes.
-- **CM3** — Keep a comment only for what code cannot show (external dependency or protocol, public-API contract,
-  license, issue/RFC link, must-not-fail boundary catch (ER4)); else reshape, because a why-comment about our code
-  rots into a false claim.
-- **CM4** — Check each comment's claim before it lands; replace a 'do not remove' note
-  with a type, test or lint, because a false comment gets believed and a 'keep in sync' note never fails.
-- **CM5** — Write Javadoc on an interface only when its contract is not obvious from
-  the signature, and none on its implementation, because Javadoc on the implementation is a second copy that goes stale.
-- **CM7** — Fix the type instead of suppressing a lint or compiler rule that protects correctness or safety
-  (`eslint-disable`, `@ts-expect-error`, `@SuppressWarnings`); style-only rules may be suppressed, because a suppressed
-  correctness rule stops catching the bugs it targets.
+- **CM1** — Write no banner or divider comments (`// ====`, `// --- Helpers ---`), because a divider outlives the
+  section it labelled once code moves; use a new method or file instead.
+- **CM2** — Write no comment that restates the code, a name or a config value, because it adds nothing and goes stale
+  when the code changes; rename instead.
+- **CMN1** — Delete commented-out code, because it is never compiled, goes stale, and version control already keeps
+  it.
+- **CM3** — Try a rename, extracted method or type first; keep a comment only for what code cannot say (non-obvious
+  reason, outside constraint, contract, license, link), because prose duplicating code goes stale.
+- **CM4** — Check a comment's factual claim against the code before it lands, and delete or fix any that is false,
+  because readers act on a false comment.
+- **CM5** — Document a public interface method's contract (what the signature cannot say: nulls, errors, side
+  effects); skip it for a self-explanatory member, and write none on an override, because a copied doc drifts from
+  the original.
+- **CM7** — Fix the code rather than suppress a compiler or lint warning that guards correctness; scope a proven-safe
+  suppression to one declaration, with a comment saying why, because a bare suppression hides the next real bug.
 
 ## When X, use Y
 
 | the comment is | use | why |
 |---|---|---|
-| a banner or divider | delete it (CM1) | banners are on the kill list (sicko :12) |
-| narration of what the code, a dependency or a config value does | delete it (CM2) | narration is on the kill list (sicko :12); a comment that explains "what" goes (simplification :144) |
-| a legal or license header | keep it (CM3) | sicko :16 |
-| behaviour forced by an external dependency, platform, vendor or protocol | keep it (CM3) | sicko :17 |
-| a surprise in our own code | delete it; rename, extract or type the symbol until the behaviour is obvious (CM3) | sicko :17 |
-| a doc comment that defines a public API contract | keep it when the signature does not show the contract (CM3, CM5) | sicko :19; an interface is also its invariants, ordering constraints and error modes (codebase-design :16) |
-| an issue or RFC link for a constraint the code cannot express | keep it (CM3) | sicko :20 |
-| a constraint note: `do not remove`, `do not change wording`, `talk to X before changing` | check the claim; encode it as a type, test or lint, then delete it (CM4) | sicko :26; no-comments :23 |
-| a lint or compiler suppression | fix the type when the rule protects correctness or safety; keep it when the rule is style-only (CM7) | sicko :18, :24 |
-
-`sicko` is pstack `agents/comment-sicko.md`, `no-comments` is pstack `skills/no-comments/SKILL.md`, `simplification`
-is addy `skills/code-simplification/SKILL.md` and `codebase-design` is mattpocock
-`skills/engineering/codebase-design/SKILL.md`; `:N` is the line.
-
-Operator preference, 2026-10-31 (SRC2), in whole or in part: CM4 and CM5.
+| a banner or divider | delete it (CM1) | a divider outlives the section it labelled once code moves |
+| a restatement of the code, a name or a config value | delete it; rename instead (CM2) | it adds nothing and goes stale when the code changes |
+| commented-out code | delete it (CMN1) | it is never compiled, goes stale, and version control already keeps it |
+| prose a rename, an extracted method or a type could replace | the rename, method or type, then no comment (CM3) | prose that duplicates code goes stale |
+| a non-obvious reason, outside constraint, contract, license or link | keep it (CM3) | it carries what the code cannot say |
+| a factual claim | check it against the code; fix or delete it if false (CM4) | readers act on a false comment |
+| a public interface method | a doc comment on its contract: nulls, errors, side effects (CM5) | a caller needs what the signature cannot say |
+| a simple, obvious member or an override | no doc comment (CM5) | a copied doc drifts from the original |
+| a lint or compiler suppression | the code fixed; a proven-safe one scoped to one declaration, with a comment saying why (CM7) | a bare suppression hides the next real bug |
 
 ## Good / Bad
 
-### CM3 — A comment survives only for a constraint the code cannot show
+### CM3 — Try a rename, a method or a type before a comment
 
-**Bad** (neutral)
+**Bad**
 ```java
 // The carrier label API accepts a weight with at most one decimal place.
 final BigDecimal labelWeight = parcel.weightKg().setScale(1, RoundingMode.HALF_UP);
-// Status 3 means the parcel left the depot. We check the flag because
-// the printer must not print a second label for the same parcel.
-if (parcel.status() == 3 && !parcel.labelPrinted()) {
+// We check the flag because the printer must not print a second label for the same parcel.
+if (parcel.stage() == ParcelStage.LEFT_DEPOT && !parcel.labelPrinted()) {
     printer.print(parcel.id(), labelWeight);
     parcel.setLabelPrinted(true);
 }
 ```
-The second comment explains our own code. A magic number and a loose flag need it.
+The second comment explains our own code: a loose flag needs it, where a method could own the guard.
 
-**Good** (neutral)
+**Good**
 ```java
 // The carrier label API accepts a weight with at most one decimal place.
 final BigDecimal labelWeight = parcel.weightKg().setScale(1, RoundingMode.HALF_UP);
@@ -67,39 +61,39 @@ if (parcel.stage() == ParcelStage.LEFT_DEPOT) {
     labels.printOnce(parcel.id(), labelWeight);
 }
 ```
-An enum names the stage, and `printOnce` owns the guard, so the second comment goes. The first comment stays: it
-names a constraint of an outside API.
+`printOnce` owns the guard, so the second comment goes. The first comment stays: it names a constraint of an
+outside API.
 
-### CM4 — Check a comment's claim; encode a constraint note
+### CM4 — Check a comment's claim before it lands
 
-**Bad** (neutral)
+**Bad**
 ```java
 // Do not change this text: the mobile app parses it.
 static final String PARCEL_LOST = "Parcel lost in transit";
-
-record ParcelEventResponse(String message) {
-}
-```
-No type, test or lint holds the note. A reworded message passes review and the build, and the app breaks.
-
-**Good** (neutral)
-```java
-enum ParcelEventCode {
-    LOST_IN_TRANSIT,
-    DELIVERED
-}
 
 record ParcelEventResponse(
         ParcelEventCode code,
         String message) {
 }
 ```
-First check the claim in the app. Then send a code for the app to match on. The text is free to change, so the note
-goes.
+The app matches on `code`, not on the text, so the claim is false. A reader who believes it freezes a message that is
+free to change.
 
-### CM7 — Fix the type instead of suppressing a correctness rule
+**Good**
+```java
+static final String PARCEL_LOST = "Parcel lost in transit";
 
-**Bad** (neutral)
+record ParcelEventResponse(
+        ParcelEventCode code,
+        String message) {
+}
+```
+The claim was checked in the app, which matches on `code`. It is false, so the note goes and the text is free to
+change.
+
+### CM7 — Fix the code instead of suppressing a correctness warning
+
+**Bad**
 ```ts
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function trackingNumber(payload: any): string {
@@ -108,7 +102,7 @@ function trackingNumber(payload: any): string {
 ```
 The suppression turns off the check on each property access. A payload without `shipment` throws at run time.
 
-**Good** (neutral)
+**Good**
 ```ts
 interface CarrierPayload {
   shipment: { trackingNumber: string };
@@ -129,32 +123,28 @@ function trackingNumber(payload: unknown): string | undefined {
 
 ## Decided edges
 
-- **Skip when** the comment fits a keep clause of CM3 that is proven true today on a live path (sicko :26). — **Do not
-  skip when** you are not sure a keep clause applies: the comment goes (sicko :22). — **Confidence** high
-- **Skip when** the why names a constraint the code cannot show (CM3). — **Do not skip when** the why is about our own
-  code, even though addy keeps such comments (simplification :145): delete it and ask for a reshape (operator
-  preference, 2026-10-31). — **Confidence** high
-- **Skip when** a member's contract is obvious from its signature: write no Javadoc (Google Java Style §7.3.1 makes it
-  optional for a simple, obvious member, and §7.3.2 for an override). — **Do not skip when** the interface has an
-  invariant, ordering constraint or error mode the signature cannot show (codebase-design :16). — **Confidence** high
-- **Skip when** the suppression is a Java unchecked cast: TY10 (`types.md`) owns that one exception to CM7. — **Do not
-  skip when** the rule is `no-explicit-any` or another correctness rule: fix the type (NGA2, `angular-ui.md`;
-  typescript-eslint `ban-ts-comment`). — **Confidence** high
+- **Skip when** the suppression is a Java unchecked cast proven safe: TY10 (`types.md`) sets its form, on the smallest
+  declaration with a comment saying why. — **Do not skip when** the warning is TypeScript `no-explicit-any`: type the
+  value `unknown` and narrow it instead (NGA2, `angular-ui.md`). — **Confidence** high
 
 ## Review checks
 
 Walk every comment, Javadoc block and suppression that the change adds or edits, in every file type. CM6 is a
 review check only, not an author rule.
 
-- [ ] CM1 — A banner or divider comment is a finding.
-- [ ] CM2 — A comment that restates the code next to it, a dependency or a config value is a finding.
-- [ ] CM3 — Each kept comment fits one keep clause: an external dependency or protocol, a public-API contract, a
-  license, an issue/RFC link, or a must-not-fail boundary catch (ER4). A comment that fits none is a finding; name the symbol to rename, extract or type.
-- [ ] CM4 — Check each factual claim against the code or the source it names. A false claim is a finding, and so is a
-  constraint note ('do not remove', 'talk to X first', 'keep in sync') that no type, test or lint enforces.
-- [ ] CM5 — Javadoc on an implementation of an interface is a finding, and so is interface Javadoc that only repeats
-  the signature.
-- [ ] CM7 — For each suppression (`grep -nE "eslint-disable|@ts-expect-error|@ts-ignore|@SuppressWarnings"`), look up
-  the rule. A suppressed rule that protects correctness or safety is a finding.
-- [ ] CM6 — A long justification comment is a finding: ask for a reshape or a keep-clause reason (CM3), because a long
-  justification usually defends a branch that should be deleted.
+- [ ] CM1 — A banner or divider comment (`grep -nE "(//|#|/\*|<!--) *([=*#-]){4,}|(//|#) *-{2,} .+ -{2,}"`) is a
+  finding.
+- [ ] CM2 — A comment that restates the code next to it, a name or a config value is a finding.
+- [ ] CMN1 — Commented-out code (`grep -nE "^\s*(//|#).*[;{}]\s*$"`) is a finding.
+- [ ] CM3 — For each kept comment, ask whether a rename, an extracted method or a type could say it. One that could is
+  a finding; name the symbol. One that states a non-obvious reason, an outside constraint, a contract, a license or a
+  link stays.
+- [ ] CM4 — Check each factual claim against the code or the source it names. A false claim is a finding.
+- [ ] CM5 — A public interface method whose contract (nulls, errors, side effects) the signature cannot say, with no
+  doc comment stating it, is a finding. A doc comment on an override, or one that only repeats the signature, is a
+  finding.
+- [ ] CM7 — For each suppression (`grep -nE "eslint-disable|@ts-expect-error|@ts-ignore|@SuppressWarnings|NOSONAR"`),
+  look up the rule. A suppressed correctness warning the code could fix is a finding, and so is a suppression wider
+  than one declaration or with no comment saying why.
+- [ ] CM6 — A long justification comment is a finding: ask for a reshape or the reason the code cannot say (CM3),
+  because a long justification usually defends a branch that should be deleted.
