@@ -12,7 +12,7 @@ approved Good/Bad pair, `references/examples/<name>.md` holds them all.
 <!-- index: built by `make index` from each reference; do not edit by hand -->
 | reference | rule IDs | read it |
 |---|---|---|
-| [angular-ui](references/angular-ui.md) | NGA1–NGA3, NGA5–NGA7, NGB1–NGB3, NGC1, NGC3, NGD1–NGD3 | when you write or review an Angular component, a `.ts` or template file in an Angular app, or its `tsconfig` |
+| [angular-ui](references/angular-ui.md) | NGA1–NGA3, NGA5–NGA7, NGB1–NGB4, NGC1, NGC3, NGD1–NGD3 | when you write or review an Angular component, a `.ts` or template file in an Angular app, or its `tsconfig` |
 | [comments](references/comments.md) | CM1–CM5, CM7 | when you write or review a comment, a Javadoc block or a suppression, in any file type |
 | [concurrency](references/concurrency.md) | CC1–CC10 | when you write or review code that starts threads, submits async work, calls a remote service, retries, locks, or builds a pool or a cache |
 | [design](references/design.md) | SEAM1 | when you write or review an interface a caller depends on, or a method that implements one |
