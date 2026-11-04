@@ -1,5 +1,5 @@
 """A rule file holds only what an agent needs to act; where a rule came from lives in the ledger
-(research/19-approved-rules.md) and the research files (agent-factory#59).
+(docs/rulebook/approved-rules.md) and the research behind it (agent-factory#59).
 
 Fails on a shipped skill file (a SKILL.md or a reference under plugins/*/skills/) that carries provenance:
 a source citation (`pstack :15`, `r47 :456`, `file.md:13`, `§Section`, a URL, `ADR-0007`, `research/41`), an

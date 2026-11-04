@@ -1,5 +1,7 @@
 # Approved rules ledger — every rule needs the operator's explicit yes (2026-10-01)
 
+Older research is under [`docs/archive/research/`](../archive/research/), frozen at git tag `design-archive-2026-11`: a cite `research/NN` or `review/…` below means that file in the archive (or at the tag), except `research/73`, which is now [rule-sources.md](rule-sources.md). The reference format is [reference-format.md](reference-format.md).
+
 `reason` column (G21 #91, skills #98, operator 2026-10-17): "because" + the failure the rule prevents, drafted from the rule's own source or evidence; the cite each reason came from is in `review/reasons.json`. `NO-REASON` = no failure found in the cited sources, flagged for deletion (checklist #15). Empty = not an author rule (file fate, pointer, placement decision).
 
 `evidence` column (G23 #93 Q3, skills #99, operator 2026-10-18): the Aruvii `path:lines @sha` that showed the mistake behind the rule's Good/Bad pair, and the neutral pair that replaces it in references (`research/68a`–`68f`). Ledger only — never reference text. The Aruvii originals stay in research/31a–31e-v2, 42, 47, 56a–c.

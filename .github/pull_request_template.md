@@ -1,6 +1,6 @@
 ## What changes
 
-<!-- One or two sentences. Name the reference or research file. -->
+<!-- One or two sentences. Name the reference or check you changed. -->
 
 ## Why
 
@@ -9,7 +9,7 @@
 ## Checklist
 
 - [ ] `make lint` and `make test` pass locally
-- [ ] Every new or changed rule has the operator's yes and a row in `research/19-approved-rules.md`
-- [ ] A new reference follows `research/00-reference-format.md` and is listed in `plugins/rulebook/README.md`
+- [ ] Every new or changed rule has the operator's yes and a row in `docs/rulebook/approved-rules.md`
+- [ ] A new reference follows `docs/rulebook/reference-format.md` and is listed in `plugins/rulebook/README.md`
 - [ ] The title is a Conventional Commit: `feat` or `fix` when the shipped plugin changes, so it gets released
 - [ ] No hand edits to a `version` or to `CHANGELOG.md`: the release writes both

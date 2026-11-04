@@ -5,7 +5,7 @@ from tests.support import FIXTURES, run_check
 # check name -> (fixtures that must pass, planted fixtures that must fail)
 CASES = {
     "versions": (["good"], ["mismatch", "missing"]),
-    "links": (["good"], ["broken", "broken-after-nested-fence"]),
+    "links": (["good", "archived"], ["broken", "broken-after-nested-fence"]),
     "sizes": (["good", "good-template", "rules-heading-ours"],
               ["root-too-long", "chain-over-32k", "rule-too-long", "rules-heading-variant", "no-rules-section"]),
     "plugin": (["good"], ["source-is-root", "root-is-a-plugin", "no-readme", "no-icon", "no-license"]),

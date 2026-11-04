@@ -61,5 +61,5 @@ from the references, and `make lint` fails when it is stale.
 ## Where a rule comes from
 
 Each rule has a source. A rule goes in only after the operator says yes; the
-[ledger](../../research/19-approved-rules.md) lists every approved rule with its reason and source. How to propose one:
+[ledger](../../docs/rulebook/approved-rules.md) lists every approved rule with its reason and source. How to propose one:
 [CONTRIBUTING.md](../../CONTRIBUTING.md).

@@ -14,7 +14,7 @@ body:
     id: sources
     attributes:
       label: Sources to read
-      description: Reference repos (see refs/README.md), official docs, real evidence as path:lines @sha.
+      description: Reference repos pinned to a commit, official docs, real evidence as path:lines @sha.
   - type: textarea
     id: informs
     attributes:

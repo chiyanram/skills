@@ -4,6 +4,7 @@ Draft consolidated 2026-10-02 from decisions already taken. Each line cites wher
 Amended 2026-10-17: Rule line (G21 #91), Good/Bad examples and location (G23 #93).
 Amended 2026-10-29: `references/examples/<topic>.md` holds every approved pair when a reference cannot (operator, #31).
 Amended 2026-11-02: the router table is built by `make index` from each reference (agent-factory#46).
+Older cites of `research/NN` and `review/…` point at the frozen design archive, [`docs/archive/`](../archive/) (git tag `design-archive-2026-11`).
 
 ## Where a reference sits
 
@@ -36,7 +37,7 @@ before …". `make index` copies that sentence and the rule IDs into the domain 
 
 | section | holds | rule for writing it | decided in |
 |---|---|---|---|
-| **Rules** | the approved rules, one line each, with their ledger id | only rules the operator approved (`research/19-approved-rules.md`); one sentence = imperative + "because" + the failure it prevents, ≤35 words; a rule with no statable reason is flagged for deletion | G5 · map #9 Notes ("no rule enters without the operator's yes") · G21 #91 (supersedes "imperative; ≤30 words") |
+| **Rules** | the approved rules, one line each, with their ledger id | only rules the operator approved (`docs/rulebook/approved-rules.md`); one sentence = imperative + "because" + the failure it prevents, ≤35 words; a rule with no statable reason is flagged for deletion | G5 · map #9 Notes ("no rule enters without the operator's yes") · G21 #91 (supersedes "imperative; ≤30 words") |
 | **When X, use Y** | decision table for choices inside the topic | a table, situation → choice → why | G5 |
 | **Good / Bad** | one pair per rule that can be misread | see the Good/Bad rules below; omit for rules whose sentence says it all | G5 · #35 (misreadable-only) |
 | **Decided edges** | cases that look like violations but are allowed, and the reverse | pstack bugbot shape: *Skip when* · *Do not skip when* · *Confidence* | G5 post-close (pstack) |
@@ -61,7 +62,7 @@ source moves to the ledger.
    has a pair, write fresh neutral code. Never re-skin project code. No project names, paths or business terms.
    ≤15 lines each. The pair carries no label or credit; its source is recorded in the ledger.
 3. **The real case is evidence, not text.** The Aruvii `path:lines` that showed the mistake (a ticket, an MR round, a QA
-   finding) goes in the ledger `research/19-approved-rules.md` as the rule's evidence, never into the reference, and
+   finding) goes in the ledger `docs/rulebook/approved-rules.md` as the rule's evidence, never into the reference, and
    never as the start of an example.
 4. **A rule enters the rulebook in one of two ways (SRC2).** (a) Two independent sources state it, each read at
    `path:line` or URL and section. Pages from one company or project count as one source. (b) The operator states it
@@ -169,7 +170,7 @@ Why this is right.
 ## How a domain gets its references (the process G9a and G9d used)
 
 1. Candidate rules with sources → operator approves each on a review page (`review/build-planning.py`, `template.html`).
-2. Approved rules → ledger `research/19-approved-rules.md` (id · target file · rule · source · status).
+2. Approved rules → ledger `docs/rulebook/approved-rules.md` (id · target file · rule · source · status).
 3. Good/Bad for the rules that can be misread → review page → approved log `research/33-good-bad-approvals.md`.
 4. Generic references are written in chiyanram/skills from the ledger and the neutral examples (skills #99); Aruvii
    answers go in agent-platform `docs/agents/*.md` (G23 #93, G24 #94).
