@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.21.0](https://github.com/chiyanram/skills/compare/rulebook--v0.20.0...rulebook--v0.21.0) (2026-11-04)
+
+### Features
+
+* **rulebook:** build each router's reference table with make index ([#199](https://github.com/chiyanram/skills/issues/199)) ([638d357](https://github.com/chiyanram/skills/commit/638d357ec5bba9700c2ef572b10d69bfcb5d6acf)), closes [chiyanram/agent-factory#46](https://github.com/chiyanram/agent-factory/issues/46)
+
 ## [0.20.0](https://github.com/chiyanram/skills/compare/rulebook--v0.19.0...rulebook--v0.20.0) (2026-11-02)
 
 ### Features
