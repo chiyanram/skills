@@ -1,6 +1,6 @@
 # Modern Java
 
-Which JDK 25 language features and library calls Java code uses: records and collection copies, switch forms,
+Which current-JDK language features and library calls Java code uses: records and collection copies, switch forms,
 patterns, `Optional` unwrapping, overflow-checked arithmetic, obsolete APIs, preview features and the build's release
 level. Read it when you write or review Java production code, a record, a `switch`, or a Maven or Gradle build file.
 
@@ -224,6 +224,9 @@ Fee feeFor(final Payment payment) {
 - **Skip when** `copyOf` or `Collectors.toUnmodifiableList()` throws `NullPointerException` on a `null` element: that
   is intended, because no domain collection holds `null` (TY12, `types.md`). — **Do not skip when** the fix would be a
   copy that admits `null`: parse the `null` away in the adapter instead (MJ2, MJ10). — **Confidence** high
+- **Skip when** the project's target JDK is older than the release that made a feature final: write the form that
+  JDK offers (MJ1–MJ17). — **Do not skip when** the target JDK has the feature: use it; a new project targets the
+  newest JDK the team runs. — **Confidence** high
 
 ## Review checks
 
