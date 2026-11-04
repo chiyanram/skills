@@ -151,9 +151,9 @@ This is the shape Prettier prints. Nobody wraps TypeScript by hand, so the forma
 - **Skip when** a framework's own style guide bans `var` (for example Spring Framework's): that ban serves a library
   read without an IDE, and JV5 already stops `var` from hiding a type. — **Do not skip when** the initializer does
   not name the type: write the type (JV5). — **Confidence** high
-- **Skip when** a `var` is a local whose initializer names the type (JV5). — **Do not skip when** the `var` sits in a
-  record pattern (`case Paid(var amount, var paidAt)`): a pattern has no initializer to name the type, so write the
-  component type, or `_` when unused (JV5; MJ6, `modern-java.md`). — **Confidence** medium
+- **Do not skip when** the `var` sits in a record pattern (`case Paid(var amount, var paidAt)`): a pattern has no
+  initializer to name the type, so write the component type, or `_` when unused (JV5; MJ6, `modern-java.md`). —
+  **Confidence** medium
 - **Skip when** the `AutoCloseable` is not backed by I/O, such as a `Stream` over a collection: try-with-resources is
   in general unnecessary there. — **Do not skip when** it holds a file, a socket or a connection: JV8 applies. —
   **Confidence** high

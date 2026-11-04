@@ -225,7 +225,7 @@ Fee feeFor(final Payment payment) {
   is intended, because no domain collection holds `null` (TY12, `types.md`). — **Do not skip when** the fix would be a
   copy that admits `null`: parse the `null` away in the adapter instead (MJ2, MJ10). — **Confidence** high
 - **Skip when** the project's target JDK is older than the release that made a feature final: write the form that
-  JDK offers (MJ1–MJ17). — **Do not skip when** the target JDK has the feature: use it; a new project targets the
+  JDK offers (every MJ rule). — **Do not skip when** the target JDK has the feature: use it; a new project targets the
   newest JDK the team runs. — **Confidence** high
 
 ## Review checks
@@ -240,11 +240,12 @@ example an Error Prone check) already enforces a rule, cite the gate and skip th
   A gate such as Error Prone `StatementSwitchToExpressionSwitch` replaces this check.
 - [ ] MJ4 — `grep -nE 'else if \(.*instanceof'`. A chain of two or more type tests on one sealed-typed variable is a
   finding.
-- [ ] MJ9 — `grep -rnE --include=pom.xml --include='*.gradle' --include='*.kts' --include='*.properties' -e '--enable-preview|enablePreview' .`.
-  Each hit outside a test-only or tooling module is a finding.
+- [ ] MJ9 — `grep -rnE -e '--enable-preview|enablePreview' .` over build files, `.mvn/jvm.config`,
+  `.mvn/maven.config`, Dockerfiles, shell scripts and YAML. Each hit outside a test-only or tooling module is a
+  finding.
 - [ ] MJ13 — `grep -nE '(Minor|[Qq]uantity|[Cc]ount)\b(\(\))? *[-+*]=? |[-+*]=? *[A-Za-z_.]*(Minor|[Qq]uantity|[Cc]ount)\b|\(int\) *[A-Za-z(]'`.
   A `+`, `*` or `(int)` cast on a count or a minor-unit amount, outside a `*Exact` call, is a finding.
-- [ ] MJ10 — `grep -nE 'Collectors\.toList\(\)'`: each hit is a finding. For each mutating call
+- [ ] MJ10 — `grep -nE 'Collectors\.toList\(\)|collect\(toList\(\)\)'`: each hit is a finding. For each mutating call
   (`grep -nE '\b[a-z][A-Za-z0-9]*\.(add|addAll|remove|removeIf|replaceAll|set|sort|clear)\('`), a receiver that came
   from `toList()` or `Collectors.toList()` is a finding.
 - [ ] MJ12 — `grep -nE '\.isPresent\(\)|\.get\(\)'`. A `get()` on an `Optional` is a finding, and so is an
@@ -256,8 +257,8 @@ example an Error Prone check) already enforces a rule, cite the gate and skip th
 - [ ] MJ6 — A named pattern variable, catch parameter or lambda parameter that the body never reads is a finding. A
   gate such as Error Prone `UnusedVariable` replaces this check.
 - [ ] MJ16 — `grep -nE 'void finalize\(\)|runFinalization'`. Each hit is a finding.
-- [ ] MJ17 — `grep -nE 'maven\.compiler\.(source|target)\b|<(source|target)>|(^|[[:space:]])-(source|target)[[:space:]]'`
-  over `pom.xml` and build scripts. Each hit is a finding.
+- [ ] MJ17 — `grep -nE 'maven\.compiler\.(source|target)\b|<(source|target)>[[:space:]]*[0-9$]|(source|target)Compatibility|(^|[[:space:]"])-(source|target)[[:space:]"]'`
+  over `pom.xml` and the Gradle build scripts. Each hit in compiler configuration is a finding.
 - [ ] MJ14 — `grep -nE '\b(Vector|Hashtable|Stack|StringBuffer)\b'`. Each hit is a finding, unless a third-party API
   signature requires the type.
 - [ ] MJ15 — `grep -nE 'new (Integer|Long|Short|Byte|Character|Boolean|Double|Float)\('`. Each hit is a finding.

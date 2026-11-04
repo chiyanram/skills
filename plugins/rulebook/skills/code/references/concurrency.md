@@ -163,7 +163,7 @@ anything after connect is `Unknown`, for a reconciler to resolve.
 - **Skip when** the `join()` or `get()` sits at the outer boundary of the flow, or runs on a virtual thread (CC6). —
   **Do not skip when** it blocks mid-flow on an event-loop or common-pool thread. — **Confidence** high
 - **Skip when** request context crosses a `CompletableFuture` or executor hop as a parameter, not a `ScopedValue`: a
-  `ScopedValue` reaches no other thread without `--enable-preview`, because `StructuredTaskScope` is still preview
+  `ScopedValue` reaches no other thread without `--enable-preview`, because `StructuredTaskScope` is a preview API
   (CC7). — **Do not skip when** it crosses in a `ThreadLocal`, copied by hand or not. — **Confidence** high
 
 ## Review checks
