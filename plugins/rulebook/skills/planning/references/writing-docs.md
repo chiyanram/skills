@@ -1,7 +1,7 @@
 # Writing docs
 
-What a project doc may claim, where each fact lives, and which spec a change updates. Read it when you write or review
-a design, a spec, a guide or a README.
+What a project doc may claim, where each fact lives, and which spec a change updates. Read it when you write or review a
+design, a spec, a guide or a README, or decide which spec a change updates.
 
 Contents: Rules · When X, use Y · Good / Bad (WD1, WD2, WD4, WD5) · Decided edges · Review checks
 

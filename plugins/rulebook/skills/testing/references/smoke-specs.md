@@ -1,7 +1,7 @@
 # Smoke specs
 
 How a Playwright smoke spec proves a user journey: it can fail, it stands alone, and it waits on state, never on time.
-Read it when you write or review a Playwright spec, or a fixture that such specs import.
+Read it when you write or review a Playwright smoke spec, or a fixture that such specs import.
 
 Contents: Rules · When X, use Y · Good / Bad (EA1–EA6) · Decided edges · Review checks
 

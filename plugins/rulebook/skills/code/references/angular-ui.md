@@ -1,7 +1,7 @@
 # Angular UI
 
-How to type, structure and template an Angular component and the TypeScript around it. Read it when you write or
-review a `.ts` or template file in an Angular app, or its `tsconfig`.
+How to type, structure and template an Angular component and the TypeScript around it. Read it when you write or review
+an Angular component, a `.ts` or template file in an Angular app, or its `tsconfig`.
 
 Contents: Rules · When X, use Y · Good / Bad (NGB3) · Decided edges · Review checks
 

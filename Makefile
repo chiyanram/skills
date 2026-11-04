@@ -1,10 +1,10 @@
-.PHONY: check lint test help
+.PHONY: check lint test index help
 
 PYTHON ?= python3
 
 check: lint test ## run everything CI runs
 
-lint: ## skill frontmatter, one version, links, size budgets, packaging, README index, skill routers, plugin validate
+lint: ## skill frontmatter, one version, links, size budgets, packaging, router index, skill routers, plugin validate
 	$(PYTHON) scripts/check_skills.py .
 	$(PYTHON) scripts/check_versions.py .
 	$(PYTHON) scripts/check_links.py .
@@ -17,6 +17,9 @@ lint: ## skill frontmatter, one version, links, size budgets, packaging, README 
 
 test: ## each check against its planted fixtures, and each review/ builder
 	$(PYTHON) -m unittest discover --start-directory tests --top-level-directory .
+
+index: ## rebuild each skill router's reference table from its references
+	$(PYTHON) scripts/build_index.py .
 
 help: ## list the targets
 	@grep -E '^[a-z]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-6s %s\n", $$1, $$2}'

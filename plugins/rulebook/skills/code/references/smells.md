@@ -1,7 +1,7 @@
 # Smells
 
-The smell baseline every diff is reviewed against, and the shape and naming rules behind it. Read it when you write
-or review production code in any language.
+The smell baseline every diff is reviewed against, and the shape and naming rules behind it. Read it when you write or
+review production code in any language: the smell baseline, and the shape and naming rules behind it.
 
 Contents: Rules · When X, use Y · Good / Bad (DS1, DS3) · Decided edges · Review checks
 

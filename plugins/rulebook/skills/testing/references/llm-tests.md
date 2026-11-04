@@ -1,8 +1,9 @@
 # LLM tests
 
-How to test code that calls a language model without a real model: the scripted fake, the agent loop, agent
-scenarios (memory, caching, limits, guards, approval, fallback) and recorded traffic. Read it when you write or review
-a test whose code under test calls the model. Real-model tests and evals are in `llm-live-tests.md`.
+How to test code that calls a language model without a real model: the scripted fake, the agent loop, agent scenarios
+(memory, caching, limits, guards, approval, fallback) and recorded traffic. Read it when you write or review a test
+whose code under test calls the model: the scripted fake, the agent loop, agent scenarios or recorded traffic.
+Real-model tests and evals are in `llm-live-tests.md`.
 
 Contents: Rules · When X, use Y · Good / Bad (LT2, LT4, LT8) · Decided edges · Review checks
 
