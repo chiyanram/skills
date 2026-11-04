@@ -232,7 +232,7 @@ A separate `.feature` tier with its own Node runtime duplicates an IT and is lef
         then: "the API refuses with the problem type, and the order is not cancelled"
         response.expectStatus().isEqualTo(409)
         response.expectBody().jsonPath('$.type').isEqualTo("https://example.com/errors/INVOICE_ALREADY_PAID")
-        orderRepository.findById(orderId).get().status() != OrderStatus.CANCELLED
+        orderRepository.findById(orderId).orElseThrow().status() != OrderStatus.CANCELLED
     }
 ```
 The AC of the order-cancellation story is an ordinary IT on the real API, called with a customer's token; its name reads
