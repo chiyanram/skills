@@ -9,7 +9,7 @@ Run both before you push. CI runs the same two targets on every pull request and
 
 ```bash
 make index  # rebuild each skill router's reference table from its references
-make lint   # skill frontmatter, one version, links, size budgets, packaging, router index, skill routers, `claude plugin validate --strict`
+make lint   # skill frontmatter, one version, links, size budgets, packaging, router index, skill routers, provenance, `claude plugin validate --strict`
 make test   # python3 -m unittest: each check against its planted fixtures, and each review/ builder
 ```
 
