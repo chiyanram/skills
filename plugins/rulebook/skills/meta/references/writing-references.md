@@ -12,7 +12,7 @@ Read it when you write or review a rule, a When X, use Y row or a Good / Bad pai
 
 | the rule has | use | why |
 |---|---|---|
-| two sources from different companies or projects, each read at `path:line` or URL §section | admit it; name both sources in the rule's ledger row (SRC2) | two independent sources show the practice is not one team's habit |
+| two sources from different companies or projects, each read at `path:line` or a URL and its section | admit it; name both sources in the rule's ledger row (SRC2) | two independent sources show the practice is not one team's habit |
 | two pages from one company or project | count them as one source; find a second source, or ask the operator (SRC2) | pages from one company or project count as one source |
 | one source or none, and the operator states it as a preference | admit it; the ledger row's status records the preference (SRC2) | a reader of the ledger can tell a choice from industry practice |
 | only part of it from two sources, and the rest from the operator | admit it; the ledger row's status says the preference covers part of the rule (SRC2) | one status covers a whole or a partial preference |
@@ -53,8 +53,8 @@ One source admits the rule, and the reference carries its source twice: on the r
 |---|---|---|
 | a client retries a failed call | a delay with random jitter (RT1) | retries in step overload a recovering server |
 ```
-The reference holds the rule and its reason only. The ledger row for RT1 names library A's documentation, §Retries,
-and organisation B's operations handbook, §Overload.
+The reference holds the rule and its reason only. The ledger row for RT1 names library A's documentation (its Retries section)
+and organisation B's operations handbook (its Overload section).
 
 ## Decided edges
 
@@ -74,7 +74,7 @@ and organisation B's operations handbook, §Overload.
 Walk every rule line, When X, use Y row, Good / Bad pair and ledger row that the change adds or edits.
 
 - [ ] SRC2 — For each rule id, open its ledger row and find two sources from different companies or projects, each at
-  `path:line` or URL §section, or a status recording the operator's preference. A row with neither is a finding.
+  `path:line` or a URL and its section, or a status recording the operator's preference. A row with neither is a finding.
 - [ ] SRC2 — Any source citation, credit, label, preference mark, evidence note or date in a reference, or a name
   that only credits a source, is a finding (`make lint` runs `check_provenance.py`).
 - [ ] SRC2 — A project name, path or business term in a rule, a why cell or a Good / Bad pair is a finding
