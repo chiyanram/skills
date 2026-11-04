@@ -15,10 +15,10 @@ implement ──▶ deslop ──▶ verify ──▶ review
 
 ## Rules
 
-- **DS13** — Run deslop on the branch diff only, before review and never instead of it; preserve behaviour and report
-  anything that could change it, because deslop checks style only and correctness and safety need the review.
-- **DS5** — When an API has no external consumer, migrate every caller and delete the old path in the same change,
-  because a kept old path becomes a permanent dual-path compatibility layer.
+- **DS13** — Run deslop on the branch diff only, before review and never instead of it; fix only behaviour-neutral
+  cleanups and report the rest, because an unreviewed behaviour change ships untested.
+- **DS5** — When an API has no external consumer, migrate every caller and delete the old path; leave no compatibility
+  shim, because two live paths must both be maintained and drift apart.
 - **DS7** — Remove dead code, vestigial parameters, commented-out blocks and `// removed` shims in the code you touch,
   because dead code confuses future readers and agents.
 - **DS8** — Add no null check or try/catch to silence a failure on a trusted path; fix the cause and search for the
@@ -51,7 +51,7 @@ the report line is posted.
 | type laundering | a cast through `Object` or a raw type, a new `@SuppressWarnings`, untrusted JSON held as `Map<String, Object>` past the adapter, a string where an enum exists | TY10, TY6 (`../code/references/types.md`) · CM7 (`../code/references/comments.md`) · SE5 (`../code/references/security.md`) |
 | one-use indirection | a helper, wrapper or variable that adds no domain meaning | DS4 (`../code/references/smells.md`); keep anything that carries a domain name |
 | fallbacks and shims | a retry, default, alias or second code path with no named contract and no removal plan | DS5 · DS7 · CC8 (`../code/references/concurrency.md`) |
-| dead code | an unused member, a vestigial parameter, a commented-out block | DS7 · SM3 (`../code/references/smells.md`) |
+| dead code | an unused member, a vestigial parameter, a commented-out block | DS7 |
 | deep nesting | three or more levels, a nested ternary | DS9 |
 | style drift | naming, control flow, imports or formatting that fight the file around them | the `code` reference for the file's language |
 | test shape | labelled blocks and feature names that fight the spec around them | U2 ([`unit-tests.md`](../testing/references/unit-tests.md)) |
@@ -59,7 +59,7 @@ the report line is posted.
 ### Fix or report
 
 - **Fix inline** only a trivial, provably behaviour-neutral cleanup: a deleted comment, an inlined one-use variable, a
-  `final` on a line the branch added (TY4), an import.
+  `final` on a field the branch added (TY4), an import.
 - **Report, never fix**, anything that touches control flow, error handling, a fallback, a cast that changes dispatch,
   or a type that crosses a module boundary. Review and the author decide those (DS13).
 - When you cannot tell which side an edit falls on, report it.
@@ -68,18 +68,17 @@ the report line is posted.
 
 ### DS8 — Fix the cause; add no silencing guard
 
-**Bad** (neutral)
+**Bad**
 ```java
 private void applyInvoicing(ImportOrdersRequest request, List<Order> created, UUID createdBy) {
-    InvoiceDestination destination = request.invoicing();
-    if (destination == null || invoiceService == null) {
+    if (invoiceService == null) {
         return;
     }
 ```
 `invoiceService` is a constructor-injected final field that a test-only constructor sets to null. The trusted path
 grows a null guard, and a wiring mistake skips invoicing without a sound.
 
-**Good** (neutral)
+**Good**
 ```java
 OrderImporter(final OrderRepository orderRepository,
               final TaxCalculator taxCalculator,
@@ -98,30 +97,28 @@ private void applyInvoicing(final InvoiceTarget placement, final List<UUID> orde
 }
 ```
 One constructor and an injected final collaborator need no null guard. The request decodes to a sealed target at the
-boundary. (Real evidence: ledger row DS8. Pair: 68f § DS8 — No null check or try/catch to silence a failure on a trusted
-path.)
+boundary.
 
 ## Decided edges
 
 - **Skip when** callers sit outside the repo's control (a published API, stored data, a webhook URL): expand, migrate,
-  then contract (ParallelChange) instead of one-change deletion (DS5). — **Do not skip when** every caller is in the
-  repo. — **Confidence** high (addy deprecation-and-migration :124, Strangler Pattern)
+  then contract (ParallelChange): remove the old path only after every consumer has migrated (DS5). — **Do not skip
+  when** every caller is in the repo. — **Confidence** high
 - **Skip when** the value crosses a trust boundary, such as request input or a third-party response: validate it there
   (ER6, `../code/references/errors.md`). — **Do not skip when** the guarded value comes from an injected field or an
-  in-repo caller (DS8). — **Confidence** high (ctk :13; openclaw :15)
+  in-repo caller (DS8). — **Confidence** high
 
-## Sources
+## Review checks
 
-`openclaw` is openclaw `.agents/skills/deslop/SKILL.md`, `ctk` is cursor-team-kit `skills/deslop/SKILL.md`, and
-`addy <name>` is addy `skills/<name>/SKILL.md`; `:N` is the line.
+Walk every hunk of the branch diff (`git diff $(git merge-base <default-branch> HEAD)...HEAD`) and the pass's report.
 
-| rule | sources |
-|---|---|
-| DS13 | openclaw :12, :20, :24 · ctk :8, :20 |
-| DS5 | addy deprecation-and-migration :110 · openclaw :18 |
-| DS7 | addy code-review-and-quality :47 · addy code-simplification :152 · refactoring.guru Dead Code |
-| DS8 | ctk :13 · openclaw :15 |
-| DS9 | addy code-simplification :131, :133 · ctk :15 |
-
-The categories come from openclaw :14-19 and ctk :12-16. Category rules point at their owner references and do not
-restate them; test shape cites U2 only.
+- [ ] DS13 — The pass touched only files in the branch diff, ran before review, and every edit it made is
+  behaviour-neutral. An edit outside the diff, or one that changes control flow, error handling or a fallback, is a
+  finding.
+- [ ] DS5 — For each API the branch replaces with no external consumer, grep for callers of the old path
+  (`grep -rn '<old name>'`). A caller left on it, or a kept compatibility shim, is a finding.
+- [ ] DS7 — An unused member, a vestigial parameter, a commented-out block or a `// removed` note in a touched file is
+  a finding.
+- [ ] DS8 — A new null check or `try`/`catch` on a value from an injected field or an in-repo caller is a finding.
+- [ ] DS9 — Nesting of three or more levels that a guard clause or early return could flatten is a finding, and so is
+  a nested ternary.
