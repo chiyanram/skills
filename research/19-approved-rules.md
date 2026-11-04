@@ -683,3 +683,12 @@ own choices (providers, which flows run live, the schedule) go in its `docs/agen
 | LYN1 | code/references/services.md | Return response DTOs from a controller, never persistence entities. | because an entity in a response leaks every field it owns and ties the API to the schema | SBS layered-architecture (No JPA entities in responses); DDH README (DTO contract, data leaks) (r48 §3 :778) | | APPROVED 2026-11-04 (re-sourced from industry, agent-factory#59) |
 | SCN1 | code/references/spring.md | Never inject a prototype-, request- or session-scoped bean straight into a singleton; inject `ObjectProvider<T>` and resolve it per use. | because the singleton keeps the first instance forever | FW factory-scopes; SONAR S6832 (r48 §3 :755) | | APPROVED 2026-11-04 (re-sourced from industry, agent-factory#59) |
 | TYN1 | code/references/types.md | Never return `null` from a method whose type is `Optional`, and never compare an `Optional` to `null`. | because a null `Optional` throws `NullPointerException` where the caller expected empty | OpenJDK `Optional` apiNote; Sonar S2789; Error Prone `NullOptional` (research/48 §1 NEW-TY-a) | | APPROVED 2026-11-04 (re-sourced from industry, agent-factory#59) |
+
+## Testing addition (skills#152) — operator 2026-11-04: "approve as recommended"
+
+Source audit on skills#152 (pstack `tdd`, `poteto-mode/playbooks/bug-fix.md`; mattpocock `diagnosing-bugs`). Part (a) has two
+sources; parts (b) and (c) are operator preference (SRC2).
+
+| id | reference | rule | reason | source | evidence | status |
+|---|---|---|---|---|---|---|
+| S6 | testing/references/strategy.md | Run a bug fix's failing test locally, before you push, and paste its command and failure output in the pull request. | because a red run sent to CI costs minutes and proves no more | pstack cursor/plugins `pstack/skills/tdd/SKILL.md:3,18` @bb68f236; mattpocock `skills/engineering/diagnosing-bugs/SKILL.md:59,63` @4ae2317d; part (b) pstack `pstack/skills/poteto-mode/playbooks/bug-fix.md:15` @bb68f236 only; part (c) no source | agent-factory research/46 G10: 4 red runs sent to the old Verifier as full jobs in one week (#820 ×2, #821, #829), 2–15 min each, called waste twice | APPROVED, OPERATOR PREFERENCE (SRC2) in part: the paste and the never-a-CI-job edge |

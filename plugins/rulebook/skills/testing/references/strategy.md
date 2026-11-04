@@ -3,7 +3,7 @@
 Which tier a test belongs in, what it may fake, and what it asserts. Read it when you choose where a new test goes,
 when you fix a bug, or when you review the tier and the doubles of a changed test.
 
-Contents: Rules · When X, use Y · Good / Bad (S1, S2, TM1, TM2, S3, S5) · Decided edges · Review checks
+Contents: Rules · When X, use Y · Good / Bad (S1, S2, TM1, TM2, S5) · Decided edges · Review checks
 
 ## Rules
 
@@ -23,6 +23,8 @@ Contents: Rules · When X, use Y · Good / Bad (S1, S2, TM1, TM2, S3, S5) · Dec
   seen only after the change cannot be told from one already red.
 - **S4** — Start a bug fix with a test that fails for the bug's reason, landed before the fix in the MR, because a
   regression test that never failed proves the mock, not the fix.
+- **S6** — Run a bug fix's failing test locally, before you push, and paste its command and failure output in the
+  pull request, because a red run sent to CI costs minutes and proves no more.
 
 ## When X, use Y
 
@@ -35,6 +37,7 @@ Contents: Rules · When X, use Y · Good / Bad (S1, S2, TM1, TM2, S3, S5) · Dec
 | a boundary the IT covers has branching it cannot reach cheaply: many input combinations, error mapping, edge values | a unit spec for that branching only | no unit test re-proves what the IT proves (TM1) |
 | an acceptance criterion is reached through the API | an IT | a `.feature` tier with no Gherkin runtime left an orphan copy of an IT (AT1) |
 | an acceptance criterion is reached through the UI | a smoke spec | a `.feature` tier with no Gherkin runtime left an orphan copy of an IT (AT1) · tier choice: `scenario-to-tests.md` |
+| a bug fix's failing test | run it locally first, then paste its command and failure in the pull request | a red run sent to CI costs minutes and proves no more (S6) |
 | an IT or smoke spec reaches the LLM | a scripted fake model | we do not own it (TM2) |
 | an IT or smoke spec reaches third-party HTTP | WireMock at the wire, or the vendor's container sandbox when it ships one (IT5) | we do not own it (TM2) |
 | an IT or smoke spec reaches our own service, repository or Redis consumer | the real one | a fake of our own code leaves its real query untested (TM2) |
@@ -198,28 +201,6 @@ An IT fakes our own repository, which our database backs, so its real query is n
 Only the payment gateway and the fraud-check service are faked, at the wire; our services, repositories and Postgres run
 for real.
 
-### S3 — Run the existing tests before changing code
-
-**Bad**
-```text
-./mvnw -pl orders-api -am -Dtest='InvoiceServiceTest+OrderServiceTest' ... test
-→ [INFO] BUILD SUCCESS
-→ zero tests executed
-```
-A hand-rolled baseline run whose filter matched nothing; nothing ran, yet "green" was noted before editing.
-
-**Good**
-```text
-./gradlew :orders-api:test --tests '*InvoiceServiceTest*'
-./gradlew :orders-api:test --tests '*OrderServiceTest*'
-
-Baseline before editing InvoiceService, at main <sha>:
-  InvoiceServiceTest   <n> tests, 0 failed
-  OrderServiceTest     <n> tests, 0 failed
-```
-It goes through the build's own test task, one pattern per run so an empty match fails, and the note records counts
-proving tests ran.
-
 ### S5 — Pick the tier by what fails, not by the error path
 
 **Bad**
@@ -271,6 +252,9 @@ nothing may be reached.
 - **Skip when** the run is the gate: the real-model tier is opt-in and stays out of it (TM3). — **Do not skip
   when** prompt or provider code changes, or before a release: the real-model tier must pass then (TM3).
   — **Confidence** high
+- **Skip when** the failing test of a bug fix runs locally in a few seconds: it is not a CI job or a gate (S6). —
+  **Do not skip when** an acceptance criterion asks for CI proof, or the bug reproduces only in a clean CI environment
+  (S6). — **Confidence** medium
 
 ## Review checks
 
@@ -297,3 +281,6 @@ Walk every changed test file, and the MR that carries it.
   green. No note is a finding.
 - [ ] S4 — For a bug fix, find the test that fails for the bug's reason, and check that it lands before the fix.
   A fix with no such test is a finding. Where that one test sits is V4 (`value-bar.md`).
+- [ ] S6 — For a bug fix, find the failing test's command and failure output in the pull request. No command and
+  output is a finding. A red run made only as a CI job is a finding, unless an acceptance criterion asks for CI proof
+  or the bug reproduces only in a clean CI environment.

@@ -282,6 +282,29 @@ proving tests ran.
 Bug #123 (every consumer shared `consumer-1`) makes this fail on the old code for exactly the bug's reason, read from
 Redis.
 
+## S6 — Run the failing test locally, and paste its output
+
+**Bad**
+```text
+git commit -m "test: rounding of a discounted total"   # the test was never run
+git push
+CI job prove-red ...................................... 12 min, failed (expected)
+Pull request body: "Red run: <link to the CI job>"
+```
+The red state is proved by a 12-minute CI job, and the pull request holds only a link, not the failure.
+
+**Good**
+```text
+./gradlew test --tests '*PriceRoundingTest*'
+  PriceRoundingTest > should round a discounted total half-up FAILED
+    expected 10.05 but was 10.04                           4 s
+Pull request body:
+  Baseline at main <sha>: PriceRoundingTest <n> tests, 0 failed.
+  Red run, local, at a1b2c3d (test only): the command and the failure above.
+  Green run at d4e5f6a (the fix): same command, passed.
+```
+The red run takes seconds locally, before the push, and the pull request carries its command and failure.
+
 ## S5 — Pick the tier by what fails, not by the error path
 
 **Bad**
