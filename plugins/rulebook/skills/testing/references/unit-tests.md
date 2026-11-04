@@ -19,22 +19,19 @@ Contents: Rules · When X, use Y · Good / Bad (U1, U3, U2) · Decided edges · 
 
 | situation | use | why |
 |---|---|---|
-| the feature tests a pure function with no collaborators | `expect:`, no doubles; `where:` for several inputs (U2) | `expect:` collapses `when:` + `then:` for a pure expression (Spock BP :56, :79) |
-| the feature asserts a state change on the subject | `given:` / `when:` / `then:` with conditions only (U2) | Spock BP :80 |
-| a collaborator only returns a value to the subject | `Stub()` with `>>` (U3); a call count on a stub is K3 (`spock.md`) | Spock BP :82 |
-| the subject's call to a collaborator is the behaviour | `Mock()` and its interaction in `then:` (U3); which interactions to assert is K4 (`spock.md`) | Spock BP :81 |
-| the collaborator is your own class or module | the real class (U3) | mock at system boundaries only, never your own classes (mocking :3, :10-14) |
-| a fake of the port already exists | the fake, not a `Stub()` or `Mock()` (U3) | a fake ranks above a stub and a mock (ladder :240-243) |
-| the logic reads the clock or a random value | a fixed clock (U1); how production code takes it is U4 (`code/references/java.md`) | time and randomness are system boundaries (mocking :7) |
-
-Spock BP is spock-best-practices `SKILL.md`; mocking is mattpocock `tdd/mocking.md`; ladder is addyosmani
-`test-driven-development/SKILL.md`. `:N` is the line.
+| the feature tests a pure function with no collaborators | `expect:`, no doubles; `where:` for several inputs (U2) | `expect:` collapses `when:` + `then:` for a pure expression |
+| the feature asserts a state change on the subject | `given:` / `when:` / `then:` with conditions only (U2) | the labels tell Spock which lines are assertions |
+| a collaborator only returns a value to the subject | `Stub()` with `>>` (U3); a call count on a stub is K3 (`spock.md`) | the call is not the behaviour, so nothing about it is verified |
+| the subject's call to a collaborator is the behaviour | `Mock()` and its interaction in `then:` (U3); which interactions to assert is K4 (`spock.md`) | the call is the behaviour, so it is what the test verifies |
+| the collaborator is your own class or module | the real class (U3) | mocking your own classes breaks tests on refactors that keep behaviour |
+| a fake of the port already exists | the fake, not a `Stub()` or `Mock()` (U3) | a fake ranks above a stub and a mock |
+| the logic reads the clock or a random value | a fixed clock (U1); how production code takes it is U4 (`code/references/java.md`) | time and randomness are system boundaries |
 
 ## Good / Bad
 
 ### U1 — Every test is A-TRIP
 
-**Bad** (neutral)
+**Bad**
 ```java
     private void await(java.util.function.BooleanSupplier cond) {
         long deadline = System.currentTimeMillis() + 60_000;
@@ -49,7 +46,7 @@ Spock BP is spock-best-practices `SKILL.md`; mocking is mattpocock `tdd/mocking.
 ```
 The result depends on wall-clock time and host speed, and an interrupt returns silently as if the condition held.
 
-**Good** (neutral)
+**Good**
 ```groovy
     InvoiceRepository invoiceRepository = Stub()
     OverdueReminder reminder = new OverdueReminder(
@@ -67,11 +64,10 @@ The result depends on wall-clock time and host speed, and an interrupt returns s
         overdue*.id() == ["due-yesterday"]
 ```
 A fixed clock, a fresh instance per feature and both sides of the boundary make the test repeatable and independent.
-(Real evidence: ledger row U1.)
 
 ### U3 — Double only at boundaries
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     OrderRepository orderRepository = Mock()
     InvoiceRepository invoiceRepository = Mock()
@@ -81,7 +77,7 @@ A fixed clock, a fresh instance per feature and both sides of the boundary make 
 ```
 Every port is a `Mock()` that is only stubbed and never verified, so the spec hides which call is the behaviour.
 
-**Good** (neutral)
+**Good**
 ```groovy
     OrderRepository orderRepository = Stub()
     InvoiceRepository invoiceRepository = Mock()
@@ -98,11 +94,11 @@ Every port is a `Mock()` that is only stubbed and never verified, so the spec hi
         }) >> { Invoice i -> i }
 ```
 The lookup only returns, so it is a `Stub()`. Saving the invoice is the behaviour, so only that call is a verified
-`Mock()`. (Real evidence: ledger row U3.)
+`Mock()`.
 
 ### U2 — Labelled blocks and a plain behaviour sentence as the name
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "shouldCarryTheLinesAnOrderIsPlacedWith"() {
         given:
@@ -118,7 +114,7 @@ The lookup only returns, so it is a `Stub()`. Saving the invoice is the behaviou
 ```
 The name is camelCase, and `when:`/`then:` wrap a pure construction.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should keep the lines a draft order is created with, in their order"() {
         given: "two lines for different products"
@@ -129,9 +125,7 @@ The name is camelCase, and `when:`/`then:` wrap a pure construction.
         Order.draft(CUSTOMER_ID, [first, second]).lines() == [first, second]
     }
 ```
-The name is a plain behaviour sentence, and `expect:` fits a pure construction. (Real evidence: ledger row U2.)
-
-U2's reason comes from Spock BP :52, :55, approved by the operator; the ledger row 19:28 has none.
+The name is a plain behaviour sentence, and `expect:` fits a pure construction.
 
 ## Decided edges
 

@@ -1,11 +1,11 @@
 # Strategy — examples
 
-Every approved Good/Bad pair for the rules in [`../strategy.md`](../strategy.md), one per rule id, in one neutral
+Every Good/Bad pair for the rules in [`../strategy.md`](../strategy.md), one per rule id, in one
 domain (ordering and billing).
 
 ## S1 — Pick the tier by what the behaviour depends on
 
-**Bad** (neutral)
+**Bad**
 ```java
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = OrderTotalTest.TestConfig.class)
@@ -24,7 +24,7 @@ class OrderTotalTest {
 ```
 A Spring context whose every bean is a mock wires plain logic, crosses no boundary, and only makes the test slow.
 
-**Good** (neutral)
+**Good**
 ```groovy
     OrderRepository orderRepository = Stub()
     FakePaymentGateway paymentGateway = new FakePaymentGateway()
@@ -39,11 +39,12 @@ A Spring context whose every bean is a mock wires plain logic, crosses no bounda
             Clock.fixed(NOW, ZoneOffset.UTC))
     }
 ```
-The service is built with `new`, only outbound ports are replaced (the gateway by its fake), our own TaxCalculator is real, and the clock is fixed. (Real evidence: ledger row S1.)
+The service is built with `new`, only outbound ports are replaced (the gateway by its fake), our own TaxCalculator is
+real, and the clock is fixed.
 
 ## S2 — Assert observable behaviour
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "the order line variants carry what they are given"() {
         given: "a unit price"
@@ -60,7 +61,7 @@ The service is built with `new`, only outbound ports are replaced (the gateway b
 ```
 Every line reads back the constructor argument, so it passes for any record and fails for no regression.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should refuse an order line with quantity #quantity, because a line orders at least one item"() {
         given: "the unit price a line would carry"
@@ -77,11 +78,11 @@ Every line reads back the constructor argument, so it passes for any record and 
         quantity << [0, -1]
     }
 ```
-It asserts what OrderLine does with a bad quantity, not what the test handed in, so a missing guard fails it. (Real evidence: ledger row S2.)
+It asserts what OrderLine does with a bad quantity, not what the test handed in, so a missing guard fails it.
 
 ## TM1 — At a boundary the IT is the primary test
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "the status filter is passed through as given, null included"() {
         when: "invoices are listed with and without a filter"
@@ -95,7 +96,7 @@ It asserts what OrderLine does with a bad quantity, not what the test handed in,
 ```
 It re-proves through a mock what the IT already proves on real rows; the SQL that does the filtering never runs.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should list only the requested status, and every invoice when no filter is given"() {
         given: "three invoices for one customer, two open and one paid"
@@ -114,11 +115,11 @@ It re-proves through a mock what the IT already proves on real rows; the SQL tha
         all.size() == 3
     }
 ```
-The filter lives in the SQL, so the IT against real Postgres is the primary proof, with `null` meaning unfiltered. (Real evidence: ledger row TM1.)
+The filter lives in the SQL, so the IT against real Postgres is the primary proof, with `null` meaning unfiltered.
 
 ## TM2 — Fake only what we do not own
 
-**Bad** (neutral)
+**Bad**
 ```java
 public class FakeInvoiceRepository implements InvoiceRepository, Resettable {
 
@@ -136,7 +137,7 @@ public class FakeInvoiceRepository implements InvoiceRepository, Resettable {
 ```
 An IT fakes our own repository, which our database backs, so its real query is never exercised.
 
-**Good** (neutral)
+**Good**
 ```groovy
     private void stubFraudCheck(String body) {
         wireMock.resetAll()
@@ -154,11 +155,12 @@ An IT fakes our own repository, which our database backs, so its real query is n
             .willReturn(okJson(CAPTURED)))
     }
 ```
-Only the payment gateway and the fraud-check service are faked, at the wire; our services, repositories and Postgres run for real. (Real evidence: ledger row TM2.)
+Only the payment gateway and the fraud-check service are faked, at the wire; our services, repositories and Postgres run
+for real.
 
 ## TM3 — Real-model tier: opt-in, outside the gate
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "should summarise a placed order"() {
         given: "a placed order of two lines — no @Requires, so the real model runs inside ./gradlew check"
@@ -174,7 +176,7 @@ Only the payment gateway and the fraud-check service are faked, at the wire; our
 ```
 Its assertions are fine, but with no opt-in it calls a real model inside the gate, so every run is slow, paid and flaky.
 
-**Good** (neutral)
+**Good**
 ```groovy
     @Requires({ sys["model.real"] == "true" })
     def "should summarise a placed order with the real model"() {
@@ -190,11 +192,12 @@ Its assertions are fine, but with no opt-in it calls a real model inside the gat
         !summary.text().isBlank()
     }
 ```
-It runs only on request, outside the gate. How a live test asserts, structure and never wording, is LT15 in [`../llm-live-tests.md`](../llm-live-tests.md). (Real evidence: ledger row TM3.)
+It runs only on request, outside the gate. How a live test asserts, structure and never wording, is LT15 in
+[`../llm-live-tests.md`](../llm-live-tests.md).
 
 ## AT1 — No separate acceptance tier
 
-**Bad** (neutral)
+**Bad**
 ```java
 /**
  * Acceptance harness for {@code features/order-cancellation.feature}.
@@ -213,7 +216,7 @@ public final class OrderCancellationHarness {
 ```
 A separate `.feature` tier with its own Node runtime duplicates an IT and is left orphaned when the feature file goes.
 
-**Good** (neutral)
+**Good**
 ```groovy
     @Issue(["#123", "AC-1"])
     def "should refuse to cancel an order whose invoice is already paid"() {
@@ -232,11 +235,12 @@ A separate `.feature` tier with its own Node runtime duplicates an IT and is lef
         orderRepository.findById(orderId).get().status() != OrderStatus.CANCELLED
     }
 ```
-The AC of the order-cancellation story is an ordinary IT on the real API, called with a customer's token; its name reads as the scenario. (Real evidence: ledger row AT1.)
+The AC of the order-cancellation story is an ordinary IT on the real API, called with a customer's token; its name reads
+as the scenario.
 
 ## S3 — Run the existing tests before changing code
 
-**Bad** (neutral)
+**Bad**
 ```text
 ./mvnw -pl orders-api -am -Dtest='InvoiceServiceTest+OrderServiceTest' ... test
 → [INFO] BUILD SUCCESS
@@ -244,7 +248,7 @@ The AC of the order-cancellation story is an ordinary IT on the real API, called
 ```
 A hand-rolled baseline run whose filter matched nothing; nothing ran, yet "green" was noted before editing.
 
-**Good** (neutral)
+**Good**
 ```text
 ./gradlew :orders-api:test --tests '*InvoiceServiceTest*'
 ./gradlew :orders-api:test --tests '*OrderServiceTest*'
@@ -253,13 +257,12 @@ Baseline before editing InvoiceService, at main <sha>:
   InvoiceServiceTest   <n> tests, 0 failed
   OrderServiceTest     <n> tests, 0 failed
 ```
-It goes through the build's own test task, one pattern per run so an empty match fails, and the note records counts proving tests ran. (Real evidence: ledger row S3.)
+It goes through the build's own test task, one pattern per run so an empty match fails, and the note records counts
+proving tests ran.
 
 ## S4 — A bug fix starts with a test that fails for the bug's reason
 
-**Bad** (n/a) — a squash-merged main shows one commit per MR, so test-before-fix order is invisible there; no "fix with no test" exists to cite.
-
-**Good** (neutral)
+**Good**
 ```groovy
     @Issue("#123")
     def "should register the injected identity on #group"() {
@@ -276,11 +279,12 @@ It goes through the build's own test task, one pattern per run so an empty match
         and: "and never the literal every consumer used to share"
         !names.contains("consumer-1")
 ```
-Bug #123 (every consumer shared `consumer-1`) makes this fail on the old code for exactly the bug's reason, read from Redis. (Real evidence: ledger row S4.)
+Bug #123 (every consumer shared `consumer-1`) makes this fail on the old code for exactly the bug's reason, read from
+Redis.
 
 ## S5 — Pick the tier by what fails, not by the error path
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "a quantity outside the allowed range is refused"() {
         when: "a quantity the database would not accept is added"
@@ -299,7 +303,7 @@ Bug #123 (every consumer shared `consumer-1`) makes this fail on the old code fo
 ```
 A pure `if` guard boots Postgres in an IT; the CHECK constraint it names is never reached, so no boundary is added.
 
-**Good** (neutral)
+**Good**
 ```groovy
     OrderRepository orderRepository = Mock()
 
@@ -318,4 +322,5 @@ A pure `if` guard boots Postgres in an IT; the CHECK constraint it names is neve
         quantity << [0, -1, 100, Integer.MIN_VALUE]
     }
 ```
-The error comes from pure logic, so it is a unit spec; `0 *` on the `Mock()` repository is the behaviour here because nothing may be reached. (Real evidence: ledger row S5.)
+The error comes from pure logic, so it is a unit spec; `0 *` on the `Mock()` repository is the behaviour here because
+nothing may be reached.

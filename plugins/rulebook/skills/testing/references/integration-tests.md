@@ -46,26 +46,22 @@ Contents: Rules · When X, use Y · Good / Bad (IT1, IT2, IT4, SP3, SP11) · Dec
 
 | the IT needs | use | why |
 |---|---|---|
-| a container, also in a spec with no Spring context | the singleton initializer's shared container; the spec never starts or stops it (IT2) | a cached context can outlive a per-class container (ledger :32) · no-Spring case: 68b :190-206 |
-| to check a branch the unit spec reaches (field validation, error mapping) | the unit spec; the IT keeps one case for the contract (IT1); the tier split is TM1 (`strategy.md`) | ledger :31, :37 · 68b :152 |
-| to replace a collaborator | a fake port bean at an outbound port (IT4); which collaborators to replace is TM2 (`strategy.md`) | ledger :34, :38 |
-| a repository slice (`@DataJpaTest`, `@JdbcTest`) | `replace = NONE` with the singleton initializer (SP5); `em.flush()` before asserting a write (SP4) | ledger :78, :79 |
-| a timeout in a transactional test | Spock's `@Timeout`, which keeps the feature on the test thread (SP10) | 68b :602 |
-| a component scan for the full `@SpringBootTest` | a separate `@Configuration` that only the full test imports (SP11) | 68b :636 |
-| to prove the system survives a dependency outage | one Toxiproxy IT per dependency (TM4); the unavailable case of each call is C2 (`coverage-design.md`) | ledger :40, :16 |
-| to find why ITs slow down or connections grow | the cache logger at DEBUG; the cache holds at most 32 contexts and evicts the least recently used (SP7) | ledger :81 |
-
-`ledger :N` is a line of `research/19-approved-rules.md`; `68b :N` is a line of
-`research/68b-neutral-testing-unit-it-spock.md`.
-TM4's reason comes from agent-factory research/31:20, approved by the operator; the ledger row has none.
+| a container, also in a spec with no Spring context | the singleton initializer's shared container; the spec never starts or stops it (IT2) | a cached context can outlive a per-class container (IT2) |
+| to check a branch the unit spec reaches (field validation, error mapping) | the unit spec; the IT keeps one case for the contract (IT1); the tier split is TM1 (`strategy.md`) | ITs that re-run unit-owned branches add slow copies with no new risk (IT1) |
+| to replace a collaborator | a fake port bean at an outbound port (IT4); which collaborators to replace is TM2 (`strategy.md`) | a mock has no behaviour of its own and couples the IT to calls (IT4) |
+| a repository slice (`@DataJpaTest`, `@JdbcTest`) | `replace = NONE` with the singleton initializer (SP5); `em.flush()` before asserting a write (SP4) | Boot otherwise swaps in an embedded database (SP5); unflushed changes skip the database check (SP4) |
+| a timeout in a transactional test | Spock's `@Timeout`, which keeps the feature on the test thread (SP10) | a preemptive timeout runs the body in another thread, where its writes commit (SP10) |
+| a component scan for the full `@SpringBootTest` | a separate `@Configuration` that only the full test imports (SP11) | an explicit `@ComponentScan` disables the slice filters, so a slice loads every bean (SP11) |
+| to prove the system survives a dependency outage | one Toxiproxy IT per dependency (TM4); the unavailable case of each call is C2 (`coverage-design.md`) | an untested outage path can hang or swallow the error (TM4) |
+| to find why ITs slow down or connections grow | the cache logger at DEBUG; the cache holds at most 32 contexts and evicts the least recently used (SP7) | each cached context holds its own pool, so connections grow per context (SP7) |
 
 ## Good / Bad
 
-Every rule's approved pair: [examples/integration-tests.md](examples/integration-tests.md).
+Every rule's pair: [examples/integration-tests.md](examples/integration-tests.md).
 
 ### IT1 — Prove the contract once; leave unit-owned branches to the unit spec
 
-**Bad** (neutral)
+**Bad**
 ```java
     @DisplayName("POST with customerId blank → 400 naming customerId")
     void createOrder_blankCustomerId_returns400() {
@@ -79,7 +75,7 @@ Every rule's approved pair: [examples/integration-tests.md](examples/integration
 ```
 One slow HTTP test per blank field re-runs validation branches that the order validator's unit spec already owns.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should answer an order the validator refuses with a 400 problem"() {
         when: "a clerk posts an order the validator refuses; which fields it refuses is the unit spec's job"
@@ -95,11 +91,11 @@ One slow HTTP test per blank field re-runs validation branches that the order va
         result.status.value() == 400
         result.responseHeaders.contentType == MediaType.APPLICATION_PROBLEM_JSON
 ```
-One IT proves the refusal-to-400 mapping through the real stack; the field branches stay in the fast unit spec. (Real evidence: ledger row IT1.)
+One IT proves the refusal-to-400 mapping through the real stack; the field branches stay in the fast unit spec.
 
 ### IT2 — Take every container from the singleton initializer
 
-**Bad** (neutral)
+**Bad**
 ```java
 @Testcontainers
 class PaymentGatewayIT {
@@ -112,7 +108,7 @@ class PaymentGatewayIT {
 ```
 The class starts its own container and stops it when the class ends, outside the shared singleton every other IT uses.
 
-**Good** (neutral)
+**Good**
 ```groovy
 /**
  * No Spring context, so no @EnableSharedContainers: the gateway sandbox comes from the singleton,
@@ -129,11 +125,11 @@ class PaymentGatewayIT extends Specification {
         seedSandboxAccounts(gatewayUrl)
     }
 ```
-The container lives in the shared initializer beside Postgres, so no spec owns its lifecycle and every spec reuses it. (Real evidence: ledger row IT2.)
+The container lives in the shared initializer beside Postgres, so no spec owns its lifecycle and every spec reuses it.
 
 ### IT4 — Swap an outbound port for a fake, never a double
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "should send the overdue notice when the reminder runs"() {
         given: "a reminder whose email sender is a Spock double"
@@ -144,7 +140,7 @@ The container lives in the shared initializer beside Postgres, so no spec owns i
 ```
 The IT replaces an outbound port with a double that has no behaviour of its own, and repeats that stub per feature.
 
-**Good** (neutral)
+**Good**
 ```groovy
     @Autowired OverdueReminder reminder
     @Autowired FakeEmailSender emailSender // the EmailSender bean of OutboundFakesConfig
@@ -160,11 +156,12 @@ The IT replaces an outbound port with a double that has no behaviour of its own,
         then: "the fake holds exactly one notice, for this invoice's customer"
         emailSender.sent()*.to() == [CUSTOMER_EMAIL]
 ```
-The subject is the wired bean, and the port is the shared in-memory fake from `OutboundFakesConfig`, with its own contract spec (IT5), instead of one stub per feature. (Real evidence: ledger row IT4.)
+The subject is the wired bean, and the port is the shared in-memory fake from `OutboundFakesConfig`, with its own
+contract spec (IT5), instead of one stub per feature.
 
 ### SP3 — Take isolation from the shared reset, never from @Transactional
 
-**Bad** (neutral)
+**Bad**
 ```java
 @Transactional
 class InvoiceControllerIT extends AbstractIT {
@@ -178,7 +175,7 @@ class InvoiceControllerIT extends AbstractIT {
 ```
 The test's transaction is not the server's, so the payment rows the server committed leak into the next test.
 
-**Good** (neutral)
+**Good**
 ```groovy
 /**
  * No @Transactional and no per-feature DELETE: @EnableSharedContainers resets the database before
@@ -194,11 +191,12 @@ class InvoiceControllerIT extends Specification {
     @Autowired
     JdbcTemplate jdbc
 ```
-One reset interceptor owns isolation and runs whatever thread the server committed on; the spec cleans up nothing by hand. (Real evidence: ledger row SP3.)
+One reset interceptor owns isolation and runs whatever thread the server committed on; the spec cleans up nothing by
+hand.
 
 ### SP11 — Keep the component scan off the class a slice finds
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 @SpringBootConfiguration
 @EnableAutoConfiguration
@@ -210,7 +208,7 @@ class OrdersTestApplication {
 ```
 Any `@DataJpaTest` that finds this class also scans and loads every service, because an explicit scan disables slice filters.
 
-**Good** (neutral)
+**Good**
 ```groovy
 @SpringBootConfiguration
 @EnableAutoConfiguration
@@ -226,20 +224,19 @@ class OrdersTestApplication {
 class OrdersServicesConfig {
 }
 ```
-The scan moves off the class a slice searches for; only the full `@SpringBootTest` imports the services config. (Real evidence: ledger row SP11.)
+The scan moves off the class a slice searches for; only the full `@SpringBootTest` imports the services config.
 
 ## Decided edges
 
 - **Do not skip when** a framework guide starts the container with `@Testcontainers` and `@Container`, or wires it
-  with `@ServiceConnection`: that default was rejected, because the container stops per class and
-  `@ServiceConnection` does not set every property the initializer sets (IT2, ledger :32). — **Confidence** high
+  with `@ServiceConnection`: that default is not used, because the container stops per class and
+  `@ServiceConnection` does not set every property the initializer sets (IT2). — **Confidence** high
 - **Do not skip when** a guide shows `TestRestTemplate` or `MockMvcTester`, or a check touches the web layer only:
-  those alternatives and `@WebMvcTest` were rejected, because they conflict with IT3 (ledger :33, :86). —
-  **Confidence** high
+  those alternatives and `@WebMvcTest` are not used, because they conflict with IT3. — **Confidence** high
 - **Skip when** no shared fake covers the port: one class may override it with `@TestBean` returning a fake (IT4). —
   **Do not skip when** the shared fake set already holds the port: use the shared set, so the Spring context is
-  reused (ledger :36, merged into IT4). — **Confidence** high
-- **Do not skip when** a guide's example uses `@MockitoBean`: that default was rejected for IT4 (ledger :34). For a
+  reused (IT4). — **Confidence** high
+- **Do not skip when** a guide's example uses `@MockitoBean`: that default is not used under IT4. For a
   `@SpringBean` in a Spock spec, see K15 (`spock.md`). — **Confidence** high
 
 ## Review checks

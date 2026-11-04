@@ -1,6 +1,6 @@
 # LLM tests — examples
 
-Every approved Good/Bad pair for the rules in [`../llm-tests.md`](../llm-tests.md), one per rule id, in one neutral
+Every Good/Bad pair for the rules in [`../llm-tests.md`](../llm-tests.md), one per rule id, in one
 domain: an `OrderAssistant` that answers questions about orders and calls a `findOrder` tool.
 
 Stand-ins: `ChatModelPort` (with `ChatReply reply(ChatRequest)`) is the model port; `ScriptedChatModel` is the shared
@@ -9,7 +9,7 @@ fake in test-support (LT1, LT2); `orders` is a Spock `Stub(OrderStore)`; `ModelR
 
 ## LT1 — One shared scripted fake behind the model port
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should answer with the order status"() {
     given:
@@ -27,7 +27,7 @@ def "should answer with the order status"() {
 Every spec rebuilds the model's protocol by hand, a little differently each time. When the port
 changes, dozens of hand-made mocks drift apart.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should answer with the order status"() {
     given:
@@ -40,11 +40,11 @@ def "should answer with the order status"() {
     assistant.ask("Where is A-17?") == "Order A-17 has shipped."
 }
 ```
-One fake in test-support speaks the port's protocol once, and every spec scripts it the same way. (Real evidence: ledger row LT1.)
+One fake in test-support speaks the port's protocol once, and every spec scripts it the same way.
 
 ## LT2 — The fake fails on an extra call and on unused steps
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 class ScriptedChatModel implements ChatModelPort {
     private final Deque<ChatReply> replies = new ArrayDeque<>()
@@ -57,7 +57,7 @@ class ScriptedChatModel implements ChatModelPort {
 A loop that runs one turn too many gets an empty answer, and the test still passes. A loop that
 stops one turn early leaves a scripted reply unused, and nothing notices.
 
-**Good** (neutral)
+**Good**
 ```groovy
 class ScriptedChatModel implements ChatModelPort {
     private final Deque<ChatReply> replies = new ArrayDeque<>()
@@ -75,11 +75,11 @@ class ScriptedChatModel implements ChatModelPort {
     }
 }
 ```
-An extra call throws, and `assertComplete()` fails a run that stopped early. (Real evidence: ledger row LT2.)
+An extra call throws, and `assertComplete()` fails a run that stopped early.
 
 ## LT3 — A test that reaches a real model client fails, unless it opts in
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 @SpringBootTest
 class OrderAssistantSpec extends Specification {
@@ -95,7 +95,7 @@ class OrderAssistantSpec extends Specification {
 The context wires the real provider adapter. With a provider key set on a laptop or runner, this calls
 the real model: it costs money, runs slowly and flakes, and nothing warns.
 
-**Good** (neutral)
+**Good**
 ```groovy
 // test-support: a global Spock extension, registered once, on for every spec
 class RealModelGuardExtension implements IGlobalExtension {
@@ -113,11 +113,11 @@ class RealModelGuardExtension implements IGlobalExtension {
 }
 // each real adapter calls ModelRequests.check() before it sends; it throws unless allowed
 ```
-Every spec is guarded by default. Only a spec annotated `@LiveModel` may reach a real provider. (Real evidence: ledger row LT3.)
+Every spec is guarded by default. Only a spec annotated `@LiveModel` may reach a real provider.
 
 ## LT4 — Assert on the request sent to the model, not only the answer
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should answer a follow-up about a second order"() {
     given:
@@ -137,7 +137,7 @@ def "should answer a follow-up about a second order"() {
 The answer comes from the script, so the test passes even if the history lost the first tool result.
 A real model would never have seen it.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should send the whole first exchange with the follow-up"() {
     given:
@@ -155,11 +155,11 @@ def "should send the whole first exchange with the follow-up"() {
                                      "assistant: A-17 has shipped.", "user: And B-02?"]
 }
 ```
-The request is where lost tool results and broken history show up. (Real evidence: ledger row LT4.)
+The request is where lost tool results and broken history show up.
 
 ## LT5 — Test each adapter against a fake HTTP server and assert the request JSON
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should send the tool to the provider"() {
     given:
@@ -176,7 +176,7 @@ def "should send the tool to the provider"() {
 The JSON the adapter writes is never built. A wrong field name, such as `schema` instead of
 `input_schema`, still passes, and the provider rejects it in production.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should send the tool schema in the provider's request body"() {
     given:
@@ -192,11 +192,11 @@ def "should send the tool schema in the provider's request body"() {
     body.tools[0].input_schema.required == ["orderId"]
 }
 ```
-The real request mapping and JSON writing run, and the test reads exactly what went on the wire. (Real evidence: ledger row LT5.)
+The real request mapping and JSON writing run, and the test reads exactly what went on the wire.
 
 ## LT6 — One contract suite every adapter passes; opt-outs are tested to fail
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 class FirstProviderAdapterSpec extends Specification {
     def "should call a tool"() { /* written for this provider */ }
@@ -210,7 +210,7 @@ class SecondProviderAdapterSpec extends Specification {
 ```
 Each copy drifts, and a capability one provider lacks is silently missing instead of declared.
 
-**Good** (neutral)
+**Good**
 ```groovy
 abstract class ChatAdapterContract extends Specification {
     abstract ChatModelPort adapter()
@@ -230,11 +230,11 @@ abstract class ChatAdapterContract extends Specification {
 ```
 Every adapter subclasses one suite, and an adapter that cannot send a field must say so and prove it
 fails cleanly. A subclass per provider runs it against a fake HTTP server; a `@LiveModel` subclass runs it against the
-real provider (`../llm-live-tests.md`). (Real evidence: ledger row LT6.)
+real provider (`../llm-live-tests.md`).
 
 ## LT7 — Tool errors go back to the model, and the run continues
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should fail when the order lookup fails"() {
     given:
@@ -251,7 +251,7 @@ def "should fail when the order lookup fails"() {
 The test pins the crash as correct. The model never sees the error, so it cannot apologise, retry or
 ask the user.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should send a failing tool's error to the model and finish the run"() {
     given:
@@ -268,11 +268,11 @@ def "should send a failing tool's error to the model and finish the run"() {
     model.requests[1].lastToolResult() == ToolResult.error("findOrder", "store down")
 }
 ```
-The error reaches the model as a tool result, and the run ends with an answer. (Real evidence: ledger row LT7.)
+The error reaches the model as a tool result, and the run ends with an answer.
 
 ## LT8 — Cap the loop and test the cap
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should stop the loop"() {
     given:
@@ -287,7 +287,7 @@ def "should stop the loop"() {
 The model stopped by itself, so the cap never fired. A model that always calls a tool would loop,
 and bill, forever.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should stop at the turn cap when the model keeps calling tools"() {
     given:
@@ -304,11 +304,11 @@ def "should stop at the turn cap when the model keeps calling tools"() {
     model.requests.size() == 2
 }
 ```
-The script asks for more turns than allowed, so the cap is what stops the run. (Real evidence: ledger row LT8.)
+The script asks for more turns than allowed, so the cap is what stops the run.
 
 ## LT9 — Stream in several chunks, join them in order, bound the wait
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should stream the answer"() {
     given:
@@ -324,7 +324,7 @@ def "should stream the answer"() {
 One chunk never crosses a boundary, so joining and ordering are never tested. And `block()` with no
 timeout hangs the build when the stream never completes.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should join streamed chunks in order into the final answer"() {
     given:
@@ -341,11 +341,11 @@ def "should join streamed chunks in order into the final answer"() {
     chunks.join() == "A-17 has shipped."
 }
 ```
-Three chunks cross two boundaries, order is checked, and the wait is bounded. (Real evidence: ledger row LT9.)
+Three chunks cross two boundaries, order is checked, and the wait is bounded.
 
 ## LT10 — After an injected failure, check the stored conversation and side effects
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should retry after the stream drops"() {
     given:
@@ -360,7 +360,7 @@ def "should retry after the stream drops"() {
 The reply is right, but the stored conversation may hold "A-17 haA-17 has shipped." or two assistant
 messages. The next turn sends that history to the model.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should keep only the complete reply after a retried stream"() {
     given:
@@ -376,11 +376,11 @@ def "should keep only the complete reply after a retried stream"() {
     model.requests.size() == 2
 }
 ```
-The test checks what was stored, which is what the next turn will send. (Real evidence: ledger row LT10.)
+The test checks what was stored, which is what the next turn will send.
 
 ## LT11 — Order races with explicit signals, never sleeps
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should report the guard's block when it lands after the turn cap"() {
     given:
@@ -397,7 +397,7 @@ def "should report the guard's block when it lands after the turn cap"() {
 200 ms only approximates "after the cap". On a slow runner the guard finishes first, so the test passes
 even against the bug it guards.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should report the guard's block when it lands after the turn cap"() {
     given:
@@ -412,11 +412,11 @@ def "should report the guard's block when it lands after the turn cap"() {
     thrown(GuardBlocked)
 }
 ```
-The latch makes the guard finish only after the cap is reached, on every machine. (Real evidence: ledger row LT11.)
+The latch makes the guard finish only after the cap is reached, on every machine.
 
 ## LS1 — Test the memory window with the real class, message by message
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should keep the last two messages"() {
     given:
@@ -434,7 +434,7 @@ def "should keep the last two messages"() {
 It counts messages but never checks which two remain. A window that keeps a tool result without its
 call makes the provider reject the next request.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should evict a tool call and its result together"() {
     given:
@@ -450,11 +450,11 @@ def "should evict a tool call and its result together"() {
     memory.messages() == [answer]
 }
 ```
-The real window runs, and the test pins exactly what survives: never half of a call/result pair. (Real evidence: ledger row LS1.)
+The real window runs, and the test pins exactly what survives: never half of a call/result pair.
 
 ## LS2 — Test compaction: what is kept, what the summariser saw, and no second pass
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should summarise a long history"() {
     given:
@@ -471,7 +471,7 @@ def "should summarise a long history"() {
 It checks only the size. It never checks what the summariser was shown, which messages were kept, or
 that the next turn leaves the summary alone.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should keep the tail, summarise the rest, and not summarise again"() {
     given:
@@ -490,11 +490,11 @@ def "should keep the tail, summarise the rest, and not summarise again"() {
 }
 ```
 The test pins the kept tail, what the summariser saw, and that compacted history is not summarised
-again (the strict fake would also throw on a second call). (Real evidence: ledger row LS2.)
+again (the strict fake would also throw on a second call).
 
 ## LS3 — Each request must extend the one before, byte for byte
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should send the system prompt on every turn"() {
     given:
@@ -512,7 +512,7 @@ def "should send the system prompt on every turn"() {
 It passes even when the system prompt ends with "Now: 2026-10-31T10:05". That changes every request
 and silently busts the provider's prompt cache.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should send each request as an extension of the one before"() {
     given:
@@ -530,11 +530,11 @@ def "should send each request as an extension of the one before"() {
 }
 ```
 The clock moves between requests, and the check compares the serialised requests, ignoring only
-cache markers. Anything that rewrites earlier bytes, such as a timestamp, shows up as a break. (Real evidence: ledger row LS3.)
+cache markers. Anything that rewrites earlier bytes, such as a timestamp, shows up as a break.
 
 ## LS4 — Cache markers only where the provider allows, and no more than its limit
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should mark tool results for caching"() {
     given:
@@ -551,7 +551,7 @@ def "should mark tool results for caching"() {
 It pins a marker on every tool result. The provider allows four cache breakpoints, so a fifth fails the
 request, and markers on every result waste the cache.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should mark only the last tool result for caching"() {
     given:
@@ -567,11 +567,11 @@ def "should mark only the last tool result for caching"() {
     results.last().cache_control == [type: "ephemeral"]
 }
 ```
-The test reads the real request body and pins one marker, on the last tool result. (Real evidence: ledger row LS4.)
+The test reads the real request body and pins one marker, on the last tool result.
 
 ## LS5 — A response cache key includes the customer and the system prompt
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should answer a repeated question from the cache"() {
     given:
@@ -588,7 +588,7 @@ def "should answer a repeated question from the cache"() {
 ```
 It pins a key built from the question alone, so customer c-2 is told about customer c-1's order.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should share a cached answer only within one customer"() {
     given:
@@ -606,11 +606,11 @@ def "should share a cached answer only within one customer"() {
 }
 ```
 The same customer gets the cached answer without a model call (the strict fake has only two replies),
-and another customer gets their own. (Real evidence: ledger row LS5.)
+and another customer gets their own.
 
 ## LS6 — Keep and count the reply that crossed the budget
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should stop when the token budget is spent"() {
     given:
@@ -629,7 +629,7 @@ def "should stop when the token budget is spent"() {
 It never checks what happened to the reply that crossed the budget. Dropping it under-counts spend, and
 asking for it again bills it twice.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should keep and count the reply that crossed the budget"() {
     given:
@@ -647,11 +647,11 @@ def "should keep and count the reply that crossed the budget"() {
     spend.tokens("c-1") == 900
 }
 ```
-The billed reply stays in the conversation and in the spend, and nothing asks for it again. (Real evidence: ledger row LS6.)
+The billed reply stays in the conversation and in the spend, and nothing asks for it again.
 
 ## LS7 — A blocking guard stops the run before the model or a tool is called
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should block a refund request that looks like fraud"() {
     given:
@@ -668,7 +668,7 @@ def "should block a refund request that looks like fraud"() {
 The exception arrives either way. The test cannot tell whether the guard ran first, or after the model
 already asked for the refund and the tool ran.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should block a fraud-like refund before the model or the refund tool runs"() {
     given:
@@ -684,11 +684,11 @@ def "should block a fraud-like refund before the model or the refund tool runs"(
     refunds.issued() == []
 }
 ```
-Zero model calls and zero refunds prove the guard ran first. (Real evidence: ledger row LS7.)
+Zero model calls and zero refunds prove the guard ran first.
 
 ## LS8 — Resume an approval from saved state; each side effect runs once
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should cancel the order after approval"() {
     given:
@@ -706,7 +706,7 @@ def "should cancel the order after approval"() {
 It resumes from memory, never from saved state, and it does not count side effects. A resume that runs
 the tool twice, or asks the model again, still passes.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should cancel exactly once when resumed from saved state"() {
     given:
@@ -724,11 +724,11 @@ def "should cancel exactly once when resumed from saved state"() {
 }
 ```
 The run is saved and restored like a real restart, and the test counts the cancellation and the
-model calls. (Real evidence: ledger row LS8.)
+model calls.
 
 ## LS9 — Fallback names and prices the model that answered
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should fall back when the first provider fails"() {
     given:
@@ -742,7 +742,7 @@ def "should fall back when the first provider fails"() {
 The answer is right, but the reply may name and price the model that failed, and the request to the
 second provider may carry the first provider's model name.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should name and price the model that answered"() {
     given:
@@ -759,11 +759,11 @@ def "should name and price the model that answered"() {
     pricing.cost(reply) == pricing.price("second-small", tokens(40))
 }
 ```
-The test pins which model served the reply, what was sent to it, and what the reply costs. (Real evidence: ledger row LS9.)
+The test pins which model served the reply, what was sent to it, and what the reply costs.
 
 ## LS10 — Test an instruction hidden in a tool result, through a whole run
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should refuse an instruction to ignore the rules"() {
     given:
@@ -780,7 +780,7 @@ def "should refuse an instruction to ignore the rules"() {
 It guards the user's question only. Untrusted text also arrives inside tool results, such as an order
 note a customer wrote, and that path is never tested.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should keep an instruction hidden in a tool result away from the model"() {
     given:
@@ -798,11 +798,11 @@ def "should keep an instruction hidden in a tool result away from the model"() {
 }
 ```
 The hidden instruction comes in through a tool, the run goes all the way through, and the test checks
-what the model saw and that nothing was refunded. (Real evidence: ledger row LS10.)
+what the model saw and that nothing was refunded.
 
 ## LT12 — Replay fails on unplayed or unmatched traffic, never accepts near-matches
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should answer from the recorded provider reply"() {
     given:
@@ -818,7 +818,7 @@ def "should answer from the recorded provider reply"() {
 The recording matches any request body and unused recordings are ignored. The test keeps passing after
 the adapter stops sending the tools or the system prompt.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should send exactly the recorded requests and play every recording"() {
     given:
@@ -834,11 +834,11 @@ def "should send exactly the recorded requests and play every recording"() {
 }
 ```
 A changed request no longer matches its recording, and a recording the code stopped using fails the
-test. (Real evidence: ledger row LT12.)
+test.
 
 ## LT13 — Scrub credentials and account ids in a hook before a recording is saved
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should record the provider exchange"() {
     given:
@@ -854,7 +854,7 @@ def "should record the provider exchange"() {
 It saves headers and bodies as sent. The API key and the account id are committed with the recording,
 and the recording only replays in the account that made it.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should scrub credentials and account ids before saving a recording"() {
     given:
@@ -870,4 +870,4 @@ def "should scrub credentials and account ids before saving a recording"() {
 }
 ```
 One hook scrubs every recording the same way, and the test proves the secret and the account id never
-reach the saved file. (Real evidence: ledger row LT13.)
+reach the saved file.
