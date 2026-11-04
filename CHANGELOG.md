@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.21.4](https://github.com/chiyanram/skills/compare/rulebook--v0.21.3...rulebook--v0.21.4) (2026-11-04)
+
+### Bug Fixes
+
+* **testing:** S6, a bug fix's failing test runs locally first ([#152](https://github.com/chiyanram/skills/issues/152)) ([#205](https://github.com/chiyanram/skills/issues/205)) ([90a7fb6](https://github.com/chiyanram/skills/commit/90a7fb63391e2504e3ef911fe67ece427645c64f))
+
 ## [0.21.3](https://github.com/chiyanram/skills/compare/rulebook--v0.21.2...rulebook--v0.21.3) (2026-11-04)
 
 ### Features
