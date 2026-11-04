@@ -45,8 +45,8 @@ Contents: Rules · When X, use Y · Good / Bad (TY1, TY3, TY9, TY8) · Decided e
 |---|---|---|
 | a method that may have no result | an `Optional` return type (TY1) | a `null` return is a check the caller can forget, and the forgotten check throws `NullPointerException` |
 | a field that may be absent and would pick a branch | a sealed case or an enum (TY1) | a boolean plus nullable fields lets contradictory states exist |
-| a closed set of cases | a sealed type or an enum, switched over arrow-form with every case and no `default` (TY2) | without a `default`, the compiler fails when a new case is not handled |
-| a record whose fields are legal only in some combinations | one record per legal shape under a sealed interface; the compact constructor for what the shapes cannot exclude (TY3) | a shape that cannot be built needs no check in any caller |
+| a closed set of cases | a sealed type or an enum, switched over arrow-form with every case and no `default` (TY2); dispatch by type is MJ4 and other switches MJ5, `modern-java.md` | without a `default`, the compiler fails when a new case is not handled |
+| a record whose fields are legal only in some combinations | one record per legal shape under a sealed interface; the compact constructor for what the shapes cannot exclude (TY3); a collection component is MJ2, `modern-java.md` | a shape that cannot be built needs no check in any caller |
 | external data: a request body, a row, config | a parse into domain types in its adapter (TY12) | data is untyped until it is parsed, and an unparsed null throws deep in the logic |
 | a cast, a null check or a "never happens" throw | the check moved into the type, where the value is built (TY9) | that place marks a type too weak to stop a runtime failure |
 | an operation with an answer for every input | the plain type (TY9) | nothing there can fail, so a stronger type adds nothing |
@@ -54,7 +54,7 @@ Contents: Rules · When X, use Y · Good / Bad (TY1, TY3, TY9, TY8) · Decided e
 | a method whose type is `Optional` | `Optional.empty()` for "none", never `null` (TYN1) | a caller of an `Optional` expects empty, not `null`, and throws on it |
 | two parameters of one primitive or `String` type that mean different things | one small wrapping record per meaning (TY8) | swapped same-typed arguments compile and corrupt data silently |
 | a field | `final`, unless it is reassigned after construction (TY4) | a mutable field makes the object unsafe to share across threads |
-| an amount of money | `BigDecimal` built from a `String` or `valueOf`, or a `long` of minor units (TY5) | binary floating point cannot hold 0.10 exactly, so totals drift |
+| an amount of money | `BigDecimal` built from a `String` or `valueOf`, or a `long` of minor units (TY5); arithmetic on minor units is MJ13, `modern-java.md` | binary floating point cannot hold 0.10 exactly, so totals drift |
 | a closed set of states, roles or modes | an enum, persisted by name (TY6) | a misspelt string compiles, and a reordered enum remaps stored ordinals |
 | an enum comparison | `==`, and a compile-time check on `equals` between unrelated types (TY11) | `equals` between unrelated types compiles and is always false |
 | an unchecked warning | the generic type fixed; else `@SuppressWarnings("unchecked")` on the smallest declaration, with a comment saying why it is safe (TY10); any other suppression is CM7, `comments.md` | a raw type turns a compile error into a runtime `ClassCastException` |
@@ -109,7 +109,7 @@ public sealed interface Delivery {
 
 static String describe(final Delivery delivery) {
     return switch (delivery) {
-        case Delivery.Pending pending -> "on its way";
+        case Delivery.Pending _ -> "on its way";
         case Delivery.Delivered delivered -> "delivered at " + delivered.at();
     };
 }

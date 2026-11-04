@@ -139,7 +139,7 @@ The miss is handled and the order is returned, yet the span counts as an error.
 ```java
 try {
     return cache.get(orderId);
-} catch (CacheMissException e) {
+} catch (final CacheMissException _) {
     observation.event(Observation.Event.of("cache.miss"));
     return repository.load(orderId);
 }

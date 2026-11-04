@@ -3,6 +3,18 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.22.0](https://github.com/chiyanram/skills/compare/rulebook--v0.21.4...rulebook--v0.22.0) (2026-11-04)
+
+### Features
+
+* **code:** modern-java reference for current JDKs ([chiyanram/agent-factory#60](https://github.com/chiyanram/agent-factory/issues/60)) ([#208](https://github.com/chiyanram/skills/issues/208)) ([c1a2f70](https://github.com/chiyanram/skills/commit/c1a2f70f947251e6621438509abe8f5f3564c90f))
+
+## [0.21.4](https://github.com/chiyanram/skills/compare/rulebook--v0.21.3...rulebook--v0.21.4) (2026-11-04)
+
+### Bug Fixes
+
+* **testing:** S6, a bug fix's failing test runs locally first ([#152](https://github.com/chiyanram/skills/issues/152)) ([#205](https://github.com/chiyanram/skills/issues/205)) ([90a7fb6](https://github.com/chiyanram/skills/commit/90a7fb63391e2504e3ef911fe67ece427645c64f))
+
 ## [0.21.3](https://github.com/chiyanram/skills/compare/rulebook--v0.21.2...rulebook--v0.21.3) (2026-11-04)
 
 ### Features

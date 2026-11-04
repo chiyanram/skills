@@ -62,7 +62,7 @@ Deletion deleteExport(final Path realRoot, final String requested, final Account
     final Path target;
     try {
         target = realRoot.resolve(requested).toRealPath();
-    } catch (final IOException missingOrUnreadable) {
+    } catch (final IOException _) {
         return new Deletion.NotFound(requested);
     }
     if (!target.startsWith(realRoot) || target.equals(realRoot)) {
