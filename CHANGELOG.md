@@ -3,6 +3,16 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.21.3](https://github.com/chiyanram/skills/compare/rulebook--v0.21.2...rulebook--v0.21.3) (2026-11-04)
+
+### Features
+
+* **repo:** rule files hold only rules; check_provenance enforces it ([chiyanram/agent-factory#59](https://github.com/chiyanram/agent-factory/issues/59)) ([#204](https://github.com/chiyanram/skills/issues/204)) ([e81dd2d](https://github.com/chiyanram/skills/commit/e81dd2dc2880aba4059ba374c9e43ed3cfd0c980))
+
+### Bug Fixes
+
+* **code:** drop CM6; ER1, MS6 and DS12 examples keep decisions free of I/O ([chiyanram/agent-factory#59](https://github.com/chiyanram/agent-factory/issues/59)) ([#206](https://github.com/chiyanram/skills/issues/206)) ([b7c3511](https://github.com/chiyanram/skills/commit/b7c3511c808dd57f3438797424b36ca9091ff215))
+
 ## [0.21.2](https://github.com/chiyanram/skills/compare/rulebook--v0.21.1...rulebook--v0.21.2) (2026-11-04)
 
 ### Bug Fixes
