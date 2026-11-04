@@ -22,13 +22,11 @@ a rule, a sources paragraph or a Good / Bad pair in any reference.
 The format of a reference (its five sections, the rule line, the Operator preference line) is the rulebook's reference
 format document. A source is a file read at `path:line`, or a web page read at its URL and section.
 
-Operator preference, 2026-10-31 (SRC2), in whole or in part: SRC2.
-
 ## Good / Bad
 
 ### SRC2 — A rule needs two independent sources or the operator preference line
 
-**Bad** (neutral)
+**Bad**
 ```markdown
 ## Rules
 
@@ -41,7 +39,7 @@ Operator preference, 2026-10-31 (SRC2), in whole or in part: SRC2.
 ```
 One source admits the rule, and nothing marks it as a preference. The rule line also carries its source.
 
-**Good** (neutral)
+**Good**
 ```markdown
 ## Rules
 

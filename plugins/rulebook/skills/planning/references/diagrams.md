@@ -24,33 +24,25 @@ Contents: Rules · When X, use Y · Good / Bad (DG2, DG3, DG5) · Decided edges 
 
 | the diagram answers | use | why |
 |---|---|---|
-| which components call which | a Mermaid `flowchart` (DG2) | show-me :47; html-report :63 |
-| in which order messages pass between parts | a Mermaid `sequenceDiagram` (DG2) | show-me :47 |
-| which states one thing moves through | a Mermaid `stateDiagram-v2` (DG2) | operator preference |
-| which tables relate, and how | a Mermaid `erDiagram` (DG2) | operator preference |
-| which types extend or hold which | a Mermaid `classDiagram` (DG2) | operator preference |
-| which calls a change adds or removes | a fenced `diff` call tree (DG2) | show-me :59, :85 |
-| which files a change adds, moves or removes | a fenced `diff` file tree (DG2) | show-me :59 |
+| which components call which | a Mermaid `flowchart` (DG2) | a flowchart shows which part calls which |
+| in which order messages pass between parts | a Mermaid `sequenceDiagram` (DG2) | a sequence diagram shows the order in which messages pass |
+| which states one thing moves through | a Mermaid `stateDiagram-v2` (DG2) | a state diagram shows each state and the moves between them |
+| which tables relate, and how | a Mermaid `erDiagram` (DG2) | an entity-relationship diagram shows tables and their relations |
+| which types extend or hold which | a Mermaid `classDiagram` (DG2) | a class diagram shows which type extends or holds which |
+| which calls a change adds or removes | a fenced `diff` call tree (DG2) | `+` and `-` lines mark the calls a change adds or removes |
+| which files a change adds, moves or removes | a fenced `diff` file tree (DG2) | `+` and `-` lines mark the files a change adds or removes |
 
 | the diagram sits in | use | why |
 |---|---|---|
-| a committed Markdown file | a `mermaid` fence, or a `diff` fence for a tree (DG1, DG2) | GitHub diagrams; pr :47 |
-| a chat reply or a terminal | plain fenced text (DG1) | pr :47; explainer :40 |
-| a doc that one decision, spec or design owns | that doc, next to the text it supports (DG6) | show-me :126 |
-
-`show-me` is humanlayer-skills `plugins/show-me/skills/show-me/SKILL.md`, `pr` is mattpocock
-`docs/engineering/pr.md`, `html-report` is mattpocock `skills/engineering/improve-codebase-architecture/HTML-REPORT.md`,
-`teach` is pstack `skills/teach/SKILL.md` and `explainer` is pstack `skills/how/references/explainer-prompt.md`; `:N`
-is the line. `GitHub diagrams` is GitHub Docs, "Creating diagrams", §About creating diagrams. DG4 rests on show-me :126
-and teach :17. DG5 rests on html-report :55 and show-me :126.
-
-Operator preference, 2026-10-31 (SRC2), in whole or in part: DG1, DG2, DG3 and DG6.
+| a committed Markdown file | a `mermaid` fence, or a `diff` fence for a tree (DG1, DG2) | GitHub renders a `mermaid` fence in Markdown as a diagram |
+| a chat reply or a terminal | plain fenced text (DG1) | a terminal shows Mermaid source as raw text |
+| a doc that one decision, spec or design owns | that doc, next to the text it supports (DG6) | a separate diagrams file is not linked from the decision it shows |
 
 ## Good / Bad
 
 ### DG2 — A call tree that a design changes is a `diff`
 
-**Bad** (neutral)
+**Bad**
 ```mermaid
 flowchart TD
     A["LoanController.borrow"] --> B["LoanService.borrow"]
@@ -60,7 +52,7 @@ flowchart TD
 ```
 The design adds `HoldQueue.release` and removes `FinePolicy.check`. The chart shows neither change.
 
-**Good** (from humanlayer-skills plugins/show-me/skills/show-me/SKILL.md:85)
+**Good**
 ```diff
  LoanController.borrow
    LoanService.borrow
@@ -73,7 +65,7 @@ The `-` and `+` marks show what the design removes and adds. Indent shows who ca
 
 ### DG3 — Each label is a name the code has
 
-**Bad** (neutral)
+**Bad**
 ```mermaid
 flowchart LR
     A["Borrow flow"] --> B["Lending engine"]
@@ -82,7 +74,7 @@ flowchart LR
 ```
 No label is a name in the code. The fine check was removed, and a search cannot show that the box is stale.
 
-**Good** (neutral)
+**Good**
 ```mermaid
 flowchart LR
     A["LoanController"] --> B["LoanService"]
@@ -94,7 +86,7 @@ A search on the main branch finds each class and the `copies` table. A deleted n
 
 ### DG5 — Redraw the diagram instead of explaining it
 
-**Bad** (neutral)
+**Bad**
 ```mermaid
 sequenceDiagram
     LoanService->>CopyRepository: reserve
@@ -104,7 +96,7 @@ sequenceDiagram
 Its caption is a paragraph: borrow a copy. `release` runs only when the copy had a hold. When it had none, the
 service skips that call and goes on to `sendDueDate`.
 
-**Good** (neutral)
+**Good**
 ```mermaid
 sequenceDiagram
     LoanService->>CopyRepository: reserve
@@ -121,7 +113,7 @@ Caption: borrow a copy. The `alt` block shows the condition, so the paragraph go
   `mermaid` fence (DG2 over DG1). — **Do not skip when** it is a component, sequence, state, entity-relationship or
   class diagram: it is a `mermaid` fence (DG1). — **Confidence** high
 - **Skip when** the diagram shows which components call which, and the change adds or removes no call: a Mermaid
-  `flowchart` is right (html-report :63). — **Do not skip when** the design adds, removes or moves a call: draw a
+  `flowchart` is right. — **Do not skip when** the design adds, removes or moves a call: draw a
   `diff` call tree (DG2). — **Confidence** medium
 - **Skip when** a node names an actor outside the code, such as a user or an outside service: name its role. Skip also
   for a `+` line in a design diff (DG3). — **Do not skip when** a node names a part of the code with a description

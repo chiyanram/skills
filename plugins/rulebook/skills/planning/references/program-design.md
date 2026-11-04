@@ -27,38 +27,29 @@ Contents: Rules · When X, use Y · Good / Bad (PD1–PD5) · Decided edges · R
 
 | the design | use | why |
 |---|---|---|
-| adds, removes or reroutes a call | a call tree in a fenced `diff` (PD1) | wsff :491-501 |
-| adds, changes or deletes a file | a file-tree `diff`, test files included, one purpose per file (PD2) | wsff :507-515; addy-plan :93-95 lists test files with source files |
-| adds a type, an interface or a public signature | the caller's usage, then signatures with no bodies (PD3) | wsff :517; architect :9 (`not implemented` bodies), :83 (usage first) |
-| touches more than one layer | vertical slices, each one tried end-to-end (PD4) | wsff :542-551; to-tickets :31; addy-plan :61-77 |
-| makes one mechanical change across the whole codebase (a wide refactor) | expand, migrate in batches, contract, instead of slices (PD4 edge) | to-tickets :40 |
-| lists a slice | its command, its test filter and any manual step (PD5) | create-plan :226-234, :325; addy-plan :86-89 |
-| needs a file path, a signature or a tree | the design, never the spec (PD6) | to-spec :55 |
-| is found wrong during the build phase | a recorded change to the design, then code (PD7) | architect :57; addy-spec :214 |
-
-`wsff` is HumanLayer `advanced-context-engineering-for-coding-agents/wsff.md` and `create-plan` is HumanLayer
-`humanlayer/.claude/commands/create_plan.md`; both are one vendor and count as one source. `architect` is pstack
-`skills/architect/SKILL.md`. `to-tickets` and `to-spec` are mattpocock `skills/engineering/to-tickets/SKILL.md` and
-`skills/engineering/to-spec/SKILL.md`. `addy-plan` and `addy-spec` are addy `skills/planning-and-task-breakdown/SKILL.md`
-and `skills/spec-driven-development/SKILL.md`. `:N` is the line. A pair label
-`(from <alias> :<line>)` names the source lines the pair is adapted from.
-
-Operator preference, 2026-10-31 (SRC2), in whole or in part: PD1, PD2, PD3 and PD6.
+| adds, removes or reroutes a call | a call tree in a fenced `diff` (PD1) | an unshown call change gets decided late, in code review |
+| adds, changes or deletes a file | a file-tree `diff`, test files included, one purpose per file (PD2) | the test files sit in the list with the source files they test |
+| adds a type, an interface or a public signature | the caller's usage, then signatures with no bodies (PD3) | a type left out of the design gets settled ad hoc in code |
+| touches more than one layer | vertical slices, each one tried end-to-end (PD4) | a layer-only step hides a defect until the last layer lands |
+| makes one mechanical change across the whole codebase (a wide refactor) | expand, migrate in batches, contract, instead of slices (PD4 edge) | no slice of a wide mechanical change can land green on its own |
+| lists a slice | its command, its test filter and any manual step (PD5) | a check with no named command does not get run |
+| needs a file path, a signature or a tree | the design, never the spec (PD6) | file paths and code snippets in a spec go stale quickly |
+| is found wrong during the build phase | a recorded change to the design, then code (PD7) | an unrecorded deviation leaves the design check judging against a guess |
 
 ## Good / Bad
 
-One neutral domain: a library that lets a member reserve a book that is out on loan.
+One domain: a library that lets a member reserve a book that is out on loan.
 
 ### PD1 — Show a call change as a call tree
 
-**Bad** (neutral)
+**Bad**
 ```text
 Checkout now asks the reservation queue before it lends a book. The old hold check
 is no longer used.
 ```
 The reader cannot see which caller makes the new call, or what replaces the hold check.
 
-**Good** (from wsff :493-501)
+**Good**
 ```diff
  checkoutRoute
    lendBook
@@ -71,13 +62,13 @@ Each new call and the removed call show at the place they run.
 
 ### PD2 — Show every file, test files included
 
-**Bad** (neutral)
+**Bad**
 ```text
 Files: reservation-queue.ts, checkout-route.ts
 ```
 No test file, no purpose, and the deleted hold check is missing.
 
-**Good** (from wsff :507-515)
+**Good**
 ```diff
  src
  └── reservation
@@ -90,14 +81,14 @@ The reviewer sees where each file lives, why it changes, and which test grades i
 
 ### PD3 — Write the usage, then the types with no bodies
 
-**Bad** (neutral)
+**Bad**
 ```text
 Add a reservation type with the book, the member and an expiry date.
 The queue finds the next holder when a book comes back.
 ```
 The prose leaves open what the queue returns when nobody waits. The build settles it ad hoc.
 
-**Good** (from architect :9, :83)
+**Good**
 ```ts
 const next = reservationQueue.nextHolder(bookId, today);
 
@@ -119,7 +110,7 @@ The usage comes first. The return type names the "nobody waits" case before any 
 
 ### PD4 — Slice the build vertically
 
-**Bad** (from addy-plan :61-67)
+**Bad**
 ```text
 Step 1: Add the reservations table
   Automated: npm test -- reservation-table
@@ -132,7 +123,7 @@ Step 4: Add the reserve button
 ```
 Each step has a command, but no one can try a reservation until step 4. A defect in step 1 hides until then.
 
-**Good** (from addy-plan :69-75)
+**Good**
 ```text
 Slice 1: A member reserves a book that is out (table + service + endpoint + button)
   Automated: npm test -- reservation-queue
@@ -145,14 +136,14 @@ Each slice runs through every layer, so a person can try it before the next slic
 
 ### PD5 — Name the command that proves each slice
 
-**Bad** (neutral)
+**Bad**
 ```text
 Slice 2: A returned book goes to the first member in the queue.
   Verification: tests pass.
 ```
 No command is named, so nobody knows which tests, and the check does not get run.
 
-**Good** (from create-plan :226-234)
+**Good**
 ```text
 Slice 2: A returned book goes to the first member in the queue.
   Automated: npm test -- checkout-route
@@ -171,16 +162,16 @@ A reviewer can run the same command and the same manual step.
   block. — **Do not skip when** an existing public signature changes: show the new signature and its caller (PD3). —
   **Confidence** high
 - **Skip when** the change is a wide refactor that no slice can land green: sequence it as expand, migrate in
-  batches, contract (to-tickets :40). — **Do not skip when** the layers only seem independent: slice it (PD4). —
+  batches, contract. — **Do not skip when** the layers only seem independent: slice it (PD4). —
   **Confidence** high
 - **Skip when** a slice has no surface a person can try (a pure library function): name the command and write
   "Manual: none". — **Do not skip when** the command runs only in a pipeline: name it anyway (PD5). — **Confidence**
   medium
 - **Skip when** the spec names a behaviour a user or an outside system sees (a request, a message, a screen). —
-  **Do not skip when** the text names where our code lives or how a function is typed: it goes in the design, although
-  addy puts a project-structure section in the spec (addy-spec :96) (operator preference, PD6). — **Confidence** high
+  **Do not skip when** the text names where our code lives or how a function is typed: it goes in the design (PD6). —
+  **Confidence** high
 - **Skip when** the build changes only code inside a body, and every approved type, signature and file placement holds.
-  — **Do not skip when** a function needs a parameter the design did not show: record it first (architect :57, PD7). —
+  — **Do not skip when** a function needs a parameter the design did not show: record it first (PD7). —
   **Confidence** high
 
 ## Review checks
