@@ -17,7 +17,7 @@ approved Good/Bad pair, `references/examples/<name>.md` holds them all.
 | [concurrency](references/concurrency.md) | CC1–CC10 | when you write or review code that starts threads, submits async work, calls a remote service, retries, locks, or builds a pool or a cache |
 | [design](references/design.md) | SEAM1 | when you write or review an interface a caller depends on, or a method that implements one |
 | [errors](references/errors.md) | ER1–ER8, ER10–ER11 | when you write or review a `throw`, a `catch`, an exception handler or request validation |
-| [java](references/java.md) | U4, JV1–JV9, CV3 | when you write or review Java production code |
+| [java](references/java.md) | U4, JV1–JV9, JVN1, CV3 | when you write or review Java production code |
 | [messaging](references/messaging.md) | MS4, MS6 | when you write or review a message consumer, a scheduled job, or an operation that can run twice |
 | [security](references/security.md) | SE1–SE7, SE7a, SE8, SE10, SS1–SS12, SS17, SS19–SS26 | when you write or review code that takes outside input, stores or checks a secret, or touches the security filter chain, a guard, a token or a security test |
 | [services](references/services.md) | LY1–LY3 | when you write or review a controller, a service, an interface or a use case that makes two calls |
