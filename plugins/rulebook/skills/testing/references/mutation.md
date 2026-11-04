@@ -30,35 +30,28 @@ Contents: Rules · When X, use Y · Good / Bad (M1–M6, M8–M10) · Decided ed
 
 | the report or the change shows | use | why |
 |---|---|---|
-| a NO_COVERAGE mutant | a test that runs the code | not reached by any test (M3) · 68c :64 |
-| a SURVIVED mutant | the missing case: name its letter, add the example test | reached, not asserted (M2, M3) · 68c :65 |
-| a SURVIVED Conditionals Boundary mutant | a just-inside and just-outside case (B3, `boundaries.md`) | M2's source pairs Conditionals Boundary with B3 · ledger :88 |
-| a survivor whose letter you must name | CORRECT (B1, `boundaries.md`) or RIGHT-BICEP (C1, `coverage-design.md`) | M2 names these two lists · ledger :88 |
-| a survivor you cannot prove equivalent | a gap with its risk (C4, `coverage-design.md`) | unsure means gap, not equivalent (M8) · 68c :172-173 |
-| a new kill test that passes on its first run | a temporary hand mutation, then revert it | green on first run is expected (M10) · 68c :230 |
-
-68c is `research/68c-neutral-testing-mutation-property-scenarios.md`; ledger is `research/19-approved-rules.md`.
-`:N` is a line in that file.
+| a NO_COVERAGE mutant | a test that runs the code | not reached by any test (M3) |
+| a SURVIVED mutant | the missing case: name its letter, add the example test | reached, not asserted (M2, M3) |
+| a SURVIVED Conditionals Boundary mutant | a just-inside and just-outside case (B3, `boundaries.md`) | testing only one side of an edge lets an off-by-one comparison pass (B3) |
+| a survivor whose letter you must name | CORRECT (B1, `boundaries.md`) or RIGHT-BICEP (C1, `coverage-design.md`) | M2 names these two lists |
+| a survivor you cannot prove equivalent | a gap with its risk (C4, `coverage-design.md`) | unsure means gap, not equivalent (M8) |
+| a new kill test that passes on its first run | a temporary hand mutation, then revert it | green on first run is expected (M10) |
 
 ## Good / Bad
 
 ### M1 — A report, not a gate; the threshold stays 0
 
-**Bad** (n/a) — no gating threshold exists to show.
-
-**Good** (neutral)
+**Good**
 ```kotlin
     // A report, never a gate (#123): a person reads the score, so the build never fails on it.
     // Raised only after a measured score exists and the operator picks a number.
     mutationThreshold.set(0)
 ```
-The value and the condition for changing it sit in the file where someone would change it. (Real evidence: ledger
-row M1.)
-M1's reason comes from agent-factory research/31:23, approved by the operator; the ledger row has none.
+The value and the condition for changing it sit in the file where someone would change it.
 
 ### M2 — Read a survivor as a missing case and name its letter
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "kills mutant on line 88"() {
     expect:
@@ -67,7 +60,7 @@ def "kills mutant on line 88"() {
 ```
 It names a line, not a case. It asserts only non-null, so the next mutant on that line survives too.
 
-**Good** (neutral)
+**Good**
 ```groovy
 /** Answers a survivor in OrderService.cancel (RIGHT-BICEP · Right: the gateway stays unconsulted). */
 def "should cancel a draft order without asking the payment gateway for a refund"() {
@@ -84,47 +77,45 @@ def "should cancel a draft order without asking the payment gateway for a refund
     cancelled.status() == OrderStatus.CANCELLED
 }
 ```
-The survivor became a named case that asserts the missed decision. Its RIGHT-BICEP letter is on the page. (Real
-evidence: ledger row M2.)
+The survivor became a named case that asserts the missed decision. Its RIGHT-BICEP letter is on the page.
 
 ### M3 — Report score and test strength
 
-**Bad** (neutral)
+**Bad**
 ```text
 mutation score 71% — good enough
 ```
 One number mixes unreached code with unasserted code. The reader cannot tell which fix is needed.
 
-**Good** (neutral)
+**Good**
 ```text
 ./gradlew pitest · billing · PIT DEFAULTS
 mutation score 71% (142/200) · test strength 89% (142 killed ÷ 160 killed+survived)
 NO_COVERAGE 40 → not reached by any test (coverage gap: add a test that runs it)
 SURVIVED 18 → reached, not asserted (missing case: name its letter, add the example)
 ```
-Both numbers are shown. The two kinds of non-kill read as two different defects. (Real evidence: ledger row M3.)
+Both numbers are shown. The two kinds of non-kill read as two different defects.
 
 ### M4 — Exclude only code with no decision in it
 
-**Bad** (neutral)
+**Bad**
 ```kotlin
 excludedClasses.set(listOf("*Config", "*Properties", "*Policy"))
 excludedMethods.set(listOf("get*", "is*"))
 ```
 `DiscountPolicy` and `Invoice.isOverdue` are decisions. Excluding them hides their missing tests and lifts the score.
 
-**Good** (neutral)
+**Good**
 ```kotlin
     // Wiring only: no class these globs match contains a decision.
     // Not get*/set*/is*: Invoice.isOverdue is a decision, and hiding it would raise the score.
     excludedClasses.set(listOf("*Config", "*Properties"))
 ```
-It names what is excluded and why it holds no decision. It also names the tempting exclusion it refuses. (Real
-evidence: ledger row M4.)
+It names what is excluded and why it holds no decision. It also names the tempting exclusion it refuses.
 
 ### M5 — Compare per-class mutant counts after changing exclusions
 
-**Bad** (neutral)
+**Bad**
 ```kotlin
 // Added org.springframework: survivors fell 18 → 4, so the change is safe (#123).
 avoidCallsTo.set(listOf("org.slf4j", "org.springframework"))
@@ -132,7 +123,7 @@ avoidCallsTo.set(listOf("org.slf4j", "org.springframework"))
 Only the total was read, and no per-class counts were compared. So nobody sees that the gateway's RestClient calls
 stopped being mutated.
 
-**Good** (neutral)
+**Good**
 ```kotlin
     // avoidCallsTo REPLACES pitest's defaults rather than adding to them, so the four logging
     // packages must be repeated here. Omitting them made every `log.warn(...)` mutable and
@@ -147,17 +138,17 @@ stopped being mutated.
     // the PaymentGateway adapter's charge(), which is real behaviour. One wiring mutant in the
     // adapter's client builder stays uncovered as a result, the cheaper of the two mistakes.
 ```
-It records the measured count change and why the broader glob was rejected. (Real evidence: ledger row M5.)
+It records the measured count change and why the broader glob was rejected.
 
 ### M6 — Keep the DEFAULTS mutators
 
-**Bad** (neutral)
+**Bad**
 ```kotlin
 mutators.set(listOf("ALL"))
 ```
 It adds unstable non-default operators and floods the report with equivalent mutants.
 
-**Good** (neutral)
+**Good**
 ```kotlin
 extensions.configure<PitestPluginExtension>("pitest") {
     junit5PluginVersion.set(version("pitestJunit5"))
@@ -166,44 +157,44 @@ extensions.configure<PitestPluginExtension>("pitest") {
     // No `mutators`: PIT's DEFAULTS group. ALL adds unstable operators and equivalent mutants.
     failWhenNoMutations.set(true)
 ```
-The rule is an absence, so a one-line comment makes it visible to the next editor. (Real evidence: ledger row M6.)
+The rule is an absence, so a one-line comment makes it visible to the next editor.
 
 ### M8 — Equivalent only with a stated reason
 
-**Bad** (neutral)
+**Bad**
 ```text
 18 survivors — all equivalent, ignore.
 ```
 No mutant has a reason, so eighteen possible missing cases become silence.
 
-**Good** (neutral)
+**Good**
 ```text
 Gap · DiscountPolicy:42 CONDITIONALS_BOUNDARY survived (`quantity > 0` → `quantity >= 0`)
 equivalent? unsure — the two differ only for a zero-quantity line; not proven unreachable.
 recorded as gap, not as equivalent; risk: a zero-quantity line could earn a GOLD discount.
 ```
-It names the mutant and the reason. It records the doubt as a gap with its risk. (Real evidence: ledger row M8.)
+It names the mutant and the reason. It records the doubt as a gap with its risk.
 
 ### M9 — A full analysis for a verdict you trust
 
-**Bad** (neutral)
+**Bad**
 ```kotlin
 withHistory.set(true)
 ```
 Incremental reuse rests on an assumption PIT calls unproven, so a stale kill can be reported.
 
-**Good** (neutral)
+**Good**
 ```kotlin
     // No withHistory: every run is a full analysis. PIT calls incremental reuse unproven,
     // and a verdict we act on must not rest on a stale kill.
     timestampedReports.set(false)
     outputFormats.set(listOf("HTML", "XML"))
 ```
-The deliberate absence is written down beside the report settings. (Real evidence: ledger row M9.)
+The deliberate absence is written down beside the report settings.
 
 ### M10 — Prove a kill test with a temporary hand mutation
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 /**
  * #123 — withStatus replaces the status and nothing else.
@@ -216,7 +207,7 @@ def "withStatus replaces the status and nothing else"() {
 ```
 The kill test was green on its first run, and nothing shows it was ever made to fail.
 
-**Good** (neutral)
+**Good**
 ```groovy
 /**
  * Kills the survivor in Order.withStatus that dropped placedAt (RIGHT-BICEP · Right).
@@ -233,17 +224,16 @@ def "should keep the placed time when an order is marked paid"() {
     paid.placedAt() == NINE_AM
 }
 ```
-Green on the first run is expected. The recorded hand mutation proves the test can fail. (Real evidence: ledger
-row M10.)
+Green on the first run is expected. The recorded hand mutation proves the test can fail.
 
 ## Decided edges
 
 - **Skip when** a class holds only wiring or config, such as `*Config` and `*Properties`: exclude it (M4). —
-  **Do not skip when** a getter or an `is*` method decides something: it stays measured (M4; ledger :90).
+  **Do not skip when** a getter or an `is*` method decides something: it stays measured (M4).
   — **Confidence** high
 - **Skip when** a test answers a surviving mutant in correct code: prove it with a hand mutation, not a Red run
-  (M10). — **Do not skip when** the change is a bug fix: the failing test comes first (S4, `strategy.md`; ledger
-  :96; ADR-0007). — **Confidence** high
+  (M10). — **Do not skip when** the change is a bug fix: the failing test comes first (S4, `strategy.md`).
+  — **Confidence** high
 
 ## Review checks
 

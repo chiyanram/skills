@@ -20,48 +20,47 @@ Contents: Rules · When X, use Y · Good / Bad (V1–V5) · Decided edges · Rev
 
 ## When X, use Y
 
-Each row maps what you see to the rule and the action. Openclaw is `openclaw/openclaw`
-`.agents/skills/test-audit/SKILL.md`, the source of V1–V5; `:N` is its line.
+Each row maps what you see to the rule and the action.
 
 | situation | use | why |
 |---|---|---|
-| you add a test | write one line each: 1 the behaviour or contract it protects · 2 the realistic regression that makes it fail · 3 why existing coverage does not catch it · 4 whether it needs a production seam no real caller needs (V1) | a missing answer means do not add it (openclaw :18-19) · questions: openclaw :21-29 |
-| existing coverage already proves the contract (answer 3) | one primary test per contract, at its strongest boundary (V1); which tier that is: S1, TM1 (`strategy.md`) | each contract has one primary test owner at the strongest boundary (openclaw :23-24) |
-| the test needs a production seam that no production caller needs (answer 4) | test at the real boundary instead (V1) | openclaw :28-29 |
-| the test would fail under a behaviour-preserving refactor | rewrite it at the boundary that owns the behaviour before it lands (V2); for mock interactions: K4 (`spock.md`) | it asserts implementation, not behaviour (openclaw :33-35) |
-| the new test matches a junk-pattern row below | name the contract it independently guards, or do not add it (V3) | openclaw :31-33 |
-| you fix a bug | one regression test at the boundary that owns the behaviour (V4); failing first: S4 (`strategy.md`) | one regression at the owner boundary covers the bug (openclaw :39-40) |
-| you would remove an existing test | keep it if a retention row below holds; otherwise prove it is junk first (V5) | a test that resembles implementation may still be the independent contract (openclaw :108-109) |
+| you add a test | write one line each: 1 the behaviour or contract it protects · 2 the realistic regression that makes it fail · 3 why existing coverage does not catch it · 4 whether it needs a production seam no real caller needs (V1) | a missing answer means do not add it |
+| existing coverage already proves the contract (answer 3) | one primary test per contract, at its strongest boundary (V1); which tier that is: S1, TM1 (`strategy.md`) | each contract has one primary test owner at the strongest boundary |
+| the test needs a production seam that no production caller needs (answer 4) | test at the real boundary instead (V1) | a seam no real caller needs costs upkeep and protects nothing (V1) |
+| the test would fail under a behaviour-preserving refactor | rewrite it at the boundary that owns the behaviour before it lands (V2); for mock interactions: K4 (`spock.md`) | it asserts implementation, not behaviour |
+| the new test matches a junk-pattern row below | name the contract it independently guards, or do not add it (V3) | a junk-pattern test cannot fail for a real defect |
+| you fix a bug | one regression test at the boundary that owns the behaviour (V4); failing first: S4 (`strategy.md`) | one regression at the owner boundary covers the bug |
+| you would remove an existing test | keep it if a retention row below holds; otherwise prove it is junk first (V5) | a test that resembles implementation may still be the independent contract |
 
 **Junk patterns (V3).** A new test matching one of these rows fails V3 unless it names the contract it guards. Each
 row's why is V3's: it cannot fail for a real defect.
 
 | the new test | use | why |
 |---|---|---|
-| has no assertion | junk pattern 1; Spock form: K19 (`spock.md`) | openclaw :47 |
-| compares a value with itself or with a copy of itself | junk pattern 2 | openclaw :48 |
-| checks a hand-copied list of enum or registry members | junk pattern 3 | openclaw :49 |
-| greps source or exact strings instead of running the code | junk pattern 4 | openclaw :50 |
-| takes its expected value from the code under test | junk pattern 5 | openclaw :56 |
-| uses a mock that implements the asserted behaviour | junk pattern 6 | openclaw :57-58 |
-| proves the same contract twice at different layers with no new risk | junk pattern 7; tier choice: GT5 (`scenario-to-tests.md`) | openclaw :52, :23-26 |
-| has a name that promises more than its input exercises | junk pattern 8 | openclaw :65-66 |
+| has no assertion | junk pattern 1; Spock form: K19 (`spock.md`) | it cannot fail for a real defect (V3) |
+| compares a value with itself or with a copy of itself | junk pattern 2 | it cannot fail for a real defect (V3) |
+| checks a hand-copied list of enum or registry members | junk pattern 3 | it cannot fail for a real defect (V3) |
+| greps source or exact strings instead of running the code | junk pattern 4 | it cannot fail for a real defect (V3) |
+| takes its expected value from the code under test | junk pattern 5 | it cannot fail for a real defect (V3) |
+| uses a mock that implements the asserted behaviour | junk pattern 6 | it cannot fail for a real defect (V3) |
+| proves the same contract twice at different layers with no new risk | junk pattern 7; tier choice: GT5 (`scenario-to-tests.md`) | it cannot fail for a real defect (V3) |
+| has a name that promises more than its input exercises | junk pattern 8 | it cannot fail for a real defect (V3) |
 
 **Retention rows (V5).** Keep an existing test when one of these rows holds.
 
 | the existing test | use | why |
 |---|---|---|
-| independently guards a contract: API, protocol, config, migration, storage, security, a promised default, architecture | keep it (V5) | openclaw :96-98 |
-| asserts order, and order is observable behaviour | keep it (V5); how to assert order: K13 (`spock.md`) | openclaw :100 |
-| is a regression with a realistic failure mode | keep it (V5) | openclaw :101 |
-| fails on master | treat it as a possible product bug: reproduce it, fix the owner, never delete it (V5) | openclaw :105-106 |
-| is slow or static | keep it: slow or static is not a deletion reason (V5) | openclaw :108 |
+| independently guards a contract: API, protocol, config, migration, storage, security, a promised default, architecture | keep it (V5) | a test that looks like junk may be the only guard of a contract (V5) |
+| asserts order, and order is observable behaviour | keep it (V5); how to assert order: K13 (`spock.md`) | a test that looks like junk may be the only guard of a contract (V5) |
+| is a regression with a realistic failure mode | keep it (V5) | a test that looks like junk may be the only guard of a contract (V5) |
+| fails on master | treat it as a possible product bug: reproduce it, fix the owner, never delete it (V5) | a test that looks like junk may be the only guard of a contract (V5) |
+| is slow or static | keep it: slow or static is not a deletion reason (V5) | a test that looks like junk may be the only guard of a contract (V5) |
 
 ## Good / Bad
 
 ### V1 — Answer the four questions before adding a test
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "a refunded order has its own status"() {
         expect: "REFUNDED is named"
@@ -70,7 +69,7 @@ row's why is V3's: it cannot fail for a real defect.
 ```
 No realistic regression fails it. Removing a constant breaks compilation first, and nothing sets REFUNDED yet.
 
-**Good** (neutral)
+**Good**
 ```groovy
 /**
  * Q1 contract: OrderRepository stores OrderStatus.name() on each order row and /api/orders
@@ -87,11 +86,11 @@ class OrderStatusSpec extends Specification {
         OrderStatus.values()*.name().containsAll(STORED_ORDER_STATUSES)
     }
 ```
-All four answers are written down. The constant with no answer to Q2 gets no test yet. (Real evidence: ledger row V1.)
+All four answers are written down. The constant with no answer to Q2 gets no test yet.
 
 ### V2 — Assert what the owner emits, not how the code is built
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "the declined-payment code carries its problem type"() {
         expect: "the member found by its Java name"
@@ -101,19 +100,18 @@ All four answers are written down. The constant with no answer to Q2 gets no tes
 It reaches the problem type through a Java enum member name. Renaming the member breaks it while every problem type a
 client sees stays the same.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should still produce every problem type clients already handle after the refactor"() {
         expect: "nothing a client already switches on has been lost"
         (PUBLISHED_PROBLEM_TYPES - ErrorCode.values()*.problemType()).isEmpty()
     }
 ```
-It asserts the problem-type strings clients see. A rename that keeps them passes, and a lost one is named. (Real
-evidence: ledger row V2.)
+It asserts the problem-type strings clients see. A rename that keeps them passes, and a lost one is named.
 
 ### V3 — A junk pattern names the contract it guards, or it does not land
 
-**Bad** (neutral)
+**Bad**
 ```groovy
         OrderStatus.valueOf("REFUNDED") != null
         ["DRAFT", "PLACED", "PAID", "SHIPPED", "CANCELLED"]
@@ -121,7 +119,7 @@ evidence: ledger row V2.)
 ```
 Junk pattern 3, a hand-copied list of enum members, with no stored or emitted form named as its contract.
 
-**Good** (neutral)
+**Good**
 ```groovy
     /**
      * The statuses order rows already store and /api/orders returns, verbatim.
@@ -135,12 +133,11 @@ Junk pattern 3, a hand-copied list of enum members, with no stored or emitted fo
         "CANCELLED",
     ]
 ```
-Still pattern 3, but it names the storage and API contract it guards and says why it must not be derived. (Real
-evidence: ledger row V3.)
+Still pattern 3, but it names the storage and API contract it guards and says why it must not be derived.
 
 ### V4 — One regression test, at the owning boundary
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 // BillingConsumerSpec — unit, StreamOperations mocked
     def "should not read as consumer-1"() {
@@ -154,7 +151,7 @@ evidence: ledger row V3.)
 ```
 The same bug is replayed at every consumer and layer. The mocked copies cannot see Redis merge two names.
 
-**Good** (neutral)
+**Good**
 ```groovy
     @Issue("#123")
     def "should register the injected identity on #group"() {
@@ -169,15 +166,11 @@ The same bug is replayed at every consumer and layer. The mocked copies cannot s
         group << [BillingConsumer.GROUP, NotificationsConsumer.GROUP]
     }
 ```
-The regression lives once, in Redis where the bug shows, with one row per consumer group. (Evidence: ledger row V4,
-adapted.)
+The regression lives once, in Redis where the bug shows, with one row per consumer group.
 
 ### V5 — Keep a test that guards a promised default
 
-**Bad** (n/a) — no deletion of a contract-guarding test without proof was found; recent deletions were replacements
-that name their successor.
-
-**Good** (neutral)
+**Good**
 ```groovy
 /** #123 AC-2 — an order created through the app starts as a draft. */
 class OrderEntityStatusSpec extends Specification {
@@ -189,8 +182,7 @@ class OrderEntityStatusSpec extends Specification {
     }
 }
 ```
-It looks like field-default junk but guards a promised default tied to migration V12, so it is kept. (Evidence: ledger
-row V5.)
+It looks like field-default junk but guards a promised default tied to migration V12, so it is kept.
 
 ## Decided edges
 
@@ -201,10 +193,10 @@ row V5.)
   it (V5 Good) over S2 (`strategy.md`). — **Do not skip when** nothing promises the default: S2 applies.
   — **Confidence** high
 - **Skip when** an existing test must change for a behaviour-preserving reorganisation: it is suspect, not
-  automatically deletable; V5 decides (openclaw :71-73). — **Do not skip when** the test is new: V2 rejects it before
+  automatically deletable; V5 decides. — **Do not skip when** the test is new: V2 rejects it before
   it lands. — **Confidence** high
 - **Skip when** a second layer has its own distinct risk the owner cannot reach, such as a transport or lifecycle
-  failure: it gets its own test (openclaw :24-26, GT5 `scenario-to-tests.md`). — **Do not skip when** it re-asserts
+  failure: it gets its own test (GT5, `scenario-to-tests.md`). — **Do not skip when** it re-asserts
   what the owner proves: that is junk pattern 7 and a V4 replay. — **Confidence** high
 
 ## Review checks

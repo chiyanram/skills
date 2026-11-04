@@ -1,7 +1,7 @@
 # LLM live tests — examples
 
-Every approved Good/Bad pair for the rules in [`../llm-live-tests.md`](../llm-live-tests.md), one per rule id, in one
-neutral domain: an `OrderAssistant` that answers questions about orders and calls a `findOrder` tool.
+Every Good/Bad pair for the rules in [`../llm-live-tests.md`](../llm-live-tests.md), one per rule id, in one
+domain: an `OrderAssistant` that answers questions about orders and calls a `findOrder` tool.
 
 Stand-ins: `@LiveModel` is the opt-in by name (LT3 in `../llm-tests.md`); `liveAdapter()` builds the real provider
 adapter with the project's pinned small model; `LiveModels` holds the project's model names; `liveAssistant()` builds
@@ -9,7 +9,7 @@ the assistant on the real provider; `ScriptedChatModel` is the shared fake (LT1)
 
 ## LS11 — Live-test only what a fake cannot know
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 @LiveModel
 class OrderAssistantLiveSpec extends Specification {
@@ -28,7 +28,7 @@ class OrderAssistantLiveSpec extends Specification {
 The turn cap is our own code. A real model makes the test slow, paid and flaky: it may answer without
 calling a tool, and the cap never fires. The fake tests it exactly (LT8).
 
-**Good** (neutral)
+**Good**
 ```groovy
 @LiveModel
 class ProviderAcceptanceLiveSpec extends Specification {
@@ -42,11 +42,11 @@ class ProviderAcceptanceLiveSpec extends Specification {
     }
 }
 ```
-Only the real provider can reject our tool schema, and only a real model decides to call the tool. (Real evidence: ledger row LS11.)
+Only the real provider can reject our tool schema, and only a real model decides to call the tool.
 
 ## LT14 — A separate live job: pinned small model, token cap, protected secret, fails when skipped
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 @Requires({ env.PROVIDER_API_KEY })
 class ProviderContractLiveSpec extends ChatAdapterContract {
@@ -58,7 +58,7 @@ class ProviderContractLiveSpec extends ChatAdapterContract {
 Without the key, the whole suite skips and CI is green. The provider's default model changes under the
 test, and nothing caps the tokens.
 
-**Good** (neutral)
+**Good**
 ```groovy
 @LiveModel
 class ProviderContractLiveSpec extends ChatAdapterContract {
@@ -72,11 +72,11 @@ class ProviderContractLiveSpec extends ChatAdapterContract {
 }
 ```
 A missing key fails the job, the model is pinned, and every call is capped. The job runs on its own,
-with the key held as a protected CI secret. (Real evidence: ledger row LT14.)
+with the key held as a protected CI secret.
 
 ## LT15 — Assert real-model output only on what the test controls
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should tell the customer the order has shipped"() {
     given:
@@ -92,7 +92,7 @@ def "should tell the customer the order has shipped"() {
 The wording changes with every model and run, so the test flakes. And a model that guessed "shipped"
 without calling the tool would pass.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should look the order up and use the result"() {
     given:
@@ -109,11 +109,11 @@ def "should look the order up and use the result"() {
 ```
 Exact tool arguments, and a marker no model would guess, prove the tool was called and its result
 reached the answer. For an agent that changes state, assert that state instead: the order cancelled once, the balance
-moved. (Real evidence: ledger row LT15.)
+moved.
 
 ## LS13 — Assert that a parameter took effect, not only that it was accepted
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should accept a max-tokens limit"() {
     when:
@@ -126,7 +126,7 @@ def "should accept a max-tokens limit"() {
 An adapter that drops the limit still gets an answer, so the test passes while production pays for
 full-length replies.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should stop at five output tokens"() {
     when:
@@ -137,11 +137,11 @@ def "should stop at five output tokens"() {
     reply.finishReason == FinishReason.LENGTH
 }
 ```
-Exactly five tokens and a LENGTH finish prove the limit reached the provider and was obeyed. (Real evidence: ledger row LS13.)
+Exactly five tokens and a LENGTH finish prove the limit reached the provider and was obeyed.
 
 ## LS15 — Join real streamed chunks and tool-call deltas into the final message
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should stream an answer"() {
     when:
@@ -157,7 +157,7 @@ def "should stream an answer"() {
 Any stream passes. It never checks that the chunks join, or that only the last chunk carries the finish
 reason, which is where real chunking breaks aggregators.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should join streamed chunks and tool-call deltas into the final message"() {
     when:
@@ -173,11 +173,11 @@ def "should join streamed chunks and tool-call deltas into the final message"() 
     last.toolCalls[0].arguments == [orderId: "A-17"]
 }
 ```
-The provider's real chunking runs through our aggregator, and the test checks the joined result. (Real evidence: ledger row LS15.)
+The provider's real chunking runs through our aggregator, and the test checks the joined result.
 
 ## LS16 — Check real cache and usage numbers, and the price we compute from them
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should enable prompt caching"() {
     when:
@@ -189,7 +189,7 @@ def "should enable prompt caching"() {
 ```
 Caching may be silently off, or priced wrongly, and nothing looks at the provider's cache counts.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should read the cache on the second turn and price it right"() {
     given:
@@ -206,11 +206,11 @@ def "should read the cache on the second turn and price it right"() {
 }
 ```
 Only the provider reports cache-write and cache-read tokens, and the test checks our price against
-them. (Real evidence: ledger row LS16.)
+them.
 
 ## LT16 — Never retry a failed assertion; inject the fault and test our own retry
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 @Retry(count = 3)
 def "should look the order up and use the result"() {
@@ -223,7 +223,7 @@ def "should look the order up and use the result"() {
 ```
 A prompt that works one time in three still goes green, so a flaky prompt is never fixed.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should retry once after a dropped connection and then succeed"() {
     given:
@@ -239,11 +239,11 @@ def "should retry once after a dropped connection and then succeed"() {
 }
 ```
 The test fails on a real assertion failure, and the adapter's own retry is proved by injecting one
-transport fault before a real call. (Real evidence: ledger row LT16.)
+transport fault before a real call.
 
 ## LS19 — Every live test can fail, and its gate does not always skip
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should switch to the small model mid-conversation"() {
     given:
@@ -259,7 +259,7 @@ def "should switch to the small model mid-conversation"() {
 ```
 It passes when the switch silently did nothing.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should send the next request with the small model after a switch"() {
     given:
@@ -273,11 +273,11 @@ def "should send the next request with the small model after a switch"() {
     reply.servedBy == LiveModels.SMALL
 }
 ```
-The test checks what the provider says served the reply. It fails if the switch did nothing. (Real evidence: ledger row LS19.)
+The test checks what the provider says served the reply. It fails if the switch did nothing.
 
 ## LS20 — Check every configured model name; excluded names must still fail
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should answer with the small model"() {
     expect:
@@ -287,7 +287,7 @@ def "should answer with the small model"() {
 It checks one hard-coded name. The names production is configured with are never checked, so users
 find a retired model first.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should get an answer from every configured model"() {
     expect:
@@ -304,11 +304,11 @@ def "should still reject the model we excluded as retired"() {
 }
 ```
 Every configured name is checked, and the excluded one must keep failing. If it starts working, the
-test fails, so someone notices it can come back. (Real evidence: ledger row LS20.)
+test fails, so someone notices it can come back.
 
 ## LT17 — The judge gives atomic verdicts; code computes the score; "not sure" fails; never self-grade
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should rate the answer as faithful to the order record"() {
     given:
@@ -324,7 +324,7 @@ def "should rate the answer as faithful to the order record"() {
 The model that wrote the answer also grades it, and the score is whatever number the judge returns.
 Neither the judge's arithmetic nor the parsing of its reply is tested.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should count unsure and missing verdicts as unsupported"() {
     given:
@@ -343,11 +343,11 @@ def "should count unsure and missing verdicts as unsupported"() {
 ```
 The judge only splits claims and gives a verdict per claim. Our code does the arithmetic: one
 supported claim out of four is 0.25, so NOT_SURE and the two missing verdicts count as unsupported. A scripted judge
-makes that arithmetic testable. The scorer refuses a judge whose name equals `answeredBy`. (Real evidence: ledger row LT17.)
+makes that arithmetic testable. The scorer refuses a judge whose name equals `answeredBy`.
 
 ## LT18 — Gate an eval on versioned thresholds over repeated runs
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should answer order questions well"() {
     given:
@@ -363,7 +363,7 @@ def "should answer order questions well"() {
 One run decides, so a lucky run passes and an unlucky one blocks. The threshold lives in test code,
 where it is quietly tuned until the test is green.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should meet the versioned thresholds over repeated runs"() {
     given:
@@ -378,4 +378,4 @@ def "should meet the versioned thresholds over repeated runs"() {
 }
 ```
 The run count and each metric's rule (a minimum over runs, or a pass rate) live in a versioned file
-that changes by review. `passes` treats a non-finite score as a failure. (Real evidence: ledger row LT18.)
+that changes by review. `passes` treats a non-finite score as a failure.

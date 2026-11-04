@@ -27,24 +27,23 @@ Contents: Rules · When X, use Y · Good / Bad (TR1, TR2, TRN1, TRN2, TRN3) · D
 
 | the code | use | why |
 |---|---|---|
-| sends a message to another process | the propagator: an instrumented producer that writes trace headers (TR1) | OpenTelemetry messaging "A producer SHOULD attach a message creation context"; propagators API; Spring Boot tracing · r47 :611-613 |
-| hands work to another thread | a context-propagating executor (TR1) | OpenTelemetry propagators API; Micrometer Tracing "continue a span in a new thread" · r47 :612, :614 |
-| measures one operation | `observation.observe(() -> …)` (TRN2) | OpenTelemetry Trace API "Any span that is created MUST also be ended"; Micrometer Observation · r47 :646-647 |
-| starts a span it cannot wrap in a lambda | `start()`, the scope in try-with-resources, `stop()` in `finally` (TRN2) | OpenTelemetry Trace API; Micrometer Observation "The Scope must be closed" · r47 :646-647 |
-| needs a tracer or registry | the API or facade type, with no null check (TR2) | OpenTelemetry library guidelines "the API calls should be no-ops"; Trace API; Micrometer Tracing "without vendor lock-in" · r47 :621-623 |
-| names a span | the class of operation: a constant such as `orders.place`, or `{method} {route template}` (TRN1) | OpenTelemetry Trace API "the most general string"; HTTP spans; Micrometer Observation · r47 :639-641 |
-| records an id | a high-cardinality key value (span attribute) (TRN1, TR3) | OpenTelemetry Trace API "account_id=42 would make a nice Span attribute"; Micrometer Observation · r47 :634 |
-| catches a failure it handles, retries or turns into a 4xx | no error status (TRN3) | OpenTelemetry Trace API, recording errors "SHOULD NOT be recorded on spans", HTTP spans · r47 :652-654 |
-| sets the sampling ratio | a parent-based sampler, ratio in configuration (TR5) | OpenTelemetry Trace SDK `ParentBased`; Spring Boot `management.tracing.sampling.probability` · r47 :661-662 |
+| sends a message to another process | the propagator: an instrumented producer that writes trace headers (TR1) | a consumer span joins the producer's trace only through the propagated context |
+| hands work to another thread | a context-propagating executor (TR1) | a bare executor drops the context, so the span on the new thread starts a new trace |
+| measures one operation | `observation.observe(() -> …)` (TRN2) | an unended span leaks memory and never reaches the backend |
+| starts a span it cannot wrap in a lambda | `start()`, the scope in try-with-resources, `stop()` in `finally` (TRN2) | the span must be ended and the scope closed, even when the work throws |
+| needs a tracer or registry | the API or facade type, with no null check (TR2) | the API is a no-op without a backend, and SDK types tie code to a vendor |
+| names a span | the class of operation: a constant such as `orders.place`, or `{method} {route template}` (TRN1) | per-id names explode cardinality |
+| records an id | a high-cardinality key value (span attribute) (TRN1, TR3) | an id is a fine span attribute, and a high-cardinality key value never reaches a meter |
+| catches a failure it handles, retries or turns into a 4xx | no error status (TRN3) | false errors inflate error alerts |
+| sets the sampling ratio | a parent-based sampler, ratio in configuration (TR5) | a `ParentBased` sampler follows the root's decision, so no trace loses spans to independent per-service ratios |
 
-`r47` is agent-factory `research/47-industry-migrations-obs.md`; `:N` is a line in that file. TRN3's sources are all
-OpenTelemetry documents. Which tracer bridge sits under the facade is a project choice (r47 :666-672).
+Which tracer bridge sits under the facade is a project choice.
 
 ## Good / Bad
 
 ### TR1 — Propagate the context, not a copied field
 
-**Bad** (neutral)
+**Bad**
 ```java
 final var message = new OrderPlaced(
     order.id(),
@@ -56,7 +55,7 @@ kafkaTemplate.send(
 The copied field is a string, not a parent context, so it builds no link from the consumer's span to the producer's
 trace.
 
-**Good** (neutral)
+**Good**
 ```java
 // the template is built with observation enabled, so it writes the trace headers
 kafkaTemplate.send(
@@ -67,7 +66,7 @@ The propagator injects the context into the message headers, and the consumer sp
 
 ### TR2 — The facade, with no null check
 
-**Bad** (neutral)
+**Bad**
 ```java
 private final SdkTracerProvider tracerProvider;
 
@@ -82,7 +81,7 @@ if (tracerProvider != null) {
 ```
 An SDK type sits in business code, and a null branch guards it.
 
-**Good** (neutral)
+**Good**
 ```java
 Observation.createNotStarted("orders.place", observationRegistry)
     .observe(() -> orderService.place(command));
@@ -91,14 +90,14 @@ The facade is a no-op when tracing is off, so no branch is needed.
 
 ### TRN1 — A span name for a class of operation
 
-**Bad** (neutral)
+**Bad**
 ```java
 Observation.createNotStarted("customers.load." + customerId, observationRegistry)
     .observe(() -> repository.load(customerId));
 ```
 Each customer gets its own span name.
 
-**Good** (neutral)
+**Good**
 ```java
 Observation.createNotStarted("customers.load", observationRegistry)
     .highCardinalityKeyValue("customer.id", customerId.toString())
@@ -108,7 +107,7 @@ The name is stable, and the id is a span attribute that never reaches a meter.
 
 ### TRN2 — End every span
 
-**Bad** (neutral)
+**Bad**
 ```java
 final var observation = Observation.start("invoices.render", observationRegistry);
 renderer.render(invoice);
@@ -116,7 +115,7 @@ observation.stop();
 ```
 An exception from `render` skips `stop()`, so the span leaks and is never exported.
 
-**Good** (neutral)
+**Good**
 ```java
 Observation.createNotStarted("invoices.render", observationRegistry)
     .observe(() -> renderer.render(invoice));
@@ -125,7 +124,7 @@ One call opens the scope, records an error if the lambda throws, and stops the o
 
 ### TRN3 — An error status only for a failed operation
 
-**Bad** (neutral)
+**Bad**
 ```java
 try {
     return cache.get(orderId);
@@ -136,7 +135,7 @@ try {
 ```
 The miss is handled and the order is returned, yet the span counts as an error.
 
-**Good** (neutral)
+**Good**
 ```java
 try {
     return cache.get(orderId);
@@ -150,11 +149,9 @@ The handled miss is an event, so the error rate counts only real failures.
 ## Decided edges
 
 - **Skip when** an environment sets its ratio to 1.0 in configuration: the ratio is a cost choice per environment
-  (TR5; OpenTelemetry Trace SDK, Spring Boot tracing, r47 :662, :664). — **Do not skip when** the ratio or the sampler
-  is set in code. — **Confidence** high
-- **Skip when** an id is a span attribute: ids are fine on spans (TR3, TRN1; OpenTelemetry Trace API, Micrometer
-  Observation, r47 :634). — **Do not skip when** the id is in the span name, or the value is a secret, token or
-  sensitive PII. — **Confidence** high
+  (TR5). — **Do not skip when** the ratio or the sampler is set in code. — **Confidence** high
+- **Skip when** an id is a span attribute: ids are fine on spans (TR3, TRN1). — **Do not skip when** the id is in
+  the span name, or the value is a secret, token or sensitive PII. — **Confidence** high
 
 ## Review checks
 

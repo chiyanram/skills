@@ -42,30 +42,28 @@ Contents: Rules · When X, use Y · Good / Bad (EA1–EA6) · Decided edges · R
 
 | situation | use | why |
 |---|---|---|
-| the test checks page state: text, an attribute, visibility | a retrying matcher: `toHaveText`, `toHaveAttribute`, `toBeVisible` | a one-shot read checks the page once, before it may settle (EC2, ledger :117) |
-| the test waits for a state to arrive | a web-first assertion, a response, a URL, or `expect.poll` with a budget | tests that wait on time are flaky, as the Playwright docs warn (EC1, ledger :116) |
-| the test locates a landmark | role, then label or text, test-id last | chrome or a shared CSS class renders on every page and proves nothing (EA2, ledger :107) |
-| a locator matches more than one element | a role name, a filter or chaining | `.first()` picks whichever match comes first, which changes with the page (EC3, ledger :118) |
-| setup that no test mutates | `beforeAll` that throws on failure | a failed or mutated `beforeAll` surfaces later as an unrelated wrong status (EB3, ledger :114) |
-| one expensive shared live call | `describe.serial`, with the reason above it | in a serial chain one failure skips every later test (EB2, ledger :113) |
-| a dependency we do not control | its fake, or a bundled local instance; what to replace: TM2 (`strategy.md`) | a third-party site then decides whether the test passes (EB4, ledger :115) |
-| the test needs the real internet | an `@external` tag and a skip when it is unreachable | a third-party site then decides whether the test passes (EB4, ledger :115) |
-| a capability the test needs is missing | a skip that names the capability and gives a reason | a swallowed setup failure makes later tests fail or skip for hidden reasons (EA6, ledger :111) |
-| a test must be quarantined | `test.fixme` naming an open issue, removed when the issue closes | a swallowed setup failure makes later tests fail or skip for hidden reasons (EA6, ledger :111) |
-| a named slow dependency (live model) | a raised timeout with a one-line reason; the poll budget below the test timeout | a poll that outlasts the test timeout dies without its failure message (EC5, ledger :120) |
-
-`ledger :N` is line N of `research/19-approved-rules.md` in chiyanram/skills.
+| the test checks page state: text, an attribute, visibility | a retrying matcher: `toHaveText`, `toHaveAttribute`, `toBeVisible` | a one-shot read checks the page once, before it may settle (EC2) |
+| the test waits for a state to arrive | a web-first assertion, a response, a URL, or `expect.poll` with a budget | tests that wait on time are flaky, as the Playwright docs warn (EC1) |
+| the test locates a landmark | role, then label or text, test-id last | chrome or a shared CSS class renders on every page and proves nothing (EA2) |
+| a locator matches more than one element | a role name, a filter or chaining | `.first()` picks whichever match comes first, which changes with the page (EC3) |
+| setup that no test mutates | `beforeAll` that throws on failure | a failed or mutated `beforeAll` surfaces later as an unrelated wrong status (EB3) |
+| one expensive shared live call | `describe.serial`, with the reason above it | in a serial chain one failure skips every later test (EB2) |
+| a dependency we do not control | its fake, or a bundled local instance; what to replace: TM2 (`strategy.md`) | a third-party site then decides whether the test passes (EB4) |
+| the test needs the real internet | an `@external` tag and a skip when it is unreachable | a third-party site then decides whether the test passes (EB4) |
+| a capability the test needs is missing | a skip that names the capability and gives a reason | a swallowed setup failure makes later tests fail or skip for hidden reasons (EA6) |
+| a test must be quarantined | `test.fixme` naming an open issue, removed when the issue closes | a swallowed setup failure makes later tests fail or skip for hidden reasons (EA6) |
+| a named slow dependency (live model) | a raised timeout with a one-line reason; the poll budget below the test timeout | a poll that outlasts the test timeout dies without its failure message (EC5) |
 
 Titles, one `test.step` per Given/When/Then, issue annotation: GT1, GT2, GT4 (`scenario-to-tests.md`). Which journeys
 get a smoke spec: S1 (`strategy.md`). A failure path per acceptance criterion: GA5 (`acceptance-criteria.md`, planning).
 
 ## Good / Bad
 
-Every rule's approved pair: [examples/smoke-specs.md](examples/smoke-specs.md).
+Every rule's pair: [examples/smoke-specs.md](examples/smoke-specs.md).
 
 ### EA1 — A poll is not an assertion
 
-**Bad** (neutral)
+**Bad**
 ```ts
 await apiRequest(request, 'POST', `/api/invoices/${invoiceId}/payments`, token, {
   amount: { amount: '42.00', currency: 'EUR' },
@@ -76,7 +74,7 @@ await pollInvoice(request, invoiceId, token,
 ```
 The poll returns silently at its deadline, so the test passes when the invoice never becomes PAID.
 
-**Good** (neutral)
+**Good**
 ```ts
 await test.step('Then the invoice reaches PAID within the deadline', async () => {
   await expect
@@ -88,11 +86,11 @@ await test.step('Then the invoice reaches PAID within the deadline', async () =>
 });
 ```
 `expect.poll` makes the condition an assertion with a message and a budget below the test timeout, so removing
-payments makes the test fail. (Real evidence: ledger row EA1.)
+payments makes the test fail.
 
 ### EA2 — Assert a feature-only landmark by role, not a shared CSS class
 
-**Bad** (neutral)
+**Bad**
 ```ts
 test('the invoice list loads with the Invoices heading and a status filter', async ({ clerkPage }) => {
   await clerkPage.goto('/invoices');
@@ -101,7 +99,7 @@ test('the invoice list loads with the Invoices heading and a status filter', asy
 ```
 `.toggle-wrap` is a CSS class every settings page renders, so it proves no invoice filter rendered.
 
-**Good** (neutral)
+**Good**
 ```ts
 test(
   'should show the invoice list with its status filter',
@@ -117,12 +115,11 @@ test(
   },
 );
 ```
-The heading and the named combobox render only on the invoice list, and both are found by role and name. (Real
-evidence: ledger row EA2.)
+The heading and the named combobox render only on the invoice list, and both are found by role and name.
 
 ### EA3 — No status net or `?? []` default before a check
 
-**Bad** (neutral)
+**Bad**
 ```ts
 test('DELETE a draft order → it disappears from the orders list', async ({ request, draftOrder }) => {
   // when — deleting the draft order
@@ -135,7 +132,7 @@ test('DELETE a draft order → it disappears from the orders list', async ({ req
 ```
 An error body or a changed shape becomes `[]`, so "it disappeared" passes without a deletion.
 
-**Good** (neutral)
+**Good**
 ```ts
 test(
   'should remove a deleted draft order from the orders list',
@@ -153,11 +150,10 @@ test(
 );
 ```
 One exact status each, and the list shape is read without a default, so an error cannot look like an empty list.
-(Real evidence: ledger row EA3.)
 
 ### EA4 — A test naming a dependency asserts that dependency's record and its success
 
-**Bad** (neutral)
+**Bad**
 ```ts
 const { payment, emails } = await pollForPayment(request, invoiceId, token, 'card-gateway',
   { maxWaitMs: 60_000, andReceiptEmail: true });
@@ -166,7 +162,7 @@ expect(emails.some(m => m.to === customer.email && m.subject?.trim())).toBe(true
 ```
 The payment record exists but its outcome is never checked, so a declined charge plus an email passes.
 
-**Good** (neutral)
+**Good**
 ```ts
 await test.step('Then the card gateway took this payment and approved it', async () => {
   const cardPayment = async () => {
@@ -186,11 +182,11 @@ await test.step('Then the card gateway took this payment and approved it', async
 });
 ```
 `expect.poll` waits for the record matched by gateway name, then its approval and the amount this test set up are
-asserted. (Real evidence: ledger row EA4.)
+asserted.
 
 ### EA5 — A deliberate dependency failure asserts the failure shape
 
-**Bad** (neutral)
+**Bad**
 ```ts
 test('pay invoice with the gateway offline', async ({ clerkPage, invoice, fakeGateway }) => {
   fakeGateway.goOffline();
@@ -201,7 +197,7 @@ test('pay invoice with the gateway offline', async ({ clerkPage, invoice, fakeGa
 ```
 Only a reply is checked, so a regression that records an approved payment for a dead gateway stays green.
 
-**Good** (neutral)
+**Good**
 ```ts
 await test.step('Then the toast says declined and no payment is approved', async () => {
   await expect(clerkPage.getByRole('alert')).toHaveText('Payment declined');
@@ -214,12 +210,11 @@ await test.step('Then the toast says declined and no payment is approved', async
   ).toBe(false);
 });
 ```
-Both halves are asserted: the clerk still gets an answer, and no successful payment exists. (Real evidence: ledger
-row EA5.)
+Both halves are asserted: the clerk still gets an answer, and no successful payment exists.
 
 ### EA6 — Own setup failure throws; skip only on a named missing capability
 
-**Bad** (neutral)
+**Bad**
 ```ts
 try {
   const probe = await apiRequest(request, 'POST', '/api/tax-rates/probe', token,
@@ -234,7 +229,7 @@ try {
 ```
 The fixture's own setup fails silently, so later tests fail or skip for a reason the report never shows.
 
-**Good** (neutral)
+**Good**
 ```ts
 const test = base.extend<{ taxSource: TaxSource }>({
   taxSource: async ({ request, clerkToken }, use) => {
@@ -249,20 +244,17 @@ const test = base.extend<{ taxSource: TaxSource }>({
 // in each @external test:
 test.skip(!taxSource.externalReachable, 'External internet not reachable from this Docker environment');
 ```
-The setup fails loud at its source, and a test skips only on one named capability with its reason. (Real evidence:
-ledger row EA6.)
+The setup fails loud at its source, and a test skips only on one named capability with its reason.
 
 ## Decided edges
 
 - **Skip when** an existing `networkidle`, sleep, `.first()`, `.nth()` or `.last()` sits on a line the change does
-  not add: EC1 and EC3 bind new code only (ledger :116, :118). — **Do not skip when** the change
-  adds the line. — **Confidence** high
+  not add: EC1 and EC3 bind new code only. — **Do not skip when** the change adds the line. — **Confidence** high
 - **Skip when** a catch sits in fixture teardown after `use()` and wraps only the cleanup call: EA3 names a catch
-  around act-and-assert (ledger :108), and the approved EB3 pair does this
-  (`research/68d-neutral-testing-smoke.md` :290). — **Do not skip when** the catch wraps an action, a setup call or an
-  `expect`. — **Confidence** high
-- **Skip when** a spec has no named screenshot file: ED3 drops that mandate (ledger :124). — **Do not skip
-  when** the spec never drives its route in the UI (ED3). — **Confidence** high
+  around act-and-assert, and the EB3 Good pair does this. — **Do not skip when** the catch wraps an action, a setup
+  call or an `expect`. — **Confidence** high
+- **Skip when** a spec has no named screenshot file: ED3 drops that mandate. — **Do not skip when** the spec never
+  drives its route in the UI (ED3). — **Confidence** high
 
 ## Review checks
 

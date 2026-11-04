@@ -36,28 +36,17 @@ How each scenario becomes its tests is owned by `testing/references/scenario-to-
 
 | the acceptance criteria have | use | why |
 |---|---|---|
-| a home | the spec's acceptance-criteria section; everything else links there (GA1) | the spec holds the testable success conditions (addy-sdd :143; spec-kit §User Scenarios & Testing; humanlayer-plan :225) |
-| a scenario that needs an id | a `# AC-n` comment line above `Scenario:`, unchanged after approval (GA2, CV1) | each requirement carries a unique id (spec-kit §Functional Requirements; sysml); a comment is a full line of its own (cucumber-ref §Comments) |
-| a scenario that needs a tag | a domain or concern tag, never a test level (GA3) | tags group related features (cucumber-ref §Tags); plinth-bdd :266 tags a test level, and this rulebook overrides it |
-| a Given that several scenarios repeat | `Background:` (GA4) | cucumber-ref §Background |
-| a `Scenario Outline` | an Examples header that names exactly its placeholders (GA4); a constant column moved to the Given (AC8) | plinth-bdd :149; cucumber-ref §Scenario Outline |
-| a Then step | an outcome a user or caller can observe (GA5) | cucumber-ref §Steps; plinth-bdd :32 |
-| an acceptance criterion with only success scenarios | one more scenario for its failure or refusal path (GA5) | spec-kit §Edge Cases; plinth-unit :25 |
-| a scenario title | a "should …" sentence about behaviour (GA6) | test names read as sentences (north §agiledox); describe behaviour, not implementation (better-gherkin §Declarative) |
-| a change to stored data or a default | a Given with state from before the change (AC7) | existing rows need a backfill (addy-migration :179) |
-| a noun in scenario text | the glossary's word; a new noun defined in the spec first (AC9) | to-spec :13; a ubiquitous language (north §BDD for analysis) |
-| an edit to approved acceptance-criteria text | a spec change that passes the approval gate again (AC10) | update the spec first, then implement (addy-sdd :214) |
-
-`addy-sdd` is addyosmani `skills/spec-driven-development/SKILL.md` and `addy-migration` is addyosmani
-`skills/deprecation-and-migration/SKILL.md`. `humanlayer-plan` is humanlayer `.claude/commands/create_plan.md`.
-`to-spec` is mattpocock `skills/engineering/to-spec/SKILL.md`. `plinth-bdd` is jabrena plinth
-`skills/058-design-bdd/references/058-design-bdd.md` and `plinth-unit` is its `131-java-testing-unit-testing.md`.
-`spec-kit` is github/spec-kit `templates/spec-template.md`. `cucumber-ref` is cucumber.io/docs/gherkin/reference and
-`better-gherkin` is cucumber.io/docs/bdd/better-gherkin. `north` is Dan North, "Introducing BDD"
-(dannorth.net/blog/introducing-bdd). `sysml` is OMG issue SYSML16-204, which quotes "The unique Id of the requirement"
-from SysML 1.6. `:N` is the line.
-
-Operator preference, 2026-10-31 (SRC2), in whole or in part: GA2, GA3, GA6, CV1, AC7, AC8, AC9 and AC10.
+| a home | the spec's acceptance-criteria section; everything else links there (GA1) | the spec holds the testable success conditions |
+| a scenario that needs an id | a `# AC-n` comment line above `Scenario:`, unchanged after approval (GA2, CV1) | each requirement carries a unique id; a Gherkin comment is a full line of its own |
+| a scenario that needs a tag | a domain or concern tag, never a test level (GA3) | tags group related features; a test-level tag decides the test level before the writer of the tests can |
+| a Given that several scenarios repeat | `Background:` (GA4) | `Background:` states shared preconditions once |
+| a `Scenario Outline` | an Examples header that names exactly its placeholders (GA4); a constant column moved to the Given (AC8) | no Gherkin parser catches a header that misses a placeholder |
+| a Then step | an outcome a user or caller can observe (GA5) | a Then that no running test can check proves nothing |
+| an acceptance criterion with only success scenarios | one more scenario for its failure or refusal path (GA5) | a criterion tested only on success leaves its failure path unproven |
+| a scenario title | a "should …" sentence about behaviour (GA6) | test names read as sentences; describe behaviour, not implementation |
+| a change to stored data or a default | a Given with state from before the change (AC7) | existing rows need a backfill |
+| a noun in scenario text | the glossary's word; a new noun defined in the spec first (AC9) | one shared, ubiquitous language; the title becomes the test name, so a wrong word reaches the code |
+| an edit to approved acceptance-criteria text | a spec change that passes the approval gate again (AC10) | an approval covers only the text as it stood when it was approved |
 
 ## Good / Bad
 
@@ -65,7 +54,7 @@ Every pair uses one domain: an online shop's orders and payments.
 
 ### GA3 — Tag by domain or concern, never by test level
 
-**Bad** (adapted from plinth-bdd :266-270)
+**Bad**
 ```gherkin
 # AC-4
 @integration-test @business-rule @error
@@ -76,7 +65,7 @@ Scenario: should keep a shipped order shipped when the customer tries to cancel 
 ```
 The tag picks the test level inside the spec. The writer of the tests can no longer choose it.
 
-**Good** (neutral)
+**Good**
 ```gherkin
 # AC-4
 @orders
@@ -89,7 +78,7 @@ The tag names the domain. The test level stays open.
 
 ### GA4 — The Examples header names exactly the placeholders
 
-**Bad** (adapted from plinth-bdd :169-176)
+**Bad**
 ```gherkin
 # AC-2
 @payments
@@ -104,7 +93,7 @@ Scenario Outline: should set the order status from the payment result
 ```
 `<amount>` and `<status>` have no column. No parser reports it.
 
-**Good** (neutral, adapted from plinth-bdd :154-164)
+**Good**
 ```gherkin
 # AC-2
 @payments
@@ -122,7 +111,7 @@ Scenario Outline: should set the order status from the payment result
 
 ### GA5 — An observable Then, and a failure scenario
 
-**Bad** (adapted from plinth-bdd :104-107)
+**Bad**
 ```gherkin
 # AC-3
 @payments
@@ -133,7 +122,7 @@ Scenario: should keep the order unpaid when the card is declined
 ```
 Each step names code, not an outcome. No customer can see it.
 
-**Good** (neutral, adapted from plinth-bdd :93-99)
+**Good**
 ```gherkin
 # AC-3
 @payments
@@ -148,7 +137,7 @@ This is the refusal scenario of the payment criterion. Each Then is an outcome t
 
 ### GA6 — The title is a "should …" behaviour sentence
 
-**Bad** (neutral)
+**Bad**
 ```gherkin
 # AC-9
 @returns
@@ -159,7 +148,7 @@ Scenario: Refund calculation for partial returns
 ```
 A topic, not a behaviour. The test name must reword it.
 
-**Good** (neutral)
+**Good**
 ```gherkin
 # AC-9
 @returns
@@ -171,14 +160,14 @@ Scenario: should refund only the returned items of a partial return
 
 ### CV1 — The id is a comment line above the scenario
 
-**Bad** (neutral)
+**Bad**
 ```gherkin
 @AC-5 @orders
 Scenario: AC-5 should cancel an unpaid order on request
 ```
 The id tag breaks GA3. The id in the title changes the test name.
 
-**Good** (neutral)
+**Good**
 ```gherkin
 # AC-5
 @orders
@@ -190,7 +179,7 @@ Scenario: should cancel an unpaid order on request
 
 ### AC7 — A Given with state from before the change
 
-**Bad** (neutral)
+**Bad**
 ```gherkin
 # AC-6
 @orders
@@ -200,7 +189,7 @@ Scenario: should give a new order the default delivery window of 3 days
 ```
 Only new orders. The orders that existed before the new column are never checked.
 
-**Good** (neutral)
+**Good**
 ```gherkin
 # AC-7
 @orders
@@ -212,7 +201,7 @@ Scenario: should give an order placed before the change the default delivery win
 
 ### AC8 — A constant column moves to the Given
 
-**Bad** (neutral)
+**Bad**
 ```gherkin
   Examples:
     | currency | total  | fee  |
@@ -221,7 +210,7 @@ Scenario: should give an order placed before the change the default delivery win
 ```
 `currency` is the same on every row. It is copied into every test table.
 
-**Good** (neutral)
+**Good**
 ```gherkin
 # AC-8
 @payments
@@ -238,7 +227,7 @@ Scenario Outline: should charge a card fee that grows with the order total
 
 ### AC9 — Glossary words in scenario text
 
-**Bad** (neutral)
+**Bad**
 ```gherkin
 # AC-10
 @orders
@@ -249,7 +238,7 @@ Scenario: should void the basket when the shopper bails at checkout
 ```
 The glossary says "order" and "customer". "Basket", "shopper" and "void" reach the test name.
 
-**Good** (neutral)
+**Good**
 ```gherkin
 # AC-10
 @orders
@@ -262,10 +251,9 @@ Scenario: should cancel the order when the customer leaves the checkout
 ## Decided edges
 
 - **Skip when** a scenario has no tag at all: GA3 asks for no tag. — **Do not skip when** a tag names a test level,
-  even when an outside source tags test levels (plinth-bdd :266). — **Confidence** high
-- **Skip when** a Then has an And or a But: GA5 asks for at least one observable Then, not exactly one (plinth-bdd
-  :93-99). — **Do not skip when** any Then names a method, a class or a table instead of an outcome. — **Confidence**
-  high
+  even when an outside guide tags test levels. — **Confidence** high
+- **Skip when** a Then has an And or a But: GA5 asks for at least one observable Then, not exactly one. — **Do not
+  skip when** any Then names a method, a class or a table instead of an outcome. — **Confidence** high
 - **Skip when** the failure path of an acceptance criterion is in a sibling scenario under the same criterion (GA5). —
   **Do not skip when** no scenario of the criterion covers a failure or a refusal. — **Confidence** medium
 - **Skip when** the change adds a new table with no rows before the change: AC7 has no old state. — **Do not skip

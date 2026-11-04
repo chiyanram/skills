@@ -35,29 +35,29 @@ Contents: Rules · When X, use Y · Good / Bad (LT14, LT15, LT17) · Decided edg
 
 | situation | use | why |
 |---|---|---|
-| the behaviour is the agent's own logic: loop cap, memory, guards, approval, fallback | the fake tier, `llm-tests.md` | LS11 · ledger :644 |
-| the question is whether the provider accepts our schema or parameters | a live test in the shared adapter contract suite (LT6, `llm-tests.md`) | LS11, LT6 · ledger :644, :626 |
-| a test calls a real provider | an opt-in by name (LT3), in its own job with a pinned small model, a token cap and a protected secret | LT14, TM3 · ledger :651, :39 |
-| the live test checks a tool call | the exact argument JSON and a marker the stub tool returns | LT15 · ledger :653, :647 |
-| the live test checks an agent run | the state the run changed: a row, a balance, the routed agent | LT15 · ledger :653, :650 |
-| the request sets a parameter: a token limit, a stop sequence | the parameter's effect: a LENGTH finish, a cut text | LS13 · ledger :646 |
-| the adapter streams | real chunks joined into the final message, tool-call deltas included | LS15 · ledger :648 |
-| the adapter reads cache or usage numbers, or we price a call | the provider's real numbers, and our price from them | LS16 · ledger :649 |
-| a live test fails some of the time | no retry of the assertion; an injected transport fault for our own retry | LT16 · ledger :654 |
-| a live test has a skip condition | a check that the condition does not always skip, and an assertion that can fail | LS19 · ledger :655 |
-| the project configures model names | one live check per configured name; excluded names as expected failures | LS20 · ledger :656 |
-| quality is scored, not asserted | an eval: an atomic-verdict judge on another model, gated on versioned thresholds over repeated runs | LT17, LT18 · ledger :657, :658 |
+| the behaviour is the agent's own logic: loop cap, memory, guards, approval, fallback | the fake tier, `llm-tests.md` | live tests cost money every run (LS11) |
+| the question is whether the provider accepts our schema or parameters | a live test in the shared adapter contract suite (LT6, `llm-tests.md`) | an unchecked opt-out silently drops a parameter (LS11, LT6) |
+| a test calls a real provider | an opt-in by name (LT3), in its own job with a pinned small model, a token cap and a protected secret | a real model in the gate makes every run slow, paid and flaky (TM3), and default models change (LT14) |
+| the live test checks a tool call | the exact argument JSON and a marker the stub tool returns | exact prose flakes and "not empty" catches nothing (LT15) |
+| the live test checks an agent run | the state the run changed: a row, a balance, the routed agent | exact prose flakes and "not empty" catches nothing (LT15) |
+| the request sets a parameter: a token limit, a stop sequence | the parameter's effect: a LENGTH finish, a cut text | a provider accepts a dropped field silently (LS13) |
+| the adapter streams | real chunks joined into the final message, tool-call deltas included | real chunking differs from every fixture (LS15) |
+| the adapter reads cache or usage numbers, or we price a call | the provider's real numbers, and our price from them | only the provider reports cache-write and cache-read tokens (LS16) |
+| a live test fails some of the time | no retry of the assertion; an injected transport fault for our own retry | blanket reruns hide flaky prompts (LT16) |
+| a live test has a skip condition | a check that the condition does not always skip, and an assertion that can fail | a test that never runs or never asserts protects nothing (LS19) |
+| the project configures model names | one live check per configured name; excluded names as expected failures | providers retire models, and a fix should be noticed (LS20) |
+| quality is scored, not asserted | an eval: an atomic-verdict judge on another model, gated on versioned thresholds over repeated runs | judge arithmetic and self-grading inflate scores, and one sample decides otherwise (LT17, LT18) |
 
-Ledger is `research/19-approved-rules.md` in this repo; `:N` is a line. Which providers and flows run live, and
-whether the job runs on every pull request or nightly, is each project's choice, written in its own testing docs.
+Which providers and flows run live, and whether the job runs on every pull request or nightly, is each project's
+choice, written in its own testing docs.
 
 ## Good / Bad
 
-Every rule's approved pair: [examples/llm-live-tests.md](examples/llm-live-tests.md).
+Every rule's pair: [examples/llm-live-tests.md](examples/llm-live-tests.md).
 
 ### LT14 — A separate live job: pinned small model, token cap, protected secret, fails when skipped
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 @Requires({ env.PROVIDER_API_KEY })
 class ProviderContractLiveSpec extends ChatAdapterContract {
@@ -69,7 +69,7 @@ class ProviderContractLiveSpec extends ChatAdapterContract {
 Without the key, the whole suite skips and CI is green. The provider's default model changes under the
 test, and nothing caps the tokens.
 
-**Good** (neutral)
+**Good**
 ```groovy
 @LiveModel
 class ProviderContractLiveSpec extends ChatAdapterContract {
@@ -83,11 +83,11 @@ class ProviderContractLiveSpec extends ChatAdapterContract {
 }
 ```
 A missing key fails the job, the model is pinned, and every call is capped. The job runs on its own,
-with the key held as a protected CI secret. (Real evidence: ledger row LT14.)
+with the key held as a protected CI secret.
 
 ### LT15 — Assert real-model output only on what the test controls
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should tell the customer the order has shipped"() {
     given:
@@ -103,7 +103,7 @@ def "should tell the customer the order has shipped"() {
 The wording changes with every model and run, so the test flakes. And a model that guessed "shipped"
 without calling the tool would pass.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should look the order up and use the result"() {
     given:
@@ -120,11 +120,11 @@ def "should look the order up and use the result"() {
 ```
 Exact tool arguments, and a marker no model would guess, prove the tool was called and its result
 reached the answer. For an agent that changes state, assert that state instead: the order cancelled once, the balance
-moved. (Real evidence: ledger row LT15.)
+moved.
 
 ### LT17 — The judge gives atomic verdicts; code computes the score; "not sure" fails; never self-grade
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 def "should rate the answer as faithful to the order record"() {
     given:
@@ -140,7 +140,7 @@ def "should rate the answer as faithful to the order record"() {
 The model that wrote the answer also grades it, and the score is whatever number the judge returns.
 Neither the judge's arithmetic nor the parsing of its reply is tested.
 
-**Good** (neutral)
+**Good**
 ```groovy
 def "should count unsure and missing verdicts as unsupported"() {
     given:
@@ -159,15 +159,15 @@ def "should count unsure and missing verdicts as unsupported"() {
 ```
 The judge only splits claims and gives a verdict per claim. Our code does the arithmetic: one
 supported claim out of four is 0.25, so NOT_SURE and the two missing verdicts count as unsupported. A scripted judge
-makes that arithmetic testable. The scorer refuses a judge whose name equals `answeredBy`. (Real evidence: ledger row LT17.)
+makes that arithmetic testable. The scorer refuses a judge whose name equals `answeredBy`.
 
 ## Decided edges
 
 - **Skip when** the run is the gate: the live tier is opt-in and stays out of it (TM3). — **Do not skip when** prompt
-  or provider code changes, or before a release: the live tier must pass then (TM3, ledger :39). — **Confidence** high
-- **Skip when** choosing when the live job runs: on every pull request or nightly is the project's choice (LT14,
-  ledger :651). — **Do not skip when** the job runs: wherever it runs, it pins the model and the cap and fails when
-  skipped (LT14). — **Confidence** high
+  or provider code changes, or before a release: the live tier must pass then (TM3). — **Confidence** high
+- **Skip when** choosing when the live job runs: on every pull request or nightly is the project's choice (LT14).
+  — **Do not skip when** the job runs: wherever it runs, it pins the model and the cap and fails when skipped
+  (LT14). — **Confidence** high
 
 ## Review checks
 

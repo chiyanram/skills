@@ -30,22 +30,20 @@ MG41, MGN1, MG44, MG45).
 
 | the migration declares | use | why |
 |---|---|---|
-| a column that holds an instant | `timestamptz` (MG30) | squawk prefer-timestamptz; GitLab migration style guide · r47 :103-104 |
-| a new string column with a business length limit | `text` + a `CHECK (char_length(col) <= n)` (MG31; its name, MG38) | squawk prefer-text-field; GitLab strings guide · r47 :111-112 |
-| a fixed-length string | `text`, never `char(n)` (MG31, MG36) | PG 8.3 "character(n) is usually the slowest"; squawk ban-char-field · r47 :110, :141 |
-| a primary key | `bigint GENERATED … AS IDENTITY`, or `uuid` (MG36) | squawk prefer-identity, prefer-bigint-over-int; GitLab downtime guide · r47 :139-140, :143 |
-| a JSON document | `jsonb` (MG36) | PG 8.14 "prefer to store JSON data as jsonb"; strong_migrations · r47 :142 |
-| a `REFERENCES` clause | an explicit `ON DELETE` action (MG32) and an index led by the referencing column (MG33) | PG 5.5.5; GitLab foreign keys guide · r47 :118-119, :125-126 |
-| a `UNIQUE` constraint or unique index | `NOT NULL` on each column, or `NULLS NOT DISTINCT` (MG35) | PG 5.5.3; GitLab adding indexes guide · r47 :132-133 |
-| an index or a constraint | a name with a fixed prefix: `pk_`, `fk_`, `uq_`, `ck_`, `idx_` (MG38) | GitLab constraint naming; PG CREATE INDEX "Index name is required when IF NOT EXISTS is specified" · r47 :148-150 |
-
-`r47` is agent-factory `research/47-industry-migrations-obs.md`; `:N` is a line in that file.
+| a column that holds an instant | `timestamptz` (MG30) | `timestamp` drops the UTC offset, so instants written from different zones compare and sort wrongly |
+| a new string column with a business length limit | `text` + a `CHECK (char_length(col) <= n)` (MG31; its name, MG38) | changing a `varchar` limit takes an `ACCESS EXCLUSIVE` lock; a `CHECK` is replaced `NOT VALID` |
+| a fixed-length string | `text`, never `char(n)` (MG31, MG36) | `char(n)` pads with spaces and is usually the slowest of the string types |
+| a primary key | `bigint GENERATED … AS IDENTITY`, or `uuid` (MG36) | an `integer` key can overflow, and `serial` makes permissions and schema management difficult |
+| a JSON document | `jsonb` (MG36) | `json` has no equality operator; `jsonb` has one |
+| a `REFERENCES` clause | an explicit `ON DELETE` action (MG32) and an index led by the referencing column (MG33) | the default `NO ACTION` fails parent deletes nobody designed for; PostgreSQL creates no index on the referencing column, so each parent `DELETE` scans the child table |
+| a `UNIQUE` constraint or unique index | `NOT NULL` on each column, or `NULLS NOT DISTINCT` (MG35) | NULLs count as distinct by default, so duplicate rows containing NULL pass |
+| an index or a constraint | a name with a fixed prefix: `pk_`, `fk_`, `uq_`, `ck_`, `idx_` (MG38) | later `VALIDATE`, `DROP` and `IF NOT EXISTS` must name the object, and a generated name hits the wrong one |
 
 ## Good / Bad
 
 ### MG31 — `text` with a named length check
 
-**Bad** (neutral)
+**Bad**
 ```sql
 CREATE TABLE customers (
   id    bigint GENERATED ALWAYS AS IDENTITY,
@@ -55,7 +53,7 @@ CREATE TABLE customers (
 ```
 Raising the limit later is `ALTER COLUMN … TYPE`, which takes an `ACCESS EXCLUSIVE` lock on the table.
 
-**Good** (neutral)
+**Good**
 ```sql
 CREATE TABLE customers (
   id    bigint GENERATED ALWAYS AS IDENTITY,
@@ -68,7 +66,7 @@ The limit is a named constraint. A new limit is a new `CHECK` added `NOT VALID`,
 
 ### MG35 — `UNIQUE` on a column that can be NULL
 
-**Bad** (neutral)
+**Bad**
 ```sql
 SET LOCAL lock_timeout = '2s';
 CREATE TABLE payments (
@@ -83,7 +81,7 @@ CREATE TABLE payments (
 ```
 Two payments for one customer, each with `external_ref` NULL, both pass the constraint.
 
-**Good** (neutral)
+**Good**
 ```sql
 SET LOCAL lock_timeout = '2s';
 CREATE TABLE payments (
@@ -104,9 +102,8 @@ nullable and write `UNIQUE NULLS NOT DISTINCT (customer_id, external_ref)` (Post
 ## Decided edges
 
 - **Skip when** a composite index or unique constraint already leads with the referencing column: it is the
-  foreign-key index, so add no second one (MG33; GitLab foreign keys guide "OK to have a composite index … so long as
-  the foreign key is in the first position", r47 :126). — **Do not skip when** the referencing column is second or
-  later in every index on the table. — **Confidence** high
+  foreign-key index, so add no second one (MG33). — **Do not skip when** the referencing column is second or later in
+  every index on the table. — **Confidence** high
 
 ## Review checks
 

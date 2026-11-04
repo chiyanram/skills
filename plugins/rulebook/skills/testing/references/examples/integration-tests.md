@@ -1,11 +1,11 @@
 # Integration tests — examples
 
-Every approved Good/Bad pair for the rules in [../integration-tests.md](../integration-tests.md), one per rule id.
+Every Good/Bad pair for the rules in [../integration-tests.md](../integration-tests.md), one per rule id.
 Read it when a rule's sentence leaves you unsure what the code looks like.
 
 ### IT1 — Prove the contract once; leave unit-owned branches to the unit spec
 
-**Bad** (neutral)
+**Bad**
 ```java
     @DisplayName("POST with customerId blank → 400 naming customerId")
     void createOrder_blankCustomerId_returns400() {
@@ -19,7 +19,7 @@ Read it when a rule's sentence leaves you unsure what the code looks like.
 ```
 One slow HTTP test per blank field re-runs validation branches that the order validator's unit spec already owns.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should answer an order the validator refuses with a 400 problem"() {
         when: "a clerk posts an order the validator refuses; which fields it refuses is the unit spec's job"
@@ -35,11 +35,11 @@ One slow HTTP test per blank field re-runs validation branches that the order va
         result.status.value() == 400
         result.responseHeaders.contentType == MediaType.APPLICATION_PROBLEM_JSON
 ```
-One IT proves the refusal-to-400 mapping through the real stack; the field branches stay in the fast unit spec. (Real evidence: ledger row IT1.)
+One IT proves the refusal-to-400 mapping through the real stack; the field branches stay in the fast unit spec.
 
 ### IT2 — Take every container from the singleton initializer
 
-**Bad** (neutral)
+**Bad**
 ```java
 @Testcontainers
 class PaymentGatewayIT {
@@ -52,7 +52,7 @@ class PaymentGatewayIT {
 ```
 The class starts its own container and stops it when the class ends, outside the shared singleton every other IT uses.
 
-**Good** (neutral)
+**Good**
 ```groovy
 /**
  * No Spring context, so no @EnableSharedContainers: the gateway sandbox comes from the singleton,
@@ -69,11 +69,11 @@ class PaymentGatewayIT extends Specification {
         seedSandboxAccounts(gatewayUrl)
     }
 ```
-The container lives in the shared initializer beside Postgres, so no spec owns its lifecycle and every spec reuses it. (Real evidence: ledger row IT2.)
+The container lives in the shared initializer beside Postgres, so no spec owns its lifecycle and every spec reuses it.
 
 ### IT3 — Call the running server with RestTestClient
 
-**Bad** (neutral)
+**Bad**
 ```java
         OrderController ctrl = new OrderController(orderService, invoiceService, paymentGateway, clock);
         mockMvc = MockMvcBuilders.standaloneSetup(ctrl).build();
@@ -85,7 +85,7 @@ The container lives in the shared initializer beside Postgres, so no spec owns i
 ```
 HTTP-shaped assertions over standalone MockMvc skip the filter chain, security and error advice the real server applies.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should cancel a placed order when a clerk asks over HTTP"() {
         given: "a placed order"
@@ -103,11 +103,11 @@ HTTP-shaped assertions over standalone MockMvc skip the filter chain, security a
         result.status.value() == 202
         orderRepository.findById(order.id()).orElseThrow().status() == OrderStatus.CANCELLED
 ```
-RestTestClient on RANDOM_PORT sends real HTTP through security and error handling, with a token from a real login. (Real evidence: ledger row IT3.)
+RestTestClient on RANDOM_PORT sends real HTTP through security and error handling, with a token from a real login.
 
 ### IT4 — Swap an outbound port for a fake, never a double
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "should send the overdue notice when the reminder runs"() {
         given: "a reminder whose email sender is a Spock double"
@@ -118,7 +118,7 @@ RestTestClient on RANDOM_PORT sends real HTTP through security and error handlin
 ```
 The IT replaces an outbound port with a double that has no behaviour of its own, and repeats that stub per feature.
 
-**Good** (neutral)
+**Good**
 ```groovy
     @Autowired OverdueReminder reminder
     @Autowired FakeEmailSender emailSender // the EmailSender bean of OutboundFakesConfig
@@ -134,13 +134,12 @@ The IT replaces an outbound port with a double that has no behaviour of its own,
         then: "the fake holds exactly one notice, for this invoice's customer"
         emailSender.sent()*.to() == [CUSTOMER_EMAIL]
 ```
-The subject is the wired bean, and the port is the shared in-memory fake from `OutboundFakesConfig`, with its own contract spec (IT5), instead of one stub per feature. (Real evidence: ledger row IT4.)
+The subject is the wired bean, and the port is the shared in-memory fake from `OutboundFakesConfig`, with its own
+contract spec (IT5), instead of one stub per feature.
 
 ### TM4 — One Toxiproxy IT per dependency the system must survive
 
-**Bad** (n/a) — no fault-injection IT exists, so there is nothing to cite.
-
-**Good** (neutral)
+**Good**
 ```groovy
     def "should pay nothing and warn while the gateway is cut, then pay once the link returns"() {
         given: "an open invoice stored in setup(), then the gateway link cut at the proxy"
@@ -158,11 +157,12 @@ The subject is the wired bean, and the port is the shared in-memory fake from `O
         then: "the same payment goes through"
         invoiceService.pay(invoiceId).map { it.invoiceId() } == Optional.of(invoiceId)
 ```
-The real gateway sits behind a proxy; it asserts predictable failure, the WARN line, and recovery once the fault clears. This is the cut, one of the three faults; latency and timeout get features of the same shape. (Real evidence: ledger row TM4.)
+The real gateway sits behind a proxy; it asserts predictable failure, the WARN line, and recovery once the fault clears.
+This is the cut, one of the three faults; latency and timeout get features of the same shape.
 
 ### IT5 — One contract spec for each fake and its real adapter
 
-**Bad** (neutral)
+**Bad**
 ```java
 public class FakePaymentGateway implements PaymentGateway, Resettable {
 
@@ -180,7 +180,7 @@ public class FakePaymentGateway implements PaymentGateway, Resettable {
 ```
 No contract spec covers the fake, so it records a repeated payment twice while the real gateway is idempotent.
 
-**Good** (neutral)
+**Good**
 ```groovy
 abstract class PaymentGatewayContract extends Specification {
     abstract PaymentGateway gateway()
@@ -198,13 +198,12 @@ abstract class PaymentGatewayContract extends Specification {
     }
 }
 ```
-`FakePaymentGatewaySpec` and `PaymentGatewayAdapterIT` both extend one contract, so the fake cannot drift from the real gateway unnoticed. (Real evidence: ledger row IT5.)
+`FakePaymentGatewaySpec` and `PaymentGatewayAdapterIT` both extend one contract, so the fake cannot drift from the real
+gateway unnoticed.
 
 ### SP1 — One field name for one overridden bean
 
-**Bad** (n/a) — the source found no `@TestBean` that overrides one type under two field names.
-
-**Good** (neutral)
+**Good**
 ```groovy
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableSharedContainers
@@ -219,13 +218,12 @@ class InvoiceControllerIT extends Specification {
         new FakeExchangeRateProvider()
     }
 ```
-Every IT that overrides `ExchangeRateProvider` names the field `exchangeRateProvider`, so they share one cached Spring context; the shared fakes do not hold this port, so each class overrides it. (Real evidence: ledger row SP1.)
+Every IT that overrides `ExchangeRateProvider` names the field `exchangeRateProvider`, so they share one cached Spring
+context; the shared fakes do not hold this port, so each class overrides it.
 
 ### SP2 — Override only a bean whose advice the IT does not assert
 
-**Bad** (n/a) — no real Bad: no bean the ITs override carries `@Transactional`, `@Cacheable`, `@Retryable`, method security or `@Async`.
-
-**Good** (neutral)
+**Good**
 ```java
 /**
  * Shared fakes for outbound ports. Each replaced bean carries no @Transactional, @Cacheable,
@@ -240,11 +238,11 @@ public class OutboundFakesConfig {
         return new FakePaymentGateway();
     }
 ```
-The javadoc records the advice check beside the override, so a later advised bean is not replaced unnoticed. (Real evidence: ledger row SP2.)
+The javadoc records the advice check beside the override, so a later advised bean is not replaced unnoticed.
 
 ### SP3 — Take isolation from the shared reset, never from @Transactional
 
-**Bad** (neutral)
+**Bad**
 ```java
 @Transactional
 class InvoiceControllerIT extends AbstractIT {
@@ -258,7 +256,7 @@ class InvoiceControllerIT extends AbstractIT {
 ```
 The test's transaction is not the server's, so the payment rows the server committed leak into the next test.
 
-**Good** (neutral)
+**Good**
 ```groovy
 /**
  * No @Transactional and no per-feature DELETE: @EnableSharedContainers resets the database before
@@ -274,11 +272,12 @@ class InvoiceControllerIT extends Specification {
     @Autowired
     JdbcTemplate jdbc
 ```
-One reset interceptor owns isolation and runs whatever thread the server committed on; the spec cleans up nothing by hand. (Real evidence: ledger row SP3.)
+One reset interceptor owns isolation and runs whatever thread the server committed on; the spec cleans up nothing by
+hand.
 
 ### SP4 — Flush before asserting a constraint or a write
 
-**Bad** (neutral)
+**Bad**
 ```groovy
     def "should refuse a second invoice for one order"() {
         given: "an invoice for an order"
@@ -294,7 +293,7 @@ One reset interceptor owns isolation and runs whatever thread the server committ
 ```
 Without a flush the second insert never reaches Postgres, so the unique index never runs and the expected exception never comes.
 
-**Good** (neutral)
+**Good**
 ```groovy
     def "should refuse a second invoice for one order"() {
         given: "an invoice for an order"
@@ -309,18 +308,18 @@ Without a flush the second insert never reaches Postgres, so the unique index ne
         e.constraintName == "uq_invoice_order"
     }
 ```
-The flush inside `when:` sends the insert to the database, and the bound exception names the exact index. (Real evidence: ledger row SP4.)
+The flush inside `when:` sends the insert to the database, and the bound exception names the exact index.
 
 ### SP5 — Keep the real database in a slice test
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 @DataJpaTest
 abstract class OrdersRepositoryIT extends Specification {
 ```
 Without `replace = NONE` Boot swaps in an embedded database unlike production Postgres, or fails when none is on the classpath.
 
-**Good** (neutral)
+**Good**
 ```groovy
 /** replace = NONE keeps the singleton Postgres; without it Boot swaps in an embedded database. */
 @DataJpaTest
@@ -331,13 +330,11 @@ abstract class OrdersRepositoryIT extends Specification {
     @Autowired
     TestEntityManager em
 ```
-Both halves of the rule sit on the slice base class, with the reason on one line. (Real evidence: ledger row SP5.)
+Both halves of the rule sit on the slice base class, with the reason on one line.
 
 ### SP6 — A one-line reason beside every @DirtiesContext
 
-**Bad** (n/a) — the source found no `@DirtiesContext` in any test source.
-
-**Good** (neutral)
+**Good**
 ```groovy
 // TaxCalculator resolves its rates once at construction; this spec changes them, so no later spec may reuse it.
 @DirtiesContext
@@ -345,11 +342,11 @@ Both halves of the rule sit on the slice base class, with the reason on one line
 @EnableSharedContainers
 class TaxRateOverrideIT extends Specification {
 ```
-The reason names what the spec changes and why reusing the context would give later specs wrong rates. (Real evidence: ledger row SP6.)
+The reason names what the spec changes and why reusing the context would give later specs wrong rates.
 
 ### SP7 — Count contexts before raising a limit
 
-**Bad** (neutral)
+**Bad**
 ```java
     // configuration (~20 in orders-api alone — every @Import / @MockitoBean / @TestPropertySource
     // makes a new cache key), none are evicted below the cache's 32-entry default, and each holds a
@@ -359,18 +356,18 @@ The reason names what the spec changes and why reusing the context would give la
 ```
 The connection limit is raised on an estimated context count, and nothing measures how many contexts really exist.
 
-**Good** (neutral)
+**Good**
 ```yaml
 # orders-api/src/test/resources/application-it.yml — temporary, while diagnosing
 logging:
   level:
     org.springframework.test.context.cache: DEBUG
 ```
-The cache logger prints size, hits and misses, so the context count is measured before any limit changes. (Real evidence: ledger row SP7.)
+The cache logger prints size, hits and misses, so the context count is measured before any limit changes.
 
 ### SP8 — Shared properties in the singleton initializer
 
-**Bad** (neutral)
+**Bad**
 ```java
     @DynamicPropertySource
     static void props(DynamicPropertyRegistry r) {
@@ -382,7 +379,7 @@ The cache logger prints size, hits and misses, so the context count is measured 
 ```
 Per-class properties enter the context cache key, so this class forks its own Spring context.
 
-**Good** (neutral)
+**Good**
 ```java
     @Override
     public void initialize(final ConfigurableApplicationContext ctx) {
@@ -396,11 +393,11 @@ Per-class properties enter the context cache key, so this class forks its own Sp
                 .applyTo(ctx);
     }
 ```
-One property set in the shared initializer serves every IT, so all of them share one cache key. (Real evidence: ledger row SP8.)
+One property set in the shared initializer serves every IT, so all of them share one cache key.
 
 ### SP9 — Keep lifecycle beans pauseable
 
-**Bad** (neutral)
+**Bad**
 ```java
     @EventListener(ApplicationReadyEvent.class)
     void start() {
@@ -415,7 +412,7 @@ One property set in the shared initializer serves every IT, so all of them share
 ```
 The consumer is not a lifecycle bean, so every cached test context keeps reading `orders.placed` until the JVM exits.
 
-**Good** (neutral)
+**Good**
 ```java
 @Component
 public class BillingConsumer implements SmartLifecycle {
@@ -433,11 +430,11 @@ public class BillingConsumer implements SmartLifecycle {
         loopThread.interrupt();
     }
 ```
-A `SmartLifecycle` bean is pauseable by default, so Spring stops the loop while its context waits in the test cache. (Real evidence: ledger row SP9.)
+A `SmartLifecycle` bean is pauseable by default, so Spring stops the loop while its context waits in the test cache.
 
 ### SP10 — No preemptive timeout in a transactional test
 
-**Bad** (neutral)
+**Bad**
 ```java
     @Test
     void shouldMarkOverdueInvoices() {
@@ -446,7 +443,7 @@ A `SmartLifecycle` bean is pauseable by default, so Spring stops the loop while 
 ```
 The timed body runs on another thread outside the test transaction, so its writes commit and never roll back.
 
-**Good** (neutral)
+**Good**
 ```groovy
     @Timeout(10)
     def "should find only invoices past their due date"() {
@@ -463,11 +460,11 @@ The timed body runs on another thread outside the test transaction, so its write
         overdue*.orderId() == [ORDER_ID]
     }
 ```
-Spock's `@Timeout` keeps the feature on the test thread, so the slice transaction stays bound and still rolls back. (Real evidence: ledger row SP10.)
+Spock's `@Timeout` keeps the feature on the test thread, so the slice transaction stays bound and still rolls back.
 
 ### SP11 — Keep the component scan off the class a slice finds
 
-**Bad** (neutral)
+**Bad**
 ```groovy
 @SpringBootConfiguration
 @EnableAutoConfiguration
@@ -479,7 +476,7 @@ class OrdersTestApplication {
 ```
 Any `@DataJpaTest` that finds this class also scans and loads every service, because an explicit scan disables slice filters.
 
-**Good** (neutral)
+**Good**
 ```groovy
 @SpringBootConfiguration
 @EnableAutoConfiguration
@@ -495,4 +492,4 @@ class OrdersTestApplication {
 class OrdersServicesConfig {
 }
 ```
-The scan moves off the class a slice searches for; only the full `@SpringBootTest` imports the services config. (Real evidence: ledger row SP11.)
+The scan moves off the class a slice searches for; only the full `@SpringBootTest` imports the services config.

@@ -3,6 +3,14 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.21.1](https://github.com/chiyanram/skills/compare/rulebook--v0.21.0...rulebook--v0.21.1) (2026-11-04)
+
+### Bug Fixes
+
+* **code:** industry re-check applied; code files hold only rules ([chiyanram/agent-factory#59](https://github.com/chiyanram/agent-factory/issues/59)) ([#200](https://github.com/chiyanram/skills/issues/200)) ([985d4dd](https://github.com/chiyanram/skills/commit/985d4ddaf3452c081014d66c97a2016246645f31))
+* **planning:** planning and meta files hold only rules; SRC2 keeps provenance in the ledger ([chiyanram/agent-factory#59](https://github.com/chiyanram/agent-factory/issues/59)) ([#202](https://github.com/chiyanram/skills/issues/202)) ([8cb3682](https://github.com/chiyanram/skills/commit/8cb36826a11179eec5c40b8b286f3e12fde29f1b))
+* **testing:** testing files hold only rules ([chiyanram/agent-factory#59](https://github.com/chiyanram/agent-factory/issues/59)) ([#201](https://github.com/chiyanram/skills/issues/201)) ([e9d9a0f](https://github.com/chiyanram/skills/commit/e9d9a0f9804e9d9b194ac516d1e44ee8d0f031f3))
+
 ## [0.21.0](https://github.com/chiyanram/skills/compare/rulebook--v0.20.0...rulebook--v0.21.0) (2026-11-04)
 
 ### Features
