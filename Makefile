@@ -16,7 +16,7 @@ lint: ## skill frontmatter, one version, links, size budgets, packaging, router 
 	claude plugin validate --strict .
 	claude plugin validate --strict --profile directory plugins/rulebook
 
-test: ## each check against its planted fixtures, and each review/ builder
+test: ## each check against its planted fixtures, the index builder and the release config
 	$(PYTHON) -m unittest discover --start-directory tests --top-level-directory .
 
 index: ## rebuild each skill router's reference table from its references

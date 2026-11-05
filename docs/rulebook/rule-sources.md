@@ -1,9 +1,9 @@
 # 73 · Sources moved out of the reference files (agent-factory#59)
 
 On 2026-11-04 the operator decided that a rule file holds only what an agent needs to act; provenance lives in the
-ledger (`19-approved-rules.md`) and the research files. The strip removed citations from every reference. Most of them
+ledger ([approved-rules.md](approved-rules.md)) and the research files (now under [`docs/archive/research/`](../archive/research/)). The strip removed citations from every reference. Most of them
 were already in each rule's ledger row. The ones below were not, so they are kept here, as they stood in the
-references on main at `52ae5e8`, with each file's short source names written out in full. A ledger row whose source cell ends "see research/73" points here.
+references on main at `52ae5e8`, with each file's short source names written out in full. A ledger row whose source cell ends "see research/73" points here (this file was `research/73-sources-moved-from-references.md`).
 
 ## Planning and meta (spec-review, diagrams, program-design, writing-docs, acceptance-criteria)
 

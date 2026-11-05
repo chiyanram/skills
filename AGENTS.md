@@ -1,7 +1,8 @@
 # AGENTS.md
 
 This repo is the generic rulebook: one Claude Code plugin, `rulebook`, in `plugins/rulebook/`. Only that folder ships.
-Everything else is the design work behind it. People start at `README.md` and `CONTRIBUTING.md`.
+Everything else keeps it correct and releases it. People start at `README.md`; `ARCHITECTURE.md`, `CONTRIBUTING.md`
+and `DEVELOPMENT.md` hold the rest. `docs/archive/` is frozen design history: never edit it or cite it as current.
 
 ## Check
 
@@ -10,7 +11,7 @@ Run both before you push. CI runs the same two targets on every pull request and
 ```bash
 make index  # rebuild each skill router's reference table from its references
 make lint   # skill frontmatter, one version, links, size budgets, packaging, router index, skill routers, provenance, `claude plugin validate --strict`
-make test   # python3 -m unittest: each check against its planted fixtures, and each review/ builder
+make test   # python3 -m unittest: each check against its planted fixtures, the index builder, the release config
 ```
 
 `make lint` needs the Claude Code CLI (`claude`). The checks are Python 3 stdlib in `scripts/`, one file per check.
@@ -22,12 +23,12 @@ make test   # python3 -m unittest: each check against its planted fixtures, and 
 3. Write `scripts/check_<name>.py` and add it to `make lint`.
 4. Add a row for it to the checks table in `CONTRIBUTING.md`.
 
-`scripts/repo_files.py` skips `tests/fixtures/`, so a planted failure never breaks `make lint`.
+`scripts/repo_files.py` skips `tests/fixtures/` and `docs/archive/`, so a planted failure never breaks `make lint`.
 
 ## Add a reference
 
-No rule goes in without the operator's explicit yes and a row in `research/19-approved-rules.md`. Follow
-`research/00-reference-format.md`, give the file one "Read it when …" sentence above its first section, then run
+No rule goes in without the operator's explicit yes and a row in `docs/rulebook/approved-rules.md`. Follow
+`docs/rulebook/reference-format.md`, give the file one "Read it when …" sentence above its first section, then run
 `make index` to rebuild its domain's `SKILL.md` table. Never edit that table by hand; `check_index.py` fails while it
 is stale.
 
