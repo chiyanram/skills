@@ -152,11 +152,12 @@ Each batch of open invoices is loaded and dirty-checked, then updated one row at
 ```java
 @Modifying(flushAutomatically = true, clearAutomatically = true)
 @Query("""
-        update Invoice i set i.status = :overdue, i.version = i.version + 1
+        update versioned Invoice i set i.status = :overdue
         where i.status = :open and i.dueOn < :today""")
 int markOverdue(InvoiceStatus open, InvoiceStatus overdue, LocalDate today);
 ```
-A single statement does the update and increments `@Version`, so concurrent editors still see the conflict.
+A single statement does the update, and `versioned` makes it increment `@Version`, so concurrent editors still see the
+conflict.
 
 ### PS11 — A sequence id for an entity inserted in bulk
 
@@ -222,14 +223,6 @@ The number exists before persist and never changes, and a proxy of `Invoice` pas
   because the JPA specification forbids final persistent fields and record entities. — **Do not skip when** the class
   is not an entity, such as a DTO or a projection, or a method returns a value that may be absent: it still returns
   `Optional` (TY1). — **Confidence** high
-- **Skip when** the list is bounded by its parent, such as one order's lines or the ids of one page (PS6). — **Do not
-  skip when** the list grows with the table, such as every open invoice. — **Confidence** high
-- **Skip when** each row gets a value the domain logic computes for that row: a loop over loaded entities is allowed,
-  with `batch_size` set (PS10) and the work flushed and cleared in chunks (PS9). — **Do not skip when** every row gets
-  the same new value. — **Confidence** high
-- **Skip when** a bulk update statement increments the version column in its own `set` clause, because the statement
-  skips `@Version` (PS9, PS13). — **Do not skip when** Java code assigns the `@Version` field (PS13). —
-  **Confidence** high
 
 ## Review checks
 
@@ -242,10 +235,9 @@ entities, and every changed `application*.yml` or `application*.properties` in `
   stream or `map` over a query result, a getter of one of them that the query did not fetch is a finding.
 - [ ] PS6 — `grep -rnE "\.findAll\(\)|List<\w+> find\w*\([^,()]*\);" src/main | grep -vE "By\w*Id(In)?(OrderBy\w*)?\("`,
   then read each hit: a list that grows with the table is a finding; one bounded by its parent is not.
-- [ ] PS4 — `grep -rnE -A1 "join fetch|@EntityGraph" src/main | grep -E "Pageable|Limit\b|setMaxResults"`, then read
-  each hit: a fetched collection is a finding; a fetched to-one is not. A missing
-  `hibernate.query.fail_on_pagination_over_collection_fetch`, or one not `true`, is a finding.
-- [ ] PS5 — `grep -rnE "PageRequest\.of\([^,()]+,[^,()]+\)|Sort\.by\(\"[^\"]+\"\)" src/main` (no sort, or one key), and
+- [ ] PS4 — `grep -rnE -A4 "join fetch|@EntityGraph" src/main | grep -E "Pageable|Limit\b|setMaxResults"`, then read
+  each hit and its method signature: a fetched collection is a finding; a fetched to-one is not.
+- [ ] PS5 — `grep -rnE "PageRequest\.of\([^,()]+,[^,()]+\)|Sort\.by\(\"[^\"]+\"\)|Sort\.by\(Sort\.Direction\.\w+, *\"[^\"]+\"\)" src/main` (no sort, or one key), and
   `grep -rnE "\bLIMIT\b" src/main | grep -v "ORDER BY"`. Then read each paged or limited query: a last order key that
   is not unique is a finding.
 - [ ] PS3 — `grep -rnE "(join fetch .*){2}|attributePaths *= *\{[^}]*," src/main`, then read each hit: two fetched
@@ -265,5 +257,5 @@ entities, and every changed `application*.yml` or `application*.properties` in `
 - [ ] PS12 — `grep -rlE "^\s*@Entity\b" src/main | xargs grep -LE "boolean equals\("`: an entity compared or put in a
   `Set` is a finding. `grep -rnE "getClass\(\) *!= *\w+\.getClass\(\)|Objects\.hash\(id\)|id\.hashCode\(\)"` in
   entity files: each hit is a finding, and so is `equals` on a field that is not the `@NaturalId`.
-- [ ] PS14 — `grep -rnE "minimum-idle|maximum-pool-size: *([5-9][0-9]|[0-9]{3,})" src/main/resources`: each hit is a
+- [ ] PS14 — `grep -rnE "minimum-idle|maximum-pool-size[:=] *([5-9][0-9]|[0-9]{3,})" src/main/resources`: each hit is a
   finding. A `maximum-pool-size` with no load test behind it is a finding.
