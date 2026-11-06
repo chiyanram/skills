@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.32.1](https://github.com/chiyanram/skills/compare/rulebook--v0.32.0...rulebook--v0.32.1) (2026-11-06)
+
+### Bug Fixes
+
+* **crq:** approval gate counts a human-only control recorded with the spec hash ([#210](https://github.com/chiyanram/skills/issues/210)) ([#222](https://github.com/chiyanram/skills/issues/222)) ([2c54c46](https://github.com/chiyanram/skills/commit/2c54c4677c51e0a363a3c1329911414180c4472f)), closes [agent-factory#30](https://github.com/chiyanram/agent-factory/issues/30)
+
 ## [0.32.0](https://github.com/chiyanram/skills/compare/rulebook--v0.31.1...rulebook--v0.32.0) (2026-11-06)
 
 ### Features
