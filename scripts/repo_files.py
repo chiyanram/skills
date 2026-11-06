@@ -1,9 +1,8 @@
-"""The files a check reads: git's view of the tree when there is one, else a walk. Planted fixtures and the frozen
-design archive (docs/archive/, whose old relative links are not kept up) are skipped."""
+"""The files a check reads: git's view of the tree when there is one, else a walk. Planted fixtures are skipped."""
 import subprocess
 from pathlib import Path
 
-SKIPPED = ("tests/fixtures/", "docs/archive/")
+SKIPPED = ("tests/fixtures/",)
 
 
 def files(root: Path, name_glob: str) -> list[Path]:

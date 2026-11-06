@@ -1,48 +1,46 @@
 # AGENTS.md
 
-This repo is the generic rulebook: one Claude Code plugin, `rulebook`, in `plugins/rulebook/`. Only that folder ships.
-Everything else keeps it correct and releases it. People start at `README.md`; `ARCHITECTURE.md`, `CONTRIBUTING.md`
-and `DEVELOPMENT.md` hold the rest. `docs/archive/` is frozen design history: never edit it or cite it as current.
+This repo ships one Claude Code plugin, `rulebook`, from `plugins/rulebook/`. Everything else keeps it correct and
+releases it. People start at `README.md`; `CONTRIBUTING.md` holds the procedures.
 
 ## Check
 
-Run both before you push. CI runs the same two targets on every pull request and on push to `main`.
+Run all three before you push. CI runs `make lint` and `make test` on every pull request and on push to `main`.
 
 ```bash
 make index  # rebuild each skill router's reference table from its references
-make lint   # skill frontmatter, one version, links, size budgets, packaging, router index, skill routers, provenance, `claude plugin validate --strict`
+make lint   # every scripts/check_*.py, then `claude plugin validate --strict`
 make test   # python3 -m unittest: each check against its planted fixtures, the index builder, the release config
 ```
 
-`make lint` needs the Claude Code CLI (`claude`). The checks are Python 3 stdlib in `scripts/`, one file per check.
+`make lint` needs the Claude Code CLI (`claude`). `make test` needs `npm ci` first.
 
-## Add a check
+## MUSTs
 
-1. Plant a bad fixture under `tests/fixtures/<check>/`, or write it to a temp dir when it is a `SKILL.md`.
-2. Add a test that expects the check to fail on it. Watch it fail.
-3. Write `scripts/check_<name>.py` and add it to `make lint`.
-4. Add a row for it to the checks table in `CONTRIBUTING.md`.
+- Add a rule to a reference only with the operator's explicit yes and a row in `docs/rulebook/approved-rules.md`,
+  because an unapproved rule reaches every project that installs the plugin.
+- Keep provenance out of `plugins/`: no citation, URL, date, credit or evidence note outside code, because the agent
+  needs the rule and the ledger keeps the source. `check_provenance.py` fails it.
+- Keep `plugins/` generic: no project names, paths or business terms, because every project installs the same files.
+- Never edit a router table, a `version` or `CHANGELOG.md` by hand, because `make index` and the release write them.
+- Read Sonar rules for calibration only. Never copy their text, because their licence does not permit it.
 
-`scripts/repo_files.py` skips `tests/fixtures/` and `docs/archive/`, so a planted failure never breaks `make lint`.
+## Where things go
 
-## Add a reference
+```text
+plugins/rulebook/skills/<domain>/SKILL.md        router; its table is built by make index
+plugins/rulebook/skills/<domain>/references/     one file per topic, five sections
+docs/rulebook/approved-rules.md                  the ledger: one row per approved rule
+docs/rulebook/reference-format.md                the template every reference follows
+docs/adr/                                        decisions about the shape of the plugin
+docs/agents/                                     issue tracker, labels, domain-doc conventions
+scripts/check_<name>.py + tests/fixtures/<name>/ one check and its planted fixtures
+```
 
-No rule goes in without the operator's explicit yes and a row in `docs/rulebook/approved-rules.md`. Follow
-`docs/rulebook/reference-format.md`, give the file one "Read it when …" sentence above its first section, then run
-`make index` to rebuild its domain's `SKILL.md` table. Never edit that table by hand; `check_index.py` fails while it
-is stale.
+## Pointers
 
-Read Sonar rules for calibration only. Never copy their text into a reference, because Sonar's source-available
-licence does not permit vendoring its rule text.
-
-## Releases
-
-semantic-release cuts every release from the commits on `main` (`release.config.mjs`). Never bump a `version` or edit
-`CHANGELOG.md` by hand. A change to what ships is `feat(<domain>)` or `fix(<domain>)`; design work is scoped
-`research`, `review` or `repo` and never releases. Table: `CONTRIBUTING.md#releases`.
-
-## Issue tracker
-
-GitHub issues on `chiyanram/skills`, through `gh`. See `docs/agents/issue-tracker.md`.
-
-Triage labels: `docs/agents/triage-labels.md`. Domain docs: `docs/agents/domain.md`.
+- A new rule, reference or check: `CONTRIBUTING.md`.
+- Commit types and what each releases: `CONTRIBUTING.md#releases`.
+- Issues: GitHub issues on `chiyanram/skills`, through `gh`. See `docs/agents/issue-tracker.md`,
+  `docs/agents/triage-labels.md` and `docs/agents/domain.md`.
+- A cite `research/NN` or `review/…` in the ledger means that file at git tag `design-archive-2026-11`.
