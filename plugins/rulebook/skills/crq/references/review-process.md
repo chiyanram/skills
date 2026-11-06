@@ -16,6 +16,8 @@ review.
   findings that matter.
 - **RV5** — Log each finding by check, with its bucket and the human's action, and rewrite or retire a check its log
   shows is noise, because without the log nobody can tell a useful check from noise.
+- **RV6** — Let a review block a change but never approve it, and read zero findings as no signal, because a reviewer
+  that a code comment talks into "no findings" would pass any change.
 
 ## When X, use Y
 
@@ -29,6 +31,7 @@ review.
 | the evidence does not hold, or the case is a check's "not a finding" | **Dismissed**, with one line why | a false finding costs the writer a round (RV2) |
 | the change breaks code it does not touch, such as a caller or an invariant | a finding at the broken line, citing the change | the change introduced the break, so RV2 holds |
 | a check's log shows its findings are mostly dismissed | rewrite the check with an example (RV5) | the check is mis-worded or mis-scoped |
+| the review returns zero findings | no signal: the change still waits for the human (RV6) | a fooled reviewer also returns zero |
 | a check's log shows it never fires where it applies | retire it, or move it to a script (RV5) | it costs reading time and catches nothing |
 
 ## Good / Bad
@@ -76,3 +79,5 @@ Walk the review's summary note, its threads and the finding log.
 - [ ] RV4 — Count the nits. More than five, or a nit marked blocking, is a finding.
 - [ ] RV5 — Find a log entry for each finding, with its check, its bucket and the human's action. A finding with no
   entry is a finding, and so is a check the log shows is noise but nobody rewrote.
+- [ ] RV6 — Find who undrafted, approved and merged the pull request. Any of them done by an agent or a review bot, or
+  done because a review returned zero findings, is a finding.
