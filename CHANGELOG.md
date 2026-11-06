@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.31.0](https://github.com/chiyanram/skills/compare/rulebook--v0.30.0...rulebook--v0.31.0) (2026-11-06)
+
+### Features
+
+* **code:** Redis reference and Redis Streams messaging rules ([#219](https://github.com/chiyanram/skills/issues/219)) ([3b78b10](https://github.com/chiyanram/skills/commit/3b78b103e25cf3240d50ff36760f50ae3c402f77)), closes [#71](https://github.com/chiyanram/skills/issues/71) [#56](https://github.com/chiyanram/skills/issues/56) [#71](https://github.com/chiyanram/skills/issues/71)
+
 ## [0.30.0](https://github.com/chiyanram/skills/compare/rulebook--v0.29.0...rulebook--v0.30.0) (2026-11-06)
 
 ### Features
