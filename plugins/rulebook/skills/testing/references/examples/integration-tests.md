@@ -350,7 +350,7 @@ The reason names what the spec changes and why reusing the context would give la
 ```java
     // configuration (~20 in orders-api alone — every @Import / @MockitoBean / @TestPropertySource
     // makes a new cache key), none are evicted below the cache's 32-entry default, and each holds a
-    // Hikari pool that idles at application.yml's minimum-idle of 5. 20 x 5 = 100 idle connections
+    // fixed Hikari pool of application.yml's maximum-pool-size of 5. 20 x 5 = 100 idle connections
     ...
                     .withCommand("postgres", "-c", "max_connections=300");
 ```
