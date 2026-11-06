@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.24.0](https://github.com/chiyanram/skills/compare/rulebook--v0.23.0...rulebook--v0.24.0) (2026-11-06)
+
+### Features
+
+* **code:** persistence reference — JPA fetching, paging, batching, ids, locking, pool ([#212](https://github.com/chiyanram/skills/issues/212)) ([547841f](https://github.com/chiyanram/skills/commit/547841f9a8809a0d4f2bd639fc0007f4248f68ae)), closes [#57](https://github.com/chiyanram/skills/issues/57) [#57](https://github.com/chiyanram/skills/issues/57) [#57](https://github.com/chiyanram/skills/issues/57) [#57](https://github.com/chiyanram/skills/issues/57) [#57](https://github.com/chiyanram/skills/issues/57)
+
 ## [0.23.0](https://github.com/chiyanram/skills/compare/rulebook--v0.22.0...rulebook--v0.23.0) (2026-11-04)
 
 ### Features
