@@ -43,6 +43,7 @@ each phase applies.
 |---|---|---|
 | [code-review](references/code-review.md) | CR1–CR4 | when you review a pull request's code, or before you split a change |
 | [lanes](references/lanes.md) | LN1–LN3 | when you take in a new change, or when a change turns out bigger, riskier or smaller than its lane |
+| [pr-readiness](references/pr-readiness.md) | PR1–PR7 | when you write a pull request body, or when you check one before merge |
 | [review-process](references/review-process.md) | RV1–RV5 | before you run, write or tune a review |
 | [verify-done](references/verify-done.md) | VB1–VB7 | when you build a change, before you call it ready, or when you check a writer's proof |
 <!-- /index -->
