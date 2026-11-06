@@ -18,8 +18,14 @@ Contents: Rules · When X, use Y · Good / Bad (CC3, CC9, CC12) · Decided edges
   longer timeout, because work for a caller who gave up wastes the capacity recovery needs.
 - **CC9** — Treat a side-effecting remote call that times out after connecting as unknown, not failed; resend it only
   with the initiator's idempotency key, because the effect may have applied and a new key duplicates it.
+- **CC19** — Require an idempotency key header on every POST that creates or triggers work, and answer 400 when it is
+  missing, because a client's retry of a keyless POST creates the work twice.
 - **CC15** — Claim each idempotency key atomically with its request fingerprint, store the response; replay it on a
   repeat, answer 409 while the first runs and 422 for another payload, because otherwise a retry repeats the effect.
+- **CC17** — Send a versioned resource's `@Version` as its `ETag` and change it only under a matching `If-Match`;
+  answer 412 on a mismatch and 428 when it is missing, because otherwise the last write silently wins.
+- **CC18** — Map an optimistic-lock failure (`OptimisticLockingFailureException`) to 409 Conflict in the global
+  handler, never 500, because the client lost a race and must reload, and a 500 reports it as a server fault.
 - **CC8** — Retry only a transient failure of an idempotent call, with bounded attempts and jittered backoff, and only
   after a timeout exists (CC3), because retrying a non-idempotent call repeats its side effect.
 - **CC12** — Retry a failure at one layer only; the layers below fail fast and report the cause, because attempts
@@ -52,6 +58,9 @@ Contents: Rules · When X, use Y · Good / Bad (CC3, CC9, CC12) · Decided edges
 | a downstream call made while serving a request that has a deadline | a timeout of the deadline's remaining time, and no call once it has passed (CC14) | a fixed longer timeout keeps working for a caller who has gone |
 | a side-effecting remote call that timed out after connecting | the outcome unknown, not failed (CC9) | the effect may have applied |
 | an idempotency key | one key minted by the initiator and reused on every resend (CC9) | a key minted per attempt makes each resend a new effect |
+| a POST that creates or triggers work | a required idempotency key header, and 400 when it is missing (CC19) | a retry of a keyless POST creates the work twice |
+| an update of a versioned resource over HTTP | its `@Version` as the `ETag`, and a matching `If-Match` required: 412 on a mismatch, 428 when missing (CC17) | without a precondition the last write silently wins |
+| an `OptimisticLockingFailureException` | a 409 Conflict from the global handler (CC18) | the client lost a race and must reload; a 500 reports a server fault |
 | an endpoint that accepts an idempotency key | an atomic claim of the key with a request fingerprint, the stored response replayed on a repeat, 409 while the first runs, 422 for another payload (CC15) | a bare "seen it" check repeats the effect or loses the result |
 | a failed remote call to retry | the timeout first, then bounded attempts with jitter, for transient failures of idempotent calls only (CC8) | retrying a non-idempotent call repeats its side effect |
 | a call chain in which more than one layer could retry | one retry, at the layer that sees the whole operation; the layers below fail fast (CC12) | attempts multiply across layers |
@@ -202,6 +211,13 @@ a pool or a cache.
 - [ ] CC9 — For each side-effecting remote call, find an outcome that keeps a timeout after connect apart from
   failure. A timeout after connect handled as failure, or a resend whose idempotency key is minted inside the retry, is
   a finding.
+- [ ] CC19 — For each `@PostMapping` that creates or starts work (`grep -rn "@PostMapping"`), find a required
+  idempotency key header and a 400 when it is missing. Either one missing is a finding.
+- [ ] CC17 — For each PUT, PATCH or DELETE of an entity with `@Version` (`grep -rln "@Version" src/main`), find the
+  `ETag` on its GET and an `If-Match` check before the change. Either one missing, or a status other than 412 for a
+  mismatch or 428 for a missing header, is a finding.
+- [ ] CC18 — `grep -rnE "OptimisticLock(ing)?(Failure)?Exception"` in the global handler. No mapping, or a mapping
+  to a status other than 409, is a finding.
 - [ ] CC15 — For each endpoint that reads an idempotency key (`grep -rn -i "idempotency"`), find an atomic claim of
   the key with a request fingerprint, a stored response replayed on a repeat, a 409 while the first runs and a 422
   for another payload. Any one missing is a finding.

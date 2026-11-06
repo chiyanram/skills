@@ -3,7 +3,7 @@
 Every approved Good/Bad pair for the concurrency rules, one per rule that has one. The rules, the decision table and
 the review checks are in [`../concurrency.md`](../concurrency.md).
 
-Contents: CC3 · CC14 · CC4 · CC9 · CC15 · CC12
+Contents: CC3 · CC14 · CC4 · CC9 · CC15 · CC17 · CC18 · CC12
 
 ### CC3 — A timeout that stops the work, not only the wait
 
@@ -151,6 +151,78 @@ PaymentOutcome pay(final IdempotencyKey key, final PaymentRequest request) {
 ```
 `claim` inserts the key and fingerprint under a unique constraint, so only one request is `New`. A repeat gets the
 stored outcome. If the charge throws, `completeOrRelease` releases the claim, so a retry can run it again.
+
+### CC17 — The version as the `ETag`, and the change only under `If-Match`
+
+**Bad**
+```java
+@PutMapping("/invoices/{id}")
+InvoiceResponse update(@PathVariable final InvoiceId id, @RequestBody @Valid final InvoiceChange change) {
+    return invoices.update(id, change);
+}
+```
+Two clerks load the same invoice. The second save overwrites the first, because nothing says which version the client
+edited.
+
+**Good**
+```java
+@PutMapping("/invoices/{id}")
+ResponseEntity<InvoiceResponse> update(
+        @PathVariable final InvoiceId id,
+        @RequestHeader(HttpHeaders.IF_MATCH) final Optional<String> ifMatch,
+        @RequestBody @Valid final InvoiceChange change) {
+    return switch (invoices.update(id, Precondition.from(ifMatch), change)) {
+        case Update.Done done -> ResponseEntity.ok().eTag(done.version().toETag()).body(done.invoice());
+        case Update.Missing _ -> ResponseEntity.notFound().build();
+        case Update.Stale _ -> ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build();
+        case Update.Unconditional _ -> ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).build();
+    };
+}
+```
+The service compares the `If-Match` version with the entity's `@Version` before it changes anything. A stale edit gets
+412, and an edit with no `If-Match` gets 428.
+
+### CC18 — A lost race is 409, not 500
+
+**Bad**
+```java
+@RestControllerAdvice
+public final class ApiExceptionHandler {
+    private static final Logger log = LoggerFactory.getLogger(ApiExceptionHandler.class);
+
+    @ExceptionHandler(DataAccessException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiError handleDataAccess(final DataAccessException failure) {
+        log.error("data access failed", failure);
+        return ApiError.of(ErrorCode.INTERNAL_ERROR);
+    }
+}
+```
+`OptimisticLockingFailureException` is a `DataAccessException`, so two edits that race reach this handler. The client
+sees a server fault, and the error rate counts it.
+
+**Good**
+```java
+@RestControllerAdvice
+public final class ApiExceptionHandler {
+    private static final Logger log = LoggerFactory.getLogger(ApiExceptionHandler.class);
+
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleLostRace(final OptimisticLockingFailureException failure) {
+        return ApiError.of(ErrorCode.CONFLICT);
+    }
+
+    @ExceptionHandler(DataAccessException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiError handleDataAccess(final DataAccessException failure) {
+        log.error("data access failed", failure);
+        return ApiError.of(ErrorCode.INTERNAL_ERROR);
+    }
+}
+```
+Spring picks the most specific handler, so a lost race gets 409 and the client reloads. Other data access faults stay
+500.
 
 ### CC12 — One layer retries; the layers below fail fast
 
