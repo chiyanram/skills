@@ -41,6 +41,7 @@ each phase applies.
 <!-- index: built by `make index` from each reference; do not edit by hand -->
 | reference | rule IDs | read it |
 |---|---|---|
+| [code-review](references/code-review.md) | CR1–CR4 | when you review a pull request's code, or before you split a change |
 | [lanes](references/lanes.md) | LN1–LN3 | when you take in a new change, or when a change turns out bigger, riskier or smaller than its lane |
 | [review-process](references/review-process.md) | RV1–RV5 | before you run, write or tune a review |
 | [verify-done](references/verify-done.md) | VB1–VB7 | when you build a change, before you call it ready, or when you check a writer's proof |
