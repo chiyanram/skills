@@ -33,6 +33,7 @@ MG41, MGN1, MG44, MG45).
 | a column that holds an instant | `timestamptz` (MG30) | `timestamp` drops the UTC offset, so instants written from different zones compare and sort wrongly |
 | a new string column with a business length limit | `text` + a `CHECK (char_length(col) <= n)` (MG31; its name, MG38) | changing a `varchar` limit takes an `ACCESS EXCLUSIVE` lock; a `CHECK` is replaced `NOT VALID` |
 | a fixed-length string | `text`, never `char(n)` (MG31, MG36) | `char(n)` pads with spaces and is usually the slowest of the string types |
+| a column that references a key | the referenced key's type, `bigint` or `uuid` (MG36) | a narrower reference overflows when the key passes its range |
 | a primary key | `bigint GENERATED … AS IDENTITY`, or `uuid` (MG36) | an `integer` key can overflow, and `serial` makes permissions and schema management difficult |
 | a JSON document | `jsonb` (MG36) | `json` has no equality operator; `jsonb` has one |
 | a `REFERENCES` clause | an explicit `ON DELETE` action (MG32) and an index led by the referencing column (MG33) | the default `NO ACTION` fails parent deletes nobody designed for; PostgreSQL creates no index on the referencing column, so each parent `DELETE` scans the child table |

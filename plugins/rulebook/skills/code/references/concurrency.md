@@ -2,7 +2,7 @@
 
 How Java code runs work on other threads, calls remote services, retries, shares state and bounds its pools and
 caches. Read it when you write or review code that starts threads, submits async work, calls a remote service, retries,
-locks, or builds a pool or a cache.
+locks, builds a pool or a cache, or handles a request or message that creates work.
 
 Contents: Rules · When X, use Y · Good / Bad (CC3, CC9, CC12) · Decided edges · Review checks
 
@@ -20,8 +20,8 @@ Contents: Rules · When X, use Y · Good / Bad (CC3, CC9, CC12) · Decided edges
   longer timeout, because work for a caller who gave up wastes the capacity recovery needs.
 - **CC9** — Treat a side-effecting remote call that times out after connecting as unknown, not failed; resend it only
   with the initiator's idempotency key, because the effect may have applied and a new key duplicates it.
-- **CC19** — Require an idempotency key on every request, message or job command that creates or triggers work, and
-  reject one without it (400 over HTTP), because a repeated command otherwise repeats the work.
+- **CC19** — Require an idempotency key on every request or message that creates or triggers work, and reject one
+  without it (400 over HTTP), because a repeated request or message otherwise repeats the work.
 - **CC15** — Claim each idempotency key atomically with its request fingerprint, store the response; replay it on a
   repeat, answer 409 while the first runs and 422 for another payload, because otherwise a retry repeats the effect.
 - **CC17** — Send a versioned resource's `@Version` as its `ETag` and change it only under a matching `If-Match`;
@@ -58,13 +58,13 @@ Contents: Rules · When X, use Y · Good / Bad (CC3, CC9, CC12) · Decided edges
 | many blocking I/O calls to run at once | `Executors.newVirtualThreadPerTaskExecutor()`, one virtual thread per task, never a pool of them (CC1) | a pool caps concurrency at its size, and blocked tasks queue behind it |
 | blocking work to run async | `supplyAsync(task, executor)` with a dedicated executor (CC2) | without an executor the task runs on the common pool, and blocking I/O starves it |
 | a client for a remote service | a connect and a read timeout, or a deadline, on the client itself (CC3) | a call with no stopping timeout holds its thread and connection forever |
-| a timeout value to choose | the call's measured p99 latency with headroom, and an alert when p99 nears it (CC20) | a guessed value cuts healthy calls or holds threads for calls that will fail |
+| a timeout value to choose | the call's measured p99 latency with headroom, named where the value is set (CC20) | a guessed value cuts healthy calls or holds threads for calls that will fail |
 | a remote call whose result the caller can do without | a short timeout and a fallback (CC20) | waiting on an optional call slows the whole request |
 | an `orTimeout` on a remote call | a client timeout beside it; `orTimeout` is only the caller's wait (CC3) | completing the future does not stop the running call |
 | a downstream call made while serving a request that has a deadline | a timeout of the deadline's remaining time, and no call once it has passed (CC14) | a fixed longer timeout keeps working for a caller who has gone |
 | a side-effecting remote call that timed out after connecting | the outcome unknown, not failed (CC9) | the effect may have applied |
 | an idempotency key | one key minted by the initiator and reused on every resend (CC9) | a key minted per attempt makes each resend a new effect |
-| a request, message or job command that creates or triggers work | a required idempotency key, rejected when missing; 400 over HTTP (CC19) | a repeated command repeats the work |
+| a request or message that creates or triggers work | a required idempotency key, rejected when missing; 400 over HTTP (CC19) | a repeated request or message repeats the work |
 | an update of a versioned resource over HTTP | its `@Version` as the `ETag`, and a matching `If-Match` required: 412 on a mismatch, 428 when missing (CC17) | without a precondition the last write silently wins |
 | an `OptimisticLockingFailureException` | a 409 Conflict from the global handler (CC18) | the client lost a race and must reload; a 500 reports a server fault |
 | an endpoint that accepts an idempotency key | an atomic claim of the key with a request fingerprint, the stored response replayed on a repeat, 409 while the first runs, 422 for another payload (CC15) | a bare "seen it" check repeats the effect or loses the result |
@@ -101,6 +101,7 @@ keeps its thread on the socket.
 
 **Good**
 ```java
+// both timeouts come from the rates call's p99 with headroom (CC20)
 final var client = HttpClient.newBuilder()
         .connectTimeout(Duration.ofSeconds(1))
         .build();
@@ -174,7 +175,7 @@ Rates fetch(final Currency base) {
     return ratesBreaker.executeSupplier(() -> http.getRates(base));
 }
 
-// QuoteService: the one retry (CC8)
+// QuoteService: the one retry (CC8), drawn from the client's retry budget (CC13)
 Quote quote(final Order order) {
     return quoteRetry.executeSupplier(() -> pricing.price(order, ratesClient.fetch(order.currency())));
 }
@@ -184,6 +185,11 @@ costs at most three requests.
 
 ## Decided edges
 
+- **Skip when** the caller passes a deadline: the remaining deadline wins when it is shorter than the p99-based
+  timeout (CC20, CC14). — **Do not skip when** no deadline came with the request. — **Confidence** high
+- **Skip when** a request or message carries a natural key that the handler claims atomically with its change: that
+  key is its idempotency key (CC19, MS6 in `messaging.md`). — **Do not skip when** the work has no natural key, such
+  as a new charge or a new run. — **Confidence** high
 - **Skip when** a `synchronized` block holds a blocking call on a virtual thread on Java 24 or later: that pinning is
   gone (CC1). — **Do not skip when** the blocking call runs inside a class initialiser: that still pins its carrier
   (CC1). — **Confidence** medium
@@ -212,17 +218,17 @@ a pool or a cache.
   one-argument call that does blocking work is a finding.
 - [ ] CC3 — For each remote call (`RestClient`, `HttpClient`, `WebClient`, a gRPC stub, a JDBC or Redis client), find
   a connect and a read timeout, or a deadline, on the client. A call whose only timeout is `orTimeout` is a finding.
-- [ ] CC20 — For each new or changed timeout, find the latency it was set from (a p99 metric) and an alert near it. A
-  timeout with neither is a finding, and so is an optional call with a long timeout and no fallback.
+- [ ] CC20 — For each new or changed timeout, a literal with no comment or config key naming the p99 it came from is a
+  finding, and so is an optional call with no fallback branch.
 - [ ] CC14 — `grep -rnE "timeout\(Duration\.of|withDeadlineAfter|Timeout\(Duration\.of"`, and for each downstream
   call made while serving a request, find where its timeout comes from. A fixed timeout, when the inbound request
   carries a deadline, is a finding; gRPC Java propagates the deadline itself.
 - [ ] CC9 — For each side-effecting remote call, find an outcome that keeps a timeout after connect apart from
   failure. A timeout after connect handled as failure, or a resend whose idempotency key is minted inside the retry, is
   a finding.
-- [ ] CC19 — For each POST, message listener and job command that creates or triggers work
-  (`grep -rnE "@PostMapping|RequestMethod\.POST|@[A-Za-z]*Listener\b"`), find a required idempotency key and a
-  rejection when it is missing. Either one missing is a finding.
+- [ ] CC19 — For each POST and each message listener that creates or triggers work
+  (`grep -rnE "@PostMapping|RequestMethod\.POST|@(Kafka|Rabbit|Jms|Sqs|Stream)Listener\b|implements \w*MessageListener"`),
+  find a required idempotency key and a rejection when it is missing. Either one missing is a finding.
 - [ ] CC17 — For each PUT, PATCH or DELETE of an entity with `@Version` (`grep -rln "@Version" src/main`), find the
   `ETag` on its GET and an `If-Match` check before the change. Either one missing, or a status other than 412 for a
   mismatch or 428 for a missing header, is a finding.

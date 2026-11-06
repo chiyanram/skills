@@ -20,6 +20,7 @@ keeps its thread on the socket.
 
 **Good**
 ```java
+// both timeouts come from the rates call's p99 with headroom (CC20)
 final var client = HttpClient.newBuilder()
         .connectTimeout(Duration.ofSeconds(1))
         .build();
@@ -257,7 +258,7 @@ Rates fetch(final Currency base) {
     return ratesBreaker.executeSupplier(() -> http.getRates(base));
 }
 
-// QuoteService: the one retry (CC8)
+// QuoteService: the one retry (CC8), drawn from the client's retry budget (CC13)
 Quote quote(final Order order) {
     return quoteRetry.executeSupplier(() -> pricing.price(order, ratesClient.fetch(order.currency())));
 }
