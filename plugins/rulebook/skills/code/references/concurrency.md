@@ -4,7 +4,7 @@ How Java code runs work on other threads, calls remote services, retries, shares
 caches. Read it when you write or review code that starts threads, submits async work, calls a remote service, retries,
 locks, or builds a pool or a cache.
 
-Contents: Rules · When X, use Y · Good / Bad (CC3, CC14, CC4, CC9, CC15, CC12) · Decided edges · Review checks
+Contents: Rules · When X, use Y · Good / Bad (CC3, CC9, CC12) · Decided edges · Review checks
 
 ## Rules
 
@@ -68,6 +68,8 @@ Contents: Rules · When X, use Y · Good / Bad (CC3, CC14, CC4, CC9, CC15, CC12)
 
 ## Good / Bad
 
+Every rule's approved pair: [examples/concurrency.md](examples/concurrency.md).
+
 ### CC3 — A timeout that stops the work, not only the wait
 
 **Bad**
@@ -93,72 +95,6 @@ final var request = HttpRequest.newBuilder(ratesUri)
 return client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
 ```
 The connect timeout and the request timeout end the exchange itself, so a stuck provider frees the thread.
-
-### CC14 — The caller's remaining deadline, not a fixed timeout
-
-**Bad**
-```java
-// http is built with a connect timeout (CC3)
-Availability availability(final Order order) throws IOException, InterruptedException {
-    final var request = HttpRequest.newBuilder(stockUri(order))
-            .timeout(Duration.ofSeconds(20))
-            .GET()
-            .build();
-    return Availability.from(http.send(request, HttpResponse.BodyHandlers.ofString()));
-}
-```
-The caller waits two seconds for the order page, yet this call can hold its thread and connection for twenty.
-
-**Good**
-```java
-// http is built with a connect timeout (CC3)
-Availability availability(final Order order, final Deadline deadline) throws IOException, InterruptedException {
-    final Duration remaining = deadline.remaining();
-    if (!remaining.isPositive()) {
-        return Availability.unknown();
-    }
-    final var request = HttpRequest.newBuilder(stockUri(order))
-            .timeout(remaining)
-            .GET()
-            .build();
-    return Availability.from(http.send(request, HttpResponse.BodyHandlers.ofString()));
-}
-```
-The call gets only the time its caller has left, and it is not made at all once that time has run out.
-
-### CC4 — A bounded pool has a bounded queue and a stated rejection
-
-**Bad**
-```java
-final class ReceiptDispatcher {
-    private final ExecutorService pool = Executors.newFixedThreadPool(8);
-
-    void dispatch(final Runnable sendReceipt) {
-        pool.submit(sendReceipt);
-    }
-}
-```
-Eight threads look bounded, but `newFixedThreadPool` queues on an unbounded `LinkedBlockingQueue`. A burst of
-receipts is never rejected, and the heap grows.
-
-**Good**
-```java
-final class ReceiptDispatcher {
-    private final ThreadPoolExecutor pool = new ThreadPoolExecutor(
-            4,
-            8,
-            60,
-            TimeUnit.SECONDS,
-            new ArrayBlockingQueue<>(200),
-            new ThreadPoolExecutor.CallerRunsPolicy());
-
-    void dispatch(final Runnable sendReceipt) {
-        pool.execute(sendReceipt);
-    }
-}
-```
-The queue holds 200 tasks. When it is full, the caller's thread runs the task, which slows the producer instead of
-growing memory.
 
 ### CC9 — A timeout after connect is unknown; a resend reuses the initiator's key
 
@@ -194,35 +130,6 @@ public ChargeOutcome charge(final ChargeIntent intent) {
 The order mints the key once, inside `ChargeIntent`, and every resend reuses it. A failed connect is `Failed`;
 anything after connect is `Unknown`, for a reconciler to resolve.
 
-### CC15 — Claim the key with its fingerprint, and replay the stored response
-
-**Bad**
-```java
-PaymentOutcome pay(final IdempotencyKey key, final PaymentRequest request) {
-    if (keys.exists(key)) {
-        return new PaymentOutcome.Duplicate(key);
-    }
-    keys.save(key);
-    return payments.charge(request);
-}
-```
-A client that retries after a lost response gets `Duplicate`, never the payment it made. Two concurrent requests can
-both pass the check, and a different payload under the same key is never noticed.
-
-**Good**
-```java
-PaymentOutcome pay(final IdempotencyKey key, final PaymentRequest request) {
-    return switch (keys.claim(key, Fingerprint.of(request))) {
-        case Claim.New claimed -> keys.complete(claimed, payments.charge(request));
-        case Claim.Completed done -> done.outcome();
-        case Claim.InFlight _ -> new PaymentOutcome.InProgress(key); // the controller answers 409
-        case Claim.Mismatch _ -> new PaymentOutcome.KeyReused(key);  // the controller answers 422
-    };
-}
-```
-`claim` inserts the key and fingerprint under a unique constraint, so only one request is `New`. A repeat gets the
-stored outcome.
-
 ### CC12 — One layer retries; the layers below fail fast
 
 **Bad**
@@ -246,21 +153,18 @@ Both layers make three attempts, so one failing quote sends nine requests to the
 
 **Good**
 ```java
-// RatesClient: client timeouts (CC3), no retry
+// RatesClient: client timeouts (CC3) and a breaker (CC11), no retry
 Rates fetch(final Currency base) {
-    return http.getRates(base);
+    return ratesBreaker.executeSupplier(() -> http.getRates(base));
 }
 
-// QuoteService: the one retry, with the breaker inside it (CC8, CC11)
+// QuoteService: the one retry (CC8)
 Quote quote(final Order order) {
-    return Decorators.ofSupplier(() -> pricing.price(order, ratesClient.fetch(order.currency())))
-            .withCircuitBreaker(ratesBreaker)
-            .withRetry(ratesRetry)
-            .get();
+    return quoteRetry.executeSupplier(() -> pricing.price(order, ratesClient.fetch(order.currency())));
 }
 ```
-The client fails fast and reports the cause. The service retries the whole quote, so one failure costs at most three
-requests.
+The client fails fast, and an open breaker fails it at once. The service retries the whole quote, so one failure
+costs at most three requests.
 
 ## Decided edges
 
@@ -292,20 +196,22 @@ a pool or a cache.
   one-argument call that does blocking work is a finding.
 - [ ] CC3 — For each remote call (`RestClient`, `HttpClient`, `WebClient`, a gRPC stub, a JDBC or Redis client), find
   a connect and a read timeout, or a deadline, on the client. A call whose only timeout is `orTimeout` is a finding.
-- [ ] CC14 — For each downstream call made while serving a request, find where its timeout comes from. A fixed
-  timeout, when the inbound request carries a deadline, is a finding; gRPC Java propagates the deadline itself.
-- [ ] CC15 — For each endpoint that reads an idempotency key (`grep -rn -i "idempotency"`), find an atomic claim of
-  the key with a request fingerprint, a stored response replayed on a repeat, a 409 while the first runs and a 422
-  for another payload. Any one missing is a finding.
+- [ ] CC14 — `grep -rnE "timeout\(Duration\.of|withDeadlineAfter|Timeout\(Duration\.of"`, and for each downstream
+  call made while serving a request, find where its timeout comes from. A fixed timeout, when the inbound request
+  carries a deadline, is a finding; gRPC Java propagates the deadline itself.
 - [ ] CC9 — For each side-effecting remote call, find an outcome that keeps a timeout after connect apart from
   failure. A timeout after connect handled as failure, or a resend whose idempotency key is minted inside the retry, is
   a finding.
+- [ ] CC15 — For each endpoint that reads an idempotency key (`grep -rn -i "idempotency"`), find an atomic claim of
+  the key with a request fingerprint, a stored response replayed on a repeat, a 409 while the first runs and a 422
+  for another payload. Any one missing is a finding.
 - [ ] CC8 — For each retry loop or retry policy, find bounded attempts, jittered backoff, a transient-only filter, an
   idempotent call (or an initiator's key) and a timeout. Any one missing is a finding.
-- [ ] CC12 — For each retry the change adds, follow the call it wraps. A callee that also retries (a `@Retryable`, a
-  `Retry` decorator, `retryWhen`, or a client whose own retries are on) is a finding.
-- [ ] CC16 — For each retry filter on HTTP status, a 4xx retried without `Retry-After`, or a retry sooner than the
-  `Retry-After` delay, is a finding.
+- [ ] CC12 — `grep -rnE "@Retryable|RetryTemplate|Retry\.of|retryWhen|withRetry|executeSupplier|retryOnResult"`. For
+  each retry the change adds, follow the call it wraps and each caller of the method. A callee or caller that also
+  retries (one of those hits, or a client whose own retries are on) is a finding.
+- [ ] CC16 — `grep -rnE "Retry-After|retryOnResult|\b4[0-9]{2}\b"` beside each retry policy. A 4xx retried without
+  `Retry-After`, or a retry sooner than the `Retry-After` delay, is a finding.
 - [ ] CC11 — For each remote dependency the change retries
   (`grep -nE "@Retryable|RetryTemplate|Retry\.of|retryWhen"`), find a circuit breaker around it. A retried dependency
   with no circuit breaker is a finding.
