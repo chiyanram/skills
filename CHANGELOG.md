@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.28.0](https://github.com/chiyanram/skills/compare/rulebook--v0.27.0...rulebook--v0.28.0) (2026-11-06)
+
+### Features
+
+* **code:** API design reference — pagination, compatibility, versioning ([#216](https://github.com/chiyanram/skills/issues/216)) ([9af215e](https://github.com/chiyanram/skills/commit/9af215ecc0f7cce5f188f22eaa4ee32059ed3f7c)), closes [#74](https://github.com/chiyanram/skills/issues/74) [#74](https://github.com/chiyanram/skills/issues/74) [#74](https://github.com/chiyanram/skills/issues/74)
+
 ## [0.27.0](https://github.com/chiyanram/skills/compare/rulebook--v0.26.0...rulebook--v0.27.0) (2026-11-06)
 
 ### Features
