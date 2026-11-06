@@ -211,13 +211,14 @@ a pool or a cache.
 - [ ] CC9 — For each side-effecting remote call, find an outcome that keeps a timeout after connect apart from
   failure. A timeout after connect handled as failure, or a resend whose idempotency key is minted inside the retry, is
   a finding.
-- [ ] CC19 — For each `@PostMapping` that creates or starts work (`grep -rn "@PostMapping"`), find a required
-  idempotency key header and a 400 when it is missing. Either one missing is a finding.
+- [ ] CC19 — For each POST that creates or triggers work (`grep -rnE "@PostMapping|RequestMethod\.POST"`), find a
+  required idempotency key header and a 400 when it is missing. Either one missing is a finding.
 - [ ] CC17 — For each PUT, PATCH or DELETE of an entity with `@Version` (`grep -rln "@Version" src/main`), find the
   `ETag` on its GET and an `If-Match` check before the change. Either one missing, or a status other than 412 for a
   mismatch or 428 for a missing header, is a finding.
-- [ ] CC18 — `grep -rnE "OptimisticLock(ing)?(Failure)?Exception"` in the global handler. No mapping, or a mapping
-  to a status other than 409, is a finding.
+- [ ] CC18 — Where an entity has `@Version` (PS13),
+  `grep -rnE "OptimisticLock(ing)?(Failure)?Exception|ConcurrencyFailureException"` in the global handler. No
+  mapping, or a mapping to a status other than 409, is a finding.
 - [ ] CC15 — For each endpoint that reads an idempotency key (`grep -rn -i "idempotency"`), find an atomic claim of
   the key with a request fingerprint, a stored response replayed on a repeat, a 409 while the first runs and a 422
   for another payload. Any one missing is a finding.

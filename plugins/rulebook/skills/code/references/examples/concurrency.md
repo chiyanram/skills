@@ -167,20 +167,24 @@ edited.
 **Good**
 ```java
 @PutMapping("/invoices/{id}")
-ResponseEntity<InvoiceResponse> update(
+ResponseEntity<?> update(
         @PathVariable final InvoiceId id,
-        @RequestHeader(HttpHeaders.IF_MATCH) final Optional<String> ifMatch,
+        @RequestHeader(name = HttpHeaders.IF_MATCH, required = false) final String ifMatch,
         @RequestBody @Valid final InvoiceChange change) {
     return switch (invoices.update(id, Precondition.from(ifMatch), change)) {
         case Update.Done done -> ResponseEntity.ok().eTag(done.version().toETag()).body(done.invoice());
-        case Update.Missing _ -> ResponseEntity.notFound().build();
-        case Update.Stale _ -> ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build();
-        case Update.Unconditional _ -> ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).build();
+        case Update.Missing _ -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiError.of(ErrorCode.NOT_FOUND));
+        case Update.Stale _ -> ResponseEntity.status(HttpStatus.PRECONDITION_FAILED)
+                .body(ApiError.of(ErrorCode.STALE_VERSION));
+        case Update.Unconditional _ -> ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED)
+                .body(ApiError.of(ErrorCode.PRECONDITION_REQUIRED));
     };
 }
 ```
-The service compares the `If-Match` version with the entity's `@Version` before it changes anything. A stale edit gets
-412, and an edit with no `If-Match` gets 428.
+`Precondition.from` parses the header into a sealed case at the boundary. The service compares the `If-Match` version
+with the entity's `@Version` before it changes anything. A stale edit gets 412, and an edit with no `If-Match` gets
+428, each with a catalogue body.
 
 ### CC18 — A lost race is 409, not 500
 
@@ -210,6 +214,7 @@ public final class ApiExceptionHandler {
     @ExceptionHandler(OptimisticLockingFailureException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleLostRace(final OptimisticLockingFailureException failure) {
+        log.warn("optimistic lock conflict", failure);
         return ApiError.of(ErrorCode.CONFLICT);
     }
 
