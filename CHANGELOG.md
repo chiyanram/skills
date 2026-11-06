@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.32.0](https://github.com/chiyanram/skills/compare/rulebook--v0.31.1...rulebook--v0.32.0) (2026-11-06)
+
+### Features
+
+* **crq:** review never approves, approval is human-signed, new deps go to the human ([#210](https://github.com/chiyanram/skills/issues/210)) ([#221](https://github.com/chiyanram/skills/issues/221)) ([abfec90](https://github.com/chiyanram/skills/commit/abfec90f3d72dfd4be2b1ca38c5efe956ac57018)), closes [agent-factory#30](https://github.com/chiyanram/agent-factory/issues/30)
+
 ## [0.31.1](https://github.com/chiyanram/skills/compare/rulebook--v0.31.0...rulebook--v0.31.1) (2026-11-06)
 
 ### Bug Fixes
