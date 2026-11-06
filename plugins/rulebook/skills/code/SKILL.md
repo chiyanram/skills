@@ -1,6 +1,6 @@
 ---
 name: code
-description: Use when you write or review production code: Java, Spring beans and configuration, types, errors, interfaces, services, JPA persistence, comments, concurrency, messaging, security, code smells, and Angular UI. Lists each code reference and when to read it.
+description: Use when you write or review production code: Java, Spring beans and configuration, types, errors, interfaces, services, HTTP API design, JPA persistence, comments, concurrency, messaging, security, code smells, and Angular UI. Lists each code reference and when to read it.
 ---
 
 # Code
@@ -13,6 +13,7 @@ approved Good/Bad pair, `references/examples/<name>.md` holds them all.
 | reference | rule IDs | read it |
 |---|---|---|
 | [angular-ui](references/angular-ui.md) | NGA1–NGA3, NGA5–NGA7, NGB1–NGB4, NGC1, NGC3, NGD1–NGD3 | when you write or review an Angular component, a `.ts` or template file in an Angular app, or its `tsconfig` |
+| [api-design](references/api-design.md) | AP1–AP6 | when you write or review a list endpoint, a page response, a change to a published request or response type, a client of another service, or a request mapping's path |
 | [comments](references/comments.md) | CM1–CM5, CM7, CMN1 | when you write or review a comment, a Javadoc block or a suppression, in any file type |
 | [concurrency](references/concurrency.md) | CC1–CC12, CC14–CC19 | when you write or review code that starts threads, submits async work, calls a remote service, retries, locks, or builds a pool or a cache |
 | [design](references/design.md) | SEAM1, DSN1 | when you write or review a method that chooses an outcome, a method that does I/O, or a method with many branches |

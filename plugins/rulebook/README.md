@@ -52,7 +52,7 @@ from the references, and `make lint` fails when it is stale.
 |---|---|
 | [crq](skills/crq/SKILL.md) | take a change from request to merge, or run one phase: lanes, spec, design, build, review, pull request, retro |
 | [testing](skills/testing/SKILL.md) | choose, write or review a test: its tier, its value, its boundaries, Spock, ITs, model calls, mutation |
-| [code](skills/code/SKILL.md) | write or review production code: Java, Spring, types, errors, services, security, concurrency, persistence, Angular |
+| [code](skills/code/SKILL.md) | write or review production code: Java, Spring, types, errors, services, API design, security, concurrency, persistence, Angular |
 | [deslop](skills/deslop/SKILL.md) | clean up an implemented branch's diff, behaviour-neutral, before review |
 | [migrations](skills/migrations/SKILL.md) | write or review a database migration |
 | [obs](skills/obs/SKILL.md) | write or review a log call, a metric or a trace |
