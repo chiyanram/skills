@@ -1,73 +1,83 @@
 # Contributing
 
-Thanks for helping. This repo ships one thing, the [`rulebook`](plugins/rulebook/) plugin. Setup and the make
-targets are in [DEVELOPMENT.md](DEVELOPMENT.md); how the parts fit is in [ARCHITECTURE.md](ARCHITECTURE.md). Coding
-agents also read [AGENTS.md](AGENTS.md).
+This repo ships one thing, the [`rulebook`](plugins/rulebook/) plugin. Coding agents also read [AGENTS.md](AGENTS.md).
 
-## The one hard rule
+**The one hard rule:** no rule enters a reference without the operator's explicit yes. A rule that is not approved
+stays out, even when an agent likes it or another repo has it.
 
-**No rule enters a reference without the operator's explicit yes.** Not a rule an agent likes, and not a rule copied
-from another repo. A rule that is not approved stays out.
+## Set up
+
+You need Python 3.10 or newer, Node `^22.22.2` or `>=24.15`, `git`, the GitHub CLI `gh`, and the Claude Code CLI
+(`npm install -g @anthropic-ai/claude-code`).
+
+```bash
+git clone https://github.com/chiyanram/skills.git
+cd skills
+npm ci          # release tooling; nothing in node_modules ships
+make check      # lint + test, the same as CI
+```
+
+To try your working copy in Claude Code: `claude plugin marketplace add ./`, then
+`claude plugin install rulebook@chiyanram`.
+
+| target | what it does |
+|---|---|
+| `make index` | rebuilds the reference table in each skill's `SKILL.md` from its references |
+| `make lint` | runs every `scripts/check_*.py`, then `claude plugin validate --strict` |
+| `make test` | runs the unit tests in `tests/`; one module: `python3 -m unittest tests.test_fixture_checks` |
+| `make check` | `make lint` and `make test`, as CI runs them |
+
+One check against one folder: `python3 scripts/check_links.py tests/fixtures/links/broken`. It exits `0` when clean
+and `1` with one line per problem.
 
 ## How a change lands
 
 One issue, one branch, one pull request.
 
-1. **Open or claim an issue.** Use a template: *Research* for a question about what others do, *Grilling* for a
-   decision with the operator, *Check or CI bug* for a check or CI run that is wrong. Labels:
-   [triage labels](docs/agents/triage-labels.md), [tracker conventions](docs/agents/issue-tracker.md).
-2. **Branch** from `main`, such as `feat/123-spock-cleanup`.
-3. **Make the change** and run `make index`, `make lint` and `make test`.
-4. **Open a pull request** against `main`. Fill in the template. CI must be green before merge.
+1. Open or claim an issue. Use a template: *Research*, *Grilling* or *Check or CI bug*. Labels:
+   [triage labels](docs/agents/triage-labels.md).
+2. Branch from `main`, such as `feat/123-spock-cleanup`.
+3. Make the change. Run `make index`, `make lint` and `make test`.
+4. Open a pull request against `main` and fill in the template. CI must be green before merge.
 
-A good pull request:
-
-- does one thing: one reference, one rule set or one check;
-- names the issue it closes, such as `Closes #123`;
-- has a [Conventional Commit](https://www.conventionalcommits.org/) title (see [Releases](#releases));
-- adds or changes a test with every change to a check.
+A good pull request does one thing, names the issue it closes (`Closes #123`), and adds a test with every change to a
+check.
 
 ## Add a rule
 
 ```mermaid
 flowchart LR
-    I["issue<br/>candidate rules,<br/>each with a source"] --> Q{"operator<br/>approves?"}
+    I["issue: candidate rules,<br/>each with a source"] --> Q{"operator<br/>approves?"}
     Q -->|"no"| X["stays out"]
-    Q -->|"yes"| L["ledger row<br/>docs/rulebook/approved-rules.md"]
+    Q -->|"yes"| L["ledger row<br/>approved-rules.md"]
     L --> F["reference in<br/>plugins/rulebook/"]
-    F --> C["make index · lint · test"] --> PR["pull request"]
+    F --> C["make index · lint · test"]
 ```
 
-1. **Find the source.** Each candidate rule cites where it came from: a file and line in a reference repo pinned to a
-   commit, an official doc, or a real mistake shown by `path:lines @sha`.
-2. **Get the yes.** The operator approves or drops each rule.
-3. **Record it.** Add a row to the [ledger](docs/rulebook/approved-rules.md): ID, reference, rule, *because* reason,
-   source, evidence, status.
-4. **Write it** into the reference, following [the reference format](docs/rulebook/reference-format.md).
+1. Find two independent sources for the rule: a file and line pinned to a commit, or an official doc and its section.
+   The operator's stated preference also admits a rule. The `meta` skill's `writing-references` reference has the
+   full test.
+2. Get the operator's yes for each rule.
+3. Add a row to the [ledger](docs/rulebook/approved-rules.md): ID, reference, rule, *because* reason, source,
+   evidence, status.
+4. Write the rule into its reference. The source stays in the ledger, never in the reference.
 
-## Write a reference
+## Add a reference
 
-- Five sections, in order: **Rules · When X, use Y · Good / Bad · Decided edges · Review checks**.
-- One rule per list item: an ID (`**S1** — …`), at most 35 words, ending in *because* plus the failure the rule
-  prevents.
-- Good/Bad examples use a neutral domain, never a real project's names. Project values stay in that project's
-  `AGENTS.md`.
-- No provenance in the reference: no citations, URLs, dates or credits outside code. They go in the ledger.
-- Start a new reference with a title, then one paragraph that says what it covers and holds one sentence starting
-  "Read it when …" or "Read it before …".
-- Run `make index`. It rebuilds the table in the domain's `SKILL.md` from each reference. Never edit that table by
-  hand. When two pull requests conflict on it, take either side and run `make index` again.
-- A new domain is a new skill folder with a `SKILL.md` router and one row in
-  [`plugins/rulebook/README.md`](plugins/rulebook/README.md).
+1. Follow [the reference format](docs/rulebook/reference-format.md): a title, one paragraph with a "Read it when …"
+   sentence, then the five sections in order.
+2. Use a neutral domain in every Good / Bad pair. Never use a real project's names.
+3. Run `make index` to rebuild the domain's router table. When two pull requests conflict on that table, take either
+   side and run `make index` again.
+4. A new domain is a new skill folder with a `SKILL.md` router, one row in
+   [`plugins/rulebook/README.md`](plugins/rulebook/README.md) and one row in the root README.
 
 ## Add a check
 
 1. Plant a failing fixture under `tests/fixtures/<check>/`, or write it to a temp dir when it is a `SKILL.md`.
 2. Add it to the test that expects the check to fail. Watch it fail.
-3. Write `scripts/check_<name>.py` and add it to `make lint` in the [Makefile](Makefile).
-4. Add a row to the table below.
-
-## Checks
+3. Write `scripts/check_<name>.py`. Read files through `scripts/repo_files.py`, which skips `tests/fixtures/`.
+4. Add it to `make lint` in the [Makefile](Makefile) and a row to the table below.
 
 | check | fails when |
 |---|---|
@@ -78,34 +88,45 @@ flowchart LR
 | `check_plugin.py` | a plugin is not under `plugins/`, has no README or icon, or the repo has no LICENSE |
 | `check_index.py` | a plugin README does not link every skill router, or a router's table differs from what `make index` builds |
 | `check_routers.py` | a skill folder ships references but has no `SKILL.md`, or its `SKILL.md` does not link each one |
-| `check_provenance.py` | a shipped skill file carries provenance outside code: a source citation (`name :N`, `file.md:N`, `§section`, a URL, `ADR-N`, `research/N`), an operator-preference line, a credit or label on an example, an evidence note, a date or an agent-factory reference |
-
-The checks skip `tests/fixtures/` and the frozen `docs/archive/`.
+| `check_provenance.py` | a shipped skill file carries provenance outside code: a source citation, a URL, a preference line, a credit, an evidence note, a date or an agent-factory reference |
 
 ## Releases
 
-Releases are automatic. [semantic-release](https://semantic-release.gitbook.io/) runs on every push to `main` after
-`make lint` and `make test` pass. Pull requests are squash-merged, so **the pull request title becomes the commit**
-that decides the release. CI fails a title that is not a Conventional Commit: `type(scope): summary`, with the domain
-as scope, such as `feat(testing): spock cleanup rules (#123)`.
+semantic-release runs on every push to `main` after `make lint` and `make test` pass. Pull requests are
+squash-merged, so **the pull request title becomes the commit** that decides the release. CI fails a title that is
+not a Conventional Commit, such as `feat(testing): spock cleanup rules (#123)`.
 
 | commit | release | use it when |
 |---|---|---|
-| `feat(<domain>): …` | minor, `0.2.0` → `0.3.0` | a new reference, rule or skill |
-| `fix(<domain>): …` | patch, `0.2.0` → `0.2.1` | a rule, example or check in a shipped file says something wrong |
+| `feat(<domain>): …` | minor | a new reference, rule or skill |
+| `fix(<domain>): …` | patch | a shipped rule, example or check says something wrong |
 | `feat(<domain>)!: …`, or a `BREAKING CHANGE:` footer | major | a rule ID is renamed or removed, or a reference moves |
 | `docs`, `chore`, `test`, `ci`, `build`, `refactor`, `style` | none | anything that does not change what ships |
 | any type with scope `research`, `review` or `repo` | none | design work, even when it is a `feat` |
 
-Never edit a `version` or `CHANGELOG.md` by hand; the release writes both. Users stay on a version until it changes,
-so every shipped change has to be a `feat` or a `fix`.
+A release bumps the version in `marketplace.json` and `plugin.json` (`scripts/set_version.py`), writes
+`CHANGELOG.md`, tags `rulebook--v<version>` and creates a GitHub release. Users stay on a version until it changes,
+so every change to what ships must be a `feat` or a `fix`. Preview the next release on `main` with
+`GITHUB_TOKEN=<token> npm run release:preview`.
 
-**A release that did not run.** GitHub skips every workflow for a push whose commit message contains the skip-ci
-marker (`[skip ci]` and its variants), in the title or the body. The release commit uses it on purpose; never quote it
-in a pull request title or description. If a merge was skipped, open **Actions → ci → Run workflow** on `main`.
+## Troubleshooting
 
-**Branch protection.** The release job pushes to `main` with the workflow's `github.token`. If a ruleset blocks that,
-add a repository secret `RELEASE_TOKEN`: a token with Contents read and write that may bypass the rule.
+| symptom | fix |
+|---|---|
+| `make lint`: `claude: command not found` | `npm install -g @anthropic-ai/claude-code` |
+| `check_index.py`: a table is stale | run `make index` and commit the router it rewrote |
+| `make test` fails in `test_release_config` or `test_release_links` | run `npm ci`; the tests load the release config from `node_modules` |
+| `check_provenance.py` fails on a reference | move the citation, URL or date into the rule's ledger row |
+| `check_sizes.py`: a rule is over 35 words | shorten it; move detail to When X, use Y or Decided edges |
+| `claude plugin marketplace add` fails on clone | the repo is private: run `gh auth setup-git` |
+| a merge to `main` did not release | the commit carried the skip-ci marker; never quote it in a pull request. Open **Actions → ci → Run workflow** on `main` |
+| the release job cannot push to `main` | add a repository secret `RELEASE_TOKEN` with Contents read and write that may bypass the ruleset |
+
+## Design history
+
+The research, review pages and old tickets from the design phase are at git tag `design-archive-2026-11`. A cite
+`research/NN` or `review/…` in the ledger means that file at that tag:
+`git show design-archive-2026-11:docs/archive/research/<file>`.
 
 ## Code of conduct
 

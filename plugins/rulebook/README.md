@@ -23,7 +23,7 @@ claude plugin install rulebook@chiyanram
 npx skills add chiyanram/skills
 ```
 
-The repo is private. See the [root README](../../README.md#install) for credentials and the worker-container setup.
+The repo is private. See the [root README](../../README.md#quick-start) for credentials and the worker-container setup.
 
 ## What a reference holds
 
