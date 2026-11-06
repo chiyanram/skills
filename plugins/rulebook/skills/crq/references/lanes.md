@@ -11,8 +11,8 @@ change, or when a change turns out bigger, riskier or smaller than its lane.
   changes behaviour, because the full pipeline costs more than a typo is worth.
 - **LN3** — In the one-way-door lane, list each irreversible step for the human's explicit yes and add the readiness
   items, because a step that cannot be undone needs inspection before it ships.
-- **LN4** — Count only an approval signed by a human's own identity as the approval gate, never one an agent gives or
-  relays, because an approval an agent can produce lets the agent approve its own work.
+- **LN4** — Count only an approval the agent cannot produce, a human forge action or a prompt only the human answers,
+  recorded with the spec's hash, because an agent-made approval passes its own work.
 
 ## When X, use Y
 
@@ -75,5 +75,6 @@ Walk the issue, the pull request and its diff.
   bump only. A tiny change with new logic is a finding.
 - [ ] LN3 — For a one-way-door change, find the list of irreversible steps and the human's yes on each, and the
   readiness items in the pull request. Each one missing is a finding.
-- [ ] LN4 — Find the approval on the pull request and the account that signed it. An approval signed by an agent or a
-  bot account, or one with no signer, is a finding.
+- [ ] LN4 — Find the approval record the pull request cites: who approved, when, how, and the spec hash. Check that the
+  hash matches the spec the change built. An approval with no record, a record an agent could write, or a hash that
+  does not match is a finding.
