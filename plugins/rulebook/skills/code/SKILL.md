@@ -14,7 +14,7 @@ approved Good/Bad pair, `references/examples/<name>.md` holds them all.
 |---|---|---|
 | [angular-ui](references/angular-ui.md) | NGA1–NGA3, NGA5–NGA7, NGB1–NGB4, NGC1, NGC3, NGD1–NGD3 | when you write or review an Angular component, a `.ts` or template file in an Angular app, or its `tsconfig` |
 | [comments](references/comments.md) | CM1–CM5, CM7, CMN1 | when you write or review a comment, a Javadoc block or a suppression, in any file type |
-| [concurrency](references/concurrency.md) | CC1–CC12, CC14–CC16 | when you write or review code that starts threads, submits async work, calls a remote service, retries, locks, or builds a pool or a cache |
+| [concurrency](references/concurrency.md) | CC1–CC12, CC14–CC19 | when you write or review code that starts threads, submits async work, calls a remote service, retries, locks, or builds a pool or a cache |
 | [design](references/design.md) | SEAM1, DSN1 | when you write or review a method that chooses an outcome, a method that does I/O, or a method with many branches |
 | [errors](references/errors.md) | ER1–ER8, ER10–ER11, ERN1–ERN2 | when you write or review a `throw`, a `catch`, an exception handler, an error response or request validation |
 | [java](references/java.md) | U4, JV1–JV9, JVN1, CV3 | when you write or review Java production code |
