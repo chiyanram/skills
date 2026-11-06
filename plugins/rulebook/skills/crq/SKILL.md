@@ -9,7 +9,7 @@ One pipeline takes every change from a request to a merge. A coordinator talks w
 workers build and review. Scripts check what a model must not judge. The human approves the plan and merges.
 
 ```text
-intake ─▶ research ─▶ clarify ─▶ spec ─▶ design ─▶ design review ─▶ HUMAN /approved
+intake ─▶ research ─▶ clarify ─▶ spec ─▶ design ─▶ design review ─▶ HUMAN approval
    ─▶ build ─▶ verify ─▶ cleanup ─▶ code review ─▶ gate ─▶ pull request ─▶ HUMAN merge ─▶ retro
 ```
 
@@ -26,7 +26,7 @@ each phase applies.
 | spec | coordinator | a draft pull request with the intent quoted, acceptance criteria a test can decide, non-goals and edge cases | `acceptance-criteria` (planning) |
 | design | coordinator | the chosen shape and a rejected alternative; slices with their proving commands | `program-design`, `spec-review`, `diagrams` (planning) |
 | design review | fresh reviewer | a verdict per decision and findings | `review-process`, `spec-review` (planning) |
-| — | **human** | `/approved` on the pull request | — |
+| — | **human** | an explicit approval of the spec and design, at the pull request's head | — |
 | build | for a bug, a separate run that writes the failing test; then one fresh writer per pull request | the slices as commits | `verify-done`, `strategy` (testing) and the `code` references the diff touches |
 | verify | writer, then a script at the pushed commit | an evidence line per acceptance criterion | `verify-done`, `value-bar` (testing) |
 | cleanup | writer | a behaviour-neutral tidy diff | `deslop` skill |

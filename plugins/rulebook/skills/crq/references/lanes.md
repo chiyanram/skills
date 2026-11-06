@@ -7,7 +7,7 @@ change, or when a change turns out bigger, riskier or smaller than its lane.
 
 - **LN1** — At intake, pick the lane from what the change touches (tiny, bug, feature or one-way door) and show it to
   the human, because one workflow for every size slows small fixes and under-reviews irreversible ones.
-- **LN2** — Run a tiny change without spec, design or `/approved`, and move it to the bug or feature lane once it
+- **LN2** — Run a tiny change without spec, design or the approval gate, and move it to the bug or feature lane once it
   changes behaviour, because the full pipeline costs more than a typo is worth.
 - **LN3** — In the one-way-door lane, list each irreversible step for the human's explicit yes and add the readiness
   items, because a step that cannot be undone needs inspection before it ships.
@@ -18,7 +18,7 @@ change, or when a change turns out bigger, riskier or smaller than its lane.
 |---|---|---|
 | docs, comments, a config value that changes no behaviour, or a patch-level dependency bump | the tiny lane | nothing a spec or design would decide (LN2) |
 | today's behaviour is wrong and the expected behaviour is known | the bug lane | the spec is current, expected and unchanged behaviour, proved by a failing test |
-| new or changed behaviour | the feature lane | the full pipeline: spec, design, design review, `/approved` |
+| new or changed behaviour | the feature lane | the full pipeline: spec, design, design review, the approval gate |
 | the change touches stored data or a schema, a public API or event contract, or a deploy | the one-way-door lane | a wrong step cannot be undone (LN3) |
 | unsure between two lanes | the heavier lane | a review that was too heavy costs time; a mistake in stored data cannot be undone |
 
@@ -27,9 +27,9 @@ The phases each lane runs:
 | lane | phases | human gates |
 |---|---|---|
 | tiny | intake → build → verify → code review → gate → pull request → the retro record; a full retro only after a rescue or a revert | merge |
-| bug | intake → research → spec → design (only when an internal interface or more than one module changes) → design review of the spec and any design → build → verify → cleanup → code review → gate → pull request → retro | `/approved`, merge |
-| feature | every phase | `/approved`, merge |
-| one-way door | every phase, plus the readiness items of the `pr-readiness` reference | `/approved` with each irreversible step listed, merge |
+| bug | intake → research → spec → design (only when an internal interface or more than one module changes) → design review of the spec and any design → build → verify → cleanup → code review → gate → pull request → retro | approval, merge |
+| feature | every phase | approval, merge |
+| one-way door | every phase, plus the readiness items of the `pr-readiness` reference | approval with each irreversible step listed, merge |
 
 ## Good / Bad
 
