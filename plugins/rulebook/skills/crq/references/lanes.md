@@ -26,7 +26,7 @@ The phases each lane runs:
 
 | lane | phases | human gates |
 |---|---|---|
-| tiny | intake → build → verify → code review → gate → pull request; retro only after a rescue or a revert | merge |
+| tiny | intake → build → verify → code review → gate → pull request → the retro record; a full retro only after a rescue or a revert | merge |
 | bug | intake → research → spec → design (only when an internal interface or more than one module changes) → design review of the spec and any design → build → verify → cleanup → code review → gate → pull request → retro | `/approved`, merge |
 | feature | every phase | `/approved`, merge |
 | one-way door | every phase, plus the readiness items of the `pr-readiness` reference | `/approved` with each irreversible step listed, merge |

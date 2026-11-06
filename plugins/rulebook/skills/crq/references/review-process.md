@@ -57,10 +57,11 @@ One finding, introduced by the change, shown at its line, with the fix.
 - **Skip the verify pass when** the change is in the tiny lane: one find pass is enough. — **Do not skip when** the
   change is a bug, a feature or a one-way door: verify every finding (RV1). — **Confidence** high
 - **Skip the thread when** a finding sits in code the change did not touch and does not break: it is Noted, not
-  posted as a thread. — **Do not skip when** the change breaks that code: it is the change's finding (RV2). — **Confidence** high
+  posted as a thread. — **Do not skip when** the change breaks that code: it is the change's finding (RV2). —
+  **Confidence** high
 - **Skip the exclusion when** a writer's commit message explains a choice: the reviewer may read the diff and the
-  commits. — **Do not skip when** the text is the writer's summary of its own work or test results: keep it out of the reviewer's
-  input (RV3). — **Confidence** medium
+  commits. — **Do not skip when** the text is the writer's summary of its own work or test results: keep it out of the
+  reviewer's input (RV3). — **Confidence** medium
 
 ## Review checks
 

@@ -52,8 +52,8 @@ Each criterion points at a command and its result at the pushed commit.
 
 ## Decided edges
 
-- **Skip a test that fails on revert when** the change is a refactor with no behaviour change and the tests that cover it are
-  named. — **Do not skip when** any public result changes (VB2). — **Confidence** high
+- **Skip a test that fails on revert when** the change is a refactor with no behaviour change and the tests that cover
+  it are named. — **Do not skip when** any public result changes (VB2). — **Confidence** high
 - **Skip the app run when** no acceptance criterion is visible to a user. — **Do not skip when** a criterion names a
   screen, a response or a message (VB4). — **Confidence** high
 - **Skip VB6 when** the spec removes a behaviour and its test goes with it, named in the pull request. — **Do not skip

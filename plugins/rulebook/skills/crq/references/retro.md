@@ -1,6 +1,6 @@
 # Retro
 
-How a finished ticket teaches the pipeline: what to record, how to find the real cause, and how a lesson becomes a
+How a merged pull request teaches the pipeline: what to record, how to find the real cause, and how a lesson becomes a
 rule, a script, a check or nothing. A rescue is a human fixing or finishing an agent's work. Read it when a pull
 request is merged, rescued or reverted, or a defect escapes.
 
@@ -9,7 +9,7 @@ request is merged, rescued or reverted, or a defect escapes.
 - **RT1** — Record each merged pull request's timeline: rounds, findings per bucket and check, tokens per phase and
   every rescue, because a pipeline nobody measures cannot tell which phase helps.
 - **RT2** — Trace each rescue or escaped defect past "the agent got it wrong" by asking why until a rule, check or step
-  is named, because blaming the agent fixes nothing for the next ticket.
+  is named, because blaming the agent fixes nothing for the next change.
 - **RT3** — For each rescue or escaped defect, tune the existing check that should have caught it, or propose a new
   one naming this issue as its origin, because a check without an origin is a guess.
 - **RT4** — Give each action a type (rule, script, check or playbook), one owner, a due date and an issue, never just
@@ -19,7 +19,7 @@ request is merged, rescued or reverted, or a defect escapes.
 
 | situation | use | why |
 |---|---|---|
-| a pilot ticket, a rescue, a revert, an escaped defect or a review that hit three rounds | a full retro | each one shows where the pipeline failed |
+| a rescue, a revert or an escaped defect | a full retro: RT1 to RT4 | each one shows where the pipeline failed |
 | any other merge | the RT1 record only | the record is cheap; the analysis goes where something failed |
 | the lesson can be checked by a tool | an action of type script (RT4) | a script never forgets |
 | the lesson needs judgement | an action of type rule or check (RT4) | every new rule still needs the operator's yes and a ledger row |
@@ -35,7 +35,7 @@ Actions:
 - Improve testing around renewals.
 - Be more careful with reservations.
 ```
-No type, no owner, no date, no ticket. Nobody acts on either line.
+No type, no owner, no date, no issue. Nobody acts on either line.
 
 **Good**
 ```text
@@ -48,8 +48,8 @@ Each action says what kind of fix, who owns it, when, and where it is tracked.
 
 ## Decided edges
 
-- **Skip the retro when** a tiny-lane change merged with no rescue. — **Do not skip when** it needed a rescue or was
-  reverted (RT1). — **Confidence** high
+- **Skip the full retro when** a change merged with no rescue, revert or escaped defect: the RT1 record still runs. —
+  **Do not skip when** it needed a rescue or was reverted (RT2, RT3). — **Confidence** high
 - **Skip a new check when** an existing check covers the case and only missed it: tune that check. — **Do not skip
   when** no rule or check covers the case at all (RT3). — **Confidence** high
 
@@ -63,5 +63,5 @@ Walk the retro note on the issue.
   agent got it wrong" is a finding.
 - [ ] RT3 — For each, find the answer to "should an existing check have caught it?" and the tuned or proposed check.
   Each one missing is a finding.
-- [ ] RT4 — For each action, find its type, owner, due date and ticket. Each one missing, or a bare "improve", is a
+- [ ] RT4 — For each action, find its type, owner, due date and issue. Each one missing, or a bare "improve", is a
   finding.
