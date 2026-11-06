@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.27.0](https://github.com/chiyanram/skills/compare/rulebook--v0.26.0...rulebook--v0.27.0) (2026-11-06)
+
+### Features
+
+* **crq:** the /crq pipeline skill with its six references, and four planning rules ([chiyanram/skills#210](https://github.com/chiyanram/skills/issues/210)) ([#214](https://github.com/chiyanram/skills/issues/214)) ([58ac935](https://github.com/chiyanram/skills/commit/58ac93511acbfd8b2d523cc5b6925f9e9ffe8e17))
+
 ## [0.26.0](https://github.com/chiyanram/skills/compare/rulebook--v0.25.0...rulebook--v0.26.0) (2026-11-06)
 
 ### Features
