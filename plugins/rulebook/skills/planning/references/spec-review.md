@@ -32,6 +32,10 @@ Contents: Rules · When X, use Y · Good / Bad (SR2, SR3, SR4, SR10, SR11) · De
   because a seam with one user adds indirection every later change pays for.
 - **SR15** — Record a decision as an ADR when it is hard to reverse, surprising without context, and the result of a
   real tradeoff, because otherwise the next reader re-decides it without knowing why.
+- **SR17** — Reuse an existing part that already does the job, or name in the design why it cannot be used, because a
+  second copy of a part drifts from the first.
+- **SR18** — For each new failure mode in the design, name the log, metric or alert that shows it in production,
+  because a failure nobody can see is found by users first.
 
 ## When X, use Y
 
@@ -53,6 +57,8 @@ Contents: Rules · When X, use Y · Good / Bad (SR2, SR3, SR4, SR10, SR11) · De
 | the design adds an input, an endpoint or a permission | name the trust boundary and the control at it (SR13) | otherwise security is left to whoever writes the code |
 | the design adds an abstraction, a setting, a port or an extension point with one user | remove it until a second user exists, today or in this spec (SR14) | a seam with one user is indirection every change pays for |
 | a decision is hard to reverse, surprising, and a real tradeoff | write it as an ADR (SR15) | the next reader re-decides it without knowing why |
+| the design adds a part that resembles one in the code today | reuse that part, or say why it cannot serve (SR17) | two copies drift apart |
+| the design adds a way to fail: a timeout, a rejected input, a lost message | the log, metric or alert that shows it (SR18) | users find an unseen failure first |
 
 ## Good / Bad
 
@@ -232,3 +238,6 @@ Walk the whole spec and the whole design in one round, every section, before you
   None is a finding.
 - [ ] SR15 — For each decision that is hard to reverse, surprising and a real tradeoff, find its ADR. None is a
   finding.
+- [ ] SR17 — For each new part, search the code for one that does the same job. One found and neither reused nor
+  ruled out in the design is a finding.
+- [ ] SR18 — For each new failure mode, find the log, metric or alert that shows it. Each one missing is a finding.

@@ -31,6 +31,8 @@ How each scenario becomes its tests is owned by `testing/references/scenario-to-
   because the title becomes the test name, so a wrong word reaches the code.
 - **AC10** — Treat an edit to acceptance-criteria text after the approval gate as a spec change: record it on the change
   request and pass the gate again, because an approval covers only the text it saw.
+- **AC12** — Write a bug's spec in three parts: current behaviour, expected behaviour and behaviour that must not
+  change, because a fix that names no unchanged behaviour can break it unseen.
 
 ## When X, use Y
 
@@ -47,6 +49,7 @@ How each scenario becomes its tests is owned by `testing/references/scenario-to-
 | a change to stored data or a default | a Given with state from before the change (AC7) | existing rows need a backfill |
 | a noun in scenario text | the glossary's word; a new noun defined in the spec first (AC9) | one shared, ubiquitous language; the title becomes the test name, so a wrong word reaches the code |
 | an edit to approved acceptance-criteria text | a spec change that passes the approval gate again (AC10) | an approval covers only the text as it stood when it was approved |
+| a bug | three parts: current, expected, and must not change (AC12) | the third part keeps the fix from breaking what works |
 
 ## Good / Bad
 
@@ -279,3 +282,4 @@ Walk every scenario in the spec's acceptance-criteria section that the change ad
 - [ ] AC9 — A noun not in the glossary, a related spec or this spec's own definitions is a finding.
 - [ ] AC10 — Compare the acceptance-criteria text with the approved version. A changed text with no new approval is a
   finding.
+- [ ] AC12 — For a bug, find the current, expected and must-not-change behaviour. Each part missing is a finding.
