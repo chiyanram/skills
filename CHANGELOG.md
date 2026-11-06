@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.26.0](https://github.com/chiyanram/skills/compare/rulebook--v0.25.0...rulebook--v0.26.0) (2026-11-06)
+
+### Features
+
+* **code:** concurrent-edit rules — ETag and If-Match, 409 for lost races, required idempotency keys ([#215](https://github.com/chiyanram/skills/issues/215)) ([a7ed9da](https://github.com/chiyanram/skills/commit/a7ed9da9ad82390b424d2a04d7a99045477319c1)), closes [#75](https://github.com/chiyanram/skills/issues/75) [#75](https://github.com/chiyanram/skills/issues/75) [#75](https://github.com/chiyanram/skills/issues/75) [#75](https://github.com/chiyanram/skills/issues/75)
+
 ## [0.25.0](https://github.com/chiyanram/skills/compare/rulebook--v0.24.0...rulebook--v0.25.0) (2026-11-06)
 
 ### Features
