@@ -18,6 +18,8 @@ Contents: Rules · When X, use Y · Good / Bad (AP2, AP4, AP5) · Decided edges 
   change its meaning or make an optional input required, because clients built on the old contract break.
 - **AP5** — Make each client of another service ignore unknown response fields and map an unknown enum value to a
   fallback, because a compatible addition on the server otherwise breaks the client.
+- **AP7** — Handle an enum's fallback value at every use, and skip and log a record the client cannot read, never fail
+  the whole batch, because one unknown value otherwise stops every record behind it.
 - **AP6** — Put the major version in every path from the first release (`/v1/…`); add `/v2` only for a change AP4
   forbids, because clients and gateways route on the URL, and a late version moves every URL.
 
@@ -31,6 +33,7 @@ Contents: Rules · When X, use Y · Good / Bad (AP2, AP4, AP5) · Decided edges 
 | a new piece of data in a published response | a new optional field beside the old ones (AP4) | old clients ignore it and keep working |
 | a field to rename, retype or remove | a new field, with the old one kept (AP4) | a rename is a removal for every old client |
 | a client DTO for another service's response | unknown fields ignored and an enum with a fallback value (AP5) | the server may add both without a new version |
+| a fallback enum value, or a record the client cannot read | a branch for the fallback at every use; the record skipped and logged (AP7) | one unknown value otherwise crashes the client or stops the batch |
 | a client that reads a resource and sends it back with PUT | unknown fields and the raw enum string kept and sent back (AP5) | dropping them erases data the client does not know |
 | a new API | `/v1/` at the start of every path (AP6) | the version is in the URL that clients and gateways route on |
 | a change that AP4 forbids | a `/v2/` path beside `/v1/` (AP6) | old clients keep `/v1/` until they move |
@@ -139,6 +142,8 @@ in the diff.
 - [ ] AP5 — For each DTO that reads another service's response, find unknown fields ignored
   (`@JsonIgnoreProperties(ignoreUnknown = true)`, or a mapper with `FAIL_ON_UNKNOWN_PROPERTIES` off, as Spring Boot's
   is) and a fallback on each enum. Either one missing is a finding.
+- [ ] AP7 — For each enum with a fallback value, find each `switch` or index on it. One with no branch for the fallback is
+  a finding, and so is a batch reader that fails the batch on a record it cannot read.
 - [ ] AP6 — `grep -rnE '@(Request|Get|Post|Put|Patch|Delete)Mapping\(((value|path) *= *)?"/'`, and join each
   method path to its class-level prefix. A full path that does not start with `/v<major>/`, or a new major version for
   a change AP4 allows, is a finding.

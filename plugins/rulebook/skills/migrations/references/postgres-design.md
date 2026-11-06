@@ -20,9 +20,9 @@ MG41, MGN1, MG44, MG45).
   offset, so instants written from different zones compare and sort wrongly.
 - **MG31** — Declare new string columns `text` with `CHECK (char_length(col) <= n)` for a business limit, never
   `varchar(n)` or `char(n)`, because changing a varchar limit locks the table while a CHECK is replaced `NOT VALID`.
-- **MG36** — Never declare `serial`, `integer` keys, `char(n)` or `json`; use `bigint GENERATED … AS IDENTITY` (or
-  `uuid`), `text` and `jsonb`, because int keys overflow, char(n) pads, json lacks equality, and serial complicates
-  permissions.
+- **MG36** — Never declare `serial`, `integer` keys or key references, `char(n)` or `json`; use `bigint GENERATED …
+  AS IDENTITY` (or `uuid`), `text` and `jsonb`, because int keys overflow, char(n) pads, json lacks equality, and
+  serial complicates permissions.
 - **MG38** — Name every index and constraint with a fixed prefix (`pk_`, `fk_`, `uq_`, `ck_`, `idx_`), because later
   `VALIDATE`, `DROP` and `IF NOT EXISTS` must name it, and a generated name hits the wrong object.
 
@@ -123,8 +123,8 @@ Walk every changed migration file, and every `CREATE TABLE`, `ADD COLUMN`, `REFE
 - [ ] MG31 — `grep -n -i -E "varchar|character varying|\bcharacter\b|\bchar\b|bpchar"` in each changed migration. A new
   column declared `varchar(n)` or `char(n)` is a finding; a length limit is a `CHECK (char_length(col) <= n)`.
 - [ ] MG36 — `grep -n -i -E "\bserial[248]?\b|bigserial|smallserial|\bjson\b"` in each changed migration, and read the
-  type of each new key column. `serial`, an `integer` key or `json` is a finding; `char(n)` hits come from the MG31
-  grep.
+  type of each new key column and each column that references a key. `serial`, an `integer` key or reference, or
+  `json` is a finding; `char(n)` hits come from the MG31 grep.
 - [ ] MG38 — For each `CREATE INDEX` and each `PRIMARY KEY`, `FOREIGN KEY`, `UNIQUE` and `CHECK` (inline or
   `ADD CONSTRAINT`), find its explicit name with a `pk_`, `fk_`, `uq_`, `ck_` or `idx_` prefix. One with no name, or
   with another prefix, is a finding.

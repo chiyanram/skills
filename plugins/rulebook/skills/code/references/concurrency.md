@@ -14,12 +14,14 @@ Contents: Rules · When X, use Y · Good / Bad (CC3, CC9, CC12) · Decided edges
   no-arg `supplyAsync` puts blocking I/O on the common pool and starves it.
 - **CC3** — Give every remote call a client connect and read timeout (or deadline) that ends the call; `orTimeout`
   alone only stops the wait, because a call with no stopping timeout holds its thread and connection forever.
+- **CC20** — Set each remote timeout from the call's measured p99 latency with headroom, and give an optional call a
+  short timeout and a fallback, because a guessed timeout cuts healthy calls or holds threads.
 - **CC14** — Pass the caller's remaining deadline to each downstream call and stop once it has passed, never a fixed
   longer timeout, because work for a caller who gave up wastes the capacity recovery needs.
 - **CC9** — Treat a side-effecting remote call that times out after connecting as unknown, not failed; resend it only
   with the initiator's idempotency key, because the effect may have applied and a new key duplicates it.
-- **CC19** — Require an idempotency key header on every POST that creates or triggers work, and answer 400 when it is
-  missing, because a client's retry of a keyless POST creates the work twice.
+- **CC19** — Require an idempotency key on every request, message or job command that creates or triggers work, and
+  reject one without it (400 over HTTP), because a repeated command otherwise repeats the work.
 - **CC15** — Claim each idempotency key atomically with its request fingerprint, store the response; replay it on a
   repeat, answer 409 while the first runs and 422 for another payload, because otherwise a retry repeats the effect.
 - **CC17** — Send a versioned resource's `@Version` as its `ETag` and change it only under a matching `If-Match`;
@@ -30,6 +32,8 @@ Contents: Rules · When X, use Y · Good / Bad (CC3, CC9, CC12) · Decided edges
   after a timeout exists (CC3), because retrying a non-idempotent call repeats its side effect.
 - **CC12** — Retry a failure at one layer only; the layers below fail fast and report the cause, because attempts
   multiply across layers: three layers of three attempts send 27 requests.
+- **CC13** — Draw every retry from a client-wide retry budget of about 10% of requests, beside the per-call cap, and
+  stop retrying when it is spent, because per-call caps still multiply load in an outage.
 - **CC16** — Retry a 4xx response only when it carries `Retry-After`, and wait at least that long, because other 4xx
   responses fail the same way again and an early retry ignores the server's request to wait.
 - **CC11** — Put a circuit breaker on a remote dependency whose failures repeat, beside the timeout and retry, because
@@ -54,15 +58,18 @@ Contents: Rules · When X, use Y · Good / Bad (CC3, CC9, CC12) · Decided edges
 | many blocking I/O calls to run at once | `Executors.newVirtualThreadPerTaskExecutor()`, one virtual thread per task, never a pool of them (CC1) | a pool caps concurrency at its size, and blocked tasks queue behind it |
 | blocking work to run async | `supplyAsync(task, executor)` with a dedicated executor (CC2) | without an executor the task runs on the common pool, and blocking I/O starves it |
 | a client for a remote service | a connect and a read timeout, or a deadline, on the client itself (CC3) | a call with no stopping timeout holds its thread and connection forever |
+| a timeout value to choose | the call's measured p99 latency with headroom, and an alert when p99 nears it (CC20) | a guessed value cuts healthy calls or holds threads for calls that will fail |
+| a remote call whose result the caller can do without | a short timeout and a fallback (CC20) | waiting on an optional call slows the whole request |
 | an `orTimeout` on a remote call | a client timeout beside it; `orTimeout` is only the caller's wait (CC3) | completing the future does not stop the running call |
 | a downstream call made while serving a request that has a deadline | a timeout of the deadline's remaining time, and no call once it has passed (CC14) | a fixed longer timeout keeps working for a caller who has gone |
 | a side-effecting remote call that timed out after connecting | the outcome unknown, not failed (CC9) | the effect may have applied |
 | an idempotency key | one key minted by the initiator and reused on every resend (CC9) | a key minted per attempt makes each resend a new effect |
-| a POST that creates or triggers work | a required idempotency key header, and 400 when it is missing (CC19) | a retry of a keyless POST creates the work twice |
+| a request, message or job command that creates or triggers work | a required idempotency key, rejected when missing; 400 over HTTP (CC19) | a repeated command repeats the work |
 | an update of a versioned resource over HTTP | its `@Version` as the `ETag`, and a matching `If-Match` required: 412 on a mismatch, 428 when missing (CC17) | without a precondition the last write silently wins |
 | an `OptimisticLockingFailureException` | a 409 Conflict from the global handler (CC18) | the client lost a race and must reload; a 500 reports a server fault |
 | an endpoint that accepts an idempotency key | an atomic claim of the key with a request fingerprint, the stored response replayed on a repeat, 409 while the first runs, 422 for another payload (CC15) | a bare "seen it" check repeats the effect or loses the result |
 | a failed remote call to retry | the timeout first, then bounded attempts with jitter, for transient failures of idempotent calls only (CC8) | retrying a non-idempotent call repeats its side effect |
+| a client that retries any call | a shared retry budget, about 10% of its requests, with retries stopped while it is spent (CC13) | in an outage every call fails, and per-call caps still multiply the load |
 | a call chain in which more than one layer could retry | one retry, at the layer that sees the whole operation; the layers below fail fast (CC12) | attempts multiply across layers |
 | a 4xx response | no retry, unless it carries `Retry-After`; then a wait of at least that long (CC16) | other 4xx responses fail the same way again |
 | a remote dependency whose failures repeat | a circuit breaker beside the timeout and retry (CC11) | retrying a dependency that is down wastes threads and amplifies the outage |
@@ -205,14 +212,17 @@ a pool or a cache.
   one-argument call that does blocking work is a finding.
 - [ ] CC3 — For each remote call (`RestClient`, `HttpClient`, `WebClient`, a gRPC stub, a JDBC or Redis client), find
   a connect and a read timeout, or a deadline, on the client. A call whose only timeout is `orTimeout` is a finding.
+- [ ] CC20 — For each new or changed timeout, find the latency it was set from (a p99 metric) and an alert near it. A
+  timeout with neither is a finding, and so is an optional call with a long timeout and no fallback.
 - [ ] CC14 — `grep -rnE "timeout\(Duration\.of|withDeadlineAfter|Timeout\(Duration\.of"`, and for each downstream
   call made while serving a request, find where its timeout comes from. A fixed timeout, when the inbound request
   carries a deadline, is a finding; gRPC Java propagates the deadline itself.
 - [ ] CC9 — For each side-effecting remote call, find an outcome that keeps a timeout after connect apart from
   failure. A timeout after connect handled as failure, or a resend whose idempotency key is minted inside the retry, is
   a finding.
-- [ ] CC19 — For each POST that creates or triggers work (`grep -rnE "@PostMapping|RequestMethod\.POST"`), find a
-  required idempotency key header and a 400 when it is missing. Either one missing is a finding.
+- [ ] CC19 — For each POST, message listener and job command that creates or triggers work
+  (`grep -rnE "@PostMapping|RequestMethod\.POST|@[A-Za-z]*Listener\b"`), find a required idempotency key and a
+  rejection when it is missing. Either one missing is a finding.
 - [ ] CC17 — For each PUT, PATCH or DELETE of an entity with `@Version` (`grep -rln "@Version" src/main`), find the
   `ETag` on its GET and an `If-Match` check before the change. Either one missing, or a status other than 412 for a
   mismatch or 428 for a missing header, is a finding.
@@ -224,6 +234,8 @@ a pool or a cache.
   for another payload. Any one missing is a finding.
 - [ ] CC8 — For each retry loop or retry policy, find bounded attempts, jittered backoff, a transient-only filter, an
   idempotent call (or an initiator's key) and a timeout. Any one missing is a finding.
+- [ ] CC13 — For each client that retries, find one retry budget shared by its calls (a counter or rate limiter in front
+  of the retries). Retries limited only per call are a finding.
 - [ ] CC12 — `grep -rnE "@Retryable|RetryTemplate|Retry\.of|retryWhen|withRetry|executeSupplier|retryOnResult"`. For
   each retry the change adds, follow the call it wraps and each caller of the method. A callee or caller that also
   retries (one of those hits, or a client whose own retries are on) is a finding.
