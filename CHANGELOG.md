@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.29.0](https://github.com/chiyanram/skills/compare/rulebook--v0.28.0...rulebook--v0.29.0) (2026-11-06)
+
+### Features
+
+* **code:** scheduling and batch jobs reference ([#217](https://github.com/chiyanram/skills/issues/217)) ([9fcf7c4](https://github.com/chiyanram/skills/commit/9fcf7c4c01747f3514129c5ce3c3ffcfdc131700)), closes [#52](https://github.com/chiyanram/skills/issues/52) [#52](https://github.com/chiyanram/skills/issues/52)
+
 ## [0.28.0](https://github.com/chiyanram/skills/compare/rulebook--v0.27.0...rulebook--v0.28.0) (2026-11-06)
 
 ### Features
