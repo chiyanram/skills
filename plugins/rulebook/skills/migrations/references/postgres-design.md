@@ -39,7 +39,7 @@ MG41, MGN1, MG44, MG45).
 | a `UNIQUE` constraint or unique index | `NOT NULL` on each column, or `NULLS NOT DISTINCT` (MG35) | NULLs count as distinct by default, so duplicate rows containing NULL pass |
 | an index or a constraint | a name with a fixed prefix: `pk_`, `fk_`, `uq_`, `ck_`, `idx_` (MG38) | later `VALIDATE`, `DROP` and `IF NOT EXISTS` must name the object, and a generated name hits the wrong one |
 
-The entity mapping for an MG36 key is PS11 in [persistence.md](../../code/references/persistence.md).
+The entity mapping for a key inserted in bulk is PS11 in [persistence.md](../../code/references/persistence.md).
 
 ## Good / Bad
 
