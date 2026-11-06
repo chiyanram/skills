@@ -13,8 +13,8 @@ when you write a pull request body, or when you check one before merge.
   reaches callers before anyone warns them.
 - **PR4** — State in one line how to roll the change back or switch it off, because the person on call needs that
   line when the change fails.
-- **PR5** — Show the change as a `diff` tree of files or a call tree, because a picture shows the merger its shape
-  before the lines.
+- **PR5** — Show the change as a tree of changed files, each marked added, changed or deleted, or as a call tree,
+  because a picture shows the merger its shape before the lines.
 - **PR6** — Name the one to three riskiest places under "Where to look", because the human's review time is best spent
   where a mistake costs most.
 - **PR7** — For a one-way door, list each dependency's failure plan, timeout and retry, an alert per new failure, the
@@ -67,9 +67,10 @@ The merger reads why, what could break, how to undo it and where to look first.
 Walk the pull request body before merge.
 
 - [ ] PR1 — Find the one-sentence reason and the spec link at the top. Each one missing is a finding.
-- [ ] PR2 — Find the evidence table, at the head commit. Its absence is a finding.
+- [ ] PR2 — Find the evidence table (VB5), at the pushed commit. Its absence is a finding.
 - [ ] PR3 — Find the breaking-change line, and for yes, what callers must change. Its absence is a finding.
 - [ ] PR4 — Find the rollback line. Its absence is a finding.
 - [ ] PR5 — For a change of two files or more, find the file tree or call tree. Its absence is a finding.
 - [ ] PR6 — Find "Where to look" with one to three places. Its absence is a finding.
-- [ ] PR7 — For a one-way door, find each readiness item. Each one missing is a finding.
+- [ ] PR7 — For a one-way door, find each readiness item; the alerts are the design's (SR18). Each one missing is a
+  finding.

@@ -1,17 +1,18 @@
 # Retro
 
 How a finished ticket teaches the pipeline: what to record, how to find the real cause, and how a lesson becomes a
-rule, a script, a check or nothing. Read it when a ticket is merged, rescued or reverted, or a defect escapes.
+rule, a script, a check or nothing. A rescue is a human fixing or finishing an agent's work. Read it when a pull
+request is merged, rescued or reverted, or a defect escapes.
 
 ## Rules
 
-- **RT1** — Record each finished ticket's timeline: rounds, findings per bucket and check, tokens per phase and every
-  rescue, because a pipeline nobody measures cannot tell which phase helps.
+- **RT1** — Record each merged pull request's timeline: rounds, findings per bucket and check, tokens per phase and
+  every rescue, because a pipeline nobody measures cannot tell which phase helps.
 - **RT2** — Trace each rescue or escaped defect past "the agent got it wrong" by asking why until a rule, check or step
   is named, because blaming the agent fixes nothing for the next ticket.
-- **RT3** — For each, ask whether an existing check should have caught it: tune that check, or propose a new one
-  naming this ticket as its origin, because a check without an origin is a guess.
-- **RT4** — Give each action a type (rule, script, check or playbook), one owner, a due date and a ticket, never just
+- **RT3** — For each rescue or escaped defect, tune the existing check that should have caught it, or propose a new
+  one naming this issue as its origin, because a check without an origin is a guess.
+- **RT4** — Give each action a type (rule, script, check or playbook), one owner, a due date and an issue, never just
   "improve", because an action without an owner and a date does not happen.
 
 ## When X, use Y
@@ -19,10 +20,10 @@ rule, a script, a check or nothing. Read it when a ticket is merged, rescued or 
 | situation | use | why |
 |---|---|---|
 | a pilot ticket, a rescue, a revert, an escaped defect or a review that hit three rounds | a full retro | each one shows where the pipeline failed |
-| any other merge | a retro on about one merge in ten | the rest repeat what the sample shows |
-| the lesson can be checked by a tool | a script check, before any rule text (RT4) | a script never forgets; strongest first: architecture, types, lint, test, docs |
-| the lesson needs judgement | a rule or a review check, with the operator's yes and a ledger row (RT3) | an unapproved rule reaches every project |
-| an existing check should have caught it but did not | a rewrite of that check, with this ticket as its example (RT3) | the check is mis-worded, not missing |
+| any other merge | the RT1 record only | the record is cheap; the analysis goes where something failed |
+| the lesson can be checked by a tool | an action of type script (RT4) | a script never forgets |
+| the lesson needs judgement | an action of type rule or check (RT4) | every new rule still needs the operator's yes and a ledger row |
+| an existing check should have caught it but did not | a rewrite of that check, with this issue as its example (RT3) | the check is mis-worded, not missing |
 
 ## Good / Bad
 

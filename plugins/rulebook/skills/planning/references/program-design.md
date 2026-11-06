@@ -22,8 +22,8 @@ Contents: Rules · When X, use Y · Good / Bad (PD1–PD5) · Decided edges · R
   file paths and code snippets in a spec go stale quickly.
 - **PD7** — During the build phase, record a change to an approved type, signature or file placement in the design
   before you code past it, because an unrecorded deviation leaves the design check judging against a guess.
-- **PD9** — Size each slice to fit one fresh writer: about 5 files and 400 changed lines, because a larger slice is
-  reviewed poorly and outgrows its writer's context.
+- **PD9** — Plan slices so their pull request stays within 400 changed lines and 15 files, and make a larger slice
+  its own issue, because one writer and one review handle that size well.
 
 ## When X, use Y
 
@@ -37,7 +37,7 @@ Contents: Rules · When X, use Y · Good / Bad (PD1–PD5) · Decided edges · R
 | lists a slice | its command, its test filter and any manual step (PD5) | a check with no named command does not get run |
 | needs a file path, a signature or a tree | the design, never the spec (PD6) | file paths and code snippets in a spec go stale quickly |
 | is found wrong during the build phase | a recorded change to the design, then code (PD7) | an unrecorded deviation leaves the design check judging against a guess |
-| has a slice larger than about 5 files or 400 lines | split it, or make it a ticket of its own (PD9) | one writer and one review handle it well |
+| has slices that together pass 400 changed lines or 15 files | make the larger slices issues of their own (PD9, CR2) | one writer and one review handle that size well |
 
 ## Good / Bad
 
@@ -194,5 +194,5 @@ Walk the whole design and every slice in it. During the build phase, also walk t
 - [ ] PD6 — Search the spec for file paths, signatures and code blocks. Each one is a finding: move it to the design.
 - [ ] PD7 — Compare each type, signature and file placement in the diff with the approved design. A difference that
   the design does not record is a finding.
-- [ ] PD9 — For each slice, count the files and lines it plans to change. A slice well over 5 files or 400 lines is a
-  finding.
+- [ ] PD9 — Add up the files and lines the slices plan to change. A plan over 400 lines or 15 files with no slice
+  moved to its own issue is a finding.

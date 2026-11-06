@@ -29,7 +29,7 @@ check a writer's proof.
 | a test fails and the test looks wrong | an open question, not an edit to the test (VB6, VB1) | the test may be the only record of the requirement |
 | a criterion a user sees: a screen, an API response, a message | a run of the app: the call made and what came back (VB4) | the test may miss how the parts fit |
 | a criterion only code sees | the test that proves it, by name (VB5) | the test is the evidence |
-| a bug fix | a separate run writes the failing test first (VB7), then the S4 and S6 steps | the test and the fix stay independent |
+| a bug fix | a separate run writes the failing test first (VB7); the writer runs it locally and pastes the failure (S6) | the test and the fix stay independent |
 
 ## Good / Bad
 
@@ -52,7 +52,7 @@ Each criterion points at a command and its result at the pushed commit.
 
 ## Decided edges
 
-- **Skip a reverting test when** the change is a refactor with no behaviour change and the tests that cover it are
+- **Skip a test that fails on revert when** the change is a refactor with no behaviour change and the tests that cover it are
   named. — **Do not skip when** any public result changes (VB2). — **Confidence** high
 - **Skip the app run when** no acceptance criterion is visible to a user. — **Do not skip when** a criterion names a
   screen, a response or a message (VB4). — **Confidence** high
@@ -69,11 +69,11 @@ Walk the pull request body, its commits and the diff of its tests.
   writer made alone is a finding.
 - [ ] VB2 — For each changed behaviour, find a test that fails when the change is reverted. No such test is a
   finding.
-- [ ] VB3 — Find the script's result for build, lint and touched tests at the head commit. A result at another
-  commit, or none, is a finding.
+- [ ] VB3 — Find the script's result for build, lint and touched tests at the pushed commit, the pull request's head.
+  A result at another commit, or none, is a finding.
 - [ ] VB4 — For each criterion a user can see, find the app run: the call and what came back. Each one missing is a
   finding.
 - [ ] VB5 — Find one evidence line per acceptance criterion. Each criterion without one is a finding.
 - [ ] VB6 — In the test diff, find each removed, skipped or loosened test. One whose behaviour stays is a finding.
-- [ ] VB7 — For a bug fix, find the failing test's commit from the separate run, before the fix commit. Its absence is
-  a finding.
+- [ ] VB7 — For a bug fix, find the commit that adds the failing test, before the fix commit, and the note that a
+  separate run wrote it. Each one missing is a finding.
