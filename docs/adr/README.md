@@ -11,3 +11,4 @@ Each file records one decision about the shape of the plugin: its context, the d
 | [5](0005-provenance-only-in-the-ledger.md) | Provenance lives only in the ledger |
 | [6](0006-router-tables-are-generated.md) | Router tables are generated |
 | [7](0007-releases-cut-from-commit-messages.md) | Releases are cut from commit messages |
+| [8](0008-crq-pipeline-is-a-workflow-skill.md) | The /crq pipeline ships inside the rulebook as the `crq` skill |
