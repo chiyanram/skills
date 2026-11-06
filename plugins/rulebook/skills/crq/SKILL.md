@@ -43,4 +43,5 @@ each phase applies.
 |---|---|---|
 | [lanes](references/lanes.md) | LN1–LN3 | when you take in a new change, or when a change turns out bigger, riskier or smaller than its lane |
 | [review-process](references/review-process.md) | RV1–RV5 | before you run, write or tune a review |
+| [verify-done](references/verify-done.md) | VB1–VB7 | when you build a change, before you call it ready, or when you check a writer's proof |
 <!-- /index -->
