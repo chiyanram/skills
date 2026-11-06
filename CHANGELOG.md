@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.25.0](https://github.com/chiyanram/skills/compare/rulebook--v0.24.0...rulebook--v0.25.0) (2026-11-06)
+
+### Features
+
+* **code:** resilience rules — one retry layer, deadline propagation, idempotency keys, Retry-After ([#213](https://github.com/chiyanram/skills/issues/213)) ([512998b](https://github.com/chiyanram/skills/commit/512998b0cbc592949c59c01acf6e8a255f33841e)), closes [#54](https://github.com/chiyanram/skills/issues/54) [#54](https://github.com/chiyanram/skills/issues/54) [#54](https://github.com/chiyanram/skills/issues/54)
+
 ## [0.24.0](https://github.com/chiyanram/skills/compare/rulebook--v0.23.0...rulebook--v0.24.0) (2026-11-06)
 
 ### Features
