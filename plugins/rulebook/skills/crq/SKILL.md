@@ -1,6 +1,6 @@
 ---
 name: crq
-description: Use when you take a change from request to merge, or run one phase of it - picking the lane, intake, research, clarify, spec, design, design review, build, verify, cleanup, code review, gate, pull request and retro. Lists the pipeline, who runs each phase, and each crq reference.
+description: Use when you take a change from request to merge, or need its lane or the order of its phases. Lists the phases, who runs each, and each crq reference.
 ---
 
 # crq
@@ -22,15 +22,15 @@ each phase applies.
 |---|---|---|---|
 | intake | coordinator | an issue with its lane; a map when the work is foggy | `lanes` |
 | research | coordinator, read-only helpers | how the touched code works today, at `file:line`; parts to reuse; test patterns | `spec-review` (planning) |
-| clarify | coordinator with the human | answers on the issue: rounds of at most five questions, each with options and a recommendation | `spec-review` (planning) |
+| clarify | coordinator with the human | answers on the issue; each open question with its decider, options and recommendation | `spec-review` (planning) |
 | spec | coordinator | intent quoted, acceptance criteria a test can decide, non-goals, edge cases | `acceptance-criteria` (planning) |
-| design | coordinator | two candidate shapes and the chosen one; slices with their proving commands | `program-design`, `spec-review`, `diagrams` (planning) |
-| design review | fresh reviewer | a verdict per decision and findings | `spec-review` (planning) |
-| — | **human** | `/approved` on the merge request | — |
-| build | one fresh writer per merge request | one commit per slice; a bug's failing test first | `strategy` (testing) and the `code` references the diff touches |
+| design | coordinator | the chosen shape and a rejected alternative; slices with their proving commands | `program-design`, `spec-review`, `diagrams` (planning) |
+| design review | fresh reviewer | a verdict per decision and findings | `review-process`, `spec-review` (planning) |
+| — | **human** | `/approved` on the pull request | — |
+| build | one fresh writer per pull request | the slices; for a bug, its failing test first | `strategy` (testing) and the `code` references the diff touches |
 | verify | writer, then a script at the pushed commit | an evidence line per acceptance criterion | `strategy`, `value-bar` (testing) |
 | cleanup | writer | a behaviour-neutral tidy diff | `deslop` skill |
-| code review | fresh reviewer | findings in buckets; at most three rounds | the Review checks of every reference in scope |
+| code review | fresh reviewer | findings in buckets | `review-process`, and the Review checks of every reference in scope |
 | gate | CI | green at the head commit | — |
 | pull request | writer | why, evidence, rollback, where to look | `diagrams` (planning) |
 | — | **human** | merge | — |
@@ -42,4 +42,5 @@ each phase applies.
 | reference | rule IDs | read it |
 |---|---|---|
 | [lanes](references/lanes.md) | LN1–LN3 | when you take in a new change, or when a change turns out bigger, riskier or smaller than its lane |
+| [review-process](references/review-process.md) | RV1–RV5 | before you run, write or tune a review |
 <!-- /index -->

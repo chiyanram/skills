@@ -10,26 +10,26 @@ change, or when a change turns out bigger, riskier or smaller than its lane.
 - **LN2** — Run a tiny change without spec, design or `/approved`, and move it to the bug or feature lane once it
   changes behaviour, because the full pipeline costs more than a typo is worth.
 - **LN3** — In the one-way-door lane, list each irreversible step for the human's explicit yes and add the readiness
-  review, because a step that cannot be undone needs inspection before it ships.
+  items, because a step that cannot be undone needs inspection before it ships.
 
 ## When X, use Y
 
 | situation | use | why |
 |---|---|---|
-| docs, comments, a config value or a patch-level dependency bump; no behaviour changes | the tiny lane | nothing a spec or design would decide (LN2) |
+| docs, comments, a config value that changes no behaviour, or a patch-level dependency bump | the tiny lane | nothing a spec or design would decide (LN2) |
 | today's behaviour is wrong and the expected behaviour is known | the bug lane | the spec is current, expected and unchanged behaviour, proved by a failing test |
 | new or changed behaviour | the feature lane | the full pipeline: spec, design, design review, `/approved` |
-| the change touches stored data or a schema, a public API or event contract, authentication or permissions, or deletes data | the one-way-door lane | a wrong step cannot be undone (LN3) |
-| unsure between two lanes | the heavier lane | a lane can move down later; a shipped mistake cannot move back |
+| the change touches stored data or a schema, a public API or event contract, or a deploy | the one-way-door lane | a wrong step cannot be undone (LN3) |
+| unsure between two lanes | the heavier lane | a review that was too heavy costs time; a mistake in stored data cannot be undone |
 
 The phases each lane runs:
 
 | lane | phases | human gates |
 |---|---|---|
 | tiny | intake → build → verify → code review → gate → pull request | merge |
-| bug | intake → research → spec → (design if a contract or more than one module changes) → design review → build → verify → cleanup → code review → gate → pull request → retro | `/approved`, merge |
+| bug | intake → research → spec → design (only when an internal interface or more than one module changes) → design review of the spec and any design → build → verify → cleanup → code review → gate → pull request → retro | `/approved`, merge |
 | feature | every phase | `/approved`, merge |
-| one-way door | every phase, plus the readiness review in the pull request | `/approved` with each irreversible step listed, merge |
+| one-way door | every phase, plus the readiness items of the `pr-readiness` reference | `/approved` with each irreversible step listed, merge |
 
 ## Good / Bad
 
@@ -53,21 +53,23 @@ The lane follows from what the change touches, and the irreversible step waits f
 
 ## Decided edges
 
-- **Skip when** a dependency bump is a patch release with no behaviour change: it is tiny (LN2). — **Do not skip
-  when** the bump is a major release or changes behaviour: it is a feature. — **Confidence** high
-- **Skip when** a bug fix only changes code inside a body: it stays a bug. — **Do not skip when** the fix changes a
-  stored format, a public contract or a permission: it is a one-way door (LN3). — **Confidence** high
-- **Skip when** a migration only adds a nullable column or a table that nothing reads yet: it is a feature. — **Do not
-  skip when** it renames, retypes, drops or backfills: it is a one-way door (LN3). — **Confidence** medium
+- **Skip the full pipeline when** a dependency bump is a patch release with no behaviour change: it is tiny (LN2). —
+  **Do not skip when** the bump is a minor or major release, or changes behaviour: it is a feature. — **Confidence**
+  high
+- **Skip the one-way door when** a bug fix only changes code inside a body: it stays a bug. — **Do not skip when** the
+  fix changes a stored format or a public contract: it is a one-way door (LN3). — **Confidence** high
+- **Skip the one-way door when** a migration only adds a nullable column or a table that nothing reads yet: it is a
+  feature. — **Do not skip when** it renames, retypes, drops or backfills: it is a one-way door (LN3). —
+  **Confidence** medium
 
 ## Review checks
 
-Walk the issue, the merge request and its diff.
+Walk the issue, the pull request and its diff.
 
-- [ ] LN1 — Find the lane on the issue. Compare it with what the diff touches: a migration, a public contract, an
-  authentication or permission change, or a deletion of data means the one-way door. A lane that is missing or too
-  light is a finding.
+- [ ] LN1 — Find the lane on the issue. Compare it with what the diff touches: stored data or a schema, a public
+  contract or a deploy means the one-way door, except the decided edges above. A lane that is missing or too light is
+  a finding.
 - [ ] LN2 — For a tiny-lane change, check that the diff changes no behaviour: docs, comments, config values or a patch
   bump only. A tiny change with new logic is a finding.
 - [ ] LN3 — For a one-way-door change, find the list of irreversible steps and the human's yes on each, and the
-  readiness review in the pull request. Each one missing is a finding.
+  readiness items in the pull request. Each one missing is a finding.
