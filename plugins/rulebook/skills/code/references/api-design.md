@@ -29,8 +29,9 @@ Contents: Rules · When X, use Y · Good / Bad (AP2, AP4, AP5) · Decided edges 
 | the next page to point at | an opaque cursor, absent on the last page (AP2) | an offset skips or repeats rows when data changes |
 | a page response | `items` and `next`, the same on every endpoint (AP3) | one client pager works for the whole API |
 | a new piece of data in a published response | a new optional field beside the old ones (AP4) | old clients ignore it and keep working |
-| a field to rename, retype or remove | a new field, with the old one kept until no client reads it (AP4) | a rename is a removal for every old client |
+| a field to rename, retype or remove | a new field, with the old one kept (AP4) | a rename is a removal for every old client |
 | a client DTO for another service's response | unknown fields ignored and an enum with a fallback value (AP5) | the server may add both without a new version |
+| a client that reads a resource and sends it back with PUT | unknown fields and the raw enum string kept and sent back (AP5) | dropping them erases data the client does not know |
 | a new API | `/v1/` at the start of every path (AP6) | the version is in the URL that clients and gateways route on |
 | a change that AP4 forbids | a `/v2/` path beside `/v1/` (AP6) | old clients keep `/v1/` until they move |
 
@@ -60,14 +61,19 @@ InvoicePage list(
 }
 ```
 `Cursor.parse` decodes the opaque cursor into the last id of the previous page, or the first page when it is absent.
-The service reads `WHERE id > :last ORDER BY id LIMIT :size` and sets `next` only when more rows remain.
+The service reads `WHERE id > :last ORDER BY id LIMIT :size` and sets `next` only when more rows remain. A
+`@JsonInclude(NON_NULL)` on the page leaves `next` out of the last page, not `null`.
 
 ### AP4 — Add a field; never rename or retype one
 
+The published response has `number`, `customerName` and `total` as a decimal.
+
 **Bad**
 ```java
-// published:  record InvoiceResponse(String number, String customerName, BigDecimal total) {}
-record InvoiceResponse(String number, String customer, Money total) {}
+record InvoiceResponse(
+        String number,
+        String customer,
+        Money total) {}
 ```
 Every old client reads `customerName` and finds nothing, and its `total` parser fails on an object.
 
@@ -85,7 +91,9 @@ The new data is a new field. Old clients ignore it, and new clients read `totalW
 
 **Bad**
 ```java
-record ShipmentResponse(String trackingNumber, Status status) {
+record ShipmentResponse(
+        String trackingNumber,
+        Status status) {
     enum Status { CREATED, IN_TRANSIT, DELIVERED }
 }
 ```
@@ -108,6 +116,12 @@ A new field is ignored, and a new status reads as `UNKNOWN`, which the caller ha
   small. — **Do not skip when** the endpoint returns the whole collection with no page size. — **Confidence** high
 - **Skip when** a user must jump to page N of a bounded result: an offset is allowed (AP2). — **Do not skip when**
   clients only move to the next or the previous page. — **Confidence** high
+- **Skip when** a paged query never reaches an API client, such as a batch job: PS5's ordered page in
+  `persistence.md` is enough (AP2). — **Do not skip when** the page is returned to an API client. — **Confidence**
+  high
+- **Skip when** a client only reads the response: the enum's fallback value is enough (AP5). — **Do not skip when**
+  the client sends the resource back with PUT: it keeps unknown fields (`@JsonAnySetter`) and the raw enum string, and
+  sends them back. — **Confidence** high
 
 ## Review checks
 
@@ -116,13 +130,15 @@ in the diff.
 
 - [ ] AP1 — `grep -rn -A3 "@GetMapping"` in controllers, and read each return type. A `List`, `Set` or array of
   resources, or a page size with no default or no maximum, is a finding.
-- [ ] AP2 — `grep -rnE "offset|Pageable|PageRequest\.of|@RequestParam.*page"` in controllers. An offset or page
+- [ ] AP2 — `grep -rnE "\b(offset|skip|page|pageNumber)\b|Pageable|PageRequest\.of"` in controllers. An offset or page
   number outside the jump-to-page edge is a finding, and so is a cursor a client could build, such as a raw id.
 - [ ] AP3 — For each page response type, read its fields. A page without `items` and `next`, or with other names for
   them, is a finding.
-- [ ] AP4 — `git diff <base> -- '*Request.java' '*Response.java'` for types already released. A removed, renamed or
-  retyped field, a changed meaning, or a new required input field is a finding.
-- [ ] AP5 — For each DTO that reads another service's response, find unknown fields ignored (on the type or the
-  client's mapper) and a fallback on each enum. Either one missing is a finding.
-- [ ] AP6 — `grep -rnE '@(Request|Get|Post|Put|Patch|Delete)Mapping\("/'`. A path that does not start with
-  `/v<major>/`, or a new major version for a change AP4 allows, is a finding.
+- [ ] AP4 — `git diff <base>` over every type serialized in a released request or response, whatever its name. A
+  removed, renamed or retyped field, a changed meaning, or a new required input field is a finding.
+- [ ] AP5 — For each DTO that reads another service's response, find unknown fields ignored
+  (`@JsonIgnoreProperties(ignoreUnknown = true)`, or a mapper with `FAIL_ON_UNKNOWN_PROPERTIES` off, as Spring Boot's
+  is) and a fallback on each enum. Either one missing is a finding.
+- [ ] AP6 — `grep -rnE '@(Request|Get|Post|Put|Patch|Delete)Mapping\(((value|path) *= *)?"/'`, and join each
+  method path to its class-level prefix. A full path that does not start with `/v<major>/`, or a new major version for
+  a change AP4 allows, is a finding.
