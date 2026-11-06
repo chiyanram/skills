@@ -1,6 +1,6 @@
 ---
 name: code
-description: Use when you write or review production code: Java, Spring beans and configuration, types, errors, interfaces, services, HTTP API design, JPA persistence, comments, concurrency, messaging, security, code smells, and Angular UI. Lists each code reference and when to read it.
+description: Use when you write or review production code: Java, Spring beans and configuration, types, errors, interfaces, services, HTTP API design, JPA persistence, scheduled and batch jobs, comments, concurrency, messaging, security, code smells, and Angular UI. Lists each code reference and when to read it.
 ---
 
 # Code
@@ -22,6 +22,7 @@ approved Good/Bad pair, `references/examples/<name>.md` holds them all.
 | [messaging](references/messaging.md) | MS4, MS6, MSN1–MSN2 | when you write or review a message consumer, a scheduled job, or an operation that can run twice |
 | [modern-java](references/modern-java.md) | MJ1–MJ6, MJ8–MJ10, MJ12–MJ17 | when you write or review Java production code, a record, a `switch`, or a Maven or Gradle build file |
 | [persistence](references/persistence.md) | PS1–PS14 | when you write or review a JPA entity, a repository or query method, a service method that reads entities, or the JPA, Hibernate or Hikari settings |
+| [scheduling](references/scheduling.md) | SJ1–SJ7 | when you write or review a `@Scheduled` method, a CronJob, a lock on a job, a job that changes many rows, or a job that deletes data |
 | [security](references/security.md) | SE1–SE7, SE7a, SE8, SE10, SEN1–SEN2, SS1–SS11, SS16–SS17, SS19–SS26 | when you write or review code that takes outside input, stores or checks a secret, or touches the security filter chain, a guard, a token or a security test |
 | [services](references/services.md) | LY1–LY3, LYN1 | when you write or review a controller, a service, an interface or a use case that makes two calls |
 | [smells](references/smells.md) | DS1–DS4, DS6, DS11–DS12, DS14, SM1, FW1–FW3, FW5–FW6, FW8, NM1–NM4 | when you write or review production code in any language: the smell baseline, and the shape and naming rules behind it |
