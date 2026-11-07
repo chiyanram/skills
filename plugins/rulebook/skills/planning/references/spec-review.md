@@ -36,6 +36,12 @@ Contents: Rules · When X, use Y · Good / Bad (SR2, SR3, SR4, SR10, SR11) · De
   second copy of a part drifts from the first.
 - **SR18** — For each new failure mode in the design, name the log, metric or alert that shows it in production,
   because a failure nobody can see is found by users first.
+- **SR19** — List each assumption behind the spec as stated, inferred from code at `file:line`, or a chosen default,
+  and have the human confirm the last two, because an unconfirmed guess becomes a requirement.
+- **SR20** — In a one-way-door design, write a pre-mortem: assume it failed and name each specific failure (trigger,
+  chain of effects, early sign) with its mitigation, because asking only whether it works hides how it fails.
+- **SR21** — Before the spec, research how the touched code works (flow, where things live, gotchas at `file:line`)
+  and why it is shaped so (commits, PRs, issues), because changing code without its reason reintroduces old bugs.
 
 ## When X, use Y
 
@@ -59,6 +65,11 @@ Contents: Rules · When X, use Y · Good / Bad (SR2, SR3, SR4, SR10, SR11) · De
 | a decision is hard to reverse, surprising, and a real tradeoff | write it as an ADR (SR15) | the next reader re-decides it without knowing why |
 | the design adds a part that resembles one in the code today | reuse that part, or say why it cannot serve (SR17) | two copies drift apart |
 | the design adds a way to fail: a timeout, a rejected input, a lost message | the log, metric or alert that shows it (SR18) | users find an unseen failure first |
+| the spec rests on something the human did not say | an assumption list, each marked stated, inferred (`file:line`) or default; the human confirms the inferred and default ones (SR19) | a guess the human never saw is built as if they asked for it |
+| the design is a one-way door (LN3) | a pre-mortem: "three months later this failed", each failure with a specific trigger, the chain of effects and the first sign, then a concrete mitigation (SR20) | a step you cannot undo needs its failures found before it ships |
+| research on one file or one function | one read-only helper that explores and explains in one pass (SR21) | a fan-out costs more than it finds |
+| research on more than one module or service | two to four read-only helpers, each on one angle, then one synthesis: overview, key concepts, how it works, where things live, gotchas (SR21) | each angle stays inside one context |
+| code that looks odd or redundant | its history: `git log` and `git blame` on the lines, then the pull requests and issues they cite (SR21) | the odd line is often the fix for a past bug |
 
 ## Good / Bad
 
@@ -180,6 +191,30 @@ went out is not delivered twice.
 ```
 Each step names its failure, its rerun and its crash, so a retry needs no debugging.
 
+### SR20 — A pre-mortem names how it fails, not only that it might
+
+**Bad**
+```markdown
+## Pre-mortem — move loan history to its own table
+
+Risk: it might not scale. Mitigation: monitor performance.
+```
+"It might not scale" names no trigger, no chain and no sign, so nobody can watch for it or plan around it.
+
+**Good**
+```markdown
+## Pre-mortem — move loan history to its own table
+
+Failure: the copy runs while members still renew loans.
+Trigger: the backfill takes longer than the release window.
+Chain: renewals made during the copy land only in the old table; the old
+table is dropped; those renewals are lost.
+Early sign: the row counts of the two tables differ after the backfill.
+Mitigation: write to both tables from the release before the backfill, and
+drop the old table only after a week of equal counts.
+```
+Each failure has a trigger, a chain and a sign someone can check.
+
 ## Decided edges
 
 - **Skip when** a later round reports a problem in text that changed since the last round: that is a new finding. —
@@ -210,6 +245,15 @@ Each step names its failure, its rerun and its crash, so a retry needs no debugg
   second user is a future one (SR14). — **Confidence** high
 - **Skip when** the decision is easy to reverse or the obvious choice: one line in the design is enough. — **Do not
   skip when** all three hold: hard to reverse, surprising, and a real tradeoff (SR15). — **Confidence** high
+- **Skip when** the change is in the tiny lane (LN2): it has no spec. — **Do not skip when** any spec (bug, feature or
+  one-way door) rests on an inference the human has not seen (SR19). — **Confidence** high
+- **Skip when** an assumption is a fact about today's code that SR4 looked up and SR2 cites: the code settles it, so
+  the human need not confirm it. — **Do not skip when** the code is used to infer what the human wants (SR19). —
+  **Confidence** high
+- **Skip when** the change is in the tiny, bug or feature lane: SR11 already asks what each step does when it fails.
+  — **Do not skip when** the change is in the one-way-door lane (SR20, LN3). — **Confidence** high
+- **Skip when** the change only adds new code and touches no existing behaviour: there is no history to read. —
+  **Do not skip when** the design plans to delete or reshape existing code (SR21). — **Confidence** high
 
 ## Review checks
 
@@ -241,3 +285,10 @@ Walk the whole spec and the whole design in one round, every section, before you
 - [ ] SR17 — For each new part, search the code for one that does the same job. One found and neither reused nor
   ruled out in the design is a finding.
 - [ ] SR18 — For each new failure mode, find the log, metric or alert that shows it. Each one missing is a finding.
+- [ ] SR19 — In the issue's clarify answers or the design, find the assumption list, each marked stated, inferred or
+  default. A missing list, or an inferred or default assumption with no answer from the human, is a finding.
+- [ ] SR20 — In a one-way-door design, find the pre-mortem. A missing pre-mortem, a failure with no specific trigger or
+  early sign, or a failure with no mitigation, is a finding.
+- [ ] SR21 — In the research notes, find the how (with `file:line`) and, for each line the design plans to delete or
+  reshape, the why: a commit, pull request or issue, or "no recorded reason". A line planned for deletion or
+  reshaping with no stated why is a finding.

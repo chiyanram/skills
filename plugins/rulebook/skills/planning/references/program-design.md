@@ -24,6 +24,8 @@ Contents: Rules · When X, use Y · Good / Bad (PD1–PD5) · Decided edges · R
   before you code past it, because an unrecorded deviation leaves the design check judging against a guess.
 - **PD9** — Plan slices so their pull request stays within 400 changed lines and 15 files, and make a larger slice
   its own issue, because one writer and one review handle that size well.
+- **PD10** — Settle a design question that paper can't decide with a throwaway prototype off the main branch, and
+  carry only the decision and its evidence into the design, because prototype code is not built to ship.
 
 ## When X, use Y
 
@@ -38,6 +40,7 @@ Contents: Rules · When X, use Y · Good / Bad (PD1–PD5) · Decided edges · R
 | needs a file path, a signature or a tree | the design, never the spec (PD6) | file paths and code snippets in a spec go stale quickly |
 | is found wrong during the build phase | a recorded change to the design, then code (PD7) | an unrecorded deviation leaves the design check judging against a guess |
 | has slices that together pass 400 changed lines or 15 files | make the larger slices issues of their own (PD9, CR2) | one writer and one review handle that size well |
+| has a question only trying it can settle: a layout, a state flow, a timing | a throwaway prototype on its own branch, marked as a prototype; the design cites its verdict and evidence (screenshots, observed output) (PD10) | a guess on paper and a polished build both cost more than a quick throwaway answer |
 
 ## Good / Bad
 
@@ -176,6 +179,9 @@ A reviewer can run the same command and the same manual step.
 - **Skip when** the build changes only code inside a body, and every approved type, signature and file placement holds.
   — **Do not skip when** a function needs a parameter the design did not show: record it first (PD7). —
   **Confidence** high
+- **Skip when** reading code or docs can settle the question: no prototype is needed, and SR4 looks those up first.
+  — **Do not skip when** two shapes both look right on paper and the choice is costly to undo (PD10). —
+  **Confidence** high
 
 ## Review checks
 
@@ -196,3 +202,5 @@ Walk the whole design and every slice in it. During the build phase, also walk t
   the design does not record is a finding.
 - [ ] PD9 — Add up the files and lines the slices plan to change. A plan over 400 lines or 15 files with no slice
   moved to its own issue is a finding.
+- [ ] PD10 — For each design decision backed by a prototype, find the verdict and its evidence in the design and the
+  prototype's branch. Prototype code in the pull request's diff is a finding.
