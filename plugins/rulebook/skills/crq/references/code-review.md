@@ -14,6 +14,8 @@ before you split a change.
   the human, because an agent that edits its own gate, rules or dependencies can pass any change.
 - **CR4** — Give each raised threshold or disabled check in a config file its reason on the line above it, because a
   silent exception hides the problem the check was built to catch.
+- **CR5** — For each changed behaviour, name the consumers outside the diff it reaches at `file:line`, and prove the
+  fact its safety rests on by running code, because breakage outside the diff never shows in it.
 
 ## When X, use Y
 
@@ -24,6 +26,7 @@ before you split a change.
 | generated files, lock files or a mechanical rename | leave them out of the count, and list them in the pull request (CR2) | they are not read line by line |
 | the diff touches `.github/workflows/`, `.gitlab-ci.yml`, a build file, a dependency manifest that adds a dependency, `CODEOWNERS`, `AGENTS.md`, `CLAUDE.md`, `.claude/` or `.agents/` | the human reviews that file before the gate (CR3) | it changes how the change is judged |
 | a lint or coverage threshold goes down, or a check is switched off | its reason on the line above, in the same change (CR4) | the next reader sees why the rule bends |
+| a change to a behaviour that code outside the diff relies on | each impacted consumer named at `file:line`, not "callers of X"; the one fact the change is safe because of, proved by a script or test that calls the real code (CR5) | a convincing write-up reads the same whether or not it is true |
 
 ## Good / Bad
 
@@ -52,6 +55,9 @@ Each finding names the criterion or the extra behaviour, and its line.
   **Confidence** medium
 - **Skip CR4 when** a threshold goes up or a check is switched on. — **Do not skip when** a threshold goes down or a
   check is switched off. — **Confidence** high
+- **Skip when** the behaviour has no consumer outside the diff, such as a private method whose only callers are in
+  the change (CR5). — **Do not skip when** it is shared code, a public contract, configuration or a library version
+  bump. — **Confidence** high
 
 ## Review checks
 
@@ -65,3 +71,5 @@ Walk the approved spec and design, then the whole diff.
   (`.agents/` included), and each dependency the diff adds, except the decided edges above. Each one without the human's review is a finding.
 - [ ] CR4 — For each lowered threshold or disabled check in a config file, find its reason on the line above. Each
   one without a reason is a finding.
+- [ ] CR5 — For each changed shared or public behaviour, find the named consumers and the proof run. "Callers of X"
+  with no `file:line`, or a safety claim with nothing run behind it, is a finding.

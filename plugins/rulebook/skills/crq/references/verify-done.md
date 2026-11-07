@@ -20,6 +20,8 @@ check a writer's proof.
   the defect it was written to catch.
 - **VB7** — For a bug fix, have a separate run write the failing test from the bug spec before the fix is written,
   because a writer that tests its own fix shares its misreading.
+- **VB8** — Resolve a conflict with the base by reading why each side changed (commits, PR, issue), keeping both
+  where they fit, and rerunning the checks, because picking ours or theirs silently drops a deliberate change.
 
 ## When X, use Y
 
@@ -30,6 +32,9 @@ check a writer's proof.
 | a criterion a user sees: a screen, an API response, a message | a run of the app: the call made and what came back (VB4) | the test may miss how the parts fit |
 | a criterion only code sees | the test that proves it, by name (VB5) | the test is the evidence |
 | a bug fix | a separate run writes the failing test first (VB7); the writer runs it locally and pastes the failure (S6) | the test and the fix stay independent |
+| a conflict between two changes that can both hold, such as two sections added at the end of one file | both sides kept, in a stated order (VB8) | each side was made on purpose |
+| a conflict between two intents that cannot both hold | an open question to the human (VB1), with each side's reason and a recommendation | choosing between intents is the human's call |
+| a conflict in a lockfile or another generated file | the file regenerated with its tool, never merged by hand (VB8) | a hand-merged lockfile is broken or stale |
 
 ## Good / Bad
 
@@ -60,6 +65,8 @@ Each criterion points at a command and its result at the pushed commit.
   when** a test is removed, skipped or loosened while its behaviour stays (VB6). — **Confidence** high
 - **Skip the separate test run when** the bug cannot be reproduced in a test: say so, and ask. — **Do not skip
   when** the bug spec names inputs and an expected result (VB7). — **Confidence** medium
+- **Skip when** git merged cleanly with no conflict: the gate at the new head is enough (VB8, VB3). — **Do not skip
+  when** any hunk needed a hand edit. — **Confidence** high
 
 ## Review checks
 
@@ -77,3 +84,6 @@ Walk the pull request body, its commits and the diff of its tests.
 - [ ] VB6 — In the test diff, find each removed, skipped or loosened test. One whose behaviour stays is a finding.
 - [ ] VB7 — For a bug fix, find the commit that adds the failing test, before the fix commit, and the note that a
   separate run wrote it. Each one missing is a finding.
+- [ ] VB8 — For each merge or rebase commit that resolved conflicts, find the note of what each side changed and why,
+  and a check run at the new head. A side dropped with no reason, a hand-edited lockfile, conflict markers left
+  behind, or no check run after the merge, is a finding.
