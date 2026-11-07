@@ -47,22 +47,38 @@ check.
 
 ```mermaid
 flowchart LR
-    I["issue: candidate rules,<br/>each with a source"] --> Q{"operator<br/>approves?"}
+    I["issue labelled<br/>ready-for-agent"] --> R["research: sources<br/>and incidents"]
+    R --> Q{"operator approves<br/>the table?"}
     Q -->|"no"| X["stays out"]
-    Q -->|"yes"| L["ledger row<br/>approved-rules.md"]
-    L --> F["reference in<br/>plugins/rulebook/"]
-    F --> C["make index · lint · test"]
+    Q -->|"yes"| W["reference + ledger row<br/>make index · lint · test"]
+    W --> V["fresh review"]
+    V --> P["pull request"] --> M{"operator<br/>merges"}
 ```
 
-1. Find two independent sources for the rule: a file and line pinned to a commit, or an official doc and its section.
-   The operator's stated preference also admits a rule. The `meta` skill's `writing-references` reference has the
-   full test.
-2. Get the operator's yes for each rule.
-3. Add a row to the [ledger](docs/rulebook/approved-rules.md): ID, reference, rule, *because* reason, source,
+A rule issue starts when the operator labels it `ready-for-agent`, or says "start #N". The operator decides twice:
+at the approval table and at the merge.
+
+1. Read the issue, and list the rules that already cover its topic, so the new rules only fill gaps.
+2. Find two independent sources for each part of each rule: a file and line pinned to a commit, or an official doc
+   and its section. Pages from one company count as one source; a vendor's own docs are enough for a rule about that
+   vendor's API. Read production incidents too, and mark each as a primary write-up or a summary. Check every source
+   before the table, not after it. The `meta` skill's `writing-references` reference has the full test.
+3. Show the operator one table, one row per rule: the rule as it would ship, where it goes, the sources for each part
+   with how many are independent, the incidents, and a recommendation. Say above it what already covers the topic, and
+   below it what was left out and why. A part with one source is decided there, once, as the operator's preference.
+   The operator's yes also covers the commits and pushes on the issue's branch until the pull request.
+4. Add a row to the [ledger](docs/rulebook/approved-rules.md): ID, reference, rule, *because* reason, source,
    evidence, status. Add new sections at the end of the file, and change a rule with a new row that says
    "Supersedes", never by editing the old row. Git merges the ledger with `union`, so two pull requests that both
    add a section merge without a conflict.
-4. Write the rule into its reference. The source stays in the ledger, never in the reference.
+5. Write the rule into its reference. The source stays in the ledger, never in the reference. Before you edit a
+   `crq` reference, check for an open pull request on the same file: wait if there is one, and note the change on
+   the crq issue (#210) when you go ahead.
+6. Have a fresh reviewer check each rule, grep and example, every Good / Bad pair against every rule, and every
+   ledger cite. Bring a fix that changes what a rule means (narrower, wider, split, or a part left with one source)
+   back to the operator before the pull request. Put every other fix in the review-fix commit and list it in the
+   pull request body.
+7. Open the pull request with `Closes #N`. The operator merges.
 
 ## Add a reference
 
