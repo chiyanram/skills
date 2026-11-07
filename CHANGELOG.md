@@ -3,6 +3,16 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.33.0](https://github.com/chiyanram/skills/compare/rulebook--v0.32.1...rulebook--v0.33.0) (2026-11-07)
+
+### Features
+
+* **planning:** seven rules from the outside skill repos ([#223](https://github.com/chiyanram/skills/issues/223)) ([#226](https://github.com/chiyanram/skills/issues/226)) ([49c312e](https://github.com/chiyanram/skills/commit/49c312e07ad8d89c4a816ad8ab31ff908ad7b035))
+
+### Bug Fixes
+
+* **repo:** merge the ledger with union and check it for repeated rows ([#224](https://github.com/chiyanram/skills/issues/224)) ([f8a91d6](https://github.com/chiyanram/skills/commit/f8a91d6117556256818ec4343a34752ef97c9042))
+
 ## [0.32.1](https://github.com/chiyanram/skills/compare/rulebook--v0.32.0...rulebook--v0.32.1) (2026-11-06)
 
 ### Bug Fixes
