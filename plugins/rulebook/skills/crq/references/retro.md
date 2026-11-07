@@ -21,13 +21,13 @@ request is merged, rescued or reverted, or a defect escapes.
 
 | situation | use | why |
 |---|---|---|
-| a rescue, a revert or an escaped defect | a full retro: RT1 to RT4 | each one shows where the pipeline failed |
+| a rescue, a revert or an escaped defect | a full retro: RT1 to RT5 | each one shows where the pipeline failed |
 | any other merge | the RT1 record only | the record is cheap; the analysis goes where something failed |
 | the lesson can be checked by a tool | an action of type script (RT4) | a script never forgets |
 | the lesson needs judgement | an action of type rule or check (RT4) | every new rule still needs the operator's yes and a ledger row |
 | an existing check should have caught it but did not | a rewrite of that check, with this issue as its example (RT3) | the check is mis-worded, not missing |
 | facts for the retro | the transcripts of the coordinator, writers and reviewers, and the pull request's events; each number cited to one of them (RT5) | memory rounds off the bad parts |
-| a lesson found once | kept only if it recurs, or if the one instance did real harm; otherwise noted and dropped (RT5) | a one-off is not a learning, and a rule per one-off becomes noise |
+| a lesson found once | kept only if it recurs; otherwise noted and dropped (RT5) | a one-off is not a learning, and a rule per one-off becomes noise |
 
 ## Good / Bad
 
@@ -56,8 +56,10 @@ Each action says what kind of fix, who owns it, when, and where it is tracked.
   **Do not skip when** it needed a rescue or was reverted (RT2, RT3). — **Confidence** high
 - **Skip a new check when** an existing check covers the case and only missed it: tune that check. — **Do not skip
   when** no rule or check covers the case at all (RT3). — **Confidence** high
-- **Skip when** the pull request was in the tiny lane and merged with no rescue: a timeline line is enough (RT5,
-  RT1). — **Do not skip when** there was a rescue, a revert or an escaped defect. — **Confidence** high
+- **Skip the transcript mining when** the merge had no rescue, revert or escaped defect: the RT1 record is enough. —
+  **Do not skip when** there was a rescue, a revert or an escaped defect (RT5). — **Confidence** high
+- **Skip the recurrence bar when** the one instance is a rescue, a revert or an escaped defect: it is a lesson the first
+  time. — **Do not skip when** the lesson comes from a merge that went well (RT5, RT2, RT3). — **Confidence** high
 
 ## Review checks
 
@@ -72,4 +74,4 @@ Walk the retro note on the issue.
 - [ ] RT4 — For each action, find its type, owner, due date and issue. Each one missing, or a bare "improve", is a
   finding.
 - [ ] RT5 — In the retro, find a transcript or command cite for each number and each claim about what happened. A
-  number with no cite, or a lesson drawn from one instance with no harm stated, is a finding.
+  number with no cite, or a lesson from one instance that was not a rescue, revert or escaped defect, is a finding.
