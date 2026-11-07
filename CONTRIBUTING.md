@@ -59,7 +59,9 @@ flowchart LR
    full test.
 2. Get the operator's yes for each rule.
 3. Add a row to the [ledger](docs/rulebook/approved-rules.md): ID, reference, rule, *because* reason, source,
-   evidence, status.
+   evidence, status. Add new sections at the end of the file, and change a rule with a new row that says
+   "Supersedes", never by editing the old row. Git merges the ledger with `union`, so two pull requests that both
+   add a section merge without a conflict.
 4. Write the rule into its reference. The source stays in the ledger, never in the reference.
 
 ## Add a reference
@@ -89,6 +91,7 @@ flowchart LR
 | `check_index.py` | a plugin README does not link every skill router, or a router's table differs from what `make index` builds |
 | `check_routers.py` | a skill folder ships references but has no `SKILL.md`, or its `SKILL.md` does not link each one |
 | `check_provenance.py` | a shipped skill file carries provenance outside code: a source citation, a URL, a preference line, a credit, an evidence note, a date or an agent-factory reference |
+| `check_ledger.py` | the ledger repeats a rule ID for the same reference without "Supersedes" in the later row, or holds a conflict marker |
 
 ## Releases
 
@@ -117,6 +120,7 @@ so every change to what ships must be a `feat` or a `fix`. Preview the next rele
 | `check_index.py`: a table is stale | run `make index` and commit the router it rewrote |
 | `make test` fails in `test_release_config` or `test_release_links` | run `npm ci`; the tests load the release config from `node_modules` |
 | `check_provenance.py` fails on a reference | move the citation, URL or date into the rule's ledger row |
+| `check_ledger.py`: a rule ID repeats | a merge kept two edits of one row: keep the right one, or mark the newer row "Supersedes" |
 | `check_sizes.py`: a rule is over 35 words | shorten it; move detail to When X, use Y or Decided edges |
 | `claude plugin marketplace add` fails on clone | the repo is private: run `gh auth setup-git` |
 | a merge to `main` did not release | the commit carried the skip-ci marker; never quote it in a pull request. Open **Actions → ci → Run workflow** on `main` |

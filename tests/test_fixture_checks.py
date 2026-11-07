@@ -13,6 +13,7 @@ CASES = {
     "routers": (["good"], ["unlisted", "no-router"]),
     "provenance": (["good"], ["citation", "preference", "credit", "date", "evidence", "agent-factory", "neutral",
                               "fileline", "section", "url", "nested-fence"]),
+    "ledger": (["good"], ["duplicate", "marker"]),
 }
 
 

@@ -1,0 +1,2 @@
+# The ledger only grows at the end, so a merge keeps both sides; check_ledger.py catches a row both sides edited.
+docs/rulebook/approved-rules.md merge=union
