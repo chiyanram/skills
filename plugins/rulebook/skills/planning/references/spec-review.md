@@ -223,6 +223,9 @@ Each step names its failure, its rerun and its crash, so a retry needs no debugg
   skip when** all three hold: hard to reverse, surprising, and a real tradeoff (SR15). — **Confidence** high
 - **Skip when** the change is in the tiny lane (LN2): it has no spec. — **Do not skip when** any spec (bug, feature or
   one-way door) rests on an inference the human has not seen (SR19). — **Confidence** high
+- **Skip when** an assumption is a fact about today's code that SR4 looked up and SR2 cites: the code settles it, so
+  the human need not confirm it. — **Do not skip when** the code is used to infer what the human wants (SR19). —
+  **Confidence** high
 - **Skip when** the change is in the tiny, bug or feature lane: SR11 already asks what each step does when it fails.
   — **Do not skip when** the change is in the one-way-door lane (SR20, LN3). — **Confidence** high
 - **Skip when** the change only adds new code and touches no existing behaviour: there is no history to read. —
