@@ -40,7 +40,7 @@ Contents: Rules · When X, use Y · Good / Bad (PD1–PD5) · Decided edges · R
 | needs a file path, a signature or a tree | the design, never the spec (PD6) | file paths and code snippets in a spec go stale quickly |
 | is found wrong during the build phase | a recorded change to the design, then code (PD7) | an unrecorded deviation leaves the design check judging against a guess |
 | has slices that together pass 400 changed lines or 15 files | make the larger slices issues of their own (PD9, CR2) | one writer and one review handle that size well |
-| a question only trying it can settle: a layout, a state flow, a timing | a throwaway prototype on its own branch, marked as a prototype; the design cites its verdict and evidence (screenshots, observed output) (PD10) | a guess on paper and a polished build both cost more than a quick throwaway answer |
+| has a question only trying it can settle: a layout, a state flow, a timing | a throwaway prototype on its own branch, marked as a prototype; the design cites its verdict and evidence (screenshots, observed output) (PD10) | a guess on paper and a polished build both cost more than a quick throwaway answer |
 
 ## Good / Bad
 
@@ -179,8 +179,8 @@ A reviewer can run the same command and the same manual step.
 - **Skip when** the build changes only code inside a body, and every approved type, signature and file placement holds.
   — **Do not skip when** a function needs a parameter the design did not show: record it first (PD7). —
   **Confidence** high
-- **Skip when** reading code or docs can settle the question: no prototype is needed (PD10; SR4 looks those up
-  first). — **Do not skip when** two shapes both look right on paper and the choice is costly to undo. —
+- **Skip when** reading code or docs can settle the question: no prototype is needed, and SR4 looks those up first.
+  — **Do not skip when** two shapes both look right on paper and the choice is costly to undo (PD10). —
   **Confidence** high
 
 ## Review checks

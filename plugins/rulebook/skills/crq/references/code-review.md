@@ -55,9 +55,9 @@ Each finding names the criterion or the extra behaviour, and its line.
   **Confidence** medium
 - **Skip CR4 when** a threshold goes up or a check is switched on. — **Do not skip when** a threshold goes down or a
   check is switched off. — **Confidence** high
-- **Skip when** the behaviour has no consumer outside the diff, such as a private method whose only callers are in
-  the change (CR5). — **Do not skip when** it is shared code, a public contract, configuration or a library version
-  bump. — **Confidence** high
+- **Skip the consumer list when** the behaviour has no consumer outside the diff, such as a private method whose only
+  callers are in the change. — **Do not skip when** it is shared code, a public contract, configuration or a minor or
+  major library version bump (CR5). — **Confidence** high
 
 ## Review checks
 
@@ -71,5 +71,6 @@ Walk the approved spec and design, then the whole diff.
   (`.agents/` included), and each dependency the diff adds, except the decided edges above. Each one without the human's review is a finding.
 - [ ] CR4 — For each lowered threshold or disabled check in a config file, find its reason on the line above. Each
   one without a reason is a finding.
-- [ ] CR5 — For each changed shared or public behaviour, find the named consumers and the proof run. "Callers of X"
-  with no `file:line`, or a safety claim with nothing run behind it, is a finding.
+- [ ] CR5 — For each changed behaviour with a consumer outside the diff (shared code, a public contract, configuration,
+  a dependency bump), find the named consumers and the proof run. "Callers of X" with no `file:line`, or a safety
+  claim with nothing run behind it, is a finding.

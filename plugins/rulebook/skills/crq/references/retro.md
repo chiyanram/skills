@@ -26,9 +26,8 @@ request is merged, rescued or reverted, or a defect escapes.
 | the lesson can be checked by a tool | an action of type script (RT4) | a script never forgets |
 | the lesson needs judgement | an action of type rule or check (RT4) | every new rule still needs the operator's yes and a ledger row |
 | an existing check should have caught it but did not | a rewrite of that check, with this issue as its example (RT3) | the check is mis-worded, not missing |
-| facts for the retro | the transcripts of the coordinator, writers and reviewers, and the forge's merge request events; each number cited to one of them (RT5) | memory rounds off the bad parts |
+| facts for the retro | the transcripts of the coordinator, writers and reviewers, and the pull request's events; each number cited to one of them (RT5) | memory rounds off the bad parts |
 | a lesson found once | kept only if it recurs, or if the one instance did real harm; otherwise noted and dropped (RT5) | a one-off is not a learning, and a rule per one-off becomes noise |
-| a proposed change to a rule or a skill | shown to the human with its destination, applied only after a yes (RT5, RT4) | rule and skill changes affect every later run |
 
 ## Good / Bad
 
