@@ -18,6 +18,8 @@ before you split a change.
   fact its safety rests on by running code, because breakage outside the diff never shows in it.
 - **CR6** — For each changed behaviour, name its smallest realistic regression and the assertion that would fail on
   it; a skipped, no-throw, snapshot-only or mock-call check does not count, because such a test passes while seeing nothing.
+- **CR7** — For each removed or replaced chunk, name the behaviour or contract it carried and where the change
+  re-establishes or retires it, because a removed guard leaves no line to review.
 
 ## When X, use Y
 
@@ -33,6 +35,7 @@ before you split a change.
 | the test that seems to cover it is skipped, flaky, not run by default, only checks that nothing was thrown, compares a snapshot, or checks a mock or log call | a finding: that test does not count (CR6) | it passes whether or not the behaviour is right |
 | a test the diff touches still asserts the old behaviour, or no longer exercises anything | a finding naming what it should assert, or that it should go (CR6) | a stale test pins the wrong outcome |
 | the diff adds a test | the junk patterns of V3 (`testing/value-bar.md`) | that is where a new test's worth is judged |
+| the diff removes or replaces a check, a default, an error path or a call | where the change puts it back, or why it is retired on purpose; a reference left pointing at the removed code is a finding (CR7) | the removal shows as red lines nobody reads for what they did |
 
 ## Good / Bad
 
@@ -86,6 +89,9 @@ Each consumer is named at its line, and the claim the change rests on is run, no
 - **Skip the regression search when** a part changes no behaviour (formatting, a rename, a type-only change) or the
   compiler or type checker already enforces it. — **Do not skip when** a return value, a thrown error, a side effect
   or observable state changes (CR6). — **Confidence** high
+- **Skip the deletion check when** the removal is a pure rename, a formatting change or code nothing reached. —
+  **Do not skip when** the removed code enforced a check, a default, an error path or a call (CR7). — **Confidence**
+  high
 
 ## Review checks
 
@@ -104,3 +110,5 @@ Walk the approved spec and design, then the whole diff.
   claim with nothing run behind it, is a finding.
 - [ ] CR6 — For each changed behaviour, find its named regression and the assertion that fails on it. A behaviour
   with none, or covered only by a skipped, no-throw, snapshot-only or mock-call check, is a finding.
+- [ ] CR7 — For each removed or replaced chunk, find the behaviour it carried and where it is re-established or why
+  it is retired. One with neither, or a reference left to removed code, is a finding.
