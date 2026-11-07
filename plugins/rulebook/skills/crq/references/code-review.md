@@ -46,6 +46,25 @@ CR1 · Act on · LoanService.java:51 — extra: a limit of 3 renewals is not in 
 ```
 Each finding names the criterion or the extra behaviour, and its line.
 
+### CR5 — Name the consumers outside the diff and prove the fact
+
+**Bad**
+```text
+Review: dueDate() now returns UTC. Callers of dueDate() should be fine. No findings.
+```
+"Callers of dueDate()" names no one, and "should be fine" proves nothing. The reminder job still compares the date
+with local midnight.
+
+**Good**
+```text
+CR5 · consumers of LoanService.dueDate(), now UTC:
+- ReminderJob.java:30 compares it with LocalDate.now(): a day off in zones ahead of UTC
+- LoanExport.java:12 formats it as ISO-8601 with its zone: safe
+CR5 · proved: DueDateZoneTest runs the real ReminderJob in UTC+2; it fails
+CR5 · Act on · ReminderJob.java:30 — convert to the library's zone before comparing
+```
+Each consumer is named at its line, and the claim the change rests on is run, not argued.
+
 ## Decided edges
 
 - **Skip the size budget when** the change is one mechanical rename or a formatter run. — **Do not skip when** the

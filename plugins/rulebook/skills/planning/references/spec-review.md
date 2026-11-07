@@ -191,6 +191,30 @@ went out is not delivered twice.
 ```
 Each step names its failure, its rerun and its crash, so a retry needs no debugging.
 
+### SR20 — A pre-mortem names how it fails, not only that it might
+
+**Bad**
+```markdown
+## Pre-mortem — move loan history to its own table
+
+Risk: it might not scale. Mitigation: monitor performance.
+```
+"It might not scale" names no trigger, no chain and no sign, so nobody can watch for it or plan around it.
+
+**Good**
+```markdown
+## Pre-mortem — move loan history to its own table
+
+Failure: the copy runs while members still renew loans.
+Trigger: the backfill takes longer than the release window.
+Chain: renewals made during the copy land only in the old table; the old
+table is dropped; those renewals are lost.
+Early sign: the row counts of the two tables differ after the backfill.
+Mitigation: write to both tables from the release before the backfill, and
+drop the old table only after a week of equal counts.
+```
+Each failure has a trigger, a chain and a sign someone can check.
+
 ## Decided edges
 
 - **Skip when** a later round reports a problem in text that changed since the last round: that is a new finding. —
