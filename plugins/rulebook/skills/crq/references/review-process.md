@@ -35,7 +35,7 @@ review.
 | the change breaks code it does not touch, such as a caller or an invariant | a finding at the broken line, citing the change | the change introduced the break, so RV2 holds |
 | a check's log shows its findings are mostly dismissed | rewrite the check with an example (RV5) | the check is mis-worded or mis-scoped |
 | the review returns zero findings | no signal: the change still waits for the human (RV6) | a fooled reviewer also returns zero |
-| a check's log shows it never fires where it applies | retire it, or move it to a script (RV5) | it costs reading time and catches nothing |
+| a check's log shows it never fires where it applies | keep it while what it guards still exists; move it to a script if a tool can run it; retire it only when what it guards is gone (RV5) | a check that works leaves no findings, so a quiet log is not noise |
 
 ## Good / Bad
 
@@ -68,6 +68,8 @@ One finding, introduced by the change, shown at its line, with the fix.
 - **Skip the exclusion when** a writer's commit message explains a choice: the reviewer may read the diff and the
   commits. — **Do not skip when** the text is the writer's summary of its own work or test results: keep it out of the
   reviewer's input (RV3). — **Confidence** medium
+- **Skip retiring a quiet check when** what it guards still exists: a check that works finds nothing. — **Do not skip
+  when** the code, contract or risk it guards is gone (RV5). — **Confidence** high
 
 ## Review checks
 
@@ -81,7 +83,8 @@ Walk the review's summary note, its threads and the finding log.
   references in scope. The writer's own summary in the input is a finding.
 - [ ] RV4 — Count the nits. More than five, or a nit marked blocking, is a finding.
 - [ ] RV5 — Find a log entry for each finding, with its check, its bucket and the human's action. A finding with no
-  entry is a finding, and so is a check the log shows is noise but nobody rewrote.
+  entry is a finding, and so is a check the log shows is noise but nobody rewrote. A check retired only because it
+  never fired, while what it guards still exists, is a finding.
 - [ ] RV6 — Find who undrafted, approved and merged the pull request. Any of them done by an agent or a review bot, or
   done because a review returned zero findings, is a finding.
 - [ ] RV7 — For each Act-on finding, find its grade: the walk-through to where it breaks, or the command run and its
