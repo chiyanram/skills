@@ -36,6 +36,8 @@ review.
 | the finding is true but the change did not introduce it | **Noted**: a follow-up issue | the change is not the place to fix it (RV2) |
 | the evidence does not hold, or the case is a check's "not a finding" | **Dismissed**, with one line why | a false finding costs the writer a round (RV2) |
 | the change breaks code it does not touch, such as a caller or an invariant | a finding at the broken line, citing the change | the change introduced the break, so RV2 holds |
+| the issue is one the project's linter or compiler fails on in CI | **Dismissed**: CI catches it (RV2) | a finding a tool already blocks costs a round and adds nothing |
+| the code is silenced on purpose, with a reason on the line | **Dismissed** (RV2); a suppression the change adds without a reason is a finding (CR4) | the reason shows the choice was made; a bare new one hides it |
 | a check's log shows its findings are mostly dismissed | rewrite the check with an example (RV5) | the check is mis-worded or mis-scoped |
 | the review returns zero findings | no signal: the change still waits for the human (RV6) | a fooled reviewer also returns zero |
 | a check's log shows it never fires where it applies | keep it while what it guards still exists; move it to a script if a tool can run it; retire it only when what it guards is gone (RV5) | a check that works leaves no findings, so a quiet log is not noise |
