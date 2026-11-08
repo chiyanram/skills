@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.34.0](https://github.com/chiyanram/skills/compare/rulebook--v0.33.0...rulebook--v0.34.0) (2026-11-08)
+
+### Features
+
+* **crq:** Group B rules from the outside skill repos ([#223](https://github.com/chiyanram/skills/issues/223)) ([#227](https://github.com/chiyanram/skills/issues/227)) ([369f28f](https://github.com/chiyanram/skills/commit/369f28f847eedc019e23bdb119b8480c814f9263))
+
 ## [0.33.0](https://github.com/chiyanram/skills/compare/rulebook--v0.32.1...rulebook--v0.33.0) (2026-11-07)
 
 ### Features
