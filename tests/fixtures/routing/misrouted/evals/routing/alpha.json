@@ -1,0 +1,48 @@
+{
+  "skill": "alpha",
+  "should": [
+    "Write the invoices for march",
+    "Write the invoices for april",
+    "Write the invoices for may",
+    "Write the invoices for june",
+    "Write the invoices for july",
+    "Write the invoices for august",
+    "Write the invoices for september",
+    "Write the invoices for october",
+    "Plan the payloads for the countdown"
+  ],
+  "near_miss": [
+    {
+      "prompt": "Plan the rocket launch for monday",
+      "owner": "beta"
+    },
+    {
+      "prompt": "Plan the rocket launch for tuesday",
+      "owner": "beta"
+    },
+    {
+      "prompt": "Plan the rocket launch for wednesday",
+      "owner": "beta"
+    },
+    {
+      "prompt": "Plan the rocket launch for thursday",
+      "owner": "beta"
+    },
+    {
+      "prompt": "Plan the rocket launch for friday",
+      "owner": "beta"
+    },
+    {
+      "prompt": "Plan the rocket launch for saturday",
+      "owner": "beta"
+    },
+    {
+      "prompt": "Plan the rocket launch for sunday",
+      "owner": "beta"
+    },
+    {
+      "prompt": "Plan the rocket launch for holiday",
+      "owner": "beta"
+    }
+  ]
+}

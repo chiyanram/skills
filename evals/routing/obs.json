@@ -1,0 +1,49 @@
+{
+  "skill": "obs",
+  "should": [
+    "Add a log call when the payment fails; which level?",
+    "Set up a logger for this class",
+    "Add a meter and a tag for request latency",
+    "Add a span around the database call",
+    "Review the logging configuration",
+    "Should this be a debug or a warn log level?",
+    "Configure metrics and tracing for the service",
+    "Add an observation for the checkout flow",
+    "Review the log calls in this diff",
+    "Which tag should this meter have?"
+  ],
+  "near_miss": [
+    {
+      "prompt": "Handle the payment client errors and retries in the service",
+      "owner": "code"
+    },
+    {
+      "prompt": "Write a unit test for the latency calculation",
+      "owner": "testing"
+    },
+    {
+      "prompt": "Write the spec for an audit trail before any code exists",
+      "owner": "planning"
+    },
+    {
+      "prompt": "Add a migration for an audit table",
+      "owner": "migrations"
+    },
+    {
+      "prompt": "Clean up the restating comments in this diff before review",
+      "owner": "deslop"
+    },
+    {
+      "prompt": "Which lane is this change in and which phases run until merge?",
+      "owner": "crq"
+    },
+    {
+      "prompt": "Write a reference for this rulebook on Good / Bad pairs",
+      "owner": "meta"
+    },
+    {
+      "prompt": "Add a scheduled job that purges old records",
+      "owner": "code"
+    }
+  ]
+}

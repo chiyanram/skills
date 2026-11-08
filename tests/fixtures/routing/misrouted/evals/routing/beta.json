@@ -1,0 +1,47 @@
+{
+  "skill": "beta",
+  "should": [
+    "Plan the orbit burns for monday",
+    "Plan the orbit burns for tuesday",
+    "Plan the orbit burns for wednesday",
+    "Plan the orbit burns for thursday",
+    "Plan the orbit burns for friday",
+    "Plan the orbit burns for saturday",
+    "Plan the orbit burns for sunday",
+    "Plan the orbit burns for holiday"
+  ],
+  "near_miss": [
+    {
+      "prompt": "Work out tax rates on invoices for march",
+      "owner": "alpha"
+    },
+    {
+      "prompt": "Work out tax rates on invoices for april",
+      "owner": "alpha"
+    },
+    {
+      "prompt": "Work out tax rates on invoices for may",
+      "owner": "alpha"
+    },
+    {
+      "prompt": "Work out tax rates on invoices for june",
+      "owner": "alpha"
+    },
+    {
+      "prompt": "Work out tax rates on invoices for july",
+      "owner": "alpha"
+    },
+    {
+      "prompt": "Work out tax rates on invoices for august",
+      "owner": "alpha"
+    },
+    {
+      "prompt": "Work out tax rates on invoices for september",
+      "owner": "alpha"
+    },
+    {
+      "prompt": "Work out tax rates on invoices for october",
+      "owner": "alpha"
+    }
+  ]
+}

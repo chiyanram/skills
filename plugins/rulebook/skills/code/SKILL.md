@@ -1,6 +1,6 @@
 ---
 name: code
-description: Use when you write or review production code: Java, Spring beans and configuration, types, errors, interfaces, services, HTTP API design, JPA persistence, scheduled and batch jobs, Redis, comments, concurrency, messaging, security, code smells, and Angular UI. Lists each code reference and when to read it.
+description: Use when you write or review production code: Java, Spring beans and configuration, types, errors, interfaces, services, HTTP API design, JPA entities and repositories, scheduled and batch jobs, Redis, comments, concurrency, messaging, security, code smells, and Angular UI. Lists each code reference and when to read it.
 ---
 
 # Code

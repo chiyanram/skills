@@ -1,0 +1,49 @@
+{
+  "skill": "deslop",
+  "should": [
+    "Clean up this diff before review: restating comments and dead code",
+    "Remove the defensive checks for states that cannot occur in this branch",
+    "The branch is ready for review; do a behaviour-neutral cleanup of the diff first",
+    "Strip the one-use indirection and the unnamed fallbacks from this diff",
+    "Flatten the deep nesting in the code I just implemented before review",
+    "This diff has type laundering and shims; clean it up",
+    "Remove the dead code and style that fights the surrounding file in my diff",
+    "Diff-scoped cleanup of my implemented branch, nothing repo-wide",
+    "Get rid of the restating comments the agent added to this diff",
+    "Behaviour-neutral cleanup pass on the implemented branch"
+  ],
+  "near_miss": [
+    {
+      "prompt": "Review this pull request for correctness before merge",
+      "owner": "crq"
+    },
+    {
+      "prompt": "Write tests for the branch before review",
+      "owner": "testing"
+    },
+    {
+      "prompt": "Write a migration that drops the dead column",
+      "owner": "migrations"
+    },
+    {
+      "prompt": "Design the error handling for the payment service",
+      "owner": "code"
+    },
+    {
+      "prompt": "Write the spec for removing the legacy checkout",
+      "owner": "planning"
+    },
+    {
+      "prompt": "Remove the noisy log level and the unused metric tag",
+      "owner": "obs"
+    },
+    {
+      "prompt": "Review the rule lines of this rulebook reference",
+      "owner": "meta"
+    },
+    {
+      "prompt": "Which phase runs after review in this change's lane?",
+      "owner": "crq"
+    }
+  ]
+}

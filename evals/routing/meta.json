@@ -1,0 +1,49 @@
+{
+  "skill": "meta",
+  "should": [
+    "Review this rulebook reference before I add it",
+    "Write the When X, use Y rows for a new reference",
+    "Are these Good / Bad pairs right for the reference?",
+    "Where is a rule's provenance kept?",
+    "Check the rule lines in this reference of the rulebook",
+    "Write a new reference for this rulebook itself",
+    "Does this rule line follow the rulebook's reference format?",
+    "Add a Good / Bad pair to this reference",
+    "How do I write a reference for the rulebook?",
+    "Review the provenance of the rules in this reference"
+  ],
+  "near_miss": [
+    {
+      "prompt": "Review this Java code for code smells",
+      "owner": "code"
+    },
+    {
+      "prompt": "Write a unit test that checks the parser",
+      "owner": "testing"
+    },
+    {
+      "prompt": "Write the design for the new rule engine before any code exists",
+      "owner": "planning"
+    },
+    {
+      "prompt": "Clean up the restating comments in this diff before review",
+      "owner": "deslop"
+    },
+    {
+      "prompt": "Which lane is this rulebook change in, and its phases to merge?",
+      "owner": "crq"
+    },
+    {
+      "prompt": "Add a migration that alters the rules table",
+      "owner": "migrations"
+    },
+    {
+      "prompt": "Add a log call when the config fails to load",
+      "owner": "obs"
+    },
+    {
+      "prompt": "Review the comments and code smells in this Java reference implementation",
+      "owner": "code"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "skill": "crq",
+  "should": [
+    "Take this change from request to merge",
+    "Which lane is this change in?",
+    "What phase comes next for this change, and who runs it?",
+    "Run the change through its phases up to the merge",
+    "Is this pull request ready to merge, or does a phase remain?",
+    "Order the phases for this bug fix from request to merge",
+    "Who runs the review phase for this change?",
+    "What lane and phases does a one-way door change go through?",
+    "I have a change request; walk it through to merge",
+    "Run the retro phase after this change merged"
+  ],
+  "near_miss": [
+    {
+      "prompt": "Review this Java service code for errors",
+      "owner": "code"
+    },
+    {
+      "prompt": "Write the acceptance criteria for this request before any code exists",
+      "owner": "planning"
+    },
+    {
+      "prompt": "Write a unit test for the merge function",
+      "owner": "testing"
+    },
+    {
+      "prompt": "Clean up the diff before review: dead code and restating comments",
+      "owner": "deslop"
+    },
+    {
+      "prompt": "Add a migration that renames the column",
+      "owner": "migrations"
+    },
+    {
+      "prompt": "Add tracing spans to the request handler",
+      "owner": "obs"
+    },
+    {
+      "prompt": "Where is a rule's provenance kept in this rulebook?",
+      "owner": "meta"
+    },
+    {
+      "prompt": "Design the HTTP API for change requests",
+      "owner": "code"
+    }
+  ]
+}
