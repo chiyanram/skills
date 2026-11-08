@@ -1,0 +1,49 @@
+{
+  "skill": "migrations",
+  "should": [
+    "Write a database migration for a new orders table",
+    "Add a column and an index to the customers table",
+    "Backfill the new status column on the existing table",
+    "Rename a column in a table that is already in production",
+    "Drop the old index on the payments table",
+    "Review this migration that alters an existing table",
+    "Add a foreign key constraint to the line items table",
+    "Can I edit a merged migration?",
+    "Add a unique constraint and a key to this table",
+    "Write the migration that indexes the events table"
+  ],
+  "near_miss": [
+    {
+      "prompt": "Write a JPA entity and repository for the orders table",
+      "owner": "code"
+    },
+    {
+      "prompt": "Write an integration test against the database",
+      "owner": "testing"
+    },
+    {
+      "prompt": "Write the design for moving the table before any code exists",
+      "owner": "planning"
+    },
+    {
+      "prompt": "Add a metric for slow database queries",
+      "owner": "obs"
+    },
+    {
+      "prompt": "Clean up the dead code in this diff before review",
+      "owner": "deslop"
+    },
+    {
+      "prompt": "Which lane is a schema change in, and what phases run before merge?",
+      "owner": "crq"
+    },
+    {
+      "prompt": "Cache the customer lookups in Redis",
+      "owner": "code"
+    },
+    {
+      "prompt": "Review the Good / Bad pairs of the migrations reference",
+      "owner": "meta"
+    }
+  ]
+}

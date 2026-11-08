@@ -1,0 +1,49 @@
+{
+  "skill": "code",
+  "should": [
+    "Review this Spring bean configuration before I merge it",
+    "Write a JPA repository and entity for the order table",
+    "Design the HTTP API for creating and cancelling bookings",
+    "Add a scheduled batch job that expires old sessions",
+    "Cache the product lookups in Redis",
+    "How should this service handle errors from the payment client?",
+    "Fix the concurrency bug in this Java class: two threads race on the counter",
+    "Add a Kafka consumer for the shipment events (messaging)",
+    "Check this Angular UI component for code smells",
+    "Lock down this endpoint with Spring Security"
+  ],
+  "near_miss": [
+    {
+      "prompt": "Write a Spock unit test for the order service",
+      "owner": "testing"
+    },
+    {
+      "prompt": "Add a migration that adds an index to the orders table",
+      "owner": "migrations"
+    },
+    {
+      "prompt": "Add a log line and a metric when the payment client fails",
+      "owner": "obs"
+    },
+    {
+      "prompt": "Clean up the restating comments and dead code in this diff before review",
+      "owner": "deslop"
+    },
+    {
+      "prompt": "Write the spec and acceptance criteria for the booking API",
+      "owner": "planning"
+    },
+    {
+      "prompt": "Which lane is this change in, and what phase comes next before merge?",
+      "owner": "crq"
+    },
+    {
+      "prompt": "Review the Good / Bad pairs in this rulebook reference",
+      "owner": "meta"
+    },
+    {
+      "prompt": "Add a Playwright smoke spec for the Angular checkout page",
+      "owner": "testing"
+    }
+  ]
+}

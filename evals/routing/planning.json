@@ -1,0 +1,49 @@
+{
+  "skill": "planning",
+  "should": [
+    "Write the spec for the new refund feature",
+    "Review these acceptance criteria before any code exists",
+    "Write a design for the reminder feature before any code exists",
+    "Review the design before we start coding",
+    "Write a work item for this request",
+    "Are these acceptance criteria testable?",
+    "Review this spec and its design",
+    "Turn this request into a spec with acceptance criteria",
+    "Split this work item before any code exists",
+    "Write the design and spec for a one-way door change"
+  ],
+  "near_miss": [
+    {
+      "prompt": "Write the Java service that implements the refund",
+      "owner": "code"
+    },
+    {
+      "prompt": "Write tests for the refund acceptance scenarios",
+      "owner": "testing"
+    },
+    {
+      "prompt": "Take this change from request to merge",
+      "owner": "crq"
+    },
+    {
+      "prompt": "Write the migration for the refunds table",
+      "owner": "migrations"
+    },
+    {
+      "prompt": "Add a log call and a meter for refunds",
+      "owner": "obs"
+    },
+    {
+      "prompt": "Clean up the diff before review",
+      "owner": "deslop"
+    },
+    {
+      "prompt": "Write a reference for the rulebook with rule lines",
+      "owner": "meta"
+    },
+    {
+      "prompt": "Design the HTTP API endpoints for refunds",
+      "owner": "code"
+    }
+  ]
+}

@@ -14,6 +14,7 @@ CASES = {
     "provenance": (["good"], ["citation", "preference", "credit", "date", "evidence", "agent-factory", "neutral",
                               "fileline", "section", "url", "nested-fence"]),
     "ledger": (["good"], ["duplicate", "marker"]),
+    "routing": (["good"], ["no-cases", "too-few", "misrouted", "near-miss-wins", "unknown-owner", "collision"]),
 }
 
 

@@ -1,0 +1,49 @@
+{
+  "skill": "testing",
+  "should": [
+    "Write a unit test for the order service",
+    "Write a Spock spec for this class",
+    "Add an integration test for the repository",
+    "Write a Playwright smoke spec for the checkout page",
+    "Add property-based tests for the parser",
+    "Run mutation tests on this module",
+    "Which tier should this test be?",
+    "Review this test before I merge it",
+    "Test the code that calls a language model",
+    "Change this test after the refactor"
+  ],
+  "near_miss": [
+    {
+      "prompt": "Write the order service in Java",
+      "owner": "code"
+    },
+    {
+      "prompt": "Write the acceptance criteria for the checkout spec",
+      "owner": "planning"
+    },
+    {
+      "prompt": "Clean up the dead code in this diff before review",
+      "owner": "deslop"
+    },
+    {
+      "prompt": "Add a migration for the test results table",
+      "owner": "migrations"
+    },
+    {
+      "prompt": "Add a log call when the parser fails",
+      "owner": "obs"
+    },
+    {
+      "prompt": "Which lane and phases does this change take to merge?",
+      "owner": "crq"
+    },
+    {
+      "prompt": "Review the Good / Bad pairs of this rulebook reference",
+      "owner": "meta"
+    },
+    {
+      "prompt": "Design the Spring configuration for the model client",
+      "owner": "code"
+    }
+  ]
+}

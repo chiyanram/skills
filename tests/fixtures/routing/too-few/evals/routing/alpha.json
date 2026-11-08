@@ -1,0 +1,41 @@
+{
+  "skill": "alpha",
+  "should": [
+    "Write the invoices for march",
+    "Write the invoices for april"
+  ],
+  "near_miss": [
+    {
+      "prompt": "Plan the rocket launch for monday",
+      "owner": "beta"
+    },
+    {
+      "prompt": "Plan the rocket launch for tuesday",
+      "owner": "beta"
+    },
+    {
+      "prompt": "Plan the rocket launch for wednesday",
+      "owner": "beta"
+    },
+    {
+      "prompt": "Plan the rocket launch for thursday",
+      "owner": "beta"
+    },
+    {
+      "prompt": "Plan the rocket launch for friday",
+      "owner": "beta"
+    },
+    {
+      "prompt": "Plan the rocket launch for saturday",
+      "owner": "beta"
+    },
+    {
+      "prompt": "Plan the rocket launch for sunday",
+      "owner": "beta"
+    },
+    {
+      "prompt": "Plan the rocket launch for holiday",
+      "owner": "beta"
+    }
+  ]
+}
