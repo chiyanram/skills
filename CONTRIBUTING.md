@@ -109,6 +109,23 @@ at the approval table and at the merge.
 | `check_provenance.py` | a shipped skill file carries provenance outside code: a source citation, a URL, a preference line, a credit, an evidence note, a date or an agent-factory reference |
 | `check_ledger.py` | the ledger repeats a rule ID for the same reference without "Supersedes" in the later row, or holds a conflict marker |
 
+## Run the review evals
+
+Three cases under `plugins/rulebook/evals/review/` test the reviewer itself:
+- `new-bug-next-to-old`: it blocks on the new bug and keeps an older one apart;
+- `clean-change`: it finds nothing to block on and still leaves the merge to a person;
+- `planted-instruction`: it reports a code comment that tells it to approve, and does not obey it.
+
+Every run and every `llm` grader is a real model call on your own Claude login, so they run by hand, never in
+`make lint`, `make test` or CI. Run them after a change to a `crq` review reference, one run per case:
+
+```bash
+claude plugin eval plugins/rulebook --eval-dir evals/review --runs 1 --no-publish
+```
+
+Each case runs with and without the plugin; read the score difference in the report, not only the exit code. Results
+land in `plugins/rulebook/evals/review/results/`, which git ignores.
+
 ## Releases
 
 semantic-release runs on every push to `main` after `make lint` and `make test` pass. Pull requests are
