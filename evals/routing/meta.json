@@ -42,7 +42,7 @@
       "owner": "obs"
     },
     {
-      "prompt": "Review the Spring configuration of the rule service",
+      "prompt": "Review the comments and code smells in this Java reference implementation",
       "owner": "code"
     }
   ]

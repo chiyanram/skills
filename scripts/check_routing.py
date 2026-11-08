@@ -34,10 +34,12 @@ me my need needs no not of on one or our should so that the their them then ther
 us use used uses using via want was we what when where which while who why will with without you your
 """.split())
 
-SUFFIXES = ("ations", "ation", "ings", "ing", "ies", "ied", "ers", "er", "es", "ed", "ly", "s")
+SUFFIXES = ("ations", "ation", "ings", "ing", "ers", "er", "es", "ed", "ly", "s")
 
 
 def stem(word: str) -> str:
+    if word.endswith(("ies", "ied")) and len(word) > 5:
+        word = word[:-3] + "y"
     for suffix in SUFFIXES:
         if word.endswith(suffix) and len(word) - len(suffix) >= 3:
             word = word[: -len(suffix)]
