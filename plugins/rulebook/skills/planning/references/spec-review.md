@@ -42,6 +42,8 @@ Contents: Rules · When X, use Y · Good / Bad (SR2, SR3, SR4, SR10, SR11) · De
   chain of effects, early sign) with its mitigation, because asking only whether it works hides how it fails.
 - **SR21** — Before the spec, research how the touched code works (flow, where things live, gotchas at `file:line`)
   and why it is shaped so (commits, PRs, issues), because changing code without its reason reintroduces old bugs.
+- **SR22** — Give a research helper neutral questions about how the current code works, and keep the wanted change
+  out of them, because a helper that knows the goal reports what supports it.
 
 ## When X, use Y
 
@@ -70,6 +72,7 @@ Contents: Rules · When X, use Y · Good / Bad (SR2, SR3, SR4, SR10, SR11) · De
 | research on one file or one function | one read-only helper that explores and explains in one pass (SR21) | a fan-out costs more than it finds |
 | research on more than one module or service | two to four read-only helpers, each on one angle, then one synthesis: overview, key concepts, how it works, where things live, gotchas (SR21) | each angle stays inside one context |
 | code that looks odd or redundant | its history: `git log` and `git blame` on the lines, then the pull requests and issues they cite (SR21) | the odd line is often the fix for a past bug |
+| a brief for a research helper or subagent | questions on how it works today ("how does X reach Y?"), with the wanted change kept in the design notes, not the brief (SR22) | the helper looks for what is there, not for what fits the goal |
 
 ## Good / Bad
 
@@ -292,3 +295,4 @@ Walk the whole spec and the whole design in one round, every section, before you
 - [ ] SR21 — In the research notes, find the how (with `file:line`) and, for each line the design plans to delete or
   reshape, the why: a commit, pull request or issue, or "no recorded reason". A line planned for deletion or
   reshaping with no stated why is a finding.
+- [ ] SR22 — In each research brief, find the wanted change or a planned design. One that states either is a finding.

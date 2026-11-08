@@ -41,10 +41,10 @@ each phase applies.
 <!-- index: built by `make index` from each reference; do not edit by hand -->
 | reference | rule IDs | read it |
 |---|---|---|
-| [code-review](references/code-review.md) | CR1–CR5 | when you review a pull request's code, or before you split a change |
+| [code-review](references/code-review.md) | CR1–CR7 | when you review a pull request's code, or before you split a change |
 | [lanes](references/lanes.md) | LN1–LN4 | when you take in a new change, or when a change turns out bigger, riskier or smaller than its lane |
 | [pr-readiness](references/pr-readiness.md) | PR1–PR7 | when you write a pull request body, or when you check one before merge |
-| [retro](references/retro.md) | RT1–RT5 | when a pull request is merged, rescued or reverted, or a defect escapes |
-| [review-process](references/review-process.md) | RV1–RV6 | before you run, write or tune a review |
+| [retro](references/retro.md) | RT1–RT6 | when a pull request is merged, rescued or reverted, or a defect escapes |
+| [review-process](references/review-process.md) | RV1–RV8 | before you run, write or tune a review |
 | [verify-done](references/verify-done.md) | VB1–VB8 | when you build a change, before you call it ready, or when you check a writer's proof |
 <!-- /index -->

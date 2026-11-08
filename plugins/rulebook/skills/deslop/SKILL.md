@@ -48,6 +48,7 @@ the report line is posted.
 | comment slop | a comment that restates the code, a banner, a divider | CM1, CM2, CM3 (`../code/references/comments.md`) |
 | defensive checks | a null check, `try`/`catch` or guard for a state the types or the callers exclude | DS8 · TY1 (`../code/references/types.md`) |
 | swallowed failure | a `catch` that continues quietly or returns an empty result | ER3 (`../code/references/errors.md`); always a report, never a fix |
+| fake fallback | on an error or missing config, production code that returns a mock, stub, fake or sample data instead of failing | DS8; remove it and fail with the real error |
 | type laundering | a cast through `Object` or a raw type, a new `@SuppressWarnings`, untrusted JSON held as `Map<String, Object>` past the adapter, a string where an enum exists | TY10, TY6 (`../code/references/types.md`) · CM7 (`../code/references/comments.md`) · SE5 (`../code/references/security.md`) |
 | one-use indirection | a helper, wrapper or variable that adds no domain meaning | DS4 (`../code/references/smells.md`); keep anything that carries a domain name |
 | fallbacks and shims | a retry, default, alias or second code path with no named contract and no removal plan | DS5 · DS7 · CC8 (`../code/references/concurrency.md`) |
@@ -120,5 +121,6 @@ Walk every hunk of the branch diff (`git diff $(git merge-base <default-branch> 
 - [ ] DS7 — An unused member, a vestigial parameter, a commented-out block or a `// removed` note in a touched file is
   a finding.
 - [ ] DS8 — A new null check or `try`/`catch` on a value from an injected field or an in-repo caller is a finding.
+  So is a fallback to a mock, stub, fake or sample data outside test code.
 - [ ] DS9 — Nesting of three or more levels that a guard clause or early return could flatten is a finding, and so is
   a nested ternary.
