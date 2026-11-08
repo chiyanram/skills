@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.34.1](https://github.com/chiyanram/skills/compare/rulebook--v0.34.0...rulebook--v0.34.1) (2026-11-08)
+
+### Bug Fixes
+
+* **code:** name JPA entities and repositories in the router, with a free routing check ([#223](https://github.com/chiyanram/skills/issues/223)) ([#228](https://github.com/chiyanram/skills/issues/228)) ([734fb63](https://github.com/chiyanram/skills/commit/734fb633da2f3417062615d3b1ef9c05bfe5bb7f))
+
 ## [0.34.0](https://github.com/chiyanram/skills/compare/rulebook--v0.33.0...rulebook--v0.34.0) (2026-11-08)
 
 ### Features
