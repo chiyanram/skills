@@ -23,10 +23,10 @@ each phase applies.
 | intake | coordinator | a ticket with its lane; a map of tickets when the work is unclear | `lanes` |
 | research | coordinator, read-only helpers | how the touched code works today, at `file:line`; parts to reuse; test patterns | `spec-review` (planning) |
 | clarify | coordinator with the human | answers on the ticket; each open question with its decider, options and recommendation | `spec-review` (planning) |
-| spec | coordinator | a draft pull request with the intent quoted, acceptance criteria a test can decide, non-goals and edge cases | `acceptance-criteria` (planning) |
+| spec | coordinator | a draft PR with the intent quoted, acceptance criteria a test can decide, non-goals and edge cases | `acceptance-criteria` (planning) |
 | design | coordinator | the chosen shape and a rejected alternative; slices with their proving commands | `program-design`, `spec-review`, `diagrams` (planning) |
 | design review | a design-reviewer run, then a verify pass | a verdict per decision and findings | `review-process`, `spec-review` (planning) |
-| — | **human** | an explicit approval of the spec and design, at the pull request's head, recorded with both hashes | `lanes` |
+| — | **human** | an explicit approval of the spec and design, at the PR's head, recorded with both hashes | `lanes` |
 | build | for a bug, a test-first run; then one fresh implementer run per PR | the slices as commits | `verify-done`, `strategy` (testing) and the `code` references the diff touches |
 | verify | implementer, then the engine's ready check at the pushed commit | an evidence row per AC | `verify-done`, `value-bar` (testing) |
 | cleanup | cleanup | a behaviour-neutral tidy diff | `deslop` skill |

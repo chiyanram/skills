@@ -1,6 +1,6 @@
 # Retro
 
-How a merged pull request teaches the pipeline: what to record, how to find the real cause, and how a lesson becomes a
+How a merged PR teaches the pipeline: what to record, how to find the real cause, and how a lesson becomes a
 rule, a script, a check or nothing. A rescue is a human fixing or finishing an agent's work. Read it when the engine
 writes a merge's timeline record, or when a human starts a full retro.
 

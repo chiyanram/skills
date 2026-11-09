@@ -77,7 +77,7 @@ Walk the ticket, the PR and its diff.
 - [ ] LN2 — For a tiny-lane change, check that the diff changes no behaviour: docs, comments, config values or a patch
   bump only. A tiny change with new logic is a finding.
 - [ ] LN3 — For a one-way-door change, find the list of irreversible steps and the human's yes on each, and the
-  readiness items in the pull request. Each one missing is a finding.
-- [ ] LN4 — Find the approval record the pull request cites: who approved, when, how, and the spec and design hashes.
+  readiness items in the PR. Each one missing is a finding.
+- [ ] LN4 — Find the approval record the PR cites: who approved, when, how, and the spec and design hashes.
   Check that each hash matches the spec or design the change built, except the decided edge above. An approval with
   no record, a record an agent could write, a missing hash or a hash that does not match is a finding.
