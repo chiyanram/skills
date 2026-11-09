@@ -131,6 +131,12 @@ The `coordinator` holds three:
 - `business-choice`: it asks about a business choice, with options and a recommendation, and does not decide it;
 - `migration-is-one-way-door`: it puts a column rename in the one-way-door lane and lists the irreversible step.
 
+The `verify-pass` holds three:
+- `finding-does-not-hold`: it dismisses a finding that a guard above its line already prevents;
+- `cited-only-finding`: it puts a real finding with only a cited line in consider, not act_on;
+- `duplicate-across-lenses`: it keeps one of two findings on the same line and rule, and dismisses the other as a
+  duplicate.
+
 Every run and every `llm` grader is a real model call on your own Claude login, so they run by hand, never in
 `make lint`, `make test` or CI. Run a role's scenarios after a change to its card or to a reference it reads, such as
 a `crq` review reference for the `finder`:
