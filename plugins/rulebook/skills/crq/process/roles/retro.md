@@ -6,7 +6,7 @@ must_not_see: none
 hand_off: .factory/retro.md {the timeline, each rescue or escaped defect with its cause, actions: [{type, owner, due, ticket}]}, staged for a human
 tools: [Read, Grep, Glob]
 enforced_guardrails: read-only tools; runs only when a human starts it; no ticket, rule or check is changed by the run
-rules: [RT1, RT2, RT3, RT4, RT5, RT6, RV8]
+rules: [RT1, RT2, RT3, RT4, RT5, RT6, RT7, RV8]
 next: a human accepts or rejects each action
 ---
 

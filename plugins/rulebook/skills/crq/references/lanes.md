@@ -11,7 +11,7 @@ change, or when a change turns out bigger, riskier or smaller than its lane.
   changes behaviour, because the full pipeline costs more than a typo is worth.
 - **LN3** — In the one-way-door lane, list each irreversible step for the human's explicit yes and add the readiness
   items, because a step that cannot be undone needs inspection before it ships.
-- **LN4** — Count only an approval the agent cannot produce, a human forge action or a prompt only the human answers,
+- **LN4** — Count only an approval the agent cannot produce, a human git-host action or a prompt only the human answers,
   recorded with the spec's and the design's hashes, because an agent-made approval passes its own work.
 
 ## When X, use Y
@@ -24,12 +24,13 @@ change, or when a change turns out bigger, riskier or smaller than its lane.
 | the change touches stored data or a schema, a public API or event contract, or a deploy | the one-way-door lane | a wrong step cannot be undone (LN3) |
 | unsure between two lanes | the heavier lane | a review that was too heavy costs time; a mistake in stored data cannot be undone |
 
-The phases each lane runs:
+The phases each lane runs. Every lane ends with the timeline record the engine writes (RT1). A full retro runs only
+when a human starts it (RT7).
 
 | lane | phases | human gates |
 |---|---|---|
-| tiny | intake → build → verify → code review → gate → pull request → the retro record; a full retro only after a rescue or a revert | merge |
-| bug | intake → research → spec → design (only when an internal interface or more than one module changes) → design review of the spec and any design → build → verify → cleanup → code review → gate → pull request → retro | approval, merge |
+| tiny | intake → build → verify → code review → gate → PR → the timeline record | merge |
+| bug | intake → research → spec → design (only when an internal interface or more than one module changes) → design review of the spec and any design → build → verify → cleanup → code review → gate → PR → the timeline record | approval, merge |
 | feature | every phase | approval, merge |
 | one-way door | every phase, plus the readiness items of the `pr-readiness` reference | approval with each irreversible step listed, merge |
 
@@ -39,14 +40,14 @@ The phases each lane runs:
 
 **Bad**
 ```text
-Issue: Rename the column loans.due_on to loans.due_date
+Ticket: Rename the column loans.due_on to loans.due_date
 Lane: feature
 ```
 A renamed column changes stored data. The feature lane never lists the drop of the old column for the human's yes.
 
 **Good**
 ```text
-Issue: Rename the column loans.due_on to loans.due_date
+Ticket: Rename the column loans.due_on to loans.due_date
 Lane: one-way door (changes stored data)
 Irreversible steps for your yes:
   - drop loans.due_on, after every reader uses loans.due_date
@@ -68,9 +69,9 @@ The lane follows from what the change touches, and the irreversible step waits f
 
 ## Review checks
 
-Walk the issue, the pull request and its diff.
+Walk the ticket, the PR and its diff.
 
-- [ ] LN1 — Find the lane on the issue. Compare it with what the diff touches: stored data or a schema, a public
+- [ ] LN1 — Find the lane on the ticket. Compare it with what the diff touches: stored data or a schema, a public
   contract or a deploy means the one-way door, except the decided edges above. A lane that is missing or too light is
   a finding.
 - [ ] LN2 — For a tiny-lane change, check that the diff changes no behaviour: docs, comments, config values or a patch
