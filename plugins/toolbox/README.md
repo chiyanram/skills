@@ -20,5 +20,6 @@ The repo is private. See the [root README](../../README.md#quick-start) for cred
 | [grilling](skills/grilling/SKILL.md) | `/toolbox:grilling` | asks about a plan or decision one question at a time, each with a recommended answer, until you agree on it |
 | [loop-me](skills/loop-me/SKILL.md) | `/toolbox:loop-me` | grills you into workflow specs an agent could build without a question, kept in `workflows/*.md` |
 | [diagram-brief](skills/diagram-brief/SKILL.md) | `/toolbox:diagram-brief` | briefs a change as a `diff` call tree with proof, message vs diff, callers and what may break |
+| [software-factory](skills/software-factory/SKILL.md) | `/toolbox:software-factory` | the shared words for designing a software factory: tasks, runs, runners and the services they plug into, with a survey per slot |
 
 A tool joins only after it has been read in full, tied to a real moment in our work, and tried once on a named task.
