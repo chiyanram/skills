@@ -35,14 +35,46 @@ and `1` with one line per problem.
 
 One issue, one branch, one pull request.
 
-1. Open or claim an issue. Use a template: *Research*, *Grilling* or *Check or CI bug*. Labels:
+1. Open or claim an issue. Use a template: *Bug*, *Feature*, *Task*, *Research* or *Grilling*. Labels:
    [triage labels](docs/agents/triage-labels.md).
 2. Branch from `main`, such as `feat/123-spock-cleanup`.
 3. Make the change. Run `make index`, `make lint` and `make test`.
-4. Open a pull request against `main` and fill in the template. CI must be green before merge.
+4. Open a pull request against `main`. Its title and description become the commit on `main`; see
+   [Commit messages](#commit-messages). CI must be green before merge.
 
-A good pull request does one thing, names the issue it closes (`Closes #123`), and adds a test with every change to a
-check.
+A good pull request does one thing and adds a test with every change to a check. Before you open it, check that:
+
+- every new or changed rule has the operator's yes and a row in `docs/rulebook/approved-rules.md`;
+- a new reference follows `docs/rulebook/reference-format.md` and is listed in `plugins/rulebook/README.md` and the root
+  `README.md`;
+- no `version` or `CHANGELOG*.md` is edited by hand.
+
+## Commit messages
+
+One format in chiyanram/skills, chiyanram/agent-factory and chiyanram/rca-agent (#281). It has the commitizen sections:
+
+```
+type(scope): lower-case summary (#issue)
+
+Why the change is needed, in 1–3 sentences.
+
+BREAKING CHANGE: what breaks and what to do instead
+Refs #12
+```
+
+- **Title**: a type from the [Releases](#releases) table, a required lower-case scope, an imperative lower-case summary
+  with no full stop, and the issue as `(#N)` or `(owner/repo#N)`. Add `!` after the scope for a breaking change.
+- **Body**: why, not what; the diff shows what. Optional footers: `BREAKING CHANGE:`, `Closes #N` to close the issue on
+  merge, and `Refs #N` for other issues.
+- **No tool or co-author lines**: no `Co-Authored-By`, no "Generated with" line.
+
+Pull requests are squash-merged. The commit on `main` is the **PR title** (GitHub adds `(#pr)`) and the **PR
+description** as its body, so write the description as the commit body. The branch commits are dropped, so they can be
+anything. CI checks the PR title.
+
+To get the prompts, install [commitizen](https://commitizen-tools.github.io/commitizen/) once (`pipx install
+commitizen`) and run `cz commit`. `.cz.toml` holds the prompts; it is the same file in all three repos. commitizen only
+writes the message: semantic-release still cuts the releases.
 
 ## Add a rule
 
