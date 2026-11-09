@@ -12,7 +12,7 @@ change, or when a change turns out bigger, riskier or smaller than its lane.
 - **LN3** — In the one-way-door lane, list each irreversible step for the human's explicit yes and add the readiness
   items, because a step that cannot be undone needs inspection before it ships.
 - **LN4** — Count only an approval the agent cannot produce, a human forge action or a prompt only the human answers,
-  recorded with the spec's hash, because an agent-made approval passes its own work.
+  recorded with the spec's and the design's hashes, because an agent-made approval passes its own work.
 
 ## When X, use Y
 
@@ -60,6 +60,8 @@ The lane follows from what the change touches, and the irreversible step waits f
   high
 - **Skip the one-way door when** a bug fix only changes code inside a body: it stays a bug. — **Do not skip when** the
   fix changes a stored format or a public contract: it is a one-way door (LN3). — **Confidence** high
+- **Skip the design's hash when** a bug-lane change ran no design phase: the record holds the spec's hash alone. —
+  **Do not skip when** the change has a design, in any lane: the record holds both hashes (LN4). — **Confidence** high
 - **Skip the one-way door when** a migration only adds a nullable column or a table that nothing reads yet: it is a
   feature. — **Do not skip when** it renames, retypes, drops or backfills: it is a one-way door (LN3). —
   **Confidence** medium
@@ -75,6 +77,6 @@ Walk the issue, the pull request and its diff.
   bump only. A tiny change with new logic is a finding.
 - [ ] LN3 — For a one-way-door change, find the list of irreversible steps and the human's yes on each, and the
   readiness items in the pull request. Each one missing is a finding.
-- [ ] LN4 — Find the approval record the pull request cites: who approved, when, how, and the spec hash. Check that the
-  hash matches the spec the change built. An approval with no record, a record an agent could write, or a hash that
-  does not match is a finding.
+- [ ] LN4 — Find the approval record the pull request cites: who approved, when, how, and the spec and design hashes.
+  Check that each hash matches the spec or design the change built, except the decided edge above. An approval with
+  no record, a record an agent could write, a missing hash or a hash that does not match is a finding.

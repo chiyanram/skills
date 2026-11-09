@@ -26,7 +26,7 @@ each phase applies.
 | spec | coordinator | a draft pull request with the intent quoted, acceptance criteria a test can decide, non-goals and edge cases | `acceptance-criteria` (planning) |
 | design | coordinator | the chosen shape and a rejected alternative; slices with their proving commands | `program-design`, `spec-review`, `diagrams` (planning) |
 | design review | fresh reviewer | a verdict per decision and findings | `review-process`, `spec-review` (planning) |
-| — | **human** | an explicit approval of the spec and design, at the pull request's head | — |
+| — | **human** | an explicit approval of the spec and design, at the pull request's head, recorded with both hashes | `lanes` |
 | build | for a bug, a separate run that writes the failing test; then one fresh writer per pull request | the slices as commits | `verify-done`, `strategy` (testing) and the `code` references the diff touches |
 | verify | writer, then a script at the pushed commit | an evidence line per acceptance criterion | `verify-done`, `value-bar` (testing) |
 | cleanup | writer | a behaviour-neutral tidy diff | `deslop` skill |
@@ -45,6 +45,6 @@ each phase applies.
 | [lanes](references/lanes.md) | LN1–LN4 | when you take in a new change, or when a change turns out bigger, riskier or smaller than its lane |
 | [pr-readiness](references/pr-readiness.md) | PR1–PR7 | when you write a pull request body, or when you check one before merge |
 | [retro](references/retro.md) | RT1–RT6 | when a pull request is merged, rescued or reverted, or a defect escapes |
-| [review-process](references/review-process.md) | RV1–RV8 | before you run, write or tune a review |
+| [review-process](references/review-process.md) | RV1–RV9 | before you run, write or tune a review |
 | [verify-done](references/verify-done.md) | VB1–VB8 | when you build a change, before you call it ready, or when you check a writer's proof |
 <!-- /index -->

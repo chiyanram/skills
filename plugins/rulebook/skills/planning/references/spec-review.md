@@ -112,11 +112,13 @@ the drift.
 
 **Good**
 ```text
-$ check-cites design.md
-design.md:12  loans/RenewalPolicy.java:42  canRenew  DRIFTED (found at :58)
-1 drifted cite
+$ sed -n 42p loans/RenewalPolicy.java | grep -c canRenew
+0
+$ grep -n canRenew loans/RenewalPolicy.java
+58:    boolean canRenew(Loan loan) {
 ```
-A check resolves each cite to its symbol on every change. The reviewer reports the drifted line as a finding.
+The check opens each cite's line and looks for the named symbol. Line 42 no longer holds `canRenew`, so the reviewer
+reports the cite at `design.md:12` as drifted, with its new line.
 
 ### SR4 — Every open question names its decider, options and a recommendation
 

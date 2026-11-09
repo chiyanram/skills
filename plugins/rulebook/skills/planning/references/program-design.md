@@ -22,8 +22,8 @@ Contents: Rules · When X, use Y · Good / Bad (PD1–PD5) · Decided edges · R
   file paths and code snippets in a spec go stale quickly.
 - **PD7** — During the build phase, record a change to an approved type, signature or file placement in the design
   before you code past it, because an unrecorded deviation leaves the design check judging against a guess.
-- **PD9** — Plan slices so their pull request stays within 400 changed lines and 15 files, and make a larger slice
-  its own issue, because one writer and one review handle that size well.
+- **PD9** — Plan each pull request within 400 changed lines and 15 files, not counting generated files, and make a
+  slice past either its own issue, because one writer and one review handle that size well.
 - **PD10** — Settle a design question that paper can't decide with a throwaway prototype off the main branch, and
   carry only the decision and its evidence into the design, because prototype code is not built to ship.
 
@@ -39,7 +39,7 @@ Contents: Rules · When X, use Y · Good / Bad (PD1–PD5) · Decided edges · R
 | lists a slice | its command, its test filter and any manual step (PD5) | a check with no named command does not get run |
 | needs a file path, a signature or a tree | the design, never the spec (PD6) | file paths and code snippets in a spec go stale quickly |
 | is found wrong during the build phase | a recorded change to the design, then code (PD7) | an unrecorded deviation leaves the design check judging against a guess |
-| has slices that together pass 400 changed lines or 15 files | make the larger slices issues of their own (PD9, CR2) | one writer and one review handle that size well |
+| has slices that together pass 400 changed lines or 15 files, generated files not counted | make the slices past the limit issues of their own (PD9); code review splits a change past the same limit (CR2) | one writer and one review handle that size well |
 | has a question only trying it can settle: a layout, a state flow, a timing | a throwaway prototype on its own branch, marked as a prototype; the design cites its verdict and evidence (screenshots, observed output) (PD10) | a guess on paper and a polished build both cost more than a quick throwaway answer |
 
 ## Good / Bad
@@ -235,12 +235,12 @@ Walk the whole design and every slice in it. During the build phase, also walk t
   Not a finding: a change inside a body while every approved type, signature and placement holds (decided edge).
   Severity: Act on
   Verify: re-open the approved design and the diff line.
-- [ ] PD9 — Add up the files and lines the slices plan to change. A plan over 400 lines or 15 files with no slice
-  moved to its own issue is a finding.
+- [ ] PD9 — Add up the files and lines the slices plan to change, generated files excluded. A plan over 400 lines or
+  15 files with no slice moved to its own issue is a finding.
   Applies when: the design plans slices.
   Evidence: the planned file and line counts, per slice.
   Not a finding: none
-  Severity: Act on over 20 files; Consider over 400 lines or 15 files
+  Severity: Act on
   Verify: add up the counts again from the file tree and the slices.
 - [ ] PD10 — For each design decision backed by a prototype, find the verdict and its evidence in the design and the
   prototype's branch. Prototype code in the pull request's diff is a finding.
