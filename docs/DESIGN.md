@@ -74,7 +74,8 @@ verify pass, retro and onboarder. The onboarder writes a project's brief and glo
 
 **Evals live here, for this plugin.**
 - Three scenarios per role card, each with a grader. A card change ships only if its scenarios do not get worse.
-- The finder's set starts from the three review cases in `plugins/rulebook/evals/review/` (skills PR #229).
+- The finder's set starts from the three review cases (skills PR #229). Every role's scenarios sit in
+  `plugins/rulebook/evals/<role>/<case>/`, apart from the cards, so they fit whichever placement section 8 picks.
 - These test the plugin on its own, in plain Claude Code. agent-factory's golden set (chiyanram/agent-factory#214) tests
   the engine's whole automated review. **Two sets, two jobs** (decided 2026-11-09).
 
