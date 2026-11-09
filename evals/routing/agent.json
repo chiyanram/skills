@@ -1,0 +1,47 @@
+{
+  "skill": "agent",
+  "should": [
+    "Write the model adapter that maps the provider's stop reasons",
+    "Review the agent's tool loop and how it resumes after approval",
+    "Add prompt caching and compaction to the agent's context",
+    "Add a guard that blocks a risky tool call in the agent",
+    "Emit GenAI spans for each model call and tool call",
+    "Build an eval with a golden set for the agent",
+    "Enforce a token budget on each agent run",
+    "Add fallback to a second model when the provider is down"
+  ],
+  "near_miss": [
+    {
+      "prompt": "Write a Spock test with a scripted fake for the order service",
+      "owner": "testing"
+    },
+    {
+      "prompt": "Add a log call and a metric when the payment client fails",
+      "owner": "obs"
+    },
+    {
+      "prompt": "Put a circuit breaker and a retry on the payment client in Java",
+      "owner": "code"
+    },
+    {
+      "prompt": "Write the spec and acceptance criteria for the support feature",
+      "owner": "planning"
+    },
+    {
+      "prompt": "Add a migration for the conversation table",
+      "owner": "migrations"
+    },
+    {
+      "prompt": "Clean up the restating comments in this diff before review",
+      "owner": "deslop"
+    },
+    {
+      "prompt": "Which lane is this change in and which phases run until merge?",
+      "owner": "crq"
+    },
+    {
+      "prompt": "Write a reference for this rulebook with its Good / Bad pairs",
+      "owner": "meta"
+    }
+  ]
+}
