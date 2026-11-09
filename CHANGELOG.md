@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.43.0](https://github.com/chiyanram/skills/compare/rulebook--v0.42.0...rulebook--v0.43.0) (2026-11-09)
+
+### Features
+
+* **crq:** add the cleanup, retro and onboarder cards and their scenarios ([#237](https://github.com/chiyanram/skills/issues/237)) ([#252](https://github.com/chiyanram/skills/issues/252)) ([bff98af](https://github.com/chiyanram/skills/commit/bff98afd2c797546b1d39e322fe5b4165d709c4c))
+
 ## [0.42.0](https://github.com/chiyanram/skills/compare/rulebook--v0.41.0...rulebook--v0.42.0) (2026-11-09)
 
 ### Features
