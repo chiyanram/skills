@@ -46,15 +46,22 @@ try {
     final var reply = model.send(request);
     reservation.get().settle(pricing.cost(reply.servedModel(), reply.usage()));
     return Outcome.reply(reply);
-} finally {
-    reservation.get().releaseUnsettled();
+} catch (final ModelError error) {
+    reservation.get().settle(pricing.cost(request.model(), error.usageSoFar()));
+    throw error;
 }
 ```
 `reserve` adds the call's maximum cost to the shared counter in one atomic step, or refuses. `settle` replaces the
-reservation with the real cost, and a failed call gives its reservation back.
+reservation with the real cost; a failed call settles from the usage reported before it failed.
 
 ## Decided edges
 
+- **Skip when** a stream fails part-way, so the call has no final usage: settle from the usage reported so far, which
+  is zero when nothing was reported (AEN6). — **Do not skip when** the code releases the reservation at zero after
+  tokens were reported, or never settles it. — **Confidence** high
+- **Skip when** a process stops between reserve and settle, so no settle ever comes: the reservation expires in the
+  shared store after a set time, and the expiry returns it to the budget (AEN6). — **Do not skip when** a
+  reservation can stay held with no expiry: every crash then shrinks the budget for good. — **Confidence** medium
 - **Skip when** only one run can use a workspace at a time, enforced by a lock or a queue: a check before each call
   and a record after it meet AEN6. — **Do not skip when** two runs, workers or replicas can spend from the same
   budget. — **Confidence** high
@@ -72,10 +79,11 @@ Walk every changed budget check, usage record and model call inside a run with a
   Not a finding: none
   Severity: Act on
   Verify: re-open each model call path, resume included
-- [ ] AEN6 — Open the workspace budget store. A read-then-write check, or a counter held in one process while several
-  processes spend from it, is a finding.
+- [ ] AEN6 — Open the workspace budget store. A read-then-write check, a counter held in one process while several
+  processes spend from it, a failed call that does not settle from its usage so far, or a reservation with no expiry,
+  is a finding.
   Applies when: more than one run can spend from one budget
   Evidence: the reserve or check at `file:line`
-  Not a finding: one run at a time per workspace (decided edge)
+  Not a finding: one run at a time per workspace; a failed stream settled from its usage so far (decided edges)
   Severity: Act on
   Verify: re-open the store's reserve and settle operations
