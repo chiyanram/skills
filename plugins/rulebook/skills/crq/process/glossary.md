@@ -35,7 +35,7 @@ reach for a word under "avoid", use the term instead.
 | **spec home** | where a project keeps its specs | — |
 | **ask** | a run that needs a human's decision ends with status `asked` and its questions, each with a recommended answer; the project's `questions` setting says one at a time or one numbered round; the answer goes into the spec | clarify inline, assume |
 | **evidence row** | `{criterion, command, result}`: one AC and the plain command that proves it | proof, output |
-| **hand-off** | the file a role leaves for the next role | summary, notes |
+| **hand-off** | what a role leaves for the next role: a file, or the JSON a read-only run returns | summary, notes |
 | **ready check** | the engine re-running every evidence row at the head, checking that every AC has a row, plus the test checks and the lane check | verify (for this step) |
 | **test checks** | what the engine stops without a model: a test removed, a skip added, fewer assertions, a judge file changed | — |
 | **judge files** | tests, test config, the gate command and what it runs | test setup, harness |
