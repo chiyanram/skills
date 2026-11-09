@@ -37,7 +37,8 @@ licence does not permit vendoring its rule text.
 
 ## Releases
 
-semantic-release cuts every release from the commits on `main` (`release.config.mjs`). Never bump a `version` or edit
+semantic-release cuts a release from the commits on `main` (`release.config.mjs`) only when the operator runs
+**Actions → ci → Run workflow** on `main`. A merge does not release (#276). Never bump a `version` or edit
 `CHANGELOG.md` by hand. A change to what ships is `feat(<domain>)` or `fix(<domain>)`; design work is scoped
 `research`, `review` or `repo` and never releases. Table: `CONTRIBUTING.md#releases`.
 

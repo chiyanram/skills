@@ -96,7 +96,7 @@ The full list of checks and what fails each one is in [CONTRIBUTING.md](CONTRIBU
 
 ```mermaid
 flowchart LR
-    M["PR squash-merged<br/>to main"] --> C["ci check job<br/>make lint + make test"]
+    M["operator: Run workflow<br/>on main"] --> C["ci check job<br/>make lint + make test"]
     C --> A{"feat, fix or breaking<br/>since the last tag?"}
     A -->|"no"| N["no release"]
     A -->|"yes"| V["set_version.py bumps<br/>marketplace.json + plugin.json"]
@@ -105,9 +105,10 @@ flowchart LR
     T --> G["GitHub release"]
 ```
 
-semantic-release ([`release.config.mjs`](release.config.mjs)) reads the Conventional Commits on `main`. Claude Code
-pins a plugin to the `version` in its manifest, so only a version bump tells users there is an update. That is why a
-change to what ships must be a `feat` or a `fix`. The tag format `rulebook--v<version>` matches `claude plugin tag`.
+semantic-release ([`release.config.mjs`](release.config.mjs)) reads the Conventional Commits on `main`. It runs only
+when the operator starts the workflow by hand; a merge does not release (#276). Claude Code pins a plugin to the
+`version` in its manifest, so only a version bump tells users there is an update. That is why a change to what ships
+must be a `feat` or a `fix`. The tag format `rulebook--v<version>` matches `claude plugin tag`.
 [`scripts/release_links.mjs`](scripts/release_links.mjs) links `repo#N` in the notes to the right repo.
 
 ## Key decisions

@@ -76,7 +76,7 @@ docs/
   agents/                      conventions agent skills read: tracker, labels, domain docs
   archive/                     frozen design history; not checked, not maintained
 release.config.mjs             semantic-release
-.github/workflows/ci.yml       lint + test on every PR; release on push to main
+.github/workflows/ci.yml       lint + test on every PR and push to main; release on Run workflow
 ```
 
 ## Troubleshooting

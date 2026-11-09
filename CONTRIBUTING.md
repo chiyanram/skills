@@ -83,11 +83,11 @@ flowchart LR
 The checks skip `tests/fixtures/` and the frozen `docs/archive/`.
 
 ## Releases
-
-Releases are automatic. [semantic-release](https://semantic-release.gitbook.io/) runs on every push to `main` after
-`make lint` and `make test` pass. Pull requests are squash-merged, so **the pull request title becomes the commit**
-that decides the release. CI fails a title that is not a Conventional Commit: `type(scope): summary`, with the domain
-as scope, such as `feat(testing): spock cleanup rules (#123)`.
+ Releases are manual during the dev phase (#276). A merge to `main` runs `make lint` and `make test` only. To release,
+open **Actions → ci → Run workflow** on `main`, or run `gh workflow run ci.yml --ref main`.
+[semantic-release](https://semantic-release.gitbook.io/) then runs after the checks pass. Pull requests are
+squash-merged, so **the pull request title becomes the commit** that decides the release. CI fails a title that is not a
+Conventional Commit: `type(scope): summary`, with the domain as scope, such as `feat(testing): spock cleanup rules (#123)`.
 
 | commit | release | use it when |
 |---|---|---|
@@ -98,11 +98,11 @@ as scope, such as `feat(testing): spock cleanup rules (#123)`.
 | any type with scope `research`, `review` or `repo` | none | design work, even when it is a `feat` |
 
 Never edit a `version` or `CHANGELOG.md` by hand; the release writes both. Users stay on a version until it changes,
-so every shipped change has to be a `feat` or a `fix`.
+so every shipped change has to be a `feat` or a `fix`, and reaches users only at the next manual release.
 
-**A release that did not run.** GitHub skips every workflow for a push whose commit message contains the skip-ci
-marker (`[skip ci]` and its variants), in the title or the body. The release commit uses it on purpose; never quote it
-in a pull request title or description. If a merge was skipped, open **Actions → ci → Run workflow** on `main`.
+**The skip-ci marker.** GitHub skips every workflow for a push whose commit message contains the skip-ci marker
+(`[skip ci]` and its variants), in the title or the body. The release commit uses it on purpose; never quote it in a
+pull request title or description.
 
 **Branch protection.** The release job pushes to `main` with the workflow's `github.token`. If a ruleset blocks that,
 add a repository secret `RELEASE_TOKEN`: a token with Contents read and write that may bypass the rule.
