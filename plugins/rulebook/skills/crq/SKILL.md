@@ -43,7 +43,8 @@ An engine reads these to run the same process a person runs with `/crq`.
 - [lanes.json](process/lanes.json): per lane, whether it needs approval, design review and test-first, its lenses
   and its retro. An engine may make a lane stricter, never looser.
 - [glossary](process/glossary.md): the words every role card and hand-off uses.
-- Role cards, one per role, each with three eval scenarios: [coordinator](process/roles/coordinator.md),
+- Role cards, one per role, each with three eval scenarios in the plugin's `evals/<role>/`:
+  [coordinator](process/roles/coordinator.md), [design-reviewer](process/roles/design-reviewer.md),
   [finder](process/roles/finder.md), [verify pass](process/roles/verify-pass.md).
 
 ## References

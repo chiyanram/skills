@@ -121,6 +121,8 @@ uses, because the report lists cases by folder name only.
 
 These test the plugin on its own, in plain Claude Code. They do not test an engine, which keeps its own set.
 
+Each case's `prompt.md` says in its `description` what the role should do, and its graders say what passes.
+
 The `finder` holds three today:
 - `new-bug-next-to-old`: it blocks on the new bug and keeps an older one apart;
 - `clean-change`: it finds nothing to block on and still leaves the merge to a person;
@@ -136,6 +138,11 @@ The `verify-pass` holds three:
 - `cited-only-finding`: it puts a real finding with only a cited line in consider, not act_on;
 - `duplicate-across-lenses`: it keeps one of two findings on the same line and rule, and dismisses the other as a
   duplicate.
+
+The `design-reviewer` holds three:
+- `stale-cite`: it marks a decision whose cite has moved a conflict and gives the new line;
+- `no-failure-path`: it flags an outside call with no failure path (SR11);
+- `consistent-design`: it marks every decision aligned and invents no blocking finding.
 
 Every run and every `llm` grader is a real model call on your own Claude login, so they run by hand, never in
 `make lint`, `make test` or CI. Run a role's scenarios after a change to its card or to a reference it reads, such as
