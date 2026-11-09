@@ -19,8 +19,8 @@ Contents: Rules · When X, use Y · Good / Bad (AE2, AE5, AEN2, AE10) · Decided
   because a retry replays text the user already saw.
 - **AE3** — Have each adapter return one normalised error (status, retry-after, request id, timeout or network,
   response started), and let the retry policy above it decide, because retries inside adapters multiply attempts.
-- **AEN2** — Count a rate-limit or overload response as back-pressure for the retry policy and rate limiter, never
-  as a circuit-breaker failure, because a breaker tripped by throttling cuts off a provider that is up.
+- **AEN2** — Treat a 429 or an explicit retry-after as back-pressure for the retry policy and rate limiter; count an
+  overload toward the breaker only once retries give up, because throttling otherwise trips a healthy breaker.
 - **AE8** — Treat an error event inside a stream as that request's failure even after a 200, and skip keep-alive and
   unknown event types, because providers fail mid-stream and add event types.
 - **AE7** — Fold each provider's usage into one record (input including cache, cache read, cache write, output,
@@ -39,7 +39,8 @@ Contents: Rules · When X, use Y · Good / Bad (AE2, AE5, AEN2, AE10) · Decided
 | a tool call's arguments arrive | a JSON library over the complete arguments, then the tool's schema | an empty-argument fallback runs the tool wrongly (AE6) · the check before a sink: SE10 (`code`'s `security`) |
 | a call fails | one normalised error from the adapter, and one retry policy above it | retries inside adapters multiply attempts (AE3) · one layer retries: CC12 (`code`'s `concurrency`) |
 | a streamed call fails | a retry only while no chunk has reached a consumer; after that, a typed failure | a retry replays text the user already saw (AE5) |
-| the provider answers with a rate limit or overload | back-pressure: the retry policy and the rate limiter, not the breaker | a breaker tripped by throttling cuts off a provider that is up (AEN2) · the breaker itself: CC11 |
+| the provider answers with a 429 or an explicit retry-after | back-pressure: the retry policy and the rate limiter, not the breaker | throttling otherwise trips a healthy breaker (AEN2) · the breaker itself: CC11 |
+| the provider answers with an overload and no retry-after | the retry policy first; a breaker failure only once it gives up | one overload burst that a retry would ride out does not open the breaker (AEN2) |
 | a stream sends an error event, a keep-alive or an event type you do not know | the error ends the request as failed; the other two are skipped | providers fail mid-stream after a 200, and add event types (AE8) |
 | the provider reports token usage | one usage record, from the final cumulative value | providers split and repeat the counts differently (AE7) · its live test: LS16 (`testing`'s `llm-live-tests`) |
 | a call needs an output-token cap | a value from agent or model configuration, sized as a backstop | a hidden low cap truncates answers and wastes retries (AE9) |
@@ -101,7 +102,7 @@ RetryDecision decide(final ModelError error, final int attempt) {
 The adapter's normalised error says whether the response started (AE3). After the first chunk, the call ends as a
 typed failure.
 
-### AEN2 — A rate limit is back-pressure, not a breaker failure
+### AEN2 — A rate limit is back-pressure; an overload counts once retries give up
 
 **Bad**
 ```java
@@ -114,8 +115,10 @@ A burst of rate-limit responses opens the breaker. Every run then fails fast whi
 
 **Good**
 ```java
+try {
+    return retrying.send(request);
 } catch (final ModelError error) {
-    if (error.kind() == ErrorKind.RATE_LIMITED || error.kind() == ErrorKind.OVERLOADED) {
+    if (error.status() == 429 || error.retryAfter().isPresent()) {
         limiter.slowDown(error.retryAfter());
     } else {
         breaker.recordFailure();
@@ -123,7 +126,8 @@ A burst of rate-limit responses opens the breaker. Every run then fails fast whi
     throw error;
 }
 ```
-Throttling slows the caller down. Only failures that show the provider is down count toward the breaker.
+This code sits outside the retry policy, so an error reaches it only once retries gave up. Throttling slows the
+caller down; an overload that outlasted the retries counts toward the breaker.
 
 ### AE10 — Fallback is a decorator with a model mapping
 
@@ -157,9 +161,9 @@ carries the model that served it, so cost is priced on that model.
   a raw provider field, such as a stop-reason string or a usage map. — **Confidence** medium
 - **Skip when** a stream is still buffered inside the adapter and no chunk has gone to a user, a socket or a store: a
   retry is allowed (AE5). — **Do not skip when** any chunk was forwarded. — **Confidence** high
-- **Skip when** a rate-limit response says a quota or spend cap is used up and carries no retry-after: it is neither
-  back-pressure nor a breaker failure; stop the run with a typed reason (AEN2, CC16). — **Do not skip when** the
-  response asks the caller to wait. — **Confidence** medium
+- **Skip when** a 429 says a quota or spend cap is used up and carries no retry-after: do not retry it (CC16), and
+  stop the run with a typed reason; it is not a breaker failure (AEN2). — **Do not skip when** the response asks the
+  caller to wait. — **Confidence** medium
 - **Skip when** the output-token cap is a default in agent configuration that a model entry can override: that is
   configuration (AE9). — **Do not skip when** the value is a constant in the adapter. — **Confidence** high
 
@@ -202,10 +206,10 @@ Walk every changed model adapter, model port decorator, retry policy, stream han
   Not a finding: none
   Severity: Act on
   Verify: re-open the error type and every caller that retries
-- [ ] AEN2 — Find what the circuit breaker counts. A rate-limit or overload response counted as a breaker failure is a
-  finding.
+- [ ] AEN2 — Find what the circuit breaker counts. A 429 or a response with retry-after counted as a breaker failure,
+  or an overload counted before the retry policy gives up, is a finding.
   Applies when: a breaker wraps a model call
-  Evidence: the record call and the error kinds that reach it, at `file:line`
+  Evidence: the record call, where it sits against the retry policy, and the errors that reach it, at `file:line`
   Not a finding: a used-up quota with no retry-after (decided edge)
   Severity: Act on
   Verify: re-open the breaker's failure predicate
