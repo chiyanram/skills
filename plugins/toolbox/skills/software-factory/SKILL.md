@@ -78,6 +78,8 @@ When the user is choosing a product for a slot, read that slot's survey to get o
 
 - [TICKET-TRACKERS.md](TICKET-TRACKERS.md)
 - [GIT-HOSTS.md](GIT-HOSTS.md)
+- [RUNNERS.md](RUNNERS.md)
+- [OBSERVABILITY-PLATFORMS.md](OBSERVABILITY-PLATFORMS.md)
 
 Buy the services and build the tasks: the tasks carry the user's design, the services are generic. Favour an off-the-shelf ticket tracker: it is robust, people already know it, and outside users are easy to let in.
 

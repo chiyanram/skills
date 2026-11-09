@@ -38,8 +38,7 @@ where each came from, at which commit, under which licence, and what we changed 
 - Source: mattpocock/skills, `skills/in-progress/software-factory/` (`SKILL.md` and its surveys; in progress upstream)
 - Commit: 4ae2317ddb22b046e26455e4f9c9b3aaaf62212d
 - Licence: MIT, Copyright (c) 2026 Matt Pocock
-- Changes: none; copied as written, typed-only upstream. `RUNNERS.md` and `OBSERVABILITY-PLATFORMS.md` and their two
-  links in `SKILL.md` follow in the next release.
+- Changes: none; copied as written, and typed-only upstream.
 
 ## MIT License
 
