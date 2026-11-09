@@ -116,7 +116,7 @@ calls (RT6).
 | 2 | `test-integrity` rubric | #235 | the review lens |
 | 3 | the rulebook's own evals: keep the review cases here as the finder's set | #236 | the role cards' evals |
 | 4 | the lanes file, the glossary and nine role cards, each with 3 eval scenarios | #237 | the factory's plugin step, then the ledger pilot |
-| 5 | crq's own wording moves to the glossary's words | (after #237) | the cards and references match |
+| 5 | crq's own wording moves to the glossary's words | #244 | the cards and references match |
 | later | agent-engineering references | #130 #134 | an RCA agent at work |
 
 New content needs the operator's yes and a ledger row, as every rule does.

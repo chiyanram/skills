@@ -1,13 +1,13 @@
-# Pull request readiness
+# PR readiness
 
-What a pull request body holds before the human merges it, and the extra readiness items of a one-way door. Read it
-when you write a pull request body, or when you check one before merge.
+What a PR body holds before the human merges it, and the extra readiness items of a one-way door. Read it
+when you write a PR body, or when you check one before merge.
 
 ## Rules
 
-- **PR1** — Open the pull request body with its reason in one sentence and a link to the approved spec, because a
-  reviewer who does not know why cannot judge whether the change does it.
-- **PR2** — Put the evidence table (VB5) in the pull request body, because the merger needs proof without running
+- **PR1** — Open the PR body with its reason in one sentence and a link to the approved spec, because a
+  human or finder who does not know why cannot judge whether the change does it.
+- **PR2** — Put the evidence table (VB5) in the PR body, because the merger needs the evidence rows without running
   anything again.
 - **PR3** — State "Breaking change: yes" or "no", and for yes, what callers must change, because an unannounced break
   reaches callers before anyone warns them.
@@ -24,27 +24,27 @@ when you write a pull request body, or when you check one before merge.
 
 | situation | use | why |
 |---|---|---|
-| any pull request | the body below, in this order | the merger finds each part in the same place |
-| the change has no spec (tiny lane) | the reason in one sentence and the issue link (PR1) | there is no spec to link |
-| the rollback is a plain revert | "Rollback: revert this pull request; no data changes" (PR4) | the line still tells the person on call it is safe |
+| any PR | the body below, in this order | the merger finds each part in the same place |
+| the change has no spec (tiny lane) | the reason in one sentence and the ticket link (PR1) | there is no spec to link |
+| the rollback is a plain revert | "Rollback: revert this PR; no data changes" (PR4) | the line still tells the person on call it is safe |
 | the change is one file | a one-line "Change:" instead of a tree (PR5) | a tree of one file shows nothing |
 | the one-way-door lane | the readiness items of PR7, under their own heading | the human approves each irreversible step |
 
 ## Good / Bad
 
-### PR1 — The reason first, then the proof
+### PR1 — The reason first, then the evidence
 
 **Bad**
 ```text
 Fixes renewal. See commits.
 ```
-No reason, no proof, no rollback, and no hint where a mistake would hide.
+No reason, no evidence, no rollback, and no hint where a mistake would hide.
 
 **Good**
 ```text
 Why: a reserved loan could be renewed; it now cannot. Spec: #42
 Breaking change: no
-Rollback: revert this pull request; no data changes.
+Rollback: revert this PR; no data changes.
 Where to look: LoanService.renew, the reservation check.
 Evidence at 4f2c9e1: (the VB5 table)
 Change:
@@ -55,7 +55,7 @@ The merger reads why, what could break, how to undo it and where to look first.
 
 ## Decided edges
 
-- **Skip the spec link when** the change is in the tiny lane: link the issue. — **Do not skip when** the change had
+- **Skip the spec link when** the change is in the tiny lane: link the ticket. — **Do not skip when** the change had
   an approved spec (PR1). — **Confidence** high
 - **Skip the tree when** the change touches one file. — **Do not skip when** it touches two files or more (PR5). —
   **Confidence** high
@@ -64,7 +64,7 @@ The merger reads why, what could break, how to undo it and where to look first.
 
 ## Review checks
 
-Walk the pull request body before merge.
+Walk the PR body before merge.
 
 - [ ] PR1 — Find the one-sentence reason and the spec link at the top. Each one missing is a finding.
 - [ ] PR2 — Find the evidence table (VB5), at the pushed commit. Its absence is a finding.
