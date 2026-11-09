@@ -1,6 +1,9 @@
-"""The crq process files an engine reads: the lanes file and the role cards (docs/DESIGN.md section 4, #237).
+"""The crq process files an engine reads: the lanes file, the review baseline and the role cards (docs/DESIGN.md
+section 4, #237).
 
 Fails when a lanes file misses a lane or a field, or lets a lane above tiny run without approval (the approval floor);
+when the review file's baseline is empty, has an entry that is not exactly a skill and a reference, names a reference
+twice, or names one the plugin does not ship;
 when a role card is not one of the known roles, misses a frontmatter field or adds one, cites a rule ID no Rules section
 holds, or lacks the job, a "done when" line, numbered steps or an "it's working if" list; or when a role has fewer
 than three eval scenarios, each a folder with a `prompt.md` and a grader under `graders/`.
@@ -87,6 +90,28 @@ def lanes_problems(path: Path) -> list[str]:
     return found
 
 
+def baseline_problems(path: Path, plugin: Path) -> list[str]:
+    try:
+        baseline = json.loads(path.read_text()).get("baseline")
+    except (json.JSONDecodeError, AttributeError):
+        baseline = None
+    if not isinstance(baseline, list) or not baseline:
+        return [f"{path}: not a JSON object with a non-empty `baseline` list"]
+    found = []
+    seen = set()
+    for entry in baseline:
+        if not isinstance(entry, dict) or set(entry) != {"skill", "reference"}:
+            found.append(f"{path}: baseline entry {json.dumps(entry)} is not exactly {{skill, reference}}")
+            continue
+        name = f"{entry['skill']}/{entry['reference']}"
+        if name in seen:
+            found.append(f"{path}: baseline names `{name}` twice")
+        seen.add(name)
+        if not (plugin / "skills" / str(entry["skill"]) / "references" / f"{entry['reference']}.md").is_file():
+            found.append(f"{path}: baseline names `{name}`, which the plugin does not ship")
+    return found
+
+
 def problems(root: Path) -> list[str]:
     entries = json.loads((root / ".claude-plugin/marketplace.json").read_text()).get("plugins", [])
     found = []
@@ -96,6 +121,8 @@ def problems(root: Path) -> list[str]:
         for process in sorted(plugin.glob("skills/*/process/")):
             lanes = process / "lanes.json"
             found += lanes_problems(lanes) if lanes.is_file() else [f"{process}: no lanes.json"]
+            review = process / "review.json"
+            found += baseline_problems(review, plugin) if review.is_file() else [f"{process}: no review.json"]
             if not (process / "glossary.md").is_file():
                 found.append(f"{process}: no glossary.md")
             found += [p for card in sorted(process.glob("roles/*.md")) for p in card_problems(card, plugin, ids)]
