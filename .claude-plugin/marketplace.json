@@ -6,13 +6,13 @@
     {
       "name": "rulebook",
       "source": "./plugins/rulebook",
-      "version": "0.43.0",
+      "version": "0.44.0",
       "description": "Generic skills, references with neutral-domain examples, and the /crq workflow."
     },
     {
       "name": "toolbox",
       "source": "./plugins/toolbox",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": "Typed-only tools: each runs only when a person types it, and none pushes or merges."
     }
   ]
