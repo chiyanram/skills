@@ -269,17 +269,78 @@ Scenario: should cancel the order when the customer leaves the checkout
 Walk every scenario in the spec's acceptance-criteria section that the change adds or edits.
 
 - [ ] GA1 — Acceptance criteria written outside the spec (a plan, a change request, a `.feature` file) are a finding.
+  Applies when: the change adds or edits acceptance criteria.
+  Evidence: the file and line where the criteria are written outside the spec.
+  Not a finding: a plan, test or change request that links to the spec's criteria.
+  Severity: Act on
+  Verify: re-open that file and confirm it holds the criterion text, not a link.
 - [ ] GA2 — A scenario without an id, or an approved id that changed, is a finding.
+  Applies when: the change adds or edits a scenario.
+  Evidence: the scenario title, and the old and new id when an id changed.
+  Not a finding: none
+  Severity: Act on
+  Verify: re-open the scenario, and the approved spec for a changed id.
 - [ ] GA3 — A tag that names a test level is a finding.
+  Applies when: a scenario the change adds or edits has a tag.
+  Evidence: the tag line, quoted.
+  Not a finding: a scenario with no tag at all (decided edge).
+  Severity: Act on
+  Verify: re-open the tag line and confirm it names a test level, not a domain or concern.
 - [ ] GA4 — Compare each Outline's placeholders with its Examples header. A difference is a finding, and so is a Given
   repeated in several scenarios outside `Background:`.
+  Applies when: the change adds or edits a Scenario Outline, or a Given that more than one scenario uses.
+  Evidence: the placeholders and the Examples header side by side, or each copy of the repeated Given.
+  Not a finding: none
+  Severity: Act on
+  Verify: re-open the Outline and its Examples header, or each scenario with the repeated Given.
 - [ ] GA5 — A scenario with no observable Then is a finding, and so is an acceptance criterion with no failure or
   refusal scenario.
+  Applies when: the change adds or edits a scenario.
+  Evidence: the Then steps, quoted, or the criterion and its list of scenarios.
+  Not a finding: a Then with an And or a But; a failure path in a sibling scenario under the same criterion (decided
+  edges).
+  Severity: Act on
+  Verify: re-open every scenario under the criterion, siblings included.
 - [ ] GA6 — A title that does not start with "should" or that names no behaviour is a finding.
+  Applies when: the change adds or edits a scenario title.
+  Evidence: the title, quoted.
+  Not a finding: none
+  Severity: Act on
+  Verify: re-open the title.
 - [ ] CV1 — An id that is not a `# AC-n` line directly above `Scenario:` is a finding.
+  Applies when: the change adds or edits a scenario id.
+  Evidence: the id line and the `Scenario:` line, quoted.
+  Not a finding: none
+  Severity: Act on
+  Verify: re-open the two lines.
 - [ ] AC7 — Open the change. When it alters stored data or a default, a criterion with no pre-change Given is a finding.
+  Applies when: the change alters stored data or a default.
+  Evidence: the stored data or default that changes, and the criterion's Given steps.
+  Not a finding: a new table with no rows before the change (decided edge).
+  Severity: Act on
+  Verify: re-open the change to the data or default, and the criterion's scenarios.
 - [ ] AC8 — An Examples column with one value on every row is a finding.
+  Applies when: the change adds or edits an Examples table.
+  Evidence: the column header and its one value.
+  Not a finding: none
+  Severity: Act on
+  Verify: re-open the Examples table.
 - [ ] AC9 — A noun not in the glossary, a related spec or this spec's own definitions is a finding.
+  Applies when: the change adds or edits scenario text.
+  Evidence: the noun, the scenario line, and where you looked for it.
+  Not a finding: none
+  Severity: Act on
+  Verify: search the glossary, the related specs and this spec for the noun again.
 - [ ] AC10 — Compare the acceptance-criteria text with the approved version. A changed text with no new approval is a
   finding.
+  Applies when: the spec has passed the approval gate.
+  Evidence: the old and new text, and the change request with no new approval.
+  Not a finding: a whitespace or typo edit that keeps the meaning (decided edge).
+  Severity: Act on
+  Verify: re-open the approved version and the change request.
 - [ ] AC12 — For a bug, find the current, expected and must-not-change behaviour. Each part missing is a finding.
+  Applies when: the work item is a bug.
+  Evidence: the spec's sections, and which part is missing.
+  Not a finding: none
+  Severity: Act on
+  Verify: re-open the bug spec.

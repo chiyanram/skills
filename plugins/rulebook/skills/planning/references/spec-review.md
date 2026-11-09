@@ -264,35 +264,126 @@ Walk the whole spec and the whole design in one round, every section, before you
 
 - [ ] SR1 — Report every finding in this round. A finding on text unchanged since an earlier round is a miss of that
   round; say so.
+  Applies when: the review is a second or later round.
+  Evidence: the text, and the earlier round that saw it unchanged.
+  Not a finding: a problem in text that changed since the last round, which is a new finding (decided edge).
+  Severity: Act on
+  Verify: compare the text with the version the earlier round reviewed.
 - [ ] SR2 — Open each `file:line` cite in the design on the main branch. A cite that does not show the claimed
   behaviour is a finding, and so is a claim about today's code with no cite. A file path in the spec is a finding.
+  Applies when: the design makes a claim about today's code, or the spec names a file path.
+  Evidence: the claim, quoted, and the cite you opened or its absence; or the spec line with the path.
+  Not a finding: a sentence that states planned behaviour; a claim in the spec that moves to the design (decided
+  edges).
+  Severity: Act on
+  Verify: open the cite on the main branch again and read the claimed behaviour there.
 - [ ] SR3 — Run the cite check over the design. Each cite that no longer points at its named symbol is a finding.
+  Applies when: the design holds a `file:line` cite.
+  Evidence: the cite check's output line for the cite.
+  Not a finding: a cite that pins a commit (`file:line @commit`) (decided edge).
+  Severity: Act on
+  Verify: run the cite check again.
 - [ ] SR4 — Read the open-questions list. Each item without a decider, without options and a recommendation, or
   without a reason it does not block building, is a finding. So is a question the code or the docs could answer.
+  Applies when: the spec reaches the approval gate.
+  Evidence: the open question, quoted, and the part it lacks; or the code or doc that answers it.
+  Not a finding: an open-questions section in a draft spec (decided edge).
+  Severity: Act on
+  Verify: re-open the question, and the code or doc that answers it.
 - [ ] SR6 — For each story, check an actor, an action and a benefit, scenarios a test can check, and an out-of-scope
   list. Each one missing is a finding.
+  Applies when: the spec holds a story.
+  Evidence: the story, and the part that is missing.
+  Not a finding: a scenario in plain prose that a test can check (decided edge).
+  Severity: Act on
+  Verify: re-open the story and its scenarios.
 - [ ] SR9 — For each design decision, find the ADRs and patterns in its area. A departure the design does not name, or
   two documents that disagree, is a finding; report it and do not pick the answer.
+  Applies when: a design decision touches an area with an ADR or an established pattern.
+  Evidence: the decision, and the ADR or pattern it departs from, or the two documents that disagree.
+  Not a finding: a named departure with its reason and its new decision recorded (decided edge).
+  Severity: Act on
+  Verify: re-open the ADR or pattern and the design decision.
 - [ ] SR10 — Find at least one rejected alternative with why it lost; none, without a named forcing constraint, is a
   finding. A cost of the chosen shape not stated as "we accept X for Y" is a finding.
+  Applies when: the change has a design.
+  Evidence: the design's alternatives section or its absence, and the unstated cost.
+  Not a finding: a shape a named constraint forced, with no invented rival (decided edge).
+  Severity: Act on
+  Verify: re-open the design's alternatives and tradeoffs.
 - [ ] SR11 — For each step that writes, sends or calls out, find what happens on failure, on a second run and after a
   crash halfway. Each one missing is a finding.
+  Applies when: the design has a step that writes data, sends a message or calls another system.
+  Evidence: the step, quoted; one finding per missing case.
+  Not a finding: a read-only step that changes no state (decided edge).
+  Severity: Act on
+  Verify: re-read the step and the text after it for the failure, rerun and crash cases.
 - [ ] SR12 — For each change to stored data, a public contract or a deploy, find the migration and the rollback. Each
   one missing is a finding, and so is an irreversible step not marked for the human's yes.
+  Applies when: the design changes stored data, a public contract or a deploy.
+  Evidence: the change, and the missing migration, rollback or mark.
+  Not a finding: an add-only change where old data and old clients keep working, stated in one line (decided edge).
+  Severity: Act on
+  Verify: re-open the design's migration and rollback text.
 - [ ] SR13 — For each new input, endpoint or permission, find the trust boundary and the control at it. Each one
   missing is a finding.
+  Applies when: the design adds an input, an endpoint or a permission.
+  Evidence: the new input, endpoint or permission, and the missing boundary or control.
+  Not a finding: none
+  Severity: Act on
+  Verify: re-open the design's text on the input, endpoint or permission.
 - [ ] SR14 — For each new abstraction, setting, port or extension point, find its second user, today or in this spec.
   None is a finding.
+  Applies when: the design adds an abstraction, a setting, a port or an extension point.
+  Evidence: the new seam, and where you looked for a second user.
+  Not a finding: a second user that exists today or is built in this spec (decided edge).
+  Severity: Act on
+  Verify: search the code and the spec for a second user again.
 - [ ] SR15 — For each decision that is hard to reverse, surprising and a real tradeoff, find its ADR. None is a
   finding.
+  Applies when: the design makes a decision that is hard to reverse, surprising and a real tradeoff.
+  Evidence: the decision, quoted, and the missing ADR.
+  Not a finding: a decision that is easy to reverse or the obvious choice (decided edge).
+  Severity: Act on
+  Verify: search the ADRs for the decision again.
 - [ ] SR17 — For each new part, search the code for one that does the same job. One found and neither reused nor
   ruled out in the design is a finding.
+  Applies when: the design adds a part.
+  Evidence: the new part, and the existing part at `file:line` that does the same job.
+  Not a finding: none
+  Severity: Act on
+  Verify: re-open the existing part and confirm it does the same job.
 - [ ] SR18 — For each new failure mode, find the log, metric or alert that shows it. Each one missing is a finding.
+  Applies when: the design adds a failure mode.
+  Evidence: the failure mode, quoted, and the missing log, metric or alert.
+  Not a finding: none
+  Severity: Act on
+  Verify: re-open the design's text on the failure mode.
 - [ ] SR19 — In the issue's clarify answers or the design, find the assumption list, each marked stated, inferred or
   default. A missing list, or an inferred or default assumption with no answer from the human, is a finding.
+  Applies when: the change has a spec.
+  Evidence: the assumption list or its absence, and each unanswered inferred or default assumption.
+  Not a finding: a tiny-lane change with no spec; a fact about today's code that SR2 cites (decided edges).
+  Severity: Act on
+  Verify: re-open the clarify answers and the design.
 - [ ] SR20 — In a one-way-door design, find the pre-mortem. A missing pre-mortem, a failure with no specific trigger or
   early sign, or a failure with no mitigation, is a finding.
+  Applies when: the change is in the one-way-door lane.
+  Evidence: the pre-mortem or its absence, and each failure with its missing part.
+  Not a finding: a change in the tiny, bug or feature lane (decided edge).
+  Severity: Act on
+  Verify: re-open the pre-mortem.
 - [ ] SR21 — In the research notes, find the how (with `file:line`) and, for each line the design plans to delete or
   reshape, the why: a commit, pull request or issue, or "no recorded reason". A line planned for deletion or
   reshaping with no stated why is a finding.
+  Applies when: the design plans to delete or reshape existing code.
+  Evidence: the planned line, and the research notes that lack its how or why.
+  Not a finding: a change that only adds new code and touches no existing behaviour (decided edge).
+  Severity: Act on
+  Verify: re-open the research notes and the planned line.
 - [ ] SR22 — In each research brief, find the wanted change or a planned design. One that states either is a finding.
+  Applies when: the change has a research brief given to a helper.
+  Evidence: the brief's line that states the wanted change or the planned design, quoted.
+  Not a finding: none
+  Severity: Act on
+  Verify: re-open the brief.
