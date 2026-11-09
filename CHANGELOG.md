@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.39.0](https://github.com/chiyanram/skills/compare/rulebook--v0.38.0...rulebook--v0.39.0) (2026-11-09)
+
+### Features
+
+* **crq:** add the coordinator card and its three scenarios ([#237](https://github.com/chiyanram/skills/issues/237)) ([#246](https://github.com/chiyanram/skills/issues/246)) ([73397bb](https://github.com/chiyanram/skills/commit/73397bbb75e4f9b77a4056826606e577e1f4ea38))
+
 ## [0.38.0](https://github.com/chiyanram/skills/compare/rulebook--v0.37.0...rulebook--v0.38.0) (2026-11-09)
 
 ### Features
