@@ -1,6 +1,6 @@
 {
   "name": "toolbox",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Typed-only tools: each runs only when a person types it, and none pushes or merges.",
   "author": { "name": "chiyanram" },
   "repository": "https://github.com/chiyanram/skills"
