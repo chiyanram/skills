@@ -21,7 +21,8 @@ COMMITS = [
     "feat(crq): a rule (#10) (#11)",
     "fix(code): a wrong example (chiyanram/agent-factory#320) (#12)",
     "perf(code): a faster check (#13)",
-    "feat(planning)!: rename a rule id (#14)\n\nBREAKING CHANGE: rule GA3 is removed.",
+    "feat(planning)!: rename a rule id (#14)\n\nBREAKING CHANGE: rule GA3 is removed.\n\n"
+    "Co-Authored-By: A Tool <noreply@example.com>\nClaude-Session: https://example.com/s",
     "docs(repo): an adr (#15)",
     "ci(repo): a workflow (#16)",
 ]
@@ -47,6 +48,10 @@ class ReleaseNotesTest(unittest.TestCase):
 
     def test_should_list_the_breaking_change_under_its_scope(self):
         self.assertIn("* **planning** — rule GA3 is removed.", self.notes)
+
+    def test_should_leave_git_trailers_out_of_a_breaking_change_note(self):
+        self.assertNotIn("Co-Authored-By", self.notes)
+        self.assertNotIn("Claude-Session", self.notes)
 
     def test_should_hide_changes_that_ship_nothing(self):
         self.assertNotIn("an adr", self.notes)
