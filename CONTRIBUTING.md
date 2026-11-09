@@ -144,6 +144,11 @@ The `design-reviewer` holds three:
 - `no-failure-path`: it flags an outside call with no failure path (SR11);
 - `consistent-design`: it marks every decision aligned and invents no blocking finding.
 
+The `test-first` holds three:
+- `bug-with-expected-result`: it writes one test that fails for the stated reason and changes no production file;
+- `no-checkable-expected`: it asks for the missing expected result and writes no test;
+- `one-line-fix-left-alone`: it writes only the failing test, even when the fix is one obvious line.
+
 Every run and every `llm` grader is a real model call on your own Claude login, so they run by hand, never in
 `make lint`, `make test` or CI. Run a role's scenarios after a change to its card or to a reference it reads, such as
 a `crq` review reference for the `finder`:
