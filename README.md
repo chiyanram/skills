@@ -79,6 +79,7 @@ Tests here call the model: use the `testing` skill (rulebook plugin) and read it
 | [obs](plugins/rulebook/skills/obs/SKILL.md) | write or review a log call, a metric or a trace |
 | [planning](plugins/rulebook/skills/planning/SKILL.md) | write or review a spec, a design or a diagram |
 | [meta](plugins/rulebook/skills/meta/SKILL.md) | write or review a reference of this rulebook |
+| [crq](plugins/rulebook/skills/crq/SKILL.md) | take a change from request to merge, or run one of its phases |
 
 The [plugin README](plugins/rulebook/README.md) has more on each skill.
 
