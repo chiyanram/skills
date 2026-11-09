@@ -107,8 +107,8 @@ Walk the approved spec and design, then the whole diff.
 - [ ] CR4 — For each lowered threshold or disabled check in a config file, find its reason on the line above. Each
   one without a reason is a finding.
 - [ ] CR5 — For each changed behaviour with a consumer outside the diff (shared code, a public contract, configuration,
-  a dependency bump), find the named consumers and the run that proves the claim. "Callers of X" with no `file:line`, or a safety
-  claim with nothing run behind it, is a finding.
+  a dependency bump), find the named consumers and the run that proves the claim. "Callers of X" with no
+  `file:line`, or a safety claim with nothing run behind it, is a finding.
 - [ ] CR6 — For each changed behaviour, find its named regression and the assertion that fails on it. A behaviour
   with none, or covered only by a skipped, no-throw, snapshot-only or mock-call check, is a finding.
 - [ ] CR7 — For each removed or replaced chunk, find the behaviour it carried and where it is re-established or why

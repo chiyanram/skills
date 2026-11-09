@@ -1,7 +1,7 @@
 # Verify done
 
-How the implementer proves a change is done before review: what it asks instead of guessing, which tests prove the change,
-and what evidence goes in the PR. Read it when you build a change, before you call it ready, or when you
+How the implementer proves a change is done before review: what it asks instead of guessing, which tests prove the
+change, and what evidence goes in the PR. Read it when you build a change, before you call it ready, or when you
 check an implementer's evidence rows.
 
 ## Rules
