@@ -1,8 +1,8 @@
 # Spec review
 
-How a reviewer checks a spec and its design before the approval gate: one round, cited claims, no open question without
-a decider, complete stories, and a sound design. Read it when you write, revise or review a spec or a design before the
-approval gate.
+How a reviewer checks a spec and its design before the approval gate: all findings in one round, cited claims, no
+open question without a decider, complete stories, and a sound design. Read it when you write, revise or review a spec
+or a design before the approval gate.
 
 Contents: Rules · When X, use Y · Good / Bad (SR2, SR3, SR4, SR10, SR11) · Decided edges · Review checks
 
@@ -118,7 +118,7 @@ $ grep -n canRenew loans/RenewalPolicy.java
 58:    boolean canRenew(Loan loan) {
 ```
 The check opens each cite's line and looks for the named symbol. Line 42 no longer holds `canRenew`, so the reviewer
-reports the cite at `design.md:12` as drifted, with its new line.
+reports the cite in the design as drifted, with its new line.
 
 ### SR4 — Every open question names its decider, options and a recommendation
 

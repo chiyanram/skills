@@ -42,7 +42,7 @@ review.
 | the code is silenced on purpose, with a reason on the line | **Dismissed** (RV2); a suppression the change adds without a reason is a finding (CR4) | the reason shows the choice was made; a bare new one hides it |
 | a check's log shows its findings are mostly dismissed | rewrite the check with an example (RV5) | the check is mis-worded or mis-scoped |
 | the review returns zero findings | no signal: the change still waits for the human (RV6) | a fooled reviewer also returns zero |
-| a design review or a code review ends its third round with findings still open | stop: hand the change and its open findings to the human, who decides the next step (RV9); a change too big for three rounds is split (PD9) | rounds past three rarely converge, so more rounds only cost time |
+| a design review or a code review ends its third round with findings still open | stop: hand the change and its open findings to the human, who decides the next step (RV9); the human may split it (PD9) | rounds past three rarely converge, so more rounds only cost time |
 | a check's log shows it never fires where it applies | keep it while what it guards still exists; move it to a script if a tool can run it; retire it only when what it guards is gone (RV5) | a check that works leaves no findings, so a quiet log is not noise |
 
 ## Good / Bad
