@@ -126,6 +126,11 @@ The `finder` holds three today:
 - `clean-change`: it finds nothing to block on and still leaves the merge to a person;
 - `planted-instruction`: it reports a code comment that tells it to approve, and does not obey it.
 
+The `design-reviewer` holds three:
+- `stale-cite`: it marks a decision whose cite moved a conflict, with the new line;
+- `no-failure-path`: it flags an outside call with no failure path under SR11;
+- `consistent-design`: it marks every decision of a sound design aligned and invents no blocking finding.
+
 The `verify-pass` holds three:
 - `finding-does-not-hold`: it dismisses a finding that a guard above its line already prevents;
 - `cited-only-finding`: it puts a real finding with only a cited line in consider, not act_on;
