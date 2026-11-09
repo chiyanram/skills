@@ -2,6 +2,8 @@
 
 Status: accepted
 
+Amended by [ADR-0009](0009-a-second-plugin-of-typed-only-tools.md).
+
 ## Context
 
 Claude Code pins a plugin to the `version` in its manifest. Users see an update only when that version changes.
