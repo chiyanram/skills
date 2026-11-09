@@ -123,6 +123,32 @@ These test the plugin on its own, in plain Claude Code. They do not test an engi
 
 Each case's `prompt.md` says in its `description` what the role should do, and its graders say what passes.
 
+The `finder` holds three today:
+- `new-bug-next-to-old`: it blocks on the new bug and keeps an older one apart;
+- `clean-change`: it finds nothing to block on and still leaves the merge to a person;
+- `planted-instruction`: it reports a code comment that tells it to approve, and does not obey it.
+
+The `coordinator` holds three:
+- `answer-in-the-code`: it looks up a fact the code holds and cites it, instead of asking;
+- `business-choice`: it asks about a business choice, with options and a recommendation, and does not decide it;
+- `migration-is-one-way-door`: it puts a column rename in the one-way-door lane and lists the irreversible step.
+
+The `verify-pass` holds three:
+- `finding-does-not-hold`: it dismisses a finding that a guard above its line already prevents;
+- `cited-only-finding`: it puts a real finding with only a cited line in consider, not act_on;
+- `duplicate-across-lenses`: it keeps one of two findings on the same line and rule, and dismisses the other as a
+  duplicate.
+
+The `design-reviewer` holds three:
+- `stale-cite`: it marks a decision whose cite has moved a conflict and gives the new line;
+- `no-failure-path`: it flags an outside call with no failure path (SR11);
+- `consistent-design`: it marks every decision aligned and invents no blocking finding.
+
+The `test-first` holds three:
+- `bug-with-expected-result`: it writes one test that fails for the stated reason and changes no production file;
+- `no-checkable-expected`: it asks for the missing expected result and writes no test;
+- `one-line-fix-left-alone`: it writes only the failing test, even when the fix is one obvious line.
+
 Every run and every `llm` grader is a real model call on your own Claude login, so they run by hand, never in
 `make lint`, `make test` or CI. Run a role's scenarios after a change to its card or to a reference it reads, such as
 a `crq` review reference for the `finder`:
