@@ -40,8 +40,11 @@ When one ran at the head and its result is in the pull request, leave these to i
 | deletes a test or a test file | VB6 (`verify-done`) |
 | adds a skip marker | VB6 (`verify-done`) |
 | removes an assertion line from a test that stays | VB6 (`verify-done`) |
-| adds a suppression with no reason, or an empty `catch` | CR4 (`code-review`) |
+| adds a suppression with no reason, or an empty `catch` | CR4 (config); CM7 (`code/comments`); ER3 (`code/errors`) |
 | edits a judge file: a build file, a file the verify command runs, test config | CR3 (`code-review`) |
+
+Leave to the gate a failure it already reports: a red test, a lint or type error. A generated snapshot is the
+deliberate exception: a snapshot regenerated to match the code passes the gate, so TI5 reviews it.
 
 ## Good / Bad
 
@@ -49,13 +52,12 @@ When one ran at the head and its result is in the pull request, leave these to i
 
 **Bad**
 ```diff
- def "should tell the borrower when a loan is overdue"() {
-     when:
-     reminders.run(today)
+ @Test
+ void shouldTellTheBorrowerWhenALoanIsOverdue() {
+     reminders.run(today);
 
-     then:
--    1 * notifier.send("Loan 7 is overdue")
-+    1 * notifier.send(_ as String)
+-    verify(notifier).send(eq("Loan 7 is overdue"));
++    verify(notifier).send(any());
  }
 ```
 The message changed, so the matcher was widened. A message about loan 8, or an empty one, now passes. The
@@ -63,16 +65,16 @@ criterion promises the loan number in the message.
 
 **Good**
 ```diff
- def "should tell the borrower when a loan is overdue"() {
-     when:
-     reminders.run(today)
+ @Test
+ void shouldTellTheBorrowerWhenALoanIsOverdue() {
+     reminders.run(today);
 
-     then:
--    1 * notifier.send("Loan 7 is overdue")
-+    1 * notifier.send("Loan 7 is overdue since 2 May")
+-    verify(notifier).send(eq("Loan 7 is overdue"));
++    verify(notifier).send(eq("Loan 7 is overdue since 2 May"));
  }
 ```
-The spec's new criterion names the message, so the exact new value replaces the old one (TI1, TI4).
+The spec's new criterion names the message, so the exact new value replaces the old one (TI1, TI4). When part of
+the message is generated, an `argThat` on the promised part only, the loan number, is the decided edge.
 
 ## Decided edges
 
@@ -80,14 +82,15 @@ The spec's new criterion names the message, so the exact new value replaces the 
   **Do not skip when** the only reason is a test comment or the commit message. — **Confidence** high
 - **Skip TI3 when** the pull request names why the real call cannot run in that test: it is slow, flaky or outside
   the system. — **Do not skip when** the double replaces code in this repository that the test ran before, with no
-  reason given. — **Confidence** medium
+  reason given, or the test is an integration or smoke test and the double replaces this repository's own code
+  (TM2, `testing/strategy.md`). — **Confidence** medium
 - **Skip TI4 when** the widened value is outside what the test promises, or the test cannot know it (a generated
   id, a timestamp): constrain the fields it can know. — **Do not skip when** the criterion promises that value. —
   **Confidence** high
 - **Skip TI5 when** the snapshot or golden file is new: it is a new test (V3). — **Do not skip when** an existing
   file changes, even in one line. — **Confidence** high
 - **Skip the floor-guard moves when** a floor guard ran at the head and its result is in the pull request. — **Do not
-  skip when** no floor guard ran: report them under VB6, CR3 or CR4. — **Confidence** high
+  skip when** no floor guard ran: report them under VB6, CR3, CR4, CM7 or ER3. — **Confidence** high
 
 ## Review checks
 
@@ -96,7 +99,8 @@ cites the `file:line` and the rule ID.
 
 - [ ] TI1 — For each changed expected value in an existing test, find the spec line or acceptance criterion that
   changes that behaviour. A changed value with none is a finding.
-  Applies when: an assertion, expected literal or fixture value in an existing test file changes
+  Applies when: an assertion, an expected literal, or a fixture value the assertion compares against changes in an
+  existing test file
   Evidence: the old and new line at `file:line`, and the spec searched
   Not a finding: behaviour change named in the spec (decided edge)
   Severity: Act on
