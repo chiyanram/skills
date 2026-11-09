@@ -96,16 +96,18 @@ The refund is checked in code. The judge grades only tone, and gets the answer a
 ### AE48 — Path for safety, end state for the task
 
 **Bad**
-```java
-assert result.text().contains("refund has been issued");
+```groovy
+then:
+result.text().contains("refund has been issued")
 ```
 The agent can say the refund was issued without calling the tool, or after calling `closeAccount` on the way.
 
 **Good**
-```java
-assert Trajectory.of(result).matches(MatchMode.IN_ORDER, List.of("findOrder", "issueRefund"));
-assert Trajectory.of(result).never("closeAccount");
-assert orders.find("A-17").refundedAmount().equals(new BigDecimal("25.00"));
+```groovy
+then:
+Trajectory.of(result).matches(MatchMode.IN_ORDER, ["findOrder", "issueRefund"])
+Trajectory.of(result).never("closeAccount")
+orders.find("A-17").refundedAmount == 25.00G
 ```
 The trajectory shows the required calls ran and the forbidden one did not. The order's end state shows the task was
 done.
@@ -115,9 +117,9 @@ done.
 - **Skip when** a capability has no tool that changes the outside world: AEN4 does not apply. — **Do not skip when**
   any tool writes, sends, pays or calls another system that changes state, even in a test account. —
   **Confidence** high
-- **Skip when** the property is a fact in the output or the trajectory: no judge is allowed for it (AE45). — **Do not
-  skip when** a code check would need a fixed answer text for an open question: that one goes to the judge. —
-  **Confidence** medium
+- **Skip when** the property is open-ended, such as tone or faithfulness, and a code check would need one fixed
+  answer text: an LLM judge grades it (AE45). — **Do not skip when** the property is a fact in the output or the
+  trajectory: code grades it. — **Confidence** medium
 - **Skip when** a judge only reports and never gates: its calibration can wait, but each score still stores the
   judge's model and prompt version (AE46). — **Do not skip when** any threshold reads the judge's score. —
   **Confidence** medium
