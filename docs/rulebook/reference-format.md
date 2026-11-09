@@ -48,8 +48,8 @@ field:
   "(decided edges)". The full Skip when / Do not
   skip when wording stays in Decided edges. Write "none" when no edge applies. Never add an exception here.
 - **Severity** is fixed per check. **Act on**: the writer fixes it before the gate. **Consider**: the human decides.
-  A check with two tiers, such as a soft and a hard limit, names both: `Act on over 20 files; Consider over 400
-  lines`. A nit is never a check's severity.
+  A check with two tiers, such as a soft and a hard limit, names both: `Act on over the hard limit; Consider over
+  the soft limit`. A nit is never a check's severity.
 - **Verify** names what to re-open: a line, a section, a command. What the verify pass does with it is the `crq`
   skill's `review-process` reference.
 

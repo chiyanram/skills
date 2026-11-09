@@ -8,8 +8,8 @@ before you split a change.
 
 - **CR1** — Check the diff against the approved spec and design, and report each criterion missing, each behaviour
   nobody asked for and each requirement misread, because code can pass every test and still build the wrong thing.
-- **CR2** — Keep a change within about 400 changed lines and 15 files, and split it beyond 20 files, not counting
-  generated files, because review usefulness falls as a change grows.
+- **CR2** — Split a change past the PD9 size limit (`planning`'s `program-design`) into issues along its slices, not
+  counting generated files, because review usefulness falls as a change grows.
 - **CR3** — Send a change to CI config, build files, a new dependency, code-owner files or agent instruction files to
   the human, because an agent that edits its own gate, rules or dependencies can pass any change.
 - **CR4** — Give each raised threshold or disabled check in a config file its reason on the line above it, because a
@@ -26,7 +26,7 @@ before you split a change.
 | situation | use | why |
 |---|---|---|
 | the diff passes every test | still compare it with the spec and design, criterion by criterion (CR1) | tests prove what was written, not what was asked |
-| the change is over 20 files | split it into issues along its slices (CR2, PD9) | a reviewer stops reading closely |
+| the change passes the size limit of PD9 in [program-design.md](../../planning/references/program-design.md) | split it into issues along its slices (CR2) | a reviewer stops reading closely |
 | generated files, lock files or a mechanical rename | leave them out of the count, and list them in the pull request (CR2) | they are not read line by line |
 | the diff touches `.github/workflows/`, `.gitlab-ci.yml`, a build file, a dependency manifest that adds a dependency, `CODEOWNERS`, `AGENTS.md`, `CLAUDE.md`, `.claude/` or `.agents/` | the human reviews that file before the gate (CR3) | it changes how the change is judged |
 | a lint or coverage threshold goes down, or a check is switched off | its reason on the line above, in the same change (CR4) | the next reader sees why the rule bends |
@@ -99,8 +99,8 @@ Walk the approved spec and design, then the whole diff.
 
 - [ ] CR1 — For each acceptance criterion, find the code that meets it. For each behaviour in the diff, find the
   criterion that asked for it. Each one missing, extra or misread is a finding.
-- [ ] CR2 — Count the changed lines and files, generated files excluded, except the decided edges above. Over 20 files
-  is an Act-on finding; over 400 lines or 15 files is a Consider finding.
+- [ ] CR2 — Count the changed lines and files, generated files excluded, except the decided edges above. A change
+  past the PD9 size limit is an Act-on finding.
 - [ ] CR3 — List the files the diff changes under CI config, build files, `CODEOWNERS` and agent instruction files
   (`.agents/` included), and each dependency the diff adds, except the decided edges above. Each one without the human's review is a finding.
 - [ ] CR4 — For each lowered threshold or disabled check in a config file, find its reason on the line above. Each
