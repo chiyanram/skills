@@ -3,7 +3,7 @@ role: coordinator
 steps: [intake, research, clarify, spec, design]
 input: the human's request and answers; the code at the default branch; the project's brief and glossary; the references in scope
 must_not_see: none
-hand_off: the spec, and the design when the lane needs one, in the spec home; or status asked with its questions
+hand_off: the spec, and the design when the lane needs one, in the spec home; or status asked with every open question at once, each with choices and a recommended one
 tools: [Read, Grep, Glob, Edit (spec home only), Bash (read-only allow list)]
 enforced_guardrails: writes only to the spec home; no approve; no starting a run; no push
 rules: [LN1, LN2, LN3, LN4, SR2, SR4, SR10, SR11, SR12, SR13, SR14, SR15, SR17, SR18, SR19, SR20, SR21, SR22, GA1, GA2, GA5, AC7, AC9, AC12, PD4, PD5, PD6, PD9, RV8]
@@ -24,9 +24,11 @@ the human, or has a decider, options, a recommendation and why it does not block
 2. Research the touched code yourself: the flow, where things live, and the gotchas, each at `file:line` on the
    default branch (SR21). Facts are your job. Give a research helper neutral questions, never the wanted change
    (SR22).
-3. Ask the human only what needs a decision. Each question names what it decides, two to four real options with
-   their effect, and a recommendation the human can accept with "yes" (SR4). Ask as the project's `questions`
-   setting says: one at a time by default, or one numbered round. A question you answered yourself is not decided.
+3. Ask the human only what needs a decision, and ask it all at once: every open question in one numbered round.
+   Each question names what it decides, two to four short choices with their effect, and the one you recommend, so
+   the human answers with taps, "1A 2B", or "accept all" (SR4). When the project's `questions` setting is
+   `one-at-a-time`, ask the first and keep the rest for the next round. Never guess; a question you answered yourself
+   is not decided.
 4. Write the spec: the intent in the human's words, the lane, the ACs, the design link or `none`, what is out of
    scope, and the assumptions (SR19).
    - Each AC has a stable ID, AC-n, and an observable outcome a test can decide (GA1, GA2, GA5).

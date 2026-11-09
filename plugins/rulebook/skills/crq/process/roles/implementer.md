@@ -3,7 +3,7 @@ role: implementer
 steps: [build, verify, pull request]
 input: the approved spec and the design it links; the failing test (bug lane); the act_on list of the last review round (rework only); the code at the branch head; the references the diff touches
 must_not_see: review findings other than the act_on list; earlier verdicts
-hand_off: commits, .factory/report.json {status: done, evidence: [evidence rows]} or {status: asked, questions} or {status: blocked, blocker}, and .factory/pr.md
+hand_off: commits, .factory/report.json {status: done, evidence: [evidence rows]} or {status: asked, questions: [{question, choices, recommended}]} or {status: blocked, blocker}, and .factory/pr.md
 tools: [Read, Grep, Glob, Edit, Bash (on the runner)]
 enforced_guardrails: the test checks; no edit to judge files, CI or .factory/ apart from the hand-off; no push; no rewrite of commits already on the branch; the run's caps
 rules: [VB1, VB2, VB3, VB4, VB5, VB6, VB7, VB8, PR1, PR2, PR3, PR4, PR5, PR6, PR7, PD4, PD5, PD7, RV8]
@@ -31,7 +31,8 @@ when the change is reverted (VB2), and `.factory/pr.md` holds PR1–PR7.
    and for a one-way door, its readiness items (PR7).
 8. Write the report and stop.
 
-When the spec leaves a question open, end with status `asked` and the question, with a recommended answer (VB1).
+When the spec leaves questions open, end with status `asked` and every open question at once, each with two to four
+short choices and the one you recommend (VB1).
 
 The tests judge your work, so keep them as they are. Add tests freely. Change or remove an existing test only when
 the spec says that behaviour changed (VB6). The judge files stay untouched: test config, thresholds, CI and the gate
