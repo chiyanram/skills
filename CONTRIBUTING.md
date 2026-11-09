@@ -188,9 +188,10 @@ which git ignores.
 
 ## Releases
 
-semantic-release runs on every push to `main` after `make lint` and `make test` pass. Pull requests are
-squash-merged, so **the pull request title becomes the commit** that decides the release. CI fails a title that is
-not a Conventional Commit, such as `feat(testing): spock cleanup rules (#123)`.
+Releases are manual during the dev phase (#276). A merge to `main` runs `make lint` and `make test` only. To release,
+open **Actions → ci → Run workflow** on `main`, or run `gh workflow run ci.yml --ref main`; semantic-release then runs
+after the checks pass. Pull requests are squash-merged, so **the pull request title becomes the commit** that decides
+the release. CI fails a title that is not a Conventional Commit, such as `feat(testing): spock cleanup rules (#123)`.
 
 | commit | release | use it when |
 |---|---|---|
@@ -201,12 +202,13 @@ not a Conventional Commit, such as `feat(testing): spock cleanup rules (#123)`.
 | any type with scope `research`, `review` or `repo` | none | design work, even when it is a `feat` |
 | `feat(toolbox)`, `fix(toolbox)`, `feat(toolbox)!` | the toolbox only | a tool is added, changed or removed |
 
-Each plugin releases on its own line (ADR-0009): scope `toolbox` releases only the toolbox, and every other scope
-that ships releases only the rulebook, so a pull request changes one plugin. A release bumps that plugin's version in
+Each plugin releases on its own line (ADR-0009): scope `toolbox` releases only the toolbox, and every other scope that
+ships releases only the rulebook, so a pull request changes one plugin. A release bumps that plugin's version in
 `marketplace.json` and its `plugin.json` (`scripts/set_version.py --plugin <name>`), writes its changelog
-(`CHANGELOG.md` or `CHANGELOG-toolbox.md`), tags `<plugin>--v<version>` and creates a GitHub release. Users stay on a version until it changes,
-so every change to what ships must be a `feat` or a `fix`. Preview the next release on `main` with
-`GITHUB_TOKEN=<token> npm run release:preview`, or `RELEASE_PLUGIN=toolbox` before it for the toolbox.
+(`CHANGELOG.md` or `CHANGELOG-toolbox.md`), tags `<plugin>--v<version>` and creates a GitHub release. Users stay on a
+version until it changes, so every change to what ships must be a `feat` or a `fix`, and reaches users only at the next
+manual release. Preview the next release on `main` with `GITHUB_TOKEN=<token> npm run release:preview`, or
+`RELEASE_PLUGIN=toolbox` before it for the toolbox.
 
 ## Troubleshooting
 
@@ -219,7 +221,7 @@ so every change to what ships must be a `feat` or a `fix`. Preview the next rele
 | `check_ledger.py`: a rule ID repeats | a merge kept two edits of one row: keep the right one, or mark the newer row "Supersedes" |
 | `check_sizes.py`: a rule is over 35 words | shorten it; move detail to When X, use Y or Decided edges |
 | `claude plugin marketplace add` fails on clone | the repo is private: run `gh auth setup-git` |
-| a merge to `main` did not release | the commit carried the skip-ci marker; never quote it in a pull request. Open **Actions → ci → Run workflow** on `main` |
+| a merge to `main` did not release | expected: releases are manual (#276). Open **Actions → ci → Run workflow** on `main` |
 | the release job cannot push to `main` | add a repository secret `RELEASE_TOKEN` with Contents read and write that may bypass the ruleset |
 
 ## Design history
