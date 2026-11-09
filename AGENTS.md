@@ -48,7 +48,8 @@ docs/DESIGN.md                                   the design on one page: rules, 
 ## Pointers
 
 - A new rule, reference or check: `CONTRIBUTING.md`.
-- Commit types and what each releases: `CONTRIBUTING.md#releases`.
+- Commit and PR format: `CONTRIBUTING.md#commit-messages`. Commit types and what each releases:
+  `CONTRIBUTING.md#releases`.
 - Issues: GitHub issues on `chiyanram/skills`, through `gh`. See `docs/agents/issue-tracker.md`,
   `docs/agents/triage-labels.md` and `docs/agents/domain.md`.
 - A cite `research/NN` or `review/…` in the ledger means that file under `docs/archive/` at git tag
