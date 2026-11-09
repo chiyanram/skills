@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.38.0](https://github.com/chiyanram/skills/compare/rulebook--v0.37.0...rulebook--v0.38.0) (2026-11-09)
+
+### Features
+
+* **crq:** add the verify-pass card and its three scenarios ([#237](https://github.com/chiyanram/skills/issues/237)) ([#245](https://github.com/chiyanram/skills/issues/245)) ([e8f93cd](https://github.com/chiyanram/skills/commit/e8f93cd0729bb87540ff6d96f03e6c9355b7a32c))
+
 ## [0.37.0](https://github.com/chiyanram/skills/compare/rulebook--v0.36.0...rulebook--v0.37.0) (2026-11-09)
 
 ### Features
