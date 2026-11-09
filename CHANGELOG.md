@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.41.0](https://github.com/chiyanram/skills/compare/rulebook--v0.40.0...rulebook--v0.41.0) (2026-11-09)
+
+### Features
+
+* **crq:** add the test-first card and its three scenarios ([#237](https://github.com/chiyanram/skills/issues/237)) ([#248](https://github.com/chiyanram/skills/issues/248)) ([aee0579](https://github.com/chiyanram/skills/commit/aee0579e3ab98ba0f502252a325b8b0c4a4106e6))
+
 ## [0.40.0](https://github.com/chiyanram/skills/compare/rulebook--v0.39.0...rulebook--v0.40.0) (2026-11-09)
 
 ### Features
