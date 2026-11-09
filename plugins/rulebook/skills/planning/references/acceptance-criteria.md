@@ -7,7 +7,7 @@ Contents: Rules · When X, use Y · Good / Bad (GA2, GA4–GA6, AC7–AC9) · De
 
 ## Rules
 
-How each AC becomes its tests is owned by `testing/references/scenario-to-tests.md` (GT1–GT6).
+How each AC becomes its tests is owned by `testing/references/scenario-to-tests.md` (GT1, GT3–GT6).
 
 - **GA1** — Write a ticket's ACs only in its spec's acceptance-criteria section, as numbered lines; a design, a test or
   a PR links to them, because a second copy drifts into a second source of truth.

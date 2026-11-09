@@ -39,10 +39,10 @@ Each row maps a part of the AC to the test construct that carries it.
 
 **Bad**
 ```text
-AC-5 — should give ten percent off to a GOLD customer and nothing to a STANDARD customer
+AC-5 — should give ten percent off to a GOLD customer on orders of 100.00 EUR or more
 ```
 ```groovy
-    def "the GOLD discount is ten percent, the STANDARD discount is zero"() {
+    def "the GOLD discount is ten percent from 100.00 EUR"() {
 ```
 The test rewords the AC, so a search for the AC text finds no test.
 
@@ -59,6 +59,13 @@ The same string, byte for byte, so `grep -F` on the AC text finds the test.
 ### GT3 — A table keeps its column names
 
 **Bad**
+```text
+AC-5 — should give ten percent off to a GOLD customer on orders of 100.00 EUR or more
+  | tier     | total  | discount |
+  | GOLD     | 99.99  | 0.00     |
+  | GOLD     | 100.00 | 10.00    |
+  | STANDARD | 100.00 | 0.00     |
+```
 ```groovy
         where:
         level    | amount || expected
@@ -113,14 +120,14 @@ test(
   'should show "Payment declined" when the gateway declines the payment',
   { tag: '@billing', annotation: { type: 'issue', description: '#123 · AC-9' } },
   async ({ page, declinedInvoice }) => {
-    await test.step('Given an OPEN invoice the gateway will decline', () =>
+    await test.step('an OPEN invoice the gateway will decline', () =>
       page.goto(`/invoices/${declinedInvoice.id}`));
-    await test.step('When the customer pays the invoice', () =>
+    await test.step('the customer pays the invoice', () =>
       page.getByRole('button', { name: 'Pay invoice' }).click());
-    await test.step('Then the page shows "Payment declined"', async () => {
+    await test.step('the page shows "Payment declined"', async () => {
       await expect(page.getByRole('alert')).toContainText('Payment declined');
     });
-    await test.step('And no payment is recorded for the invoice', async () => {
+    await test.step('no payment is recorded for the invoice', async () => {
       const payments = await page.request.get(`/api/invoices/${declinedInvoice.id}/payments`);
       expect(await payments.json()).toEqual([]);
     });

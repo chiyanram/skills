@@ -43,12 +43,12 @@ Contents: Rules · When X, use Y · Good / Bad (P1, P2, P3, P4, P6, P7, P8, P10)
 AC-4 — should keep the invoice total at zero or more for any order with the GOLD discount
 ```
 ```groovy
-    def "no discount makes an invoice total negative"() {
+    def "should keep the invoice total at zero or more for any order with the GOLD discount"() {
         expect: "a GOLD customer never gets money back"
         discountPolicy.discountedTotal(orderWithQuantity(Integer.MAX_VALUE), GOLD).amount() >= 0
     }
 ```
-The requirement says "any order", but the test checks one value.
+The AC says "any order", but the test checks one value.
 
 **Good**
 ```groovy
