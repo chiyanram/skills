@@ -33,7 +33,7 @@ reach for a word under "avoid", use the term instead.
 | **design** | the chosen shape, one rejected alternative, and the slices; the spec links it | plan (alone), architecture doc |
 | **slice** | one thin end-to-end piece of the design, with the command that proves it | task (for a slice), chunk |
 | **spec home** | where a project keeps its specs | — |
-| **ask** | a run that needs a human's decision ends with status `asked` and its questions, each with a recommended answer; the project's `questions` setting says one at a time or one numbered round; the answer goes into the spec | clarify inline, assume |
+| **ask** | a run that needs a human's decision ends with status `asked` and every open question at once, in one numbered round; each question carries 2 to 4 short choices and one recommended choice, so the human answers with taps, "1A 2B" or "accept all"; the project's `questions` setting can be `one-at-a-time` instead; never a guess; the answer goes into the spec | clarify inline, assume |
 | **evidence row** | `{criterion, command, result}`: one AC and the plain command that proves it | proof, output |
 | **hand-off** | what a role leaves for the next role: a file, or the JSON a read-only run returns | summary, notes |
 | **ready check** | the engine re-running every evidence row at the head, checking that every AC has a row, plus the test checks and the lane check | verify (for this step) |

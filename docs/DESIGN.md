@@ -64,6 +64,10 @@ verify pass, retro and onboarder. The onboarder writes a project's brief and glo
   - Its factory words: task, trigger, run, runner, ticket tracker, git host, orchestrator, automated review.
   - Its process words: spec, AC, design, slice, lane, evidence row, finding, lens, judge files, hand-off, ask, ready
     check.
+- **Questions** (decided, [operator 2026-11-09](https://github.com/chiyanram/agent-factory/issues/30#issuecomment-6744864148)):
+  a run that needs decisions asks every open question at once, in one numbered round. Each question carries 2 to 4
+  short choices and one recommended choice, so the human answers with taps, "1A 2B", or "accept all". The project
+  setting `questions` can be `one-at-a-time` instead. Never a guess.
 
 **Review rubrics** (the finder's lenses) follow the same shape:
 - each check is binary, with something you can observe ("met if …, unmet if …");
@@ -128,5 +132,4 @@ New content needs the operator's yes and a ledger row, as every rule does.
 - **Card status:** whether a role card counts as a rule (it needs a ledger row) or as a prompt that cites rules (it
   needs eval scenarios). Proposed: the card cites rules by id and needs eval scenarios, and the rules keep their ledger
   rows.
-- **Questions:** asked one at a time, or as one numbered round. Proposed: a project setting.
 - **The PR body:** written by the implementer, as crq gives the PR phase to the build. To be confirmed.
