@@ -1,6 +1,6 @@
 # 9. A second plugin, `toolbox`, of typed-only tools
 
-Status: proposed
+Status: accepted (operator, 2026-11-09, #231)
 
 Amends [ADR-0001](0001-one-plugin-one-folder-ships.md), [ADR-0005](0005-provenance-only-in-the-ledger.md) and
 [ADR-0007](0007-releases-cut-from-commit-messages.md).
