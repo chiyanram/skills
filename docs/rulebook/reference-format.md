@@ -25,7 +25,33 @@ before …". `make index` copies that sentence and the rule IDs into the domain 
 | **When X, use Y** | a decision table for choices inside the topic | situation → choice → why |
 | **Good / Bad** | one pair per rule that can be misread | see the Good / Bad rules below |
 | **Decided edges** | cases that look like violations but are allowed, and the reverse | *Skip when* · *Do not skip when* · *Confidence* |
-| **Review checks** | what the reviewer checks, at the end of the file | each check names the rule ID it enforces and what to open; a mechanical one names its script |
+| **Review checks** | what the reviewer checks, at the end of the file | one check per rule, same ID, in the layout below; a mechanical one names its script |
+
+## Review check layout
+
+Each check keeps its check text: what to open and what counts as a finding. Under it, write one short line per
+field:
+
+```markdown
+- [ ] V1 — <the check: what to open, and what counts as a finding>
+  Applies when: <an observable predicate: a file type, a section, a lane, a kind of step>
+  Evidence: <what a finding quotes>
+  Not a finding: <the case in a few words> (decided edge), or none
+  Severity: Act on | Consider | Act on <hard tier>; Consider <soft tier>
+  Verify: <what the verify pass re-opens before the finding is posted>
+```
+
+- **Applies when** is a fact the reviewer can see. Never a judgement such as "when it matters".
+- **Evidence** names what the finding quotes: the line, the `file:line`, the command output. The section's "Walk …"
+  line says what the reviewer reads when nothing is found.
+- **Not a finding** names a case from this reference's Decided edges, in a few words, marked "(decided edge)" or
+  "(decided edges)". The full Skip when / Do not
+  skip when wording stays in Decided edges. Write "none" when no edge applies. Never add an exception here.
+- **Severity** is fixed per check. **Act on**: the writer fixes it before the gate. **Consider**: the human decides.
+  A check with two tiers, such as a soft and a hard limit, names both: `Act on over 20 files; Consider over 400
+  lines`. A nit is never a check's severity.
+- **Verify** names what to re-open: a line, a section, a command. What the verify pass does with it is the `crq`
+  skill's `review-process` reference.
 
 ## Good / Bad rules
 
@@ -84,15 +110,20 @@ Why this is right.
 
 ## Review checks
 
-- [ ] V1 — what to open and what to look for (`scripts/<check>` if mechanical)
+- [ ] V1 — what to open and what counts as a finding (`scripts/<check>` if mechanical)
+  Applies when: …
+  Evidence: …
+  Not a finding: … (decided edge), or none
+  Severity: Act on
+  Verify: …
 ````
 
 ## Writing checklist
 
 ```text
-[ ] 1  ≤300 lines; >100 lines → a contents line at the top; links one level deep, none into another reference's
-       body; a reference that cannot hold every approved pair keeps its most telling pairs and links
-       references/examples/<topic>.md, which holds them all
+[ ] 1  ≤300 lines, the Review checks section not counted; >100 lines → a contents line at the top; links one
+       level deep, none into another reference's body; a reference that cannot hold every approved pair keeps its
+       most telling pairs and links references/examples/<topic>.md, which holds them all
 [ ] 2  Rules: instruction + "because" + the failure it prevents, ≤35 words; a grep or a reader can decide it
        (no "consider", no "prefer")
 [ ] 3  Rules: each discipline rule names the permitted alternative in the same sentence
@@ -101,7 +132,8 @@ Why this is right.
 [ ] 6  Good / Bad: from the rule's source, one neutral domain, no project names
 [ ] 7  Good / Bad: one pair per rule that can be misread; none for a rule whose sentence says it all
 [ ] 8  Decided edges: Skip when / Do not skip when / Confidence; exceptions live here, never inside a rule
-[ ] 9  Review checks: last section; one check per rule, same ID, each with its evidence (file:line or grep)
+[ ] 9  Review checks: last section; one check per rule, same ID, each with Applies when, Evidence, Not a finding,
+       Severity and Verify (Review check layout)
 [ ] 10 Review checks: state the exhaustive bar ("every changed test file walked", not "check tests")
 [ ] 11 One term per concept across all references
 [ ] 12 No dates, counts that rot, narration or provenance (check_provenance.py)

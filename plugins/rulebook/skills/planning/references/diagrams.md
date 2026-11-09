@@ -133,12 +133,42 @@ Walk every diagram that the change adds or edits, in every Markdown file, design
 
 - [ ] DG1 — A diagram in a committed `.md` file that is plain text and not a tree is a finding. A `mermaid` fence in a
   chat reply is a finding.
+  Applies when: the change adds or edits a diagram in a committed `.md` file or a chat reply.
+  Evidence: the file and line of the fence, and its fence type.
+  Not a finding: a call tree or file tree in a `diff` fence (decided edge).
+  Severity: Act on
+  Verify: re-open the fence and confirm what the diagram shows.
 - [ ] DG2 — A call tree or file tree in a design drawn as a Mermaid chart is a finding. A component, sequence, state,
   entity-relationship or class diagram drawn as plain text in a committed file is a finding.
+  Applies when: the change adds or edits a diagram in a design or a committed file.
+  Evidence: the diagram's fence, and what it shows.
+  Not a finding: a `flowchart` of which components call which, when the change adds or removes no call (decided edge).
+  Severity: Act on
+  Verify: re-open the diagram, and the design text that says whether calls are added, removed or moved.
 - [ ] DG3 — Search the main branch for each node label. A label that matches no class, module, table or endpoint is
   a finding, unless it is a `+` line in a design diff or an outside actor.
+  Applies when: the change adds or edits a diagram node.
+  Evidence: the label, and the search you ran on the main branch.
+  Not a finding: an outside actor named by its role; a `+` line in a design diff (decided edge).
+  Severity: Act on
+  Verify: run the search for the label again on the main branch.
 - [ ] DG4 — Name the one question each diagram answers, from the When X, use Y table. A diagram with two questions is
   a finding.
+  Applies when: the change adds or edits a diagram.
+  Evidence: the two questions, and the parts of the diagram that answer each.
+  Not a finding: a failure branch of the same flow in an `alt` block (decided edge).
+  Severity: Act on
+  Verify: re-open the diagram and match each part to its question.
 - [ ] DG5 — A caption longer than one line, or prose that explains a box, arrow or branch, is a finding: ask for a
   smaller diagram.
+  Applies when: the change adds or edits a diagram or the text next to it.
+  Evidence: the caption or the prose, quoted.
+  Not a finding: text that is the doc's own argument, not an explanation of the diagram (decided edge).
+  Severity: Act on
+  Verify: re-open the text and confirm it explains a box, arrow or branch.
 - [ ] DG6 — A diagram in a file that holds only diagrams, or in a doc other than the one it illustrates, is a finding.
+  Applies when: the change adds, edits or moves a diagram.
+  Evidence: the file the diagram sits in, and the doc it illustrates.
+  Not a finding: a diagram in its owning doc and linked from the others (decided edge).
+  Severity: Act on
+  Verify: re-open the file and the doc the diagram illustrates.
