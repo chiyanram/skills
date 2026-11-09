@@ -13,3 +13,16 @@ The skills speak in terms of five canonical triage roles. This file maps those r
 When a skill mentions a role (e.g. "apply the AFK-ready triage label"), use the corresponding label string from this table.
 
 Edit the right-hand column to match whatever vocabulary you actually use.
+
+## Type labels
+
+Each issue form sets one type label (#276). chiyanram/agent-factory and chiyanram/rca-agent use the same three.
+
+| Label | Form | Meaning |
+| ----- | ---- | ------- |
+| `type:bug` | Bug | Something shipped is wrong |
+| `type:feature` | Feature | Something new to ship |
+| `type:task` | Task | A step that ships nothing new, such as a repo, CI or docs change |
+
+The `wayfinder:*` labels keep their own forms (Grilling, Research). The labels were created once with `gh label create`;
+there is no sync tool.

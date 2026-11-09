@@ -191,7 +191,14 @@ which git ignores.
 Releases are manual during the dev phase (#276). A merge to `main` runs `make lint` and `make test` only. To release,
 open **Actions → ci → Run workflow** on `main`, or run `gh workflow run ci.yml --ref main`; semantic-release then runs
 after the checks pass. Pull requests are squash-merged, so **the pull request title becomes the commit** that decides
-the release. CI fails a title that is not a Conventional Commit, such as `feat(testing): spock cleanup rules (#123)`.
+the release. CI fails a title that is not `type(scope): lower-case summary (#issue)`, such as
+`feat(testing): spock cleanup rules (#123)`. The issue can be in another repo: `(chiyanram/agent-factory#320)`. Only
+Dependabot (scope `deps`) and the release commit name no issue. chiyanram/agent-factory and chiyanram/rca-agent use the
+same rule.
+
+The release notes group changes under ⚠️ Breaking changes, ✨ Features, 🐛 Fixes, ⚡ Performance and ⏪ Reverts, one
+bullet per change as `**scope** — summary · #issue (PR #pr)` ([`scripts/release_notes.mjs`](scripts/release_notes.mjs)).
+Other types ship nothing and are not listed.
 
 | commit | release | use it when |
 |---|---|---|
@@ -216,7 +223,7 @@ manual release. Preview the next release on `main` with `GITHUB_TOKEN=<token> np
 |---|---|
 | `make lint`: `claude: command not found` | `npm install -g @anthropic-ai/claude-code` |
 | `check_index.py`: a table is stale | run `make index` and commit the router it rewrote |
-| `make test` fails in `test_release_config` or `test_release_links` | run `npm ci`; the tests load the release config from `node_modules` |
+| `make test` fails in `test_release_config`, `test_release_notes` or `test_release_links` | run `npm ci`; the tests load the release config from `node_modules` |
 | `check_provenance.py` fails on a reference | move the citation, URL or date into the rule's ledger row |
 | `check_ledger.py`: a rule ID repeats | a merge kept two edits of one row: keep the right one, or mark the newer row "Supersedes" |
 | `check_sizes.py`: a rule is over 35 words | shorten it; move detail to When X, use Y or Decided edges |
