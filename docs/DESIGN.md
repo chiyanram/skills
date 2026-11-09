@@ -89,12 +89,12 @@ verify pass, retro and onboarder. The onboarder writes a project's brief and glo
 | the approval is recorded with the spec's hash only (LN4, `crq/references/lanes.md:14-15`), though the human approves spec and design (`crq/SKILL.md:29`) | the approval covers spec and design |
 | no review-round cap in the skill (the engine has 3) | the cap is stated in the skill |
 | CR2 splits a change beyond 20 files; PD9 makes a slice over 15 files its own issue | one size rule |
-| acceptance criteria must be Gherkin scenarios (GA1–GA6); the role cards use numbered lines | **open:** one form for both (section 8) |
+| acceptance criteria must be Gherkin scenarios (GA1–GA6); the role cards use numbered lines | numbered AC-n lines for both (#244) |
 | `check-cites` is named only as an example (`planning/references/spec-review.md:115`), and no script exists | the script is added, or the example names no missing tool |
 | test protection is one sentence (VB6) | plus a `test-integrity` rubric for the review lens |
 | "fails on revert" (VB2) and "the smallest regression" (CR6) are judged by reading | a revert script, and mutation on the changed lines, where a project can run them |
 | crq assumes a CI system | the gate is whatever the project has: CI, a queue, or a local run |
-| some findings are cosmetic: Gherkin wording, the PR5 file tree, a mandatory alternative for a small feature | demoted to nits or dropped; decided with the operator per rule |
+| some findings are cosmetic: the PR5 file tree, a mandatory alternative for a small feature | demoted to nits or dropped; decided with the operator per rule |
 
 ## 6. How the content stays good
 
@@ -125,8 +125,8 @@ New content needs the operator's yes and a ledger row, as every rule does.
 
 - **Placement:** where the lanes file and the cards sit in the plugin (`plugins/rulebook/skills/crq/...` or a sibling
   folder), and how `check_*.py` and `make index` treat them. Decided with the first card.
-- **AC form:** acceptance criteria as Gherkin scenarios (GA1–GA6, approved) or numbered lines (the role cards, and
-  agent-factory's spec template). Changing GA1–GA6 needs the operator's yes and a ledger row.
+- **AC form** (decided 2026-11-09, #237 decision 2; rows on #244): numbered AC-n lines for specs and role cards, each
+  decidable by a test. GA1, GA2, GA4–GA6 are superseded, GA3 and CV1 are dropped, and Gherkin is no longer required.
 - **Card status:** whether a role card counts as a rule (it needs a ledger row) or as a prompt that cites rules (it
   needs eval scenarios). Proposed: the card cites rules by id and needs eval scenarios, and the rules keep their ledger
   rows.

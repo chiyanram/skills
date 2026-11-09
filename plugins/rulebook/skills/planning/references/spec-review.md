@@ -16,7 +16,7 @@ Contents: Rules · When X, use Y · Good / Bad (SR2, SR3, SR4, SR10, SR11) · De
   check that can be run, because drifted cites are otherwise found only by chance.
 - **SR4** — Before approval, look up what code and docs answer, then give each open question left a decider, options
   with a recommendation, and why it does not block building, because a bare question outlives the build.
-- **SR6** — Check each story for actor, action and benefit, scenarios a test can check, and an out-of-scope list,
+- **SR6** — Check each story for actor, action and benefit, ACs a test can check, and an out-of-scope list,
   because without them the builder guesses who it serves, when it is done, and where it stops.
 - **SR9** — Check each design decision against the ADRs and patterns it touches; report an unnamed departure, or a
   conflict between documents, without resolving it, because a silent departure overrides a recorded decision.
@@ -56,7 +56,7 @@ Contents: Rules · When X, use Y · Good / Bad (SR2, SR3, SR4, SR10, SR11) · De
 | the spec reaches the approval gate with open questions | resolve each, or give it a decider, options with a recommendation, and why it does not block (SR4) | a bare question outlives the build |
 | an open question the code or the docs can answer | look the fact up, record the answer in the design, and drop the question (SR4) | a question the author could answer costs the human a lookup and invites a guess |
 | a story has no "as a … so that …" line | add actor, action and benefit (SR6) | without actor, action and benefit, the builder guesses who the story serves |
-| a scenario says "works well" or "is fast" | rewrite it as a condition a test can check (SR6) | a vague criterion such as "works well" gives no test a pass condition |
+| an AC says "works well" or "is fast" | rewrite it as a condition a test can check (SR6) | a vague criterion such as "works well" gives no test a pass condition |
 | a story has no out-of-scope list | add one (SR6) | without an out-of-scope list, the builder guesses where the story ends |
 | a design decision touches an area with an ADR or an established pattern | check the fit, and report a departure or a conflict for the human to settle (SR9) | a silent departure overrides a recorded decision |
 | the design picks one shape | name a rejected alternative and why it lost, and each tradeoff as "we accept X for Y" (SR10) | an unstated cost later reads as an oversight |
@@ -233,8 +233,6 @@ Each failure has a trigger, a chain and a sign someone can check.
   the main branch (SR3). — **Confidence** medium
 - **Skip when** the spec is still a draft: an open-questions section is normal then. — **Do not skip
   when** the spec reaches the approval gate (SR4). — **Confidence** high
-- **Skip when** a scenario is plain prose, not Gherkin: the bar is that a test can check it, not the format. — **Do not
-  skip when** a scenario names no observable result (SR6). — **Confidence** high
 - **Skip when** the design names its departure from an ADR and why, and records the new decision, as an ADR when SR15
   applies and in the design otherwise: that is a decision, not a finding. — **Do not skip when** the departure is
   unnamed, or two documents disagree: report it and leave the choice to the human, even when the answer looks plain
@@ -291,13 +289,13 @@ Walk the whole spec and the whole design in one round, every section, before you
   Not a finding: an open-questions section in a draft spec (decided edge).
   Severity: Act on
   Verify: re-open the question, and the code or doc that answers it.
-- [ ] SR6 — For each story, check an actor, an action and a benefit, scenarios a test can check, and an out-of-scope
+- [ ] SR6 — For each story, check an actor, an action and a benefit, ACs a test can check, and an out-of-scope
   list. Each one missing is a finding.
   Applies when: the spec holds a story.
   Evidence: the story, and the part that is missing.
-  Not a finding: a scenario in plain prose that a test can check (decided edge).
+  Not a finding: none
   Severity: Act on
-  Verify: re-open the story and its scenarios.
+  Verify: re-open the story and its ACs.
 - [ ] SR9 — For each design decision, find the ADRs and patterns in its area. A departure the design does not name, or
   two documents that disagree, is a finding; report it and do not pick the answer.
   Applies when: the design makes a decision.

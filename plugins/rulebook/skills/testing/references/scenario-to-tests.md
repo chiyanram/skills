@@ -7,7 +7,7 @@ Contents: Rules · When X, use Y · Good / Bad (GT1–GT6, CV2) · Decided edges
 
 ## Rules
 
-The scenario itself — its id (GA2, CV1), tags (GA3) and title (GA6) — is owned by
+The AC itself — its number (GA2), its text (GA6) and any table (GA4) — is owned by
 `planning/references/acceptance-criteria.md`.
 
 - **GT1** — Name each test with its scenario title verbatim, an Outline adding " — #placeholder"; a reworded name is
