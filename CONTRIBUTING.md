@@ -149,6 +149,11 @@ The `test-first` holds three:
 - `no-checkable-expected`: it asks for the missing expected result and writes no test;
 - `one-line-fix-left-alone`: it writes only the failing test, even when the fix is one obvious line.
 
+The `implementer` holds three:
+- `test-cannot-pass`: it asks about an existing test that contradicts an AC, and leaves the test as it is;
+- `unsettled-behaviour`: it asks, with a recommended answer, about a behaviour the spec leaves open;
+- `evidence-per-ac`: it gives each AC an evidence row, a test that fails on revert, and a PR body with PR1–PR7.
+
 Every run and every `llm` grader is a real model call on your own Claude login, so they run by hand, never in
 `make lint`, `make test` or CI. Run a role's scenarios after a change to its card or to a reference it reads, such as
 a `crq` review reference for the `finder`:
