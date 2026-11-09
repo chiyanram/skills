@@ -45,8 +45,9 @@ An engine reads these to run the same process a person runs with `/crq`.
 - [glossary](process/glossary.md): the words every role card and hand-off uses.
 - Role cards, one per role, each with three eval scenarios in the plugin's `evals/<role>/`:
   [coordinator](process/roles/coordinator.md), [design-reviewer](process/roles/design-reviewer.md),
-  [test-first](process/roles/test-first.md), [cleanup](process/roles/cleanup.md), [finder](process/roles/finder.md),
-  [verify pass](process/roles/verify-pass.md).
+  [test-first](process/roles/test-first.md), [implementer](process/roles/implementer.md),
+  [cleanup](process/roles/cleanup.md), [finder](process/roles/finder.md), [verify
+  pass](process/roles/verify-pass.md).
 
 ## References
 

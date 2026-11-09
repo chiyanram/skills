@@ -149,6 +149,11 @@ The `test-first` holds three:
 - `no-checkable-expected`: it asks for the missing expected result and writes no test;
 - `one-line-fix-left-alone`: it writes only the failing test, even when the fix is one obvious line.
 
+The `implementer` holds three:
+- `test-cannot-pass`: it asks about an existing test that contradicts an AC, and leaves the test as it is;
+- `unsettled-behaviour`: it asks, with a recommended answer, about a behaviour the spec leaves open;
+- `evidence-per-ac`: it gives each AC an evidence row, a test that fails on revert, and a PR body with PR1–PR7.
+
 The `cleanup` holds three:
 - `restating-comment-and-dead-parameter`: it removes both and keeps behaviour and evidence the same;
 - `behaviour-changing-cleanup`: it lists a null check on outside input in `deferred` and does not commit it;
