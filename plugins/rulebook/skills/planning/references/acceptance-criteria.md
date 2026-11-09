@@ -55,17 +55,18 @@ Every pair uses one domain: an online shop's orders and payments.
 
 **Bad**
 ```text
-- The customer can cancel an unpaid order.
-- A shipped order stays shipped (was AC-3; now AC-2 after the review removed one)
+Approved:     AC-1 — should cancel an unpaid order on request
+              AC-2 — should keep a shipped order shipped when the customer tries to cancel it
+After review: AC-1 — should keep a shipped order shipped when the customer tries to cancel it
 ```
-No numbers on the first line, and an approved number moved. The evidence row for AC-3 now points at nothing.
+An approved AC was removed and the next one took its number. The test and evidence row for AC-1 now name the wrong
+criterion.
 
 **Good**
 ```text
-AC-1 — should cancel an unpaid order on request
-AC-3 — should keep a shipped order shipped when the customer tries to cancel it
+AC-2 — should keep a shipped order shipped when the customer tries to cancel it
 ```
-AC-2 was removed before approval and its number is not reused. Each number stays where tests cite it.
+AC-1 is removed through a spec change (AC10), and AC-2 keeps its number. Each number stays where tests cite it.
 
 ### GA4 — Several inputs: one AC and a table
 
@@ -148,6 +149,7 @@ AC-8 — should charge a card fee in EUR that grows with the order total
   | 10.00  | 0.50 |
   | 100.00 | 1.00 |
 ```
+The currency sits in the AC line once, and the table holds only what changes.
 
 ### AC9 — Glossary words in AC text
 
@@ -161,6 +163,7 @@ The glossary says "order" and "customer". "Basket", "shopper" and "void" reach t
 ```text
 AC-10 — should cancel the order when the customer leaves the checkout
 ```
+Every noun is the glossary's, so the test name uses the project's words.
 
 ## Decided edges
 
