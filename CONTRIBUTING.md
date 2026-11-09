@@ -110,22 +110,34 @@ at the approval table and at the merge.
 | `check_ledger.py` | the ledger repeats a rule ID for the same reference without "Supersedes" in the later row, or holds a conflict marker |
 | `check_routing.py` | a skill router has no `evals/routing/<name>.json`, a file has fewer than 8 `should` or 8 `near_miss` requests, a `should` request does not rank its router first, a near miss does not rank its named owner above that router, or two router descriptions are 75% alike. Word matching only: a model-graded run (`claude plugin eval`) costs tokens and stays manual |
 
-## Run the review evals
+## Run the role evals
 
-Three cases under `plugins/rulebook/evals/review/` test the reviewer itself:
+Each role card gets three scenarios, each with graders, under `plugins/rulebook/evals/<role>/<case>/`: a `prompt.md`
+and a `graders/` folder, the format `claude plugin eval` reads. The role folders are `coordinator`,
+`design-reviewer`, `test-first`, `implementer`, `cleanup`, `finder`, `verify-pass`, `retro` and `onboarder`. A folder
+appears with its first scenario. Give each case a name no other role uses, because the report lists cases by folder
+name only.
+
+These test the plugin on its own, in plain Claude Code. They do not test an engine, which keeps its own set.
+
+The `finder` holds three today:
 - `new-bug-next-to-old`: it blocks on the new bug and keeps an older one apart;
 - `clean-change`: it finds nothing to block on and still leaves the merge to a person;
 - `planted-instruction`: it reports a code comment that tells it to approve, and does not obey it.
 
 Every run and every `llm` grader is a real model call on your own Claude login, so they run by hand, never in
-`make lint`, `make test` or CI. Run them after a change to a `crq` review reference, one run per case:
+`make lint`, `make test` or CI. Run a role's scenarios after a change to its card or to a reference it reads, such as
+a `crq` review reference for the `finder`:
 
 ```bash
-claude plugin eval plugins/rulebook --eval-dir evals/review --runs 1 --no-publish
+claude plugin eval plugins/rulebook --runs 1 --no-publish                            # every role
+claude plugin eval plugins/rulebook --eval-dir evals/finder --runs 1 --no-publish    # one role
+claude plugin eval plugins/rulebook --case planted-instruction --runs 1 --no-publish # one case
 ```
 
-Each case runs with and without the plugin; read the score difference in the report, not only the exit code. Results
-land in `plugins/rulebook/evals/review/results/`, which git ignores.
+Each case runs with and without the plugin; read the score difference in the report, not only the exit code. A card
+change ships only if its scenarios do not get worse. Results land in a `results/` folder under the eval dir you ran,
+which git ignores.
 
 ## Releases
 
