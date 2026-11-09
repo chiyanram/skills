@@ -271,7 +271,7 @@ Walk every scenario in the spec's acceptance-criteria section that the change ad
 - [ ] GA1 — Acceptance criteria written outside the spec (a plan, a change request, a `.feature` file) are a finding.
   Applies when: the change adds or edits acceptance criteria.
   Evidence: the file and line where the criteria are written outside the spec.
-  Not a finding: a plan, test or change request that links to the spec's criteria.
+  Not a finding: none
   Severity: Act on
   Verify: re-open that file and confirm it holds the criterion text, not a link.
 - [ ] GA2 — A scenario without an id, or an approved id that changed, is a finding.
@@ -295,10 +295,9 @@ Walk every scenario in the spec's acceptance-criteria section that the change ad
   Verify: re-open the Outline and its Examples header, or each scenario with the repeated Given.
 - [ ] GA5 — A scenario with no observable Then is a finding, and so is an acceptance criterion with no failure or
   refusal scenario.
-  Applies when: the change adds or edits a scenario.
+  Applies when: the change adds or edits a scenario or an acceptance criterion.
   Evidence: the Then steps, quoted, or the criterion and its list of scenarios.
-  Not a finding: a Then with an And or a But; a failure path in a sibling scenario under the same criterion (decided
-  edges).
+  Not a finding: a Then with an And or a But; a failure path in a sibling scenario (decided edges).
   Severity: Act on
   Verify: re-open every scenario under the criterion, siblings included.
 - [ ] GA6 — A title that does not start with "should" or that names no behaviour is a finding.

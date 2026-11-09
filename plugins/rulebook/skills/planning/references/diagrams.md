@@ -167,7 +167,7 @@ Walk every diagram that the change adds or edits, in every Markdown file, design
   Severity: Act on
   Verify: re-open the text and confirm it explains a box, arrow or branch.
 - [ ] DG6 — A diagram in a file that holds only diagrams, or in a doc other than the one it illustrates, is a finding.
-  Applies when: the change adds or moves a diagram.
+  Applies when: the change adds, edits or moves a diagram.
   Evidence: the file the diagram sits in, and the doc it illustrates.
   Not a finding: a diagram in its owning doc and linked from the others (decided edge).
   Severity: Act on

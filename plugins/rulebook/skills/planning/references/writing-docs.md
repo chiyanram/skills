@@ -128,7 +128,7 @@ Walk every doc file that the change adds or edits: designs, specs, guides, READM
   finding; ask for a cite that a check can run.
   Applies when: the change adds or edits a doc line.
   Evidence: the marker, quoted, at its `file:line`.
-  Not a finding: a date that is part of the fact; a claim in a spec, whose cite goes in the design (decided edges).
+  Not a finding: a date that is part of the fact (decided edge).
   Severity: Act on
   Verify: re-open the line and confirm the marker only says someone checked the claim.
 - [ ] WD2 — Each number in an added line either is a chosen value or is a finding. A count of files, tests,
@@ -142,7 +142,7 @@ Walk every doc file that the change adds or edits: designs, specs, guides, READM
   A claim the code does not hold is a finding.
   Applies when: an added doc line says "always", "never", "only" or "guaranteed".
   Evidence: the claim, quoted, and the code or config `file:line` that does not hold it.
-  Not a finding: a weakness the owning doc already states, linked (decided edge).
+  Not a finding: none
   Severity: Act on
   Verify: re-open the code or config and walk the case the claim gets wrong.
 - [ ] WD5 — A new spec whose subject is a bug fix is a finding: name the spec it should correct. A chore with no

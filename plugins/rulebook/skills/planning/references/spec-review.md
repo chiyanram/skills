@@ -264,7 +264,7 @@ Walk the whole spec and the whole design in one round, every section, before you
 
 - [ ] SR1 — Report every finding in this round. A finding on text unchanged since an earlier round is a miss of that
   round; say so.
-  Applies when: the review is a second or later round.
+  Applies when: every round; a miss only from the second round on.
   Evidence: the text, and the earlier round that saw it unchanged.
   Not a finding: a problem in text that changed since the last round, which is a new finding (decided edge).
   Severity: Act on
@@ -273,8 +273,7 @@ Walk the whole spec and the whole design in one round, every section, before you
   behaviour is a finding, and so is a claim about today's code with no cite. A file path in the spec is a finding.
   Applies when: the design makes a claim about today's code, or the spec names a file path.
   Evidence: the claim, quoted, and the cite you opened or its absence; or the spec line with the path.
-  Not a finding: a sentence that states planned behaviour; a claim in the spec that moves to the design (decided
-  edges).
+  Not a finding: planned behaviour; an uncited claim in the spec, cited in the design (decided edges).
   Severity: Act on
   Verify: open the cite on the main branch again and read the claimed behaviour there.
 - [ ] SR3 — Run the cite check over the design. Each cite that no longer points at its named symbol is a finding.
@@ -299,7 +298,7 @@ Walk the whole spec and the whole design in one round, every section, before you
   Verify: re-open the story and its scenarios.
 - [ ] SR9 — For each design decision, find the ADRs and patterns in its area. A departure the design does not name, or
   two documents that disagree, is a finding; report it and do not pick the answer.
-  Applies when: a design decision touches an area with an ADR or an established pattern.
+  Applies when: the design makes a decision.
   Evidence: the decision, and the ADR or pattern it departs from, or the two documents that disagree.
   Not a finding: a named departure with its reason and its new decision recorded (decided edge).
   Severity: Act on
@@ -341,7 +340,7 @@ Walk the whole spec and the whole design in one round, every section, before you
   Verify: search the code and the spec for a second user again.
 - [ ] SR15 — For each decision that is hard to reverse, surprising and a real tradeoff, find its ADR. None is a
   finding.
-  Applies when: the design makes a decision that is hard to reverse, surprising and a real tradeoff.
+  Applies when: the design makes a decision.
   Evidence: the decision, quoted, and the missing ADR.
   Not a finding: a decision that is easy to reverse or the obvious choice (decided edge).
   Severity: Act on

@@ -29,23 +29,29 @@ before …". `make index` copies that sentence and the rule IDs into the domain 
 
 ## Review check layout
 
-Each check is one sentence that asks the question, then one short line per field:
+Each check keeps its check text: what to open and what counts as a finding. Under it, write one short line per
+field:
 
 ```markdown
 - [ ] V1 — <the check: what to open, and what counts as a finding>
   Applies when: <an observable predicate: a file type, a section, a lane, a kind of step>
-  Evidence: <what a finding quotes; for no finding, where the reviewer looked>
+  Evidence: <what a finding quotes>
   Not a finding: <the case in a few words> (decided edge), or none
-  Severity: Act on | Consider
+  Severity: Act on | Consider | Act on <hard tier>; Consider <soft tier>
   Verify: <what the verify pass re-opens before the finding is posted>
 ```
 
 - **Applies when** is a fact the reviewer can see. Never a judgement such as "when it matters".
-- **Not a finding** names a case from this reference's Decided edges, in a few words. The full Skip when / Do not
+- **Evidence** names what the finding quotes: the line, the `file:line`, the command output. The section's "Walk …"
+  line says what the reviewer reads when nothing is found.
+- **Not a finding** names a case from this reference's Decided edges, in a few words, marked "(decided edge)" or
+  "(decided edges)". The full Skip when / Do not
   skip when wording stays in Decided edges. Write "none" when no edge applies. Never add an exception here.
 - **Severity** is fixed per check. **Act on**: the writer fixes it before the gate. **Consider**: the human decides.
-  A check with two tiers, such as a soft and a hard limit, names both. A nit is never a check's severity.
-- **Verify** names what to re-open: a line, a section, a command. The verify pass drops a finding it cannot re-open.
+  A check with two tiers, such as a soft and a hard limit, names both: `Act on over 20 files; Consider over 400
+  lines`. A nit is never a check's severity.
+- **Verify** names what to re-open: a line, a section, a command. What the verify pass does with it is the `crq`
+  skill's `review-process` reference.
 
 ## Good / Bad rules
 

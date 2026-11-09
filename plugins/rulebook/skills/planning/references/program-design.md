@@ -210,7 +210,7 @@ Walk the whole design and every slice in it. During the build phase, also walk t
   Verify: search the design for the type or signature again.
 - [ ] PD4 — Each slice runs end-to-end and can be tried. A step that builds one layer only (a table, a service, an
   endpoint or a screen alone) is a finding, unless it is part of an expand–contract wide refactor.
-  Applies when: the design touches more than one layer.
+  Applies when: the design lists a slice.
   Evidence: the slice, quoted, and the one layer it builds.
   Not a finding: an expand–contract wide refactor that no slice can land green (decided edge).
   Severity: Act on
