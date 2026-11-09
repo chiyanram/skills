@@ -69,6 +69,15 @@ class CheckProcessTest(unittest.TestCase):
             result = run_check("process", Path(root))
             self.assertEqual(result.returncode, 0, result.stdout)
 
+    def test_should_accept_a_rule_from_a_skill_router(self):
+        with process_tree() as root:
+            router = Path(root) / "plugins" / "p" / "skills" / "tidy" / "SKILL.md"
+            router.parent.mkdir(parents=True)
+            router.write_text("# Tidy\n\n## Rules\n\n- **TD1** — Tidy only, because a fix hides.\n")
+            plant(Path(root), "skills/crq/process/roles/finder.md", CARD.replace("[DM1]", "[DM1, TD1]"))
+            result = run_check("process", Path(root))
+            self.assertEqual(result.returncode, 0, result.stdout)
+
     def test_should_fail_each_planted_case(self):
         for case, (name, text) in PLANTED.items():
             with self.subTest(case), process_tree() as root:

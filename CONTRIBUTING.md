@@ -109,7 +109,7 @@ at the approval table and at the merge.
 | `check_provenance.py` | a shipped skill file carries provenance outside code: a source citation, a URL, a preference line, a credit, an evidence note, a date or an agent-factory reference |
 | `check_ledger.py` | the ledger repeats a rule ID for the same reference without "Supersedes" in the later row, or holds a conflict marker |
 | `check_routing.py` | a skill router has no `evals/routing/<name>.json`, a file has fewer than 8 `should` or 8 `near_miss` requests, a `should` request does not rank its router first, a near miss does not rank its named owner above that router, or two router descriptions are 75% alike. Word matching only: a model-graded run (`claude plugin eval`) costs tokens and stays manual |
-| `check_process.py` | a crq lanes file misses a lane or a field, or a lane above tiny drops approval; a role card is not a known role, misses or adds a frontmatter field, cites a rule ID no reference holds, or lacks the job, a "done when" line, numbered steps or an "it's working if" list; or its role has fewer than 3 eval scenarios, each a `prompt.md` and a grader |
+| `check_process.py` | a crq lanes file misses a lane or a field, or a lane above tiny drops approval; a role card is not a known role, misses or adds a frontmatter field, cites a rule ID that no Rules section holds, or lacks the job, a "done when" line, numbered steps or an "it's working if" list; or its role has fewer than 3 eval scenarios, each a `prompt.md` and a grader |
 
 ## Run the role evals
 
@@ -153,6 +153,22 @@ The `implementer` holds three:
 - `test-cannot-pass`: it asks about an existing test that contradicts an AC, and leaves the test as it is;
 - `unsettled-behaviour`: it asks, with a recommended answer, about a behaviour the spec leaves open;
 - `evidence-per-ac`: it gives each AC an evidence row, a test that fails on revert, and a PR body with PR1–PR7.
+
+The `cleanup` holds three:
+- `restating-comment-and-dead-parameter`: it removes both and keeps behaviour and evidence the same;
+- `behaviour-changing-cleanup`: it lists a null check on outside input in `deferred` and does not commit it;
+- `nothing-to-tidy`: it makes no commit on a clean diff.
+
+The `retro` holds three:
+- `one-rescue`: it traces the rescue to the check that missed it and proposes one action with type, owner, due date
+  and ticket;
+- `clean-merge`: it invents no action for a merge with no rescue;
+- `repeat-rescue`: it proposes a check or script, not another written rule, for a rescue that recurs.
+
+The `onboarder` holds three:
+- `makefile-front-door`: it names the `make` targets, not the raw build-tool commands;
+- `existing-glossary-linked`: it links the project's glossary instead of copying it;
+- `moved-cite-on-refresh`: it reports a cite whose line moved as stale, for the retro.
 
 Every run and every `llm` grader is a real model call on your own Claude login, so they run by hand, never in
 `make lint`, `make test` or CI. Run a role's scenarios after a change to its card or to a reference it reads, such as

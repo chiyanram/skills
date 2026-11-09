@@ -46,7 +46,8 @@ An engine reads these to run the same process a person runs with `/crq`.
 - Role cards, one per role, each with three eval scenarios in the plugin's `evals/<role>/`:
   [coordinator](process/roles/coordinator.md), [design-reviewer](process/roles/design-reviewer.md),
   [test-first](process/roles/test-first.md), [implementer](process/roles/implementer.md),
-  [finder](process/roles/finder.md), [verify pass](process/roles/verify-pass.md).
+  [cleanup](process/roles/cleanup.md), [finder](process/roles/finder.md), [verify
+  pass](process/roles/verify-pass.md), [retro](process/roles/retro.md), [onboarder](process/roles/onboarder.md).
 
 ## References
 
