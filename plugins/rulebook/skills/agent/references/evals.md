@@ -10,8 +10,8 @@ Contents: Rules · When X, use Y · Good / Bad (AE43, AEN4, AE45, AE48) · Decid
 
 - **AE43** — Run each agent capability's versioned golden set through the real entry point and fail on a drop beyond
   the threshold against the stored baseline, because a harness that bypasses the entry point tests something else.
-- **AEN4** — Run evals through a test-mode wrapper that fakes only database writes, outbound messages and external
-  actions, because an eval on live tools sends real messages and changes real data.
+- **AEN4** — Point each tool that writes, sends or acts outside the run at a sandbox (test store or recording fake)
+  whose end state the grader reads, because live tools send real messages and change real data.
 - **AE44** — Record infrastructure failures, timeouts and truncations as their own eval status, never as a failed
   case, because they measure the harness, not the agent.
 - **AE45** — Grade with code first and use an LLM judge only for properties code cannot check, passing the candidate
@@ -26,7 +26,7 @@ Contents: Rules · When X, use Y · Good / Bad (AE43, AEN4, AE45, AE48) · Decid
 | situation | use | why |
 |---|---|---|
 | an eval runs an agent capability | its versioned golden set, through the real entry point, against the stored baseline | a harness that bypasses the entry point tests something else (AE43) · thresholds over repeated runs: LT18 (`testing`'s `llm-live-tests`) |
-| the agent's tools write, send or act outside the run | a test-mode wrapper that fakes only those effects; the rest stays real | an eval on live tools sends real messages and changes real data (AEN4) |
+| the agent's tools write, send or act outside the run | a sandbox for those tools, a test store or a recording fake, and a grader that reads its end state | live tools send real messages and change real data (AEN4) |
 | a case ends in an infrastructure error, a timeout or a truncation | its own status, kept out of the pass rate | it measures the harness, not the agent (AE44) |
 | a property can be checked by code: a field, a number, a format, a tool call | a code grader | a judge is costlier, noisier and injectable (AE45) |
 | a property needs judgement: tone, faithfulness, helpfulness | an LLM judge that gets the candidate output as data | code cannot check it (AE45) · the verdict form: LT17 |
@@ -54,7 +54,7 @@ scores.add(grader.grade(evalCase, result));
 ```
 The case goes through the same entry point users reach, so the score covers the whole agent.
 
-### AEN4 — Evals fake only the side effects
+### AEN4 — Side-effecting tools point at a sandbox the grader reads
 
 **Bad**
 ```java
@@ -66,14 +66,15 @@ Running the golden set issues real refunds and sends real emails to the customer
 
 **Good**
 ```java
+final var sandbox = new EvalSandbox();
 final var supportAgent = new SupportAgent(
         model,
-        liveTools.withFakes(Map.of(
-                "issueRefund", recordingRefunds,
-                "sendEmail", recordingMail)));
+        liveTools.withSandbox(Map.of(
+                "issueRefund", sandbox.refunds(),
+                "sendEmail", sandbox.outbox())));
 ```
-Only the tools that change the outside world are faked, and they record what they were asked. Reads and the model
-stay real.
+The tools that change the outside world write to the sandbox instead, and the grader reads its end state (AE48).
+Reads and the model stay real.
 
 ### AE45 — Code grades what code can check
 
@@ -107,10 +108,10 @@ The agent can say the refund was issued without calling the tool, or after calli
 then:
 Trajectory.of(result).matches(MatchMode.IN_ORDER, ["findOrder", "issueRefund"])
 Trajectory.of(result).never("closeAccount")
-orders.find("A-17").refundedAmount == 25.00G
+sandbox.refunds.issued == [new Refund("A-17", 25.00G)]
 ```
-The trajectory shows the required calls ran and the forbidden one did not. The order's end state shows the task was
-done.
+The trajectory shows the required calls ran and the forbidden one did not. The sandbox's end state shows the task
+was done (AEN4).
 
 ## Decided edges
 
@@ -136,7 +137,7 @@ Walk every changed eval harness, golden set, grader, judge and eval sandbox.
   Severity: Act on
   Verify: re-open the harness and the entry point it calls
 - [ ] AEN4 — List the tools each evaluated capability can call. A tool that writes, sends or acts outside the run
-  and is not faked in the eval is a finding.
+  and does not point at a sandbox, or a grader that does not read the sandbox's end state, is a finding.
   Applies when: an eval runs a capability with side-effecting tools
   Evidence: the tool wiring at `file:line`
   Not a finding: a capability with no side-effecting tool (decided edge)
