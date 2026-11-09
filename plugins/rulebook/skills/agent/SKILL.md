@@ -16,4 +16,5 @@ These rules cover the production code of an agent. The tests of that code are in
 | reference | rule IDs | read it |
 |---|---|---|
 | [adapter](references/adapter.md) | AE1–AE3, AE5–AE10, AEN2 | when you write or review a model adapter, a stop reason, a model error or retry policy, a streamed reply, a tool call's arguments, a usage record, an output-token cap or a fallback model |
+| [context](references/context.md) | AE21–AE26 | when you write or review the code that builds a model request, a memory window, compaction or summarisation of history, a prompt cache breakpoint, or how a tool result enters context |
 <!-- /index -->
