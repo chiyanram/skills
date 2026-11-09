@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [1.1.0](https://github.com/chiyanram/skills/compare/rulebook--v1.0.0...rulebook--v1.1.0) (2026-11-09)
+
+### Features
+
+* **agent:** add the agent domain with its seven references ([#134](https://github.com/chiyanram/skills/issues/134)) ([#266](https://github.com/chiyanram/skills/issues/266)) ([0d2744c](https://github.com/chiyanram/skills/commit/0d2744c73e5c319de46acbddfb7acda5c0b1e5f2)), closes [#132](https://github.com/chiyanram/skills/issues/132) [#132](https://github.com/chiyanram/skills/issues/132) [#132](https://github.com/chiyanram/skills/issues/132) [#132](https://github.com/chiyanram/skills/issues/132) [#132](https://github.com/chiyanram/skills/issues/132) [#271](https://github.com/chiyanram/skills/issues/271) [#132](https://github.com/chiyanram/skills/issues/132)
+
 ## [1.0.0](https://github.com/chiyanram/skills/compare/rulebook--v0.45.0...rulebook--v1.0.0) (2026-11-09)
 
 ### ⚠ BREAKING CHANGES
