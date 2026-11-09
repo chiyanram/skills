@@ -109,7 +109,7 @@ at the approval table and at the merge.
 | `check_provenance.py` | a shipped skill file carries provenance outside code: a source citation, a URL, a preference line, a credit, an evidence note, a date or an agent-factory reference |
 | `check_ledger.py` | the ledger repeats a rule ID for the same reference without "Supersedes" in the later row, or holds a conflict marker |
 | `check_routing.py` | a skill router has no `evals/routing/<name>.json`, a file has fewer than 8 `should` or 8 `near_miss` requests, a `should` request does not rank its router first, a near miss does not rank its named owner above that router, or two router descriptions are 75% alike. Word matching only: a model-graded run (`claude plugin eval`) costs tokens and stays manual |
-| `check_process.py` | a crq lanes file misses a lane or a field, or a lane above tiny drops approval; a role card is not a known role, misses or adds a frontmatter field, cites a rule ID no reference holds, or lacks the job, a "done when" line, numbered steps or an "it's working if" list; or its role has fewer than 3 eval scenarios, each a `prompt.md` and a grader |
+| `check_process.py` | a crq lanes file misses a lane or a field, or a lane above tiny drops approval; a role card is not a known role, misses or adds a frontmatter field, cites a rule ID that no Rules section holds, or lacks the job, a "done when" line, numbered steps or an "it's working if" list; or its role has fewer than 3 eval scenarios, each a `prompt.md` and a grader |
 
 ## Run the role evals
 
@@ -121,21 +121,7 @@ uses, because the report lists cases by folder name only.
 
 These test the plugin on its own, in plain Claude Code. They do not test an engine, which keeps its own set.
 
-The `finder` holds three today:
-- `new-bug-next-to-old`: it blocks on the new bug and keeps an older one apart;
-- `clean-change`: it finds nothing to block on and still leaves the merge to a person;
-- `planted-instruction`: it reports a code comment that tells it to approve, and does not obey it.
-
-The `coordinator` holds three:
-- `answer-in-the-code`: it looks up a fact the code holds and cites it, instead of asking;
-- `business-choice`: it asks about a business choice, with options and a recommendation, and does not decide it;
-- `migration-is-one-way-door`: it puts a column rename in the one-way-door lane and lists the irreversible step.
-
-The `verify-pass` holds three:
-- `finding-does-not-hold`: it dismisses a finding that a guard above its line already prevents;
-- `cited-only-finding`: it puts a real finding with only a cited line in consider, not act_on;
-- `duplicate-across-lenses`: it keeps one of two findings on the same line and rule, and dismisses the other as a
-  duplicate.
+Each case's `prompt.md` says in its `description` what the role should do, and its graders say what passes.
 
 Every run and every `llm` grader is a real model call on your own Claude login, so they run by hand, never in
 `make lint`, `make test` or CI. Run a role's scenarios after a change to its card or to a reference it reads, such as

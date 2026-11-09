@@ -1,7 +1,7 @@
 """The crq process files an engine reads: the lanes file and the role cards (docs/DESIGN.md section 4, #237).
 
 Fails when a lanes file misses a lane or a field, or lets a lane above tiny run without approval (the approval floor);
-when a role card is not one of the known roles, misses a frontmatter field or adds one, cites a rule ID no reference
+when a role card is not one of the known roles, misses a frontmatter field or adds one, cites a rule ID no Rules section
 holds, or lacks the job, a "done when" line, numbered steps or an "it's working if" list; or when a role has fewer
 than three eval scenarios, each a folder with a `prompt.md` and a grader under `graders/`.
 """
@@ -38,8 +38,9 @@ def frontmatter(text: str) -> tuple[dict[str, str], str] | None:
 
 
 def known_ids(plugin: Path) -> set[str]:
-    return {f"{p}{n}{s}" for reference in plugin.glob("skills/*/references/*.md")
-            for p, n, s in RULE_ID.findall(rules(reference.read_text()))}
+    """Rule IDs from each reference's Rules section, and from a skill that keeps its rules in its SKILL.md."""
+    sources = [*plugin.glob("skills/*/references/*.md"), *plugin.glob("skills/*/SKILL.md")]
+    return {f"{p}{n}{s}" for source in sources for p, n, s in RULE_ID.findall(rules(source.read_text()))}
 
 
 def scenario_problems(plugin: Path, role: str) -> list[str]:
