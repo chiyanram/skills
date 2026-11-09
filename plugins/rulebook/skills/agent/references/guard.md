@@ -51,15 +51,23 @@ Only one call site asks for approval. The resume path and a new refund tool skip
 
 **Good**
 ```java
-return pipeline.run(call, List.of(
-        Stage.SCHEMA_CHECK,
-        Stage.GLOBAL_GUARDS,
-        Stage.AGENT_GUARDS,
-        Stage.APPROVAL_GATE,
-        Stage.EXECUTE,
-        Stage.OUTPUT_GUARDS));
+final class ToolPipeline {
+    private static final List<Stage> STAGES = List.of(
+            Stage.SCHEMA_CHECK,
+            Stage.GLOBAL_GUARDS,
+            Stage.AGENT_GUARDS,
+            Stage.APPROVAL_GATE,
+            Stage.EXECUTE,
+            Stage.OUTPUT_GUARDS);
+    ToolResult run(final ToolCall call) {
+        return Stage.runInOrder(STAGES, call);
+    }
+}
+
+return pipeline.run(call);
 ```
-The loop, resume and every tool reach `tools` only through `pipeline.run`, in this fixed order.
+The stage order is fixed inside the pipeline, and no caller can change it. The loop, resume and every tool reach
+`tools` only through `pipeline.run`.
 
 ### AE28 — A failing guard blocks
 
@@ -124,8 +132,8 @@ The review reaches the model only inside a tool result, encoded as data and labe
   environment: tuning is allowed (AE28). — **Do not skip when** configuration can turn the guard off, or a missing
   setting means no guard. — **Confidence** high
 - **Skip when** content was written by your own system and no outside party can change it, such as a fixed help
-  text: AE29 does not apply. — **Do not skip when** any part of it comes from a user, a web page, a file, an email or
-  another system. — **Confidence** high
+  text: AE29 does not apply. — **Do not skip when** any part of it comes from another user, a web page, a file, an
+  email or another system. — **Confidence** high
 - **Skip when** the agent uses no MCP server: AE36 does not apply. — **Do not skip when** any tool is loaded from an
   MCP server, even one you run. — **Confidence** high
 
