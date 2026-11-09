@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.35.1](https://github.com/chiyanram/skills/compare/rulebook--v0.35.0...rulebook--v0.35.1) (2026-11-09)
+
+### Bug Fixes
+
+* **crq:** approval binds spec and design, a three-round review cap, one size rule ([#234](https://github.com/chiyanram/skills/issues/234)) ([#240](https://github.com/chiyanram/skills/issues/240)) ([2055d87](https://github.com/chiyanram/skills/commit/2055d873ef427726cca99196076e8b2544bf367d))
+
 ## [0.35.0](https://github.com/chiyanram/skills/compare/rulebook--v0.34.1...rulebook--v0.35.0) (2026-11-09)
 
 ### Features
