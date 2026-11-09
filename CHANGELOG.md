@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.37.0](https://github.com/chiyanram/skills/compare/rulebook--v0.36.0...rulebook--v0.37.0) (2026-11-09)
+
+### Features
+
+* **crq:** add the lanes file, the glossary and the finder card ([#237](https://github.com/chiyanram/skills/issues/237)) ([#243](https://github.com/chiyanram/skills/issues/243)) ([2cee43b](https://github.com/chiyanram/skills/commit/2cee43b69362dd00d961d584351222af31253eb3))
+
 ## [0.36.0](https://github.com/chiyanram/skills/compare/rulebook--v0.35.1...rulebook--v0.36.0) (2026-11-09)
 
 ### Features
