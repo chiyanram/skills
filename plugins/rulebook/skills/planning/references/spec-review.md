@@ -267,7 +267,7 @@ Walk the whole spec and the whole design in one round, every section, before you
   Applies when: every round; a miss only from the second round on.
   Evidence: the text, and the earlier round that saw it unchanged.
   Not a finding: a problem in text that changed since the last round, which is a new finding (decided edge).
-  Severity: Act on
+  Severity: Consider: the miss; the finding keeps its own severity
   Verify: compare the text with the version the earlier round reviewed.
 - [ ] SR2 — Open each `file:line` cite in the design on the main branch. A cite that does not show the claimed
   behaviour is a finding, and so is a claim about today's code with no cite. A file path in the spec is a finding.

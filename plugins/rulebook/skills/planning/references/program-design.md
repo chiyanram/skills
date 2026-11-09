@@ -240,7 +240,7 @@ Walk the whole design and every slice in it. During the build phase, also walk t
   Applies when: the design plans slices.
   Evidence: the planned file and line counts, per slice.
   Not a finding: none
-  Severity: Act on
+  Severity: Act on over 20 files; Consider over 400 lines or 15 files
   Verify: add up the counts again from the file tree and the slices.
 - [ ] PD10 — For each design decision backed by a prototype, find the verdict and its evidence in the design and the
   prototype's branch. Prototype code in the pull request's diff is a finding.
