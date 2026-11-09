@@ -14,6 +14,9 @@ cosine similarity. The check fails when:
 - a `near_miss` names an unknown owner, or its owner does not outrank the router whose file holds it;
 - two descriptions are near-duplicates (cosine at or above COLLISION).
 
+A typed-only skill (`disable-model-invocation: true`) is skipped: its description is not in the model's context, so
+nothing routes to it (ADR-0009).
+
 It approximates the real router: it sees words, not meaning. A model-graded run (`claude plugin eval`) costs tokens,
 so it stays a manual step and never runs here.
 """
@@ -64,6 +67,8 @@ def routers(root: Path) -> dict[str, str]:
     found = {}
     for path in sorted(root.glob("plugins/*/skills/*/SKILL.md")):
         meta = frontmatter(path)
+        if meta.get("disable-model-invocation") == "true":
+            continue
         name = meta.get("name", path.parent.name)
         found[name] = f"{name} {meta.get('description', '')}"
     return found

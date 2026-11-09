@@ -1,7 +1,8 @@
 """A rule file holds only what an agent needs to act; where a rule came from lives in the ledger
 (docs/rulebook/approved-rules.md) and the research behind it (agent-factory#59).
 
-Fails on a shipped skill file (a SKILL.md or a reference under plugins/*/skills/) that carries provenance:
+Fails on a shipped skill file (a SKILL.md or a reference under plugins/*/skills/; in the toolbox, a SKILL.md only)
+that carries provenance:
 a source citation (`pstack :15`, `r47 :456`, `file.md:13`, `§Section`, a URL, `ADR-0007`, `research/41`), an
 "Operator preference" line, a credit or label on an example (`**Bad** (from …)`, `(neutral)`), a "Real evidence"
 note, a date or an agent-factory reference. Code fences and inline code spans are skipped.
@@ -31,8 +32,14 @@ CODE_SPAN = re.compile(r"(`+)(?!`).*?(?<!`)\1(?!`)")
 
 
 def shipped(root: Path) -> list[Path]:
-    return [f for f in files(root, "*.md") if "skills" in f.relative_to(root).parts
-            and f.relative_to(root).parts[0] == "plugins"]
+    """Skill files under plugins/. In the toolbox only each SKILL.md: the files beside a copied tool's SKILL.md are
+    the tool's own content, and its source sits in THIRD_PARTY_NOTICES.md (ADR-0009)."""
+    found = []
+    for f in files(root, "*.md"):
+        parts = f.relative_to(root).parts
+        if parts[0] == "plugins" and "skills" in parts and (parts[1] != "toolbox" or f.name == "SKILL.md"):
+            found.append(f)
+    return found
 
 
 def problems_in(path: Path) -> list[str]:

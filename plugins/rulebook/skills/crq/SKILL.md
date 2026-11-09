@@ -6,11 +6,11 @@ description: Use when you take a change from request to merge, or need its lane 
 # crq
 
 One pipeline takes every change from a request to a merge. A coordinator talks with the human and plans. Fresh
-workers build and review. Scripts check what a model must not judge. The human approves the plan and merges.
+runs build and review. Scripts check what a model must not judge. The human approves the plan and merges.
 
 ```text
 intake ─▶ research ─▶ clarify ─▶ spec ─▶ design ─▶ design review ─▶ HUMAN approval
-   ─▶ build ─▶ verify ─▶ cleanup ─▶ code review ─▶ gate ─▶ pull request ─▶ HUMAN merge ─▶ retro
+   ─▶ build ─▶ verify ─▶ cleanup ─▶ code review ─▶ gate ─▶ PR ─▶ HUMAN merge ─▶ timeline record
 ```
 
 ## Phases
@@ -20,21 +20,22 @@ each phase applies.
 
 | phase | who | produces | rules to apply |
 |---|---|---|---|
-| intake | coordinator | an issue with its lane; a map of issues when the work is unclear | `lanes` |
+| intake | coordinator | a ticket with its lane; a map of tickets when the work is unclear | `lanes` |
 | research | coordinator, read-only helpers | how the touched code works today, at `file:line`; parts to reuse; test patterns | `spec-review` (planning) |
-| clarify | coordinator with the human | answers on the issue; each open question with its decider, options and recommendation | `spec-review` (planning) |
-| spec | coordinator | a draft pull request with the intent quoted, acceptance criteria a test can decide, non-goals and edge cases | `acceptance-criteria` (planning) |
+| clarify | coordinator with the human | answers on the ticket; each open question with its decider, options and recommendation | `spec-review` (planning) |
+| spec | coordinator | a draft PR with the intent quoted, acceptance criteria a test can decide, non-goals and edge cases | `acceptance-criteria` (planning) |
 | design | coordinator | the chosen shape and a rejected alternative; slices with their proving commands | `program-design`, `spec-review`, `diagrams` (planning) |
-| design review | fresh reviewer | a verdict per decision and findings | `review-process`, `spec-review` (planning) |
-| — | **human** | an explicit approval of the spec and design, at the pull request's head, recorded with both hashes | `lanes` |
-| build | for a bug, a separate run that writes the failing test; then one fresh writer per pull request | the slices as commits | `verify-done`, `strategy` (testing) and the `code` references the diff touches |
-| verify | writer, then a script at the pushed commit | an evidence line per acceptance criterion | `verify-done`, `value-bar` (testing) |
-| cleanup | writer | a behaviour-neutral tidy diff | `deslop` skill |
-| code review | fresh reviewer | findings in buckets | `review-process`, `code-review`, `test-integrity` when the diff edits an existing test, and the Review checks of every reference in scope |
-| gate | CI | green at the head commit | — |
-| pull request | writer | why, evidence, rollback, where to look | `pr-readiness`, `diagrams` (planning) |
+| design review | a design-reviewer run, then a verify pass | a verdict per decision and findings | `review-process`, `spec-review` (planning) |
+| — | **human** | an explicit approval of the spec and design, at the PR's head, recorded with both hashes | `lanes` |
+| build | for a bug, a test-first run; then one fresh implementer run per PR | the slices as commits | `verify-done`, `strategy` (testing) and the `code` references the diff touches |
+| verify | implementer, then the engine's ready check at the pushed commit | an evidence row per AC | `verify-done`, `value-bar` (testing) |
+| cleanup | cleanup | a behaviour-neutral tidy diff | `deslop` skill |
+| code review | automated review: one finder run per lens, then a verify pass | findings in buckets | `review-process`, `code-review`, `test-integrity` when the diff edits an existing test, and the Review checks of every reference in scope |
+| gate | the gate: CI, a queue or a local run | green at the head commit | — |
+| PR | implementer | why, evidence, rollback, where to look | `pr-readiness`, `diagrams` (planning) |
 | — | **human** | merge | — |
-| retro | coordinator | each lesson as a rule, a script, a review check or nothing | `retro` |
+| timeline record | engine, no model | rounds, findings, tokens per phase, rescues | `retro` |
+| full retro (only when a human starts one) | retro run | each lesson as a rule, a script, a review check or nothing | `retro` |
 
 ## Process files
 
@@ -42,6 +43,8 @@ An engine reads these to run the same process a person runs with `/crq`.
 
 - [lanes.json](process/lanes.json): per lane, whether it needs approval, design review and test-first, its lenses
   and its retro. An engine may make a lane stricter, never looser.
+- [review.json](process/review.json): the baseline references every automated review reads, whatever the repo's
+  own instruction files say.
 - [glossary](process/glossary.md): the words every role card and hand-off uses.
 - Role cards, one per role, each with three eval scenarios in the plugin's `evals/<role>/`:
   [coordinator](process/roles/coordinator.md), [design-reviewer](process/roles/design-reviewer.md),
@@ -57,7 +60,7 @@ An engine reads these to run the same process a person runs with `/crq`.
 | [code-review](references/code-review.md) | CR1–CR7 | when you review a pull request's code, or before you split a change |
 | [lanes](references/lanes.md) | LN1–LN4 | when you take in a new change, or when a change turns out bigger, riskier or smaller than its lane |
 | [pr-readiness](references/pr-readiness.md) | PR1–PR7 | when you write a pull request body, or when you check one before merge |
-| [retro](references/retro.md) | RT1–RT6 | when a pull request is merged, rescued or reverted, or a defect escapes |
+| [retro](references/retro.md) | RT1–RT7 | when the engine writes a merge's timeline record, or when a human starts a full retro |
 | [review-process](references/review-process.md) | RV1–RV9 | before you run, write or tune a review |
 | [test-integrity](references/test-integrity.md) | TI1–TI5 | when you review a diff that edits an existing test, a snapshot or a golden file |
 | [verify-done](references/verify-done.md) | VB1–VB8 | when you build a change, before you call it ready, or when you check a writer's proof |

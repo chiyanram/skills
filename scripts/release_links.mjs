@@ -18,3 +18,8 @@ export function transformWithCrossRepoLinks(commit, context) {
   const entry = transform(commit, context)
   return entry && typeof entry.subject === 'string' ? { ...entry, subject: crossRepoLinks(entry.subject, context) } : entry
 }
+
+// Each plugin's release notes list only its own commits: `keep(scope)` says whether a commit belongs to it.
+export function forScope(keep, transformCommit) {
+  return (commit, context) => (keep(commit.scope ?? '') ? transformCommit(commit, context) : null)
+}
