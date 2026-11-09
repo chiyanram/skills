@@ -3,6 +3,12 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.45.0](https://github.com/chiyanram/skills/compare/rulebook--v0.44.0...rulebook--v0.45.0) (2026-11-09)
+
+### Features
+
+* **crq:** a full retro runs only when a human starts one ([#244](https://github.com/chiyanram/skills/issues/244)) ([#262](https://github.com/chiyanram/skills/issues/262)) ([d9ab715](https://github.com/chiyanram/skills/commit/d9ab71598665d098d1feb514bd015e3a5c9cf672))
+
 ## [0.44.0](https://github.com/chiyanram/skills/compare/rulebook--v0.43.0...rulebook--v0.44.0) (2026-11-09)
 
 ### Features
