@@ -37,7 +37,7 @@ Contents: Rules · When X, use Y · Good / Bad (AE38, AE39, AE41) · Decided edg
 **Bad**
 ```java
 final var span = tracer.startToolSpan(call);
-try (var _ = span.makeCurrent()) {
+try (final var scope = span.makeCurrent()) {
     return tools.run(call);
 } finally {
     span.end();
@@ -49,7 +49,7 @@ nothing.
 **Good**
 ```java
 final var span = tracer.startToolSpan(call);
-try (var _ = span.makeCurrent()) {
+try (final var scope = span.makeCurrent()) {
     final var result = tools.run(call);
     if (result.isError()) {
         span.setStatus(StatusCode.ERROR, result.errorType());
