@@ -66,12 +66,12 @@ The cut can fall between a tool call and its result. The provider rejects the ne
 
 **Good**
 ```java
-final var window = repair.apply(Windows.lastTurns(
+final var window = repair.apply(Windows.lastTurnsWithin(
         history,
-        MAX_TURNS));
+        tokenBudget));
 ```
-`lastTurns` cuts only between whole turns, so a call and its result stay together. `repair` drops any orphan left,
-the same way before every request.
+`lastTurnsWithin` keeps the newest whole turns that fit the token budget (AE25), so a call and its result stay
+together. `repair` drops any orphan left, the same way before every request.
 
 ### AE23 — Stable content first, per-turn content last
 
@@ -107,7 +107,7 @@ The model gets the first part of the history and treats it as all of it. Nothing
 **Good**
 ```java
 final var page = orderHistory.page(0, PAGE_SIZE);
-runs.saveFullResult(call.id(), orderHistory);
+runs.saveFullResult(new CallKey(runId, step, call.id()), orderHistory);
 final var note = page.hasMore() ? " Cut to the first page; call again with page=1 for more." : "";
 return ToolResult.ok(call.id(), page.toJson() + note);
 ```
