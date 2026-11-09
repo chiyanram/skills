@@ -3,7 +3,7 @@
 Generic engineering rules for coding agents. The agent that writes the code and the agent that reviews it read the same
 file. Project-specific values (commands, paths, module names) stay in each project's own `AGENTS.md`.
 
-Each domain is one skill: `testing`, `code`, `migrations`, `obs`, `planning` and `meta`. Its `SKILL.md` lists every reference in the
+Each domain is one skill: `testing`, `code`, `agent`, `migrations`, `obs`, `planning` and `meta`. Its `SKILL.md` lists every reference in the
 domain and when to read it, and the agent opens only the references the task needs. From a project's nested
 `AGENTS.md`, point at a reference by name, never by path, because the plugin's install folder differs per machine and
 per version:
@@ -53,6 +53,7 @@ from the references, and `make lint` fails when it is stale.
 | [crq](skills/crq/SKILL.md) | take a change from request to merge, or run one phase: lanes, spec, design, build, review, pull request, retro |
 | [testing](skills/testing/SKILL.md) | choose, write or review a test: its tier, its value, its boundaries, Spock, ITs, model calls, mutation |
 | [code](skills/code/SKILL.md) | write or review production code: Java, Spring, types, errors, services, API design, security, concurrency, persistence, scheduled jobs, Redis, Angular |
+| [agent](skills/agent/SKILL.md) | write or review code that calls a model or runs an agent: adapter, tool loop, context, guards, GenAI spans, evals, budgets |
 | [deslop](skills/deslop/SKILL.md) | clean up an implemented branch's diff, behaviour-neutral, before review |
 | [migrations](skills/migrations/SKILL.md) | write or review a database migration |
 | [obs](skills/obs/SKILL.md) | write or review a log call, a metric or a trace |

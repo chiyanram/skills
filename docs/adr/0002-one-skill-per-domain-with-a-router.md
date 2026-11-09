@@ -8,8 +8,8 @@ A rulebook that an agent must read in full costs context on every task, and most
 
 ## Decision
 
-Each domain (`testing`, `code`, `migrations`, `obs`, `planning`, `meta`, `deslop`) is one skill. Its `SKILL.md` is
-a router: a table of its references, their rule IDs and when to read each.
+Each domain (`testing`, `code`, `agent`, `migrations`, `obs`, `planning`, `meta`, `deslop`) is one skill. Its
+`SKILL.md` is a router: a table of its references, their rule IDs and when to read each.
 
 ## Consequences
 

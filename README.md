@@ -8,9 +8,9 @@ One shared rulebook for coding agents: the agent that writes the code and the ag
 ## What it is
 
 `skills` ships the Claude Code plugin [`rulebook`](plugins/rulebook/). It holds the engineering rules that every
-project shares: tests, code, migrations, observability and planning. Each rule has a reason and an approved source.
-A second plugin, [`toolbox`](plugins/toolbox/), holds tools a person types, copied from other skill repos with their
-licence notices (ADR-0009).
+project shares: tests, code, agents, migrations, observability and planning. Each rule has a reason and an approved
+source. A second plugin, [`toolbox`](plugins/toolbox/), holds tools a person types, copied from other skill repos with
+their licence notices (ADR-0009).
 
 - **One file, two readers.** The writer follows the rules. The reviewer checks the same rules.
 - **Load only what the task needs.** Each domain has a router, so an agent opens one reference, not the whole book.
@@ -76,6 +76,7 @@ Tests here call the model: use the `testing` skill (rulebook plugin) and read it
 |---|---|
 | [testing](plugins/rulebook/skills/testing/SKILL.md) | choose, write or review a test |
 | [code](plugins/rulebook/skills/code/SKILL.md) | write or review production code |
+| [agent](plugins/rulebook/skills/agent/SKILL.md) | write or review code that calls a model or runs an agent |
 | [deslop](plugins/rulebook/skills/deslop/SKILL.md) | clean up a branch's diff before review |
 | [migrations](plugins/rulebook/skills/migrations/SKILL.md) | write or review a database migration |
 | [obs](plugins/rulebook/skills/obs/SKILL.md) | write or review a log call, a metric or a trace |
