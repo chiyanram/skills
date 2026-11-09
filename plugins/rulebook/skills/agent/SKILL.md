@@ -16,4 +16,5 @@ These rules cover the production code of an agent. The tests of that code are in
 | reference | rule IDs | read it |
 |---|---|---|
 | [adapter](references/adapter.md) | AE1–AE3, AE5–AE10, AEN2 | when you write or review a model adapter, a stop reason, a model error or retry policy, a streamed reply, a tool call's arguments, a usage record, an output-token cap or a fallback model |
+| [evals](references/evals.md) | AE43–AE46, AE48, AEN4 | when you write or review an eval harness, a golden set, an eval case or its status, a grader or LLM judge, a trajectory assertion, or the sandbox an eval runs in |
 <!-- /index -->
