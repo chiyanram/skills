@@ -16,4 +16,6 @@ These rules cover the production code of an agent. The tests of that code are in
 | reference | rule IDs | read it |
 |---|---|---|
 | [adapter](references/adapter.md) | AE1–AE3, AE5–AE10, AEN2 | when you write or review a model adapter, a stop reason, a model error or retry policy, a streamed reply, a tool call's arguments, a usage record, an output-token cap or a fallback model |
+| [cost](references/cost.md) | AE51, AEN6 | when you write or review a run budget, a workspace or tenant budget, a spend limit, or the code that checks or records usage around a model call |
+| [genai-obs](references/genai-obs.md) | AE37–AE41 | when you write or review a span, metric or log for a model call, a tool call or an agent run, the capture of prompts and completions, or the record kept for each model call |
 <!-- /index -->
