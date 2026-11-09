@@ -44,4 +44,5 @@ evals/routing/<router>.json                      requests each router must pick,
 - Commit types and what each releases: `CONTRIBUTING.md#releases`.
 - Issues: GitHub issues on `chiyanram/skills`, through `gh`. See `docs/agents/issue-tracker.md`,
   `docs/agents/triage-labels.md` and `docs/agents/domain.md`.
-- A cite `research/NN` or `review/…` in the ledger means that file at git tag `design-archive-2026-11`.
+- A cite `research/NN` or `review/…` in the ledger means that file under `docs/archive/` at git tag
+  `design-archive-2026-11`: `git show design-archive-2026-11:docs/archive/research/<file>`.

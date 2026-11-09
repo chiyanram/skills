@@ -162,9 +162,10 @@ so every change to what ships must be a `feat` or a `fix`. Preview the next rele
 
 ## Design history
 
-The research, review pages and old tickets from the design phase are at git tag `design-archive-2026-11`. A cite
-`research/NN` or `review/…` in the ledger means that file at that tag:
-`git show design-archive-2026-11:docs/archive/research/<file>`.
+The research, review pages and old tickets from the design phase are under `docs/archive/` at git tag
+`design-archive-2026-11`. A cite `research/NN` or `review/…` in the ledger means that file there:
+`git show design-archive-2026-11:docs/archive/research/<file>`. The tag's parent, `design-archive-2026-11^`, holds
+them at their old paths, before the move.
 
 ## Code of conduct
 
