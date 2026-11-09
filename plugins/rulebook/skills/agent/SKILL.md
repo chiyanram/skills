@@ -16,4 +16,5 @@ These rules cover the production code of an agent. The tests of that code are in
 | reference | rule IDs | read it |
 |---|---|---|
 | [adapter](references/adapter.md) | AE1–AE3, AE5–AE10, AEN2 | when you write or review a model adapter, a stop reason, a model error or retry policy, a streamed reply, a tool call's arguments, a usage record, an output-token cap or a fallback model |
+| [loop](references/loop.md) | AE12–AE20, AEN3 | when you write or review an agent loop, a step result, a tool-call result or tool error, a call cap, an approval pause, or a resume path |
 <!-- /index -->
