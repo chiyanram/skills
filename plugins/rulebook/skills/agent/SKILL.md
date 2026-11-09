@@ -16,4 +16,5 @@ These rules cover the production code of an agent. The tests of that code are in
 | reference | rule IDs | read it |
 |---|---|---|
 | [adapter](references/adapter.md) | AE1–AE3, AE5–AE10, AEN2 | when you write or review a model adapter, a stop reason, a model error or retry policy, a streamed reply, a tool call's arguments, a usage record, an output-token cap or a fallback model |
+| [guard](references/guard.md) | AE28–AE31, AE33–AE34, AE36 | when you write or review a guard, an approval gate, a tool's risk or approval setting, the tool-call pipeline, an output check, an MCP tool, or how outside content enters the model's context |
 <!-- /index -->
