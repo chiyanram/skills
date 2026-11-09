@@ -87,7 +87,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
-      contents: write       # push the release commit and the rulebook--v<version> tag
+      contents: write       # push the release commit and the <plugin>--v<version> tag
       issues: write         # comment "released in" on the issues a release closes
       pull-requests: write  # comment "released in" on the merged pull requests
     steps:
@@ -102,23 +102,29 @@ jobs:
           node-version: 24
           cache: npm
 
-      # The first run has no rulebook--v* tag yet. Tag the commit where plugin.json got its current version, so
-      # semantic-release counts from there instead of starting at 1.0.0. Every later run finds a tag and skips this.
-      - name: Baseline tag
+      # A plugin's first run has no <plugin>--v* tag yet. Tag the commit where its plugin.json got its current version,
+      # so semantic-release counts from there instead of starting at 1.0.0. Every later run finds a tag and skips this.
+      - name: Baseline tags
         run: |
-          if [ -z "$(git tag --list 'rulebook--v*')" ]; then
-            manifest=plugins/rulebook/.claude-plugin/plugin.json
-            version=$(python3 -c "import json; print(json.load(open('$manifest'))['version'])")
-            commit=$(git log -1 --format=%H -G'"version"' -- "$manifest")
-            git -c user.name=github-actions -c user.email=github-actions@github.com \
-              tag -a "rulebook--v$version" "$commit" -m "rulebook $version"
-            git push origin "rulebook--v$version"
-          fi
+          for plugin in $(python3 -c "import json; print(' '.join(p['name'] for p in json.load(open('.claude-plugin/marketplace.json'))['plugins']))"); do
+            if [ -z "$(git tag --list "$plugin--v*")" ]; then
+              manifest=plugins/$plugin/.claude-plugin/plugin.json
+              version=$(python3 -c "import json; print(json.load(open('$manifest'))['version'])")
+              commit=$(git log -1 --format=%H -G'"version"' -- "$manifest")
+              git -c user.name=github-actions -c user.email=github-actions@github.com \
+                tag -a "$plugin--v$version" "$commit" -m "$plugin $version"
+              git push origin "$plugin--v$version"
+            fi
+          done
 
       - name: Install release tooling
         run: npm ci --no-fund --no-audit
 
-      - name: semantic-release
+      # One release line per plugin (ADR-0009).
+      - name: semantic-release, once per plugin
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
-        run: npx semantic-release
+        run: |
+          for plugin in $(python3 -c "import json; print(' '.join(p['name'] for p in json.load(open('.claude-plugin/marketplace.json'))['plugins']))"); do
+            RELEASE_PLUGIN=$plugin npx semantic-release
+          done
