@@ -3,6 +3,24 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [1.0.0](https://github.com/chiyanram/skills/compare/rulebook--v0.45.0...rulebook--v1.0.0) (2026-11-09)
+
+### ⚠ BREAKING CHANGES
+
+* **planning:** rule IDs GA3 and CV1 are removed, and acceptance
+criteria are no longer Gherkin scenarios.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_012EphAgXmJeLDVFfEgSjwGe
+* **planning:** rule ID GT2 is removed.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_012EphAgXmJeLDVFfEgSjwGe
+
+### Features
+
+* **planning:** numbered AC-n lines replace Gherkin, with the AC-to-tests and glossary wording passes ([#244](https://github.com/chiyanram/skills/issues/244)) ([#260](https://github.com/chiyanram/skills/issues/260)) ([f9702ef](https://github.com/chiyanram/skills/commit/f9702ef83a51eb4b93943e8f9f82ba8bf417de43)), closes [#237](https://github.com/chiyanram/skills/issues/237)
+
 ## [0.45.0](https://github.com/chiyanram/skills/compare/rulebook--v0.44.0...rulebook--v0.45.0) (2026-11-09)
 
 ### Features
