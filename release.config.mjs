@@ -1,8 +1,7 @@
 // semantic-release config, one release line per plugin (ADR-0009). A module, not JSON, because the release notes need
-// a writer transform: the conventionalcommits preset links every `#N` in a subject to this repo, and
-// scripts/release_links.mjs points `repo#N` and `owner/repo#N` at their own repo.
+// their own templates and transform, which live in scripts/release_notes.mjs (#276).
 // RELEASE_PLUGIN picks the plugin; CI runs it once for each. Scope `toolbox` releases only the toolbox (ADR-0009).
-import { forScope, transformWithCrossRepoLinks } from './scripts/release_links.mjs'
+import { releaseNotes } from './scripts/release_notes.mjs'
 
 const DESIGN = ['research', 'review', 'repo'].map((scope) => ({ scope, release: false }))
 
@@ -42,10 +41,7 @@ export function releaseConfig(plugin) {
     tagFormat: `${plugin}--v\${version}`,
     plugins: [
       ['@semantic-release/commit-analyzer', { preset: 'conventionalcommits', releaseRules: settings.releaseRules }],
-      [
-        '@semantic-release/release-notes-generator',
-        { preset: 'conventionalcommits', writerOpts: { transform: forScope(settings.keep, transformWithCrossRepoLinks) } },
-      ],
+      ['@semantic-release/release-notes-generator', releaseNotes(plugin, settings.keep)],
       ['@semantic-release/changelog', { changelogFile: settings.changelogFile, changelogTitle: settings.changelogTitle }],
       ['@semantic-release/exec', { prepareCmd: `python3 scripts/set_version.py \${nextRelease.version} . --plugin ${plugin}` }],
       [

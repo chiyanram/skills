@@ -1,0 +1,26 @@
+name: Bug
+description: A shipped rule, skill or check is wrong, or CI fails for a reason that is not the change.
+labels: ["type:bug", "needs-triage"]
+body:
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: The reference, skill or check that is wrong.
+      placeholder: scripts/check_sizes.py
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: What happened
+      description: The command you ran and what it printed, or the rule text that is wrong.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected
+    validations:
+      required: true
