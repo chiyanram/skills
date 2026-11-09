@@ -8,9 +8,14 @@
     "Emit GenAI spans for each model call and tool call",
     "Build an eval with a golden set for the agent",
     "Enforce a token budget on each agent run",
-    "Add fallback to a second model when the provider is down"
+    "Add fallback to a second model when the provider is down",
+    "Write the prompt the agent sends to the LLM"
   ],
   "near_miss": [
+    {
+      "prompt": "Write a test of the agent loop with a scripted fake model",
+      "owner": "testing"
+    },
     {
       "prompt": "Write a Spock test with a scripted fake for the order service",
       "owner": "testing"
