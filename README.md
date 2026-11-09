@@ -9,8 +9,8 @@ One shared rulebook for coding agents: the agent that writes the code and the ag
 
 `skills` ships the Claude Code plugin [`rulebook`](plugins/rulebook/). It holds the engineering rules that every
 project shares: tests, code, agents, migrations, observability and planning. Each rule has a reason and an approved
-source. A second plugin, `toolbox` in `plugins/toolbox/`, holds tools a person types, copied from other skill repos
-with their licence notices (ADR-0009).
+source. A second plugin, [`toolbox`](plugins/toolbox/), holds tools a person types, copied from other skill repos with
+their licence notices (ADR-0009).
 
 - **One file, two readers.** The writer follows the rules. The reviewer checks the same rules.
 - **Load only what the task needs.** Each domain has a router, so an agent opens one reference, not the whole book.
