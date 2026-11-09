@@ -1,6 +1,6 @@
 # Test integrity
 
-How a reviewer judges a diff's edits to tests that already exist: changed expected values, rewritten tests, new
+How a finder judges a diff's edits to tests that already exist: changed expected values, rewritten tests, new
 doubles, wider matchers and regenerated snapshots. Read it when you review a diff that edits an existing test, a
 snapshot or a golden file.
 
@@ -12,7 +12,7 @@ Contents: Rules · When X, use Y · Good / Bad (TI4) · Decided edges · Review 
   explains, because an expectation edited to match the code hides the defect the old value caught.
 - **TI2** — For each rewritten test, name the acceptance criterion it checked before and the one it checks now;
   report a change no spec line explains, because a rewrite can keep its name and drop its check.
-- **TI3** — Report a test double that replaces a real call an existing test made, unless the pull request names why
+- **TI3** — Report a test double that replaces a real call an existing test made, unless the PR names why
   the real call cannot run there, because the double passes while the real dependency breaks.
 - **TI4** — Report an exact matcher widened in an existing test (to `any()`, `contains`, a wildcard) unless that
   value is outside the test's promise, because a wide matcher lets a wrong value pass.
@@ -26,14 +26,14 @@ Contents: Rules · When X, use Y · Good / Bad (TI4) · Decided edges · Review 
 | an assertion in an existing test expects a new value | the spec line or acceptance criterion that changes that behaviour; none is a finding (TI1) | only a behaviour change gives an existing test a new answer |
 | the new value comes with a reason only in a test comment or the commit message | still a finding (TI1) | a plausible comment is how an edited expectation reads |
 | an existing test's body is rewritten: new setup, new action or new assertions | the criterion before and after, side by side (TI2); a weaker check is also VB6 (`verify-done`) | the name stays while the check moves |
-| a mock, stub or fake now stands where the test called real code | the pull request's reason the real call cannot run there (TI3); a mock that implements the asserted behaviour: V3 (`testing/value-bar.md`) | a double cannot fail on a bug in what it replaces |
+| a mock, stub or fake now stands where the test called real code | the PR's reason the real call cannot run there (TI3); a mock that implements the asserted behaviour: V3 (`testing/value-bar.md`) | a double cannot fail on a bug in what it replaces |
 | an exact argument or value matcher becomes `any()`, `_`, `contains`, `startsWith` or a type match | the value is outside the test's promise, or a finding (TI4); a Spock verified interaction: K2b (`testing/spock.md`) | the wide matcher accepts the wrong value too |
 | a snapshot or golden file changes | each changed line traced to a code or spec change in this diff (TI5) | a regenerated snapshot also records a bug |
 | a test the diff touches still asserts the old behaviour | CR6 (`code-review`) | that is a stale test, not an edited one |
 | the diff adds a test or a snapshot file | V3 (`testing/value-bar.md`), not this reference | a new test's worth is judged there |
 
 **Do not report.** A floor guard is a script that reads the diff and fails it on the moves that lower the bar.
-When one ran at the head and its result is in the pull request, leave these to it:
+When one ran at the head and its result is in the PR, leave these to it:
 
 | the diff | owner when no floor guard ran |
 |---|---|
@@ -80,7 +80,7 @@ the message is generated, an `argThat` on the promised part only, the loan numbe
 
 - **Skip TI1 and TI2 when** a spec line or an acceptance criterion in this change names the behaviour change. —
   **Do not skip when** the only reason is a test comment or the commit message. — **Confidence** high
-- **Skip TI3 when** the pull request names why the real call cannot run in that test: it is slow, flaky or outside
+- **Skip TI3 when** the PR names why the real call cannot run in that test: it is slow, flaky or outside
   the system. — **Do not skip when** the double replaces code in this repository that the test ran before, with no
   reason given, or the test is an integration or smoke test and the double replaces this repository's own code
   (TM2, `testing/strategy.md`). — **Confidence** medium
@@ -89,7 +89,7 @@ the message is generated, an `argThat` on the promised part only, the loan numbe
   **Confidence** high
 - **Skip TI5 when** the snapshot or golden file is new: it is a new test (V3). — **Do not skip when** an existing
   file changes, even in one line. — **Confidence** high
-- **Skip the floor-guard moves when** a floor guard ran at the head and its result is in the pull request. — **Do not
+- **Skip the floor-guard moves when** a floor guard ran at the head and its result is in the PR. — **Do not
   skip when** no floor guard ran: report them under VB6, CR3, CR4, CM7 or ER3. — **Confidence** high
 
 ## Review checks

@@ -12,7 +12,7 @@ approved Good/Bad pair, `references/examples/<name>.md` holds them all.
 <!-- index: built by `make index` from each reference; do not edit by hand -->
 | reference | rule IDs | read it |
 |---|---|---|
-| [acceptance-criteria](references/acceptance-criteria.md) | GA1–GA6, CV1, AC7–AC10, AC12 | when you write or review the acceptance criteria of a spec as Gherkin scenarios |
+| [acceptance-criteria](references/acceptance-criteria.md) | GA1–GA2, GA4–GA6, AC7–AC10, AC12 | when you write or review the acceptance criteria of a spec |
 | [diagrams](references/diagrams.md) | DG1–DG6 | when you draw or review a diagram in a design, a spec, a decision record, a Markdown doc or a chat reply |
 | [program-design](references/program-design.md) | PD1–PD7, PD9–PD10 | when you write or review a design's call trees, file trees, types and signatures, or its build slices and their proof, or when the build phase needs to change what the design approved |
 | [spec-review](references/spec-review.md) | SR1–SR4, SR6, SR9–SR15, SR17–SR22 | when you write, revise or review a spec or a design before the approval gate |

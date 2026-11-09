@@ -89,12 +89,12 @@ verify pass, retro and onboarder. The onboarder writes a project's brief and glo
 | the approval is recorded with the spec's hash only (LN4, `crq/references/lanes.md:14-15`), though the human approves spec and design (`crq/SKILL.md:29`) | the approval covers spec and design |
 | no review-round cap in the skill (the engine has 3) | the cap is stated in the skill |
 | CR2 splits a change beyond 20 files; PD9 makes a slice over 15 files its own issue | one size rule |
-| acceptance criteria must be Gherkin scenarios (GA1–GA6); the role cards use numbered lines | **open:** one form for both (section 8) |
+| acceptance criteria must be Gherkin scenarios (GA1–GA6); the role cards use numbered lines | numbered AC-n lines, each decidable by a test, for specs and cards (decided 2026-11-09, #237 decision 2; #244): GA1, GA2, GA4–GA6 superseded; GA3, CV1 and GT2 dropped; no Gherkin |
 | `check-cites` is named only as an example (`planning/references/spec-review.md:115`), and no script exists | the script is added, or the example names no missing tool |
 | test protection is one sentence (VB6) | plus a `test-integrity` rubric for the review lens |
 | "fails on revert" (VB2) and "the smallest regression" (CR6) are judged by reading | a revert script, and mutation on the changed lines, where a project can run them |
 | crq assumes a CI system | the gate is whatever the project has: CI, a queue, or a local run |
-| some findings are cosmetic: Gherkin wording, the PR5 file tree, a mandatory alternative for a small feature | demoted to nits or dropped; decided with the operator per rule |
+| some findings are cosmetic: the PR5 file tree, a mandatory alternative for a small feature | demoted to nits or dropped; decided with the operator per rule |
 
 ## 6. How the content stays good
 
@@ -116,7 +116,7 @@ calls (RT6).
 | 2 | `test-integrity` rubric | #235 | the review lens |
 | 3 | the rulebook's own evals: keep the review cases here as the finder's set | #236 | the role cards' evals |
 | 4 | the lanes file, the glossary and nine role cards, each with 3 eval scenarios | #237 | the factory's plugin step, then the ledger pilot |
-| 5 | crq's own wording moves to the glossary's words | (after #237) | the cards and references match |
+| 5 | crq's own wording moves to the glossary's words | #244 | the cards and references match |
 | later | agent-engineering references | #130 #134 | an RCA agent at work |
 
 New content needs the operator's yes and a ledger row, as every rule does.
@@ -125,8 +125,6 @@ New content needs the operator's yes and a ledger row, as every rule does.
 
 - **Placement:** where the lanes file and the cards sit in the plugin (`plugins/rulebook/skills/crq/...` or a sibling
   folder), and how `check_*.py` and `make index` treat them. Decided with the first card.
-- **AC form:** acceptance criteria as Gherkin scenarios (GA1–GA6, approved) or numbered lines (the role cards, and
-  agent-factory's spec template). Changing GA1–GA6 needs the operator's yes and a ledger row.
 - **Card status:** whether a role card counts as a rule (it needs a ledger row) or as a prompt that cites rules (it
   needs eval scenarios). Proposed: the card cites rules by id and needs eval scenarios, and the rules keep their ledger
   rows.

@@ -145,7 +145,7 @@ Walk every changed test file.
   alone and in any order. Professional: it is named and kept like production code. A letter not met is a finding.
 - [ ] U2 — For each new or changed Spock feature, find every statement under `given:`, `when:`, `then:`, `expect:`
   or `where:`, and a name that is a plain behaviour sentence. An unlabelled statement or a camelCase shouldXxx name is
-  a finding. Block descriptions are K20 (`spock.md`); a name tied to a scenario is GT1 (`scenario-to-tests.md`).
+  a finding. Block descriptions are K20 (`spock.md`); a name tied to an AC is GT1 (`scenario-to-tests.md`).
 - [ ] U3 — For each `Mock()`, `Stub()` and `Spy(` in a changed spec (`grep -nE "Mock\(|Stub\(|Spy\("`): the doubled
   type is a boundary (outbound port, clock, randomness, external API), never your own class; a collaborator that only
   returns is a `Stub()`; a `Mock()` has its call verified in `then:`; where a fake of the port exists, the fake is
