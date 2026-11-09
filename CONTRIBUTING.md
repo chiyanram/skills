@@ -1,6 +1,7 @@
 # Contributing
 
-This repo ships one thing, the [`rulebook`](plugins/rulebook/) plugin. Coding agents also read [AGENTS.md](AGENTS.md).
+This repo ships two plugins: [`rulebook`](plugins/rulebook/), and `toolbox`, typed-only tools in `plugins/toolbox/`
+(ADR-0009). Coding agents also read [AGENTS.md](AGENTS.md).
 
 **The one hard rule:** no rule enters a reference without the operator's explicit yes. A rule that is not approved
 stays out, even when an agent likes it or another repo has it.
@@ -100,16 +101,17 @@ at the approval table and at the merge.
 | check | fails when |
 |---|---|
 | `check_skills.py` | a `SKILL.md` has no `name` or `description`, its name is not its folder name, or its description is over 1024 characters |
-| `check_versions.py` | the marketplace entry and `plugin.json` disagree on the version |
+| `check_versions.py` | a plugin's marketplace entry and its `plugin.json` disagree on the version |
 | `check_links.py` | a relative markdown link points at nothing |
 | `check_sizes.py` | root `AGENTS.md` reaches 200 lines, a rule is over 35 words, or an `AGENTS.md` chain is over 32 KiB |
 | `check_plugin.py` | a plugin is not under `plugins/`, has no README or icon, or the repo has no LICENSE |
 | `check_index.py` | a plugin README does not link every skill router, or a router's table differs from what `make index` builds |
 | `check_routers.py` | a skill folder ships references but has no `SKILL.md`, or its `SKILL.md` does not link each one |
-| `check_provenance.py` | a shipped skill file carries provenance outside code: a source citation, a URL, a preference line, a credit, an evidence note, a date or an agent-factory reference |
+| `check_provenance.py` | a shipped skill file carries provenance outside code: a source citation, a URL, a preference line, a credit, an evidence note, a date or an agent-factory reference. In the toolbox it reads only each `SKILL.md` |
 | `check_ledger.py` | the ledger repeats a rule ID for the same reference without "Supersedes" in the later row, or holds a conflict marker |
-| `check_routing.py` | a skill router has no `evals/routing/<name>.json`, a file has fewer than 8 `should` or 8 `near_miss` requests, a `should` request does not rank its router first, a near miss does not rank its named owner above that router, or two router descriptions are 75% alike. Word matching only: a model-graded run (`claude plugin eval`) costs tokens and stays manual |
+| `check_routing.py` | a skill router has no `evals/routing/<name>.json`, a file has fewer than 8 `should` or 8 `near_miss` requests, a `should` request does not rank its router first, a near miss does not rank its named owner above that router, or two router descriptions are 75% alike. It skips a typed-only skill, which nothing routes to. Word matching only: a model-graded run (`claude plugin eval`) costs tokens and stays manual |
 | `check_process.py` | a crq lanes file misses a lane or a field, or a lane above tiny drops approval; a role card is not a known role, misses or adds a frontmatter field, cites a rule ID that no Rules section holds, or lacks the job, a "done when" line, numbered steps or an "it's working if" list; or its role has fewer than 3 eval scenarios, each a `prompt.md` and a grader |
+| `check_toolbox.py` | a toolbox `SKILL.md` lacks `disable-model-invocation: true`, a toolbox skill has no section with `Source:`, `Commit:` and `Licence:` in `THIRD_PARTY_NOTICES.md`, or a toolbox file holds a `git push`, a `gh pr merge`, a `.cursor/` path or a Grok model |
 
 ## Run the role evals
 
@@ -197,11 +199,14 @@ not a Conventional Commit, such as `feat(testing): spock cleanup rules (#123)`.
 | `feat(<domain>)!: …`, or a `BREAKING CHANGE:` footer | major | a rule ID is renamed or removed, or a reference moves |
 | `docs`, `chore`, `test`, `ci`, `build`, `refactor`, `style` | none | anything that does not change what ships |
 | any type with scope `research`, `review` or `repo` | none | design work, even when it is a `feat` |
+| `feat(toolbox)`, `fix(toolbox)`, `feat(toolbox)!` | the toolbox only | a tool is added, changed or removed |
 
-A release bumps the version in `marketplace.json` and `plugin.json` (`scripts/set_version.py`), writes
-`CHANGELOG.md`, tags `rulebook--v<version>` and creates a GitHub release. Users stay on a version until it changes,
+Each plugin releases on its own line (ADR-0009): scope `toolbox` releases only the toolbox, and every other scope
+that ships releases only the rulebook, so a pull request changes one plugin. A release bumps that plugin's version in
+`marketplace.json` and its `plugin.json` (`scripts/set_version.py --plugin <name>`), writes its changelog
+(`CHANGELOG.md` or `CHANGELOG-toolbox.md`), tags `<plugin>--v<version>` and creates a GitHub release. Users stay on a version until it changes,
 so every change to what ships must be a `feat` or a `fix`. Preview the next release on `main` with
-`GITHUB_TOKEN=<token> npm run release:preview`.
+`GITHUB_TOKEN=<token> npm run release:preview`, or `RELEASE_PLUGIN=toolbox` before it for the toolbox.
 
 ## Troubleshooting
 
