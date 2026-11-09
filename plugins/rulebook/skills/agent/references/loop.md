@@ -26,8 +26,8 @@ Contents: Rules · When X, use Y · Good / Bad (AE14, AE15, AEN3, AE16) · Decid
   tool guards first, because a client can submit a forged call or approval.
 - **AE15** — Persist each finished tool result keyed by run, step and call id before the loop moves on, and on resume
   run only calls without a stored result, because resume otherwise repeats side effects.
-- **AEN3** — Derive a side-effecting tool call's idempotency key from the run id and the tool-call id, and pass it to
-  the remote end, because resume runs a call with no stored result again.
+- **AEN3** — Pass a side-effecting tool call's result key (run id, step, call id) to the remote end as its
+  idempotency key, because resume runs a call with no stored result again.
 
 ## When X, use Y
 
@@ -42,7 +42,7 @@ Contents: Rules · When X, use Y · Good / Bad (AE14, AE15, AEN3, AE16) · Decid
 | a tool needs human approval | a persisted pending request keyed by call id; resume through the same loop | a second resume path skips budget and guards (AE13) · its test: LS8 |
 | a client resumes a run with an approval or a call | a match against the stored call this agent made, then authorization and guards again | a client can forge a call or an approval (AE14) |
 | a tool finishes | its result stored by run, step and call id before the next step | resume otherwise repeats side effects (AE15) |
-| a tool changes something outside the run | an idempotency key from run id and call id, sent to the remote end | a call with no stored result runs again on resume (AEN3) · the remote end: CC15, CC19 (`code`'s `concurrency`) |
+| a tool changes something outside the run | its result key (run id, step, call id) sent to the remote end as the idempotency key | a call with no stored result runs again on resume (AEN3) · the remote end: CC15, CC19 (`code`'s `concurrency`) |
 
 ## Good / Bad
 
@@ -109,9 +109,10 @@ resume sends a second refund under a new key.
 final var refund = new RefundRequest(
         orderId,
         amount,
-        context.runId() + ":" + context.callId());
+        context.callKey().asIdempotencyKey());
 ```
-The key is the same on every run of this call, so the payment service applies the refund once.
+`callKey()` is the run id, step and call id that AE15 stores the result under. The key is the same on every run of
+this call, so the payment service applies the refund once.
 
 ### AE16 — A fault the model can fix goes back as a tool result
 
@@ -136,6 +137,9 @@ The model sees the valid names and calls `findOrder` in the next step.
 - **Skip when** a tool only reads and changes nothing outside the run: AEN3 does not apply, and a repeat on resume is
   harmless (AE15 still stores its result). — **Do not skip when** the tool writes, sends, pays or calls another
   system that changes state. — **Confidence** high
+- **Skip when** the remote end takes no idempotency key: AEN3 cannot apply. Before a resend, mark the call unknown
+  and read the remote state to see whether it ran (CC9). — **Do not skip when** the remote end takes a key under any
+  name, such as a request id or a client reference. — **Confidence** medium
 - **Skip when** a tool error is a platform fault, such as a lost database or a missing credential: end the run
   (AE16), with the generic text of AE17. — **Do not skip when** the model's own call caused the fault. —
   **Confidence** high
@@ -209,10 +213,10 @@ Walk every changed agent loop, step handler, tool executor, approval pause and r
   Not a finding: none
   Severity: Act on
   Verify: re-open the store's key and the resume filter
-- [ ] AEN3 — For each side-effecting tool, find the idempotency key it sends. A key not derived from run id and call
-  id, or no key, is a finding.
+- [ ] AEN3 — For each side-effecting tool, find the idempotency key it sends. No key, or a key that is not the
+  call's result key (run id, step, call id), is a finding.
   Applies when: a tool writes, sends, pays or changes state outside the run
   Evidence: the key at `file:line`
-  Not a finding: a read-only tool (decided edge)
+  Not a finding: a read-only tool; a remote end that takes no key (decided edges)
   Severity: Act on
   Verify: re-open the tool's request builder
