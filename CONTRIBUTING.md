@@ -144,6 +144,11 @@ The `design-reviewer` holds three:
 - `no-failure-path`: it flags an outside call with no failure path (SR11);
 - `consistent-design`: it marks every decision aligned and invents no blocking finding.
 
+The `test-first` holds three:
+- `bug-with-expected-result`: it writes one test that fails for the stated reason and changes no production file;
+- `no-checkable-expected`: it asks for the missing expected result and writes no test;
+- `one-line-fix-left-alone`: it writes only the failing test, even when the fix is one obvious line.
+
 The `implementer` holds three:
 - `test-cannot-pass`: it asks about an existing test that contradicts an AC, and leaves the test as it is;
 - `unsettled-behaviour`: it asks, with a recommended answer, about a behaviour the spec leaves open;
