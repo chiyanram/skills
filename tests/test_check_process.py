@@ -15,6 +15,8 @@ LANE = {"starts_on": "START only", "design_review": False, "test_first": False, 
 LANES = {"lanes": [{"lane": "tiny", "approval": False, **LANE},
                    *({"lane": name, "approval": True, **LANE} for name in ("bug", "feature", "one-way door"))]}
 
+REVIEW = {"baseline": [{"skill": "crq", "reference": "demo"}]}
+
 # Written to a temp dir, never committed: a planted card under plugins/ would be found by the other checks.
 # Each planted case: (a path under the plugin root, its new text, or None to delete it).
 PLANTED = {
@@ -30,6 +32,13 @@ PLANTED = {
                             json.dumps(LANES).replace('"feature", "approval": true', '"feature", "approval": false')),
     "lane-missing": ("skills/crq/process/lanes.json", json.dumps({"lanes": LANES["lanes"][:3]})),
     "no-glossary": ("skills/crq/process/glossary.md", None),
+    "no-review": ("skills/crq/process/review.json", None),
+    "baseline-empty": ("skills/crq/process/review.json", json.dumps({"baseline": []})),
+    "baseline-unshipped": ("skills/crq/process/review.json",
+                           json.dumps({"baseline": [{"skill": "crq", "reference": "missing"}]})),
+    "baseline-twice": ("skills/crq/process/review.json", json.dumps({"baseline": REVIEW["baseline"] * 2})),
+    "baseline-extra-field": ("skills/crq/process/review.json",
+                             json.dumps({"baseline": [{"skill": "crq", "reference": "demo", "why": "x"}]})),
 }
 
 
@@ -39,6 +48,7 @@ def process_tree() -> tempfile.TemporaryDirectory:
         "skills/crq/references/demo.md": REFERENCE,
         "skills/crq/process/glossary.md": "# Glossary\n",
         "skills/crq/process/lanes.json": json.dumps(LANES),
+        "skills/crq/process/review.json": json.dumps(REVIEW),
         "skills/crq/process/roles/finder.md": CARD,
         **{f"evals/finder/c{n}/prompt.md": "Review it.\n" for n in (1, 2, 3)},
         **{f"evals/finder/c{n}/graders/g.md": "---\ntype: llm\n---\nPASS if it finds.\n" for n in (1, 2, 3)},
