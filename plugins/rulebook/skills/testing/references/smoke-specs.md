@@ -54,8 +54,8 @@ Contents: Rules · When X, use Y · Good / Bad (EA1–EA6) · Decided edges · R
 | a test must be quarantined | `test.fixme` naming an open issue, removed when the issue closes | a swallowed setup failure makes later tests fail or skip for hidden reasons (EA6) |
 | a named slow dependency (live model) | a raised timeout with a one-line reason; the poll budget below the test timeout | a poll that outlasts the test timeout dies without its failure message (EC5) |
 
-Titles, one `test.step` per Given/When/Then, issue annotation: GT1, GT2, GT4 (`scenario-to-tests.md`). Which journeys
-get a smoke spec: S1 (`strategy.md`). A failure path per acceptance criterion: GA5 (`acceptance-criteria.md`, planning).
+Titles and the issue annotation: GT1, GT4 (`scenario-to-tests.md`). Which journeys
+get a smoke spec: S1 (`strategy.md`). A failure or refusal AC per behaviour: GA5 (`acceptance-criteria.md`, planning).
 
 ## Good / Bad
 

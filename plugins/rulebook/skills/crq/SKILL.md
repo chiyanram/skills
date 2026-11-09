@@ -57,11 +57,11 @@ An engine reads these to run the same process a person runs with `/crq`.
 <!-- index: built by `make index` from each reference; do not edit by hand -->
 | reference | rule IDs | read it |
 |---|---|---|
-| [code-review](references/code-review.md) | CR1–CR7 | when you review a pull request's code, or before you split a change |
+| [code-review](references/code-review.md) | CR1–CR7 | when you review a PR's code, or before you split a change |
 | [lanes](references/lanes.md) | LN1–LN4 | when you take in a new change, or when a change turns out bigger, riskier or smaller than its lane |
-| [pr-readiness](references/pr-readiness.md) | PR1–PR7 | when you write a pull request body, or when you check one before merge |
+| [pr-readiness](references/pr-readiness.md) | PR1–PR7 | when you write a PR body, or when you check one before merge |
 | [retro](references/retro.md) | RT1–RT7 | when the engine writes a merge's timeline record, or when a human starts a full retro |
 | [review-process](references/review-process.md) | RV1–RV9 | before you run, write or tune a review |
 | [test-integrity](references/test-integrity.md) | TI1–TI5 | when you review a diff that edits an existing test, a snapshot or a golden file |
-| [verify-done](references/verify-done.md) | VB1–VB8 | when you build a change, before you call it ready, or when you check a writer's proof |
+| [verify-done](references/verify-done.md) | VB1–VB8 | when you build a change, before you call it ready, or when you check an implementer's evidence rows |
 <!-- /index -->

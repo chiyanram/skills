@@ -66,7 +66,7 @@ Contents: Rules · When X, use Y · Good / Bad (K1, K2, K11, K13, K19) · Decide
 | a call order that is the contract | one `then:` block per step, in order (K13) | `and:` imposes no order, so calls in the wrong order still pass (K13) |
 | a spec that changes process-wide state | `@spock.lang.Isolated` on the class, or `@ResourceLock` (K14) | Spock ignores `junit.jupiter.execution.parallel.*` · `Isolated` targets a class only |
 | an expected exception | `def e = thrown(T)`, then a condition on what matters (K19) | an unbound `thrown()` passes for any exception, even an unrelated one (K19) |
-| a block label | the scenario words and the why (K20); a scenario's own text is GT2, `scenario-to-tests.md` | labels are documentation, not report output |
+| a block label | the scenario words and the why (K20) | labels are documentation, not report output |
 
 ## Good / Bad
 

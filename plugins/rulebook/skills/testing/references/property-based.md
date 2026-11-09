@@ -39,19 +39,16 @@ Contents: Rules · When X, use Y · Good / Bad (P1, P2, P3, P4, P6, P7, P8, P10)
 ### P1 — Property when the requirement says "for any input"; otherwise examples
 
 **Bad**
-```gherkin
-Scenario: No discount makes an invoice total negative
-  Given any order with any number of lines
-  When the GOLD discount is applied
-  Then the invoice total is zero or more
+```text
+AC-4 — should keep the invoice total at zero or more for any order with the GOLD discount
 ```
 ```groovy
-    def "no discount makes an invoice total negative"() {
+    def "should keep the invoice total at zero or more for any order with the GOLD discount"() {
         expect: "a GOLD customer never gets money back"
         discountPolicy.discountedTotal(orderWithQuantity(Integer.MAX_VALUE), GOLD).amount() >= 0
     }
 ```
-The requirement says "any order", but the test checks one value.
+The AC says "any order", but the test checks one value.
 
 **Good**
 ```groovy

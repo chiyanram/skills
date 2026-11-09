@@ -19,7 +19,7 @@ Good/Bad pair, `references/examples/<name>.md` holds them all.
 | [llm-tests](references/llm-tests.md) | LT1–LT13, LS1–LS10 | when you write or review a test whose code under test calls the model: the scripted fake, the agent loop, agent scenarios or recorded traffic |
 | [mutation](references/mutation.md) | M1–M6, M8–M10 | when you change a PIT configuration, read a mutation report, or write a test that answers a surviving mutant |
 | [property-based](references/property-based.md) | P1–P4, P6–P8, P10 | when you write or review a property test, a generator, or a requirement that says "for any input" |
-| [scenario-to-tests](references/scenario-to-tests.md) | GT1–GT6, CV2 | when you write or review a test for a scenario in a work item's acceptance criteria |
+| [scenario-to-tests](references/scenario-to-tests.md) | GT1, GT3–GT6, CV2 | when you write or review a test for an AC in a ticket's acceptance criteria |
 | [smoke-specs](references/smoke-specs.md) | EA1–EA6, EB2–EB4, EC1–EC5, ED3 | when you write or review a Playwright smoke spec, or a fixture that such specs import |
 | [spock](references/spock.md) | K1–K2, K2b, K3–K20 | when you write or review a Spock spec, unit or integration: its interactions, data tables, shared state, cleanup or assertions |
 | [strategy](references/strategy.md) | S1–S4, S6, TM1–TM3, AT1 | when you choose where a new test goes, when you fix a bug, or when you review the tier and the doubles of a changed test |
