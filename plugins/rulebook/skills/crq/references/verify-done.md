@@ -1,8 +1,8 @@
 # Verify done
 
-How a writer proves a change is done before review: what it asks instead of guessing, which tests prove the change,
-and what evidence goes in the pull request. Read it when you build a change, before you call it ready, or when you
-check a writer's proof.
+How the implementer proves a change is done before review: what it asks instead of guessing, which tests prove the change,
+and what evidence goes in the PR. Read it when you build a change, before you call it ready, or when you
+check an implementer's evidence rows.
 
 ## Rules
 
@@ -11,27 +11,27 @@ check a writer's proof.
 - **VB2** — Give each changed behaviour a test that fails when the change is reverted, because a test that passes
   either way proves nothing about the change.
 - **VB3** — Call a change ready only when its build, lint and touched tests pass at the pushed commit, checked by a
-  script, because a writer's "done" is a report, not proof.
+  script, because an implementer's "done" is a report, not evidence.
 - **VB4** — For each acceptance criterion a user can see, drive the running app and paste what it returned, because
   passing tests can still leave the feature broken for the user.
-- **VB5** — Map every acceptance criterion to its evidence in the pull request (criterion, command, result), because
+- **VB5** — Map every acceptance criterion to its evidence in the PR (criterion, command, result), because
   a criterion with no evidence is unproved.
 - **VB6** — Never delete, skip or weaken a test to reach green; fix the code, or ask, because a weakened test hides
   the defect it was written to catch.
-- **VB7** — For a bug fix, have a separate run write the failing test from the bug spec before the fix is written,
-  because a writer that tests its own fix shares its misreading.
-- **VB8** — Resolve a conflict with the base by reading why each side changed (commits, PR, issue), keeping both
+- **VB7** — For a bug fix, have a test-first run write the failing test from the bug spec before the fix is written,
+  because an implementer that tests its own fix shares its misreading.
+- **VB8** — Resolve a conflict with the base by reading why each side changed (commits, PR, ticket), keeping both
   where they fit, and rerunning the checks, because picking ours or theirs silently drops a deliberate change.
 
 ## When X, use Y
 
 | situation | use | why |
 |---|---|---|
-| the spec is silent or unclear on a point the code must decide | an open question on the pull request, then stop (VB1) | a guess becomes behaviour nobody approved |
-| a test fails and the test looks wrong | an open question, not an edit to the test (VB6, VB1) | the test may be the only record of the requirement |
+| the spec is silent or unclear on a point the code must decide | an open question on the PR, then stop (VB1) | a guess becomes behaviour nobody approved |
+| a test fails and the test looks wrong | an open question, not an edit to the test (VB6, VB1) | the test may be the only record of the behaviour |
 | a criterion a user sees: a screen, an API response, a message | a run of the app: the call made and what came back (VB4) | the test may miss how the parts fit |
 | a criterion only code sees | the test that proves it, by name (VB5) | the test is the evidence |
-| a bug fix | a separate run writes the failing test first (VB7); the writer runs it locally and pastes the failure (S6) | the test and the fix stay independent |
+| a bug fix | a test-first run writes the failing test first (VB7); the implementer runs it locally and pastes the failure (S6) | the test and the fix stay independent |
 | a conflict between two changes that can both hold, such as two sections added at the end of one file | both sides kept, in a stated order (VB8) | each side was made on purpose |
 | a conflict between two intents that cannot both hold | an open question to the human (VB1), with each side's reason and a recommendation | choosing between intents is the human's call |
 | a conflict in a lock file or another generated file | the file regenerated with its tool, never merged by hand (VB8) | a hand-merged lock file is broken or stale |
@@ -61,29 +61,29 @@ Each criterion points at a command and its result at the pushed commit.
   it are named. — **Do not skip when** any public result changes (VB2). — **Confidence** high
 - **Skip the app run when** no acceptance criterion is visible to a user. — **Do not skip when** a criterion names a
   screen, a response or a message (VB4). — **Confidence** high
-- **Skip VB6 when** the spec removes a behaviour and its test goes with it, named in the pull request. — **Do not skip
+- **Skip VB6 when** the spec removes a behaviour and its test goes with it, named in the PR. — **Do not skip
   when** a test is removed, skipped or loosened while its behaviour stays (VB6). — **Confidence** high
-- **Skip the separate test run when** the bug cannot be reproduced in a test: say so, and ask. — **Do not skip
+- **Skip the test-first run when** the bug cannot be reproduced in a test: say so, and ask. — **Do not skip
   when** the bug spec names inputs and an expected result (VB7). — **Confidence** medium
 - **Skip the history read when** both sides of the conflict are this branch's own commits: their reason is already
-  known. — **Do not skip when** the base side came from another pull request (VB8). — **Confidence** high
+  known. — **Do not skip when** the base side came from another PR (VB8). — **Confidence** high
 
 ## Review checks
 
-Walk the pull request body, its commits and the diff of its tests.
+Walk the PR body, its commits and the diff of its tests.
 
 - [ ] VB1 — For each behaviour the spec does not settle, find the open question and its answer. A decision the
-  writer made alone is a finding.
+  implementer made alone is a finding.
 - [ ] VB2 — For each changed behaviour, find a test that fails when the change is reverted. No such test is a
   finding.
-- [ ] VB3 — Find the script's result for build, lint and touched tests at the pushed commit, the pull request's head.
+- [ ] VB3 — Find the script's result for build, lint and touched tests at the pushed commit, the PR's head.
   A result at another commit, or none, is a finding.
 - [ ] VB4 — For each criterion a user can see, find the app run: the call and what came back. Each one missing is a
   finding.
-- [ ] VB5 — Find one evidence line per acceptance criterion. Each criterion without one is a finding.
+- [ ] VB5 — Find one evidence row per acceptance criterion. Each criterion without one is a finding.
 - [ ] VB6 — In the test diff, find each removed, skipped or loosened test. One whose behaviour stays is a finding.
 - [ ] VB7 — For a bug fix, find the commit that adds the failing test, before the fix commit, and the note that a
-  separate run wrote it. Each one missing is a finding.
+  test-first run wrote it. Each one missing is a finding.
 - [ ] VB8 — For each merge or rebase commit that resolved conflicts, find the note of what each side changed and why,
-  in the merge commit message or the pull request body, and a check run at the new head. A side dropped with no
+  in the merge commit message or the PR body, and a check run at the new head. A side dropped with no
   reason, a hand-edited lock file, conflict markers left behind, or no check run after the merge, is a finding.
