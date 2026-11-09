@@ -1,6 +1,6 @@
 # Contributing
 
-This repo ships two plugins: [`rulebook`](plugins/rulebook/), and `toolbox`, typed-only tools in `plugins/toolbox/`
+This repo ships two plugins: [`rulebook`](plugins/rulebook/), and [`toolbox`](plugins/toolbox/), typed-only tools
 (ADR-0009). Coding agents also read [AGENTS.md](AGENTS.md).
 
 **The one hard rule:** no rule enters a reference without the operator's explicit yes. A rule that is not approved
