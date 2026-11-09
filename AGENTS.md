@@ -36,6 +36,7 @@ docs/adr/                                        decisions about the shape of th
 docs/agents/                                     issue tracker, labels, domain-doc conventions
 scripts/check_<name>.py + tests/fixtures/<name>/ one check and its planted fixtures
 evals/routing/<router>.json                      requests each router must pick, and near misses it must not
+docs/DESIGN.md                                   the design on one page: rules, the crq process, role cards
 ```
 
 ## Pointers
