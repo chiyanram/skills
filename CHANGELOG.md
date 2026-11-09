@@ -3,6 +3,13 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [1.1.1](https://github.com/chiyanram/skills/compare/rulebook--v1.1.0...rulebook--v1.1.1) (2026-11-09)
+
+### Bug Fixes
+
+* **crq:** ask every open question at once, with choices ([chiyanram/agent-factory#320](https://github.com/chiyanram/agent-factory/issues/320)) ([#275](https://github.com/chiyanram/skills/issues/275)) ([bd1622b](https://github.com/chiyanram/skills/commit/bd1622b4b00e4941d68a7b2db7f130b1add2a3e8))
+* **crq:** the finder card hands off the design's finding contract ([#237](https://github.com/chiyanram/skills/issues/237)) ([#274](https://github.com/chiyanram/skills/issues/274)) ([44d4a13](https://github.com/chiyanram/skills/commit/44d4a13678621bb21d143e503abd7a501d274147))
+
 ## [1.1.0](https://github.com/chiyanram/skills/compare/rulebook--v1.0.0...rulebook--v1.1.0) (2026-11-09)
 
 ### Features
