@@ -3,6 +3,16 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [0.36.0](https://github.com/chiyanram/skills/compare/rulebook--v0.35.1...rulebook--v0.36.0) (2026-11-09)
+
+### Features
+
+* **crq:** add the test-integrity review rubric ([#235](https://github.com/chiyanram/skills/issues/235)) ([#241](https://github.com/chiyanram/skills/issues/241)) ([3888c9e](https://github.com/chiyanram/skills/commit/3888c9ea041527acfdccce19b75ae44cfc195353))
+
+### Bug Fixes
+
+* **crq:** role evals live in evals/<role>/, the review cases become the finder's ([#236](https://github.com/chiyanram/skills/issues/236)) ([#242](https://github.com/chiyanram/skills/issues/242)) ([e37f14f](https://github.com/chiyanram/skills/commit/e37f14fcf2b19bf81134622ddde1674775fee4fe))
+
 ## [0.35.1](https://github.com/chiyanram/skills/compare/rulebook--v0.35.0...rulebook--v0.35.1) (2026-11-09)
 
 ### Bug Fixes
