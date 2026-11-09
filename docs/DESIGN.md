@@ -48,14 +48,16 @@ The crq process gets a machine-readable side, so an engine runs the same process
 
 An engine may make a lane stricter, never looser.
 
-**Role cards.** One markdown file per step: coordinator, design-reviewer, test-first, writer, cleanup, finder,
-verify-pass, retro.
+**Role cards.** One markdown file per role: coordinator, design-reviewer, test-first, implementer, cleanup, finder,
+verify pass, retro and onboarder (which writes a project's brief and glossary once, for every other role).
 - **Frontmatter** names the job's steps, inputs, what it must not see, the hand-off file, tools, the rules it applies,
   and the next role. An engine enforces it.
 - **Body:** the job, a "done when" line, numbered steps, and an "it's working if" list.
 - **No persona and no capitals.** A prohibition appears only for a hard guardrail.
-- **One glossary** used by every card (spec, AC, design, slice, lane, evidence row, finding, lens, judge files,
-  hand-off, ask, ticket, ready check).
+- **One glossary** used by every card. Its factory words are Matt Pocock's `software-factory` vocabulary (task,
+  trigger, run, runner, ticket tracker, git host, orchestrator, automated review), as agent-factory's `GLOSSARY.md`
+  has them (chiyanram/agent-factory#144). Its process words are spec, AC, design, slice, lane, evidence row, finding,
+  lens, judge files, hand-off, ask and ready check.
 
 **Role evals.** Three scenarios per role, each with a grader. A card change ships only if its scenarios do not get
 worse. The finder's set starts from `evals/review/` (#229).
@@ -65,7 +67,8 @@ worse. The finder's set starts from `evals/review/` (#229).
 | today | changes to |
 |---|---|
 | crq is prose for a person only | plus a lanes file and role cards an engine can run |
-| the writer and reviewer prompts live in agent-factory | they live here, as role cards |
+| the implementer and review prompts live in agent-factory | they live here, as role cards |
+| crq says writer and reviewer | implementer, finder and verify pass, per the term map (chiyanram/agent-factory#144 phase 6) |
 | the approval is recorded with the spec's hash only (LN4, `crq/references/lanes.md:16`), though the human approves spec and design (`crq/SKILL.md:29`) | the approval covers spec and design |
 | no review-round cap in the skill (the engine has 3) | the cap is stated in the skill |
 | CR2 splits a change beyond 20 files; PD9 makes a slice over 15 files its own issue | one size rule |
@@ -93,7 +96,8 @@ calls (RT6).
 | 1 | crq fixes: spec + design approval, round cap, size rule, `check-cites` | the factory's safety core |
 | 2 | `test-integrity` rubric | the review lens |
 | 3 | one reviewer eval set, joined with agent-factory#214 | the factory's eval step |
-| 4 | the lanes file, glossary and role cards, each with 3 eval scenarios | the factory's plugin step, then the ledger pilot |
+| 4 | the lanes file, glossary and nine role cards, each with 3 eval scenarios | the factory's plugin step, then the ledger pilot |
+| 5 | crq's own wording moves to the glossary's words (writer → implementer, reviewer → finder and verify pass) | after step 4, so the cards and references match |
 | later | agent-engineering references (#130, #134) | an RCA agent at work |
 
 New content needs the operator's yes and a ledger row, as every rule does.
