@@ -2,6 +2,8 @@
 
 Status: accepted
 
+Amended by [ADR-0009](0009-a-second-plugin-of-typed-only-tools.md).
+
 ## Context
 
 Citations, dates and credits in a reference cost the agent context and change nothing it does.

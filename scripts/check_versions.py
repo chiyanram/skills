@@ -1,4 +1,4 @@
-"""Every manifest carries one version: each marketplace plugin entry and each plugin.json."""
+"""Each plugin carries one version: its marketplace entry and its plugin.json agree. Plugins version apart (ADR-0009)."""
 import json
 import sys
 from pathlib import Path
@@ -6,21 +6,19 @@ from pathlib import Path
 MARKETPLACE = Path(".claude-plugin/marketplace.json")
 
 
-def versions(root: Path) -> dict[str, str]:
-    market = json.loads((root / MARKETPLACE).read_text())
-    found = {}
-    for entry in market.get("plugins", []):
-        found[f"{MARKETPLACE} plugins[{entry['name']}]"] = entry.get("version", "")
-        manifest = Path(entry["source"]) / ".claude-plugin" / "plugin.json"
-        found[str(manifest)] = json.loads((root / manifest).read_text()).get("version", "")
+def plugin_problems(root: Path, entry: dict) -> list[str]:
+    where = f"{MARKETPLACE} plugins[{entry['name']}]"
+    manifest = Path(entry["source"]) / ".claude-plugin" / "plugin.json"
+    listed, own = entry.get("version", ""), json.loads((root / manifest).read_text()).get("version", "")
+    found = [f"{place}: no version" for place, version in ((where, listed), (str(manifest), own)) if not version]
+    if listed and own and listed != own:
+        found.append(f"{where} says {listed} but {manifest} says {own}")
     return found
 
 
 def problems(root: Path) -> list[str]:
-    found = versions(root)
-    missing = [f"{where}: no version" for where, version in found.items() if not version]
-    drift = [f"manifests disagree on version: {found}"] if len(set(found.values()) - {""}) > 1 else []
-    return missing + drift
+    entries = json.loads((root / MARKETPLACE).read_text()).get("plugins", [])
+    return [p for entry in entries for p in plugin_problems(root, entry)]
 
 
 if __name__ == "__main__":
