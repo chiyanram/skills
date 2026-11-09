@@ -30,7 +30,7 @@ each phase applies.
 | build | for a bug, a separate run that writes the failing test; then one fresh writer per pull request | the slices as commits | `verify-done`, `strategy` (testing) and the `code` references the diff touches |
 | verify | writer, then a script at the pushed commit | an evidence line per acceptance criterion | `verify-done`, `value-bar` (testing) |
 | cleanup | writer | a behaviour-neutral tidy diff | `deslop` skill |
-| code review | fresh reviewer | findings in buckets | `review-process`, `code-review`, and the Review checks of every reference in scope |
+| code review | fresh reviewer | findings in buckets | `review-process`, `code-review`, `test-integrity` when the diff edits an existing test, and the Review checks of every reference in scope |
 | gate | CI | green at the head commit | — |
 | pull request | writer | why, evidence, rollback, where to look | `pr-readiness`, `diagrams` (planning) |
 | — | **human** | merge | — |
@@ -46,5 +46,6 @@ each phase applies.
 | [pr-readiness](references/pr-readiness.md) | PR1–PR7 | when you write a pull request body, or when you check one before merge |
 | [retro](references/retro.md) | RT1–RT6 | when a pull request is merged, rescued or reverted, or a defect escapes |
 | [review-process](references/review-process.md) | RV1–RV9 | before you run, write or tune a review |
+| [test-integrity](references/test-integrity.md) | TI1–TI5 | when you review a diff that edits an existing test, a snapshot or a golden file |
 | [verify-done](references/verify-done.md) | VB1–VB8 | when you build a change, before you call it ready, or when you check a writer's proof |
 <!-- /index -->
