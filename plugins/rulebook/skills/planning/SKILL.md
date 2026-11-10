@@ -14,7 +14,7 @@ approved Good/Bad pair, `references/examples/<name>.md` holds them all.
 |---|---|---|
 | [acceptance-criteria](references/acceptance-criteria.md) | GA1–GA2, GA4–GA6, AC7–AC10, AC12 | when you write or review the acceptance criteria of a spec |
 | [diagrams](references/diagrams.md) | DG1–DG6 | when you draw or review a diagram in a design, a spec, a decision record, a Markdown doc or a chat reply |
-| [program-design](references/program-design.md) | PD1–PD7, PD9–PD10 | when you write or review a design's call trees, file trees, types and signatures, or its build slices and their proof, or when the build phase needs to change what the design approved |
+| [program-design](references/program-design.md) | PD1–PD7, PD9–PD11 | when you write or review a design's call trees, file trees, types and signatures, or its build slices and their proof, or when the build phase needs to change what the design approved |
 | [spec-review](references/spec-review.md) | SR1–SR4, SR6, SR9–SR15, SR17–SR22 | when you write, revise or review a spec or a design before the approval gate |
 | [writing-docs](references/writing-docs.md) | WD1–WD2, WD4–WD5, WD7 | when you write or review a design, a spec, a guide or a README, or decide which spec a change updates |
 <!-- /index -->

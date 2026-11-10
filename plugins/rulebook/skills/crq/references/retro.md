@@ -2,7 +2,7 @@
 
 How a merged PR teaches the pipeline: what to record, how to find the real cause, and how a lesson becomes a
 rule, a script, a check or nothing. A rescue is a human fixing or finishing an agent's work. Read it when the engine
-writes a merge's timeline record, or when a human starts a full retro.
+writes a merge's timeline record, when a human starts a full retro, or when you write a lesson's PR.
 
 ## Rules
 
@@ -20,6 +20,12 @@ writes a merge's timeline record, or when a human starts a full retro.
   then a test; a written rule only for judgement calls, because a skipped rule fails nothing.
 - **RT7** — Run a full retro only when a human starts one; a rescue, revert or escaped defect is flagged in the
   timeline record, never a trigger, because a human picks which lesson is worth a run.
+- **RT8** — Ship each accepted lesson as one PR whose fix sits at the highest level that holds (RT6), because a lesson
+  split across PRs ships a rule apart from its test.
+- **RT9** — Add to each lesson PR a new golden case or role scenario from the failure, and change no eval judge or
+  existing case, because a lesson that edits its test can move the bar.
+- **RT10** — Give each lesson a review-by date, when a human checks that the rule still pays, because a lesson nobody
+  reviews stays after it stops helping.
 
 ## When X, use Y
 
@@ -33,6 +39,8 @@ writes a merge's timeline record, or when a human starts a full retro.
 | an existing check should have caught it but did not | a rewrite of that check, with this ticket as its example (RT3) | the check is mis-worded, not missing |
 | facts for the retro | the transcripts of the coordinator, implementer, finder and verify pass runs, and the PR's events; each number cited to one of them (RT5) | memory rounds off the bad parts |
 | a lesson found once | kept only if it recurs; otherwise noted and dropped (RT5) | a one-off is not a learning, and a rule per one-off becomes noise |
+| a human accepts a lesson | one PR with three parts: the fix at the highest level that holds, a new golden case or role scenario from the failure, and a review-by date (RT8, RT9, RT10) | every rule change carries a test that would have caught its failure |
+| a lesson PR also edits the eval judge or an existing case | a finding; the lesson PR only adds its new case (RT9) | the rule and the bar that judges it never change together |
 
 ## Good / Bad
 
@@ -84,3 +92,8 @@ Walk the timeline record, and the retro hand-off (`.factory/retro.md`) when a hu
   mistake a lint or type could catch is a finding.
 - [ ] RT7 — Find who started each full retro. One started by the engine, the coordinator or any run, not a human, is
   a finding.
+- [ ] RT8 — For each lesson PR, find the fix and why no higher level could hold it. A lesson split across PRs, or a
+  written rule for a mistake a lint or type could catch, is a finding.
+- [ ] RT9 — In each lesson PR, find the new golden case or role scenario built from the failure. A lesson PR with no
+  new case, or one that edits the eval judge or an existing case, is a finding.
+- [ ] RT10 — In each lesson PR, find its review-by date. A lesson with no date is a finding.

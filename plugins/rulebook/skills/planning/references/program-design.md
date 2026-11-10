@@ -20,12 +20,14 @@ Contents: Rules · When X, use Y · Good / Bad (PD1–PD5) · Decided edges · R
   with no named command does not get run.
 - **PD6** — Put file paths, signatures and trees in the design, never in the spec, which states behaviour only, because
   file paths and code snippets in a spec go stale quickly.
-- **PD7** — During the build phase, record a change to an approved type, signature or file placement in the design
-  before you code past it, because an unrecorded deviation leaves the design check judging against a guess.
+- **PD7** — During the build phase, never edit the approved design: post each changed type, signature or file
+  placement as a `[writer] DEVIATION:` note on the PR, because a design edit makes the approval stale.
 - **PD9** — Plan each pull request within 400 changed lines and 15 files, not counting generated files, and make a
   slice past either its own issue, because one writer and one review handle that size well.
 - **PD10** — Settle a design question that paper can't decide with a throwaway prototype off the main branch, and
   carry only the decision and its evidence into the design, because prototype code is not built to ship.
+- **PD11** — Name, for every slice, the AC-n it delivers, and give every AC a slice, because an AC with no slice is
+  found missing only after the build.
 
 ## When X, use Y
 
@@ -37,8 +39,10 @@ Contents: Rules · When X, use Y · Good / Bad (PD1–PD5) · Decided edges · R
 | touches more than one layer | vertical slices, each one tried end-to-end (PD4) | a layer-only step hides a defect until the last layer lands |
 | makes one mechanical change across the whole codebase (a wide refactor) | expand, migrate in batches, contract, instead of slices (PD4 edge) | no slice of a wide mechanical change can land green on its own |
 | lists a slice | its command, its test filter and any manual step (PD5) | a check with no named command does not get run |
+| lists its slices | the AC-n each slice delivers, and a slice for every AC (PD11) | an AC with no slice shows before the approval, not after the build |
 | needs a file path, a signature or a tree | the design, never the spec (PD6) | file paths and code snippets in a spec go stale quickly |
-| is found wrong during the build phase | a recorded change to the design, then code (PD7) | an unrecorded deviation leaves the design check judging against a guess |
+| is found wrong during the build phase | a `[writer] DEVIATION:` note on the PR: what changed, why, and the `file:line`; the design stays as approved (PD7) | the approval stays valid, and the review judges the code against the design plus its notes |
+| is found wrong in a way that changes what an AC observes | a question for the human, and the work stops (PD7 edge) | a change to an AC is a spec change, not a deviation |
 | has slices that together pass 400 changed lines or 15 files, generated files not counted | make the slices past the limit issues of their own (PD9); code review splits a change past the same limit (CR2) | one writer and one review handle that size well |
 | has a question only trying it can settle: a layout, a state flow, a timing | a throwaway prototype on its own branch, marked as a prototype; the design cites its verdict and evidence (screenshots, observed output) (PD10) | a guess on paper and a polished build both cost more than a quick throwaway answer |
 
@@ -132,9 +136,11 @@ Each step has a command, but no one can try a reservation until step 4. A defect
 **Good**
 ```text
 Slice 1: A member reserves a book that is out (table + service + endpoint + button)
+  Delivers: AC-1, AC-2
   Automated: npm test -- reservation-queue
   Manual: curl -X POST /books/42/reservations, then see the reservation listed
 Slice 2: A returned book goes to the first member in the queue
+  Delivers: AC-3
   Automated: npm test -- checkout-route
   Manual: return book 42 in the UI, then see "held for you" for that member
 ```
@@ -145,6 +151,7 @@ Each slice runs through every layer, so a person can try it before the next slic
 **Bad**
 ```text
 Slice 2: A returned book goes to the first member in the queue.
+  Delivers: AC-3
   Verification: tests pass.
 ```
 No command is named, so nobody knows which tests, and the check does not get run.
@@ -152,6 +159,7 @@ No command is named, so nobody knows which tests, and the check does not get run
 **Good**
 ```text
 Slice 2: A returned book goes to the first member in the queue.
+  Delivers: AC-3
   Automated: npm test -- checkout-route
   Manual: return book 42 in the UI, then see "held for you" for that member
 ```
@@ -177,8 +185,11 @@ A reviewer can run the same command and the same manual step.
   **Do not skip when** the text names where our code lives or how a function is typed: it goes in the design (PD6). —
   **Confidence** high
 - **Skip when** the build changes only code inside a body, and every approved type, signature and file placement holds.
-  — **Do not skip when** a function needs a parameter the design did not show: record it first (PD7). —
-  **Confidence** high
+  — **Do not skip when** a function needs a parameter the design did not show: post a `[writer] DEVIATION:` note
+  (PD7). — **Confidence** high
+- **Skip the deviation note when** the change alters what an AC observes: it is not a deviation, so ask the human and
+  stop. — **Do not skip when** every AC's outcome holds and only the code's shape changes (PD7). — **Confidence**
+  high
 - **Skip when** reading code or docs can settle the question: no prototype is needed, and SR4 looks those up first.
   — **Do not skip when** two shapes both look right on paper and the choice is costly to undo (PD10). —
   **Confidence** high
@@ -228,10 +239,11 @@ Walk the whole design and every slice in it. During the build phase, also walk t
   Not a finding: a behaviour a user or an outside system sees (decided edge).
   Severity: Act on
   Verify: re-open the spec line.
-- [ ] PD7 — Compare each type, signature and file placement in the diff with the approved design. A difference that
-  the design does not record is a finding.
+- [ ] PD7 — Compare each type, signature and file placement in the diff with the approved design and the PR's
+  `[writer] DEVIATION:` notes. A difference with no note, an edit to the approved design, or a note that changes
+  what an AC observes is a finding.
   Applies when: the build phase has a diff.
-  Evidence: the diff's `file:line`, and the approved design's text it differs from.
+  Evidence: the diff's `file:line`, and the approved design's text it differs from, or the note.
   Not a finding: a change inside a body while every approved type, signature and placement holds (decided edge).
   Severity: Act on
   Verify: re-open the approved design and the diff line.
@@ -249,3 +261,10 @@ Walk the whole design and every slice in it. During the build phase, also walk t
   Not a finding: a question that code or docs settle, with no prototype (decided edge).
   Severity: Act on
   Verify: re-open the design, the prototype's branch and the diff.
+- [ ] PD11 — For each slice, find the AC-n it delivers. For each AC in the spec, find a slice that names it. A slice
+  with no AC-n, or an AC that no slice names, is a finding.
+  Applies when: the design lists slices.
+  Evidence: the slice, quoted, or the AC line with no slice.
+  Not a finding: none
+  Severity: Act on
+  Verify: re-open the spec's ACs and every slice in the design.

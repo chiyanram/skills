@@ -67,7 +67,8 @@ verify pass, retro and onboarder. The onboarder writes a project's brief and glo
 - **Questions** (decided, [operator 2026-11-09](https://github.com/chiyanram/agent-factory/issues/30#issuecomment-6744864148)):
   a run that needs decisions asks every open question at once, in one numbered round. Each question carries 2 to 4
   short choices and one recommended choice, so the human answers with taps, "1A 2B", or "accept all". The project
-  setting `questions` can be `one-at-a-time` instead. Never a guess.
+  setting `questions` can be `one-at-a-time` instead. Never a guess. A coordinator round holds at most 3 questions;
+  every other open question becomes a marked default that "accept all" takes (decided 2026-11-10, #295).
 
 **Review rubrics** (the finder's lenses) follow the same shape:
 - each check is binary, with something you can observe ("met if …, unmet if …");
