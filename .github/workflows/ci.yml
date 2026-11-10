@@ -5,15 +5,16 @@ on:
     types: [opened, edited, synchronize, reopened]
   push:
     branches: [main]
-  workflow_dispatch:
+  # release.yml runs these checks first, then releases (#285).
+  workflow_call:
 
 permissions:
   contents: read
 
-# A newer push to the same pull request cancels the run still going. Runs on main are never cancelled, so a
-# release is never cut off halfway.
+# A newer push to the same pull request cancels the run still going. Runs on main are never cancelled. The event name
+# keeps the checks that release.yml calls out of the group of a push to main.
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
@@ -81,53 +82,3 @@ jobs:
             echo "::error::The title, description or a commit message contains a skip-ci marker. The squash merge would carry it to main and skip the checks there. Reword it."
             exit 1
           fi
-
-  # Runs only from "Run workflow" on main: during the dev phase a merge does not release (#276). A push to main runs
-  # the check job alone.
-  release:
-    needs: check
-    if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: write       # push the release commit and the <plugin>--v<version> tag
-      issues: write         # comment "released in" on the issues a release closes
-      pull-requests: write  # comment "released in" on the merged pull requests
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-          # RELEASE_TOKEN is only needed when branch protection stops github.token from pushing to main.
-          token: ${{ secrets.RELEASE_TOKEN || github.token }}
-
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 24
-          cache: npm
-
-      # A plugin's first run has no <plugin>--v* tag yet. Tag the commit where its plugin.json got its current version,
-      # so semantic-release counts from there instead of starting at 1.0.0. Every later run finds a tag and skips this.
-      - name: Baseline tags
-        run: |
-          for plugin in $(python3 -c "import json; print(' '.join(p['name'] for p in json.load(open('.claude-plugin/marketplace.json'))['plugins']))"); do
-            if [ -z "$(git tag --list "$plugin--v*")" ]; then
-              manifest=plugins/$plugin/.claude-plugin/plugin.json
-              version=$(python3 -c "import json; print(json.load(open('$manifest'))['version'])")
-              commit=$(git log -1 --format=%H -G'"version"' -- "$manifest")
-              git -c user.name=github-actions -c user.email=github-actions@github.com \
-                tag -a "$plugin--v$version" "$commit" -m "$plugin $version"
-              git push origin "$plugin--v$version"
-            fi
-          done
-
-      - name: Install release tooling
-        run: npm ci --no-fund --no-audit
-
-      # One release line per plugin (ADR-0009).
-      - name: semantic-release, once per plugin
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
-        run: |
-          for plugin in $(python3 -c "import json; print(' '.join(p['name'] for p in json.load(open('.claude-plugin/marketplace.json'))['plugins']))"); do
-            RELEASE_PLUGIN=$plugin npx semantic-release
-          done
