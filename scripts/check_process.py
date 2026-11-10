@@ -17,7 +17,7 @@ from index_table import RULE_ID, rules
 
 ROLES = {"coordinator", "design-reviewer", "test-first", "implementer", "cleanup", "finder", "verify-pass", "retro",
          "onboarder"}
-FIELDS = ["role", "steps", "input", "must_not_see", "hand_off", "tools", "enforced_guardrails", "rules", "next"]
+FIELDS = ["role", "steps", "input", "must_not_see", "hand_off", "tools", "enforced_guardrails", "rules"]
 LANES = ["tiny", "bug", "feature", "one-way door"]
 LANE_FIELDS = {"lane", "approval", "starts_on", "design_review", "test_first", "lenses", "retro"}
 CITED = re.compile(r"\b[A-Z]+\d+[a-z]?\b")

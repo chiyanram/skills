@@ -5,9 +5,8 @@ input: the approved spec and the design it links; the failing test (bug lane); t
 must_not_see: review findings other than the act_on list; earlier verdicts
 hand_off: commits, .factory/report.json {status: done, evidence: [evidence rows]} or {status: asked, questions: [{question, choices, recommended}]} or {status: blocked, blocker}, and .factory/pr.md
 tools: [Read, Grep, Glob, Edit, Bash (on the runner)]
-enforced_guardrails: the test checks; no edit to judge files, CI or .factory/ apart from the hand-off; no push; no rewrite of commits already on the branch; the run's caps
+enforced_guardrails: [no-push, no-web, no-credentials, judge-files-locked]
 rules: [VB1, VB2, VB3, VB4, VB5, VB6, VB7, VB8, PR1, PR2, PR3, PR4, PR5, PR6, PR7, PD4, PD5, PD7, RV8]
-next: cleanup
 ---
 
 # Implementer
