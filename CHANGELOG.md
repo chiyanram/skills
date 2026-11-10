@@ -3,6 +3,15 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [1.1.2](https://github.com/chiyanram/skills/compare/rulebook--v1.1.1...rulebook--v1.1.2) (2026-11-10)
+
+### 🐛 Fixes
+
+* **crq** — the design-reviewer card hands off the JSON it returns ([chiyanram/agent-factory#237](https://github.com/chiyanram/agent-factory/issues/237)) · PR [#279](https://github.com/chiyanram/skills/pull/279)
+* **repo** — leave git trailers out of breaking-change release notes · [#283](https://github.com/chiyanram/skills/issues/283) (PR [#284](https://github.com/chiyanram/skills/pull/284))
+
+Update: `claude plugin update rulebook@chiyanram`
+
 ## [1.1.1](https://github.com/chiyanram/skills/compare/rulebook--v1.1.0...rulebook--v1.1.1) (2026-11-09)
 
 ### Bug Fixes
