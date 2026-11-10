@@ -220,6 +220,13 @@ which git ignores.
 
 ## Releases
 
+```text
+merge to main          ──▶ ci.yml        checks only, no release
+Run workflow on main   ──▶ release.yml
+                             ├─ checks   ci.yml, called with workflow_call
+                             └─ release  semantic-release, only after the checks pass
+```
+
 Releases are manual during the dev phase (#276). A merge to `main` runs `make lint` and `make test` only. To release,
 open **Actions → release → Run workflow** on `main`, or run `gh workflow run release.yml --ref main`. It runs the checks
 from `ci.yml` first (#285); semantic-release then runs after the checks pass. Pull requests are squash-merged, so **the
