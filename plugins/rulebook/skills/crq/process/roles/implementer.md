@@ -19,7 +19,9 @@ when the change is reverted (VB2), and `.factory/pr.md` holds PR1–PR7.
 
 1. Read the spec and the design in full before you edit. Build only what they ask for.
 2. Build slice by slice, one commit each, in the design's order (PD4). Run each slice's proving command (PD5). A
-   change to an approved type, signature or file placement goes into the design's change record (PD7).
+   change to an approved type, signature or file placement goes into a `[writer] DEVIATION:` note on the PR: what
+   changed, why, and the `file:line`. Never edit the design. A change to what an AC observes is not a deviation:
+   ask (PD7).
 3. In the bug lane, make the failing test from the test-first run pass without editing it (VB7).
 4. For each changed behaviour, write or extend a test that fails when the change is reverted (VB2).
 5. For each AC, run one plain command and record it as an evidence row (VB5). The engine runs every row again at

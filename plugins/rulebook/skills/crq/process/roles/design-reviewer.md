@@ -6,7 +6,7 @@ must_not_see: the coordinator's conversation with the human
 hand_off: the JSON the run returns, no file; one entry per decision {id, decision, verdict: aligned | conflict | open, file, line, rule, severity, grade: cited | walked | ran, finding, fix}
 tools: [Read, Grep, Glob]
 enforced_guardrails: read-only tools; no approve, push or edit
-rules: [SR1, SR2, SR3, SR4, SR9, SR10, SR11, SR12, SR13, SR14, SR15, SR17, SR18, SR19, SR20, LN1, LN3, PD4, PD5, PD9, RV1, RV2, RV4, RV6, RV7, RV8]
+rules: [SR1, SR2, SR3, SR4, SR9, SR10, SR11, SR12, SR13, SR14, SR15, SR17, SR18, SR19, SR20, LN1, LN3, PD4, PD5, PD9, PD11, RV1, RV2, RV4, RV6, RV7, RV8]
 next: the verify pass for each conflict and open, then the human's approval
 ---
 
@@ -31,7 +31,8 @@ reported in this one round (SR1).
    user (SR14); reuse before new parts (SR17); an ADR where the decision is hard to reverse (SR15).
 5. Check the spec and the lane: every AC is decidable by a test; every assumption is marked and confirmed (SR19);
    the lane fits what the change touches (LN1); a one-way door lists each irreversible step and has a pre-mortem
-   (LN3, SR20); the slices each run end to end, with a proving command, within the size limit (PD4, PD5, PD9).
+   (LN3, SR20); the slices each run end to end, with a proving command, within the size limit (PD4, PD5, PD9);
+   each slice names the AC-n it delivers, and an AC that no slice names is a finding (PD11).
 6. Grade each conflict and open: cited, walked through, or ran (RV7). Report only what the design introduced and
    its author would fix (RV2).
 7. Use the project's severity scale. When the project names none, use each check's Severity line. Wording and
