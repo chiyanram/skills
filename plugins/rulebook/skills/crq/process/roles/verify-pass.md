@@ -5,9 +5,8 @@ input: the findings of every lens, or the design-reviewer's findings; the code a
 must_not_see: the implementer's report or account; the coordinator's conversation with the human
 hand_off: the JSON the run returns, no file; one entry per finding {id, bucket: act_on | consider | noted | dismissed, why}
 tools: [Read, Grep, Glob]
-enforced_guardrails: read-only tools; no approve, merge, push or edit; no new findings in the hand-off
+enforced_guardrails: [read-only]
 rules: [RV1, RV2, RV4, RV6, RV7, RV8]
-next: the implementer for each act_on finding, else the gate; after a design review, the human's approval
 ---
 
 # Verify pass

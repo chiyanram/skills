@@ -5,9 +5,8 @@ input: the bug spec; the code at the branch head; the testing references in scop
 must_not_see: any fix, drafted or planned; the implementer's work
 hand_off: one commit with the failing test, and .factory/report.json {status: done, evidence: [one evidence row]} or {status: asked, questions: [{question, choices, recommended}]}
 tools: [Read, Grep, Glob, Edit (test files only), Bash (on the runner)]
-enforced_guardrails: the engine refuses a commit that changes a file other than a test; no push; .factory/ is read-only apart from the report
+enforced_guardrails: [no-push, no-web, no-credentials]
 rules: [VB1, VB6, VB7, AC12, GA5]
-next: the implementer
 ---
 
 # Test-first

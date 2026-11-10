@@ -9,7 +9,7 @@ from tests.support import run_check
 MARKETPLACE = {"name": "m", "owner": {"name": "o"}, "plugins": [{"name": "p", "source": "./plugins/p"}]}
 REFERENCE = "# Demo\n\nRead it when testing.\n\n## Rules\n\n- **DM1** — Do one thing, because two break.\n"
 CARD = ("---\nrole: finder\nsteps: [code review]\ninput: the diff\nmust_not_see: the implementer's report\n"
-        "hand_off: findings\ntools: [Read]\nenforced_guardrails: read-only\nrules: [DM1]\nnext: verify pass\n---\n\n"
+        "hand_off: findings\ntools: [Read]\nenforced_guardrails: [read-only]\nrules: [DM1]\n---\n\n"
         "**The job.** Find.\n\n**Done when** every check was walked.\n\n1. Walk.\n\n**It's working if:**\n- it finds.\n")
 LANE = {"starts_on": "START only", "design_review": False, "test_first": False, "lenses": "1", "retro": "record"}
 LANES = {"lanes": [{"lane": "tiny", "approval": False, **LANE},
@@ -22,7 +22,8 @@ REVIEW = {"baseline": [{"skill": "crq", "reference": "demo"}]}
 PLANTED = {
     "role-not-file-name": ("skills/crq/process/roles/finder.md", CARD.replace("role: finder", "role: reviewer")),
     "missing-field": ("skills/crq/process/roles/finder.md", CARD.replace("must_not_see: the implementer's report\n", "")),
-    "extra-field": ("skills/crq/process/roles/finder.md", CARD.replace("next:", "persona: a senior\nnext:")),
+    "extra-field": ("skills/crq/process/roles/finder.md", CARD.replace("rules:", "persona: a senior\nrules:")),
+    "next-dropped": ("skills/crq/process/roles/finder.md", CARD.replace("rules:", "next: verify pass\nrules:")),
     "unknown-rule": ("skills/crq/process/roles/finder.md", CARD.replace("[DM1]", "[DM1, DM9]")),
     "no-done-when": ("skills/crq/process/roles/finder.md", CARD.replace("**Done when**", "Finish when")),
     "no-steps": ("skills/crq/process/roles/finder.md", CARD.replace("1. Walk.", "Walk.")),

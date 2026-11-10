@@ -57,7 +57,8 @@ The crq process gets a side an engine can read, so an engine runs the same proce
 **Role cards.** One markdown file per role: coordinator, design-reviewer, test-first, implementer, cleanup, finder,
 verify pass, retro and onboarder. The onboarder writes a project's brief and glossary once, for every other role.
 - **Frontmatter** (the same fields everywhere): role, steps, input, `must_not_see`, hand-off, tools, enforced
-  guardrails, rules (by id) and next. An engine enforces it.
+  guardrails (IDs from the engine's closed list, agent-factory #424), rules (by id). An engine enforces it. `next` is
+  dropped: the lanes hold the flow.
 - **Body:** the job, a "done when" line, numbered steps, and an "it's working if" list.
 - **No persona and no capitals.** A prohibition appears only for a hard guardrail.
 - **One glossary** is used by every card.

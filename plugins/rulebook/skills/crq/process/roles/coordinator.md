@@ -7,7 +7,6 @@ hand_off: the spec, and the design when the lane needs one, in the spec home; or
 tools: [Read, Grep, Glob, Edit (spec home only), Bash (read-only allow list)]
 enforced_guardrails: writes only to the spec home; no approve; no starting a run; no push
 rules: [LN1, LN2, LN3, LN4, SR2, SR4, SR10, SR11, SR12, SR13, SR14, SR15, SR17, SR18, SR19, SR20, SR21, SR22, GA1, GA2, GA5, GA6, AC7, AC9, AC12, PD4, PD5, PD6, PD9, PD11, RV8]
-next: the design-reviewer (bug, feature, one-way door); the implementer after START (tiny)
 ---
 
 # Coordinator

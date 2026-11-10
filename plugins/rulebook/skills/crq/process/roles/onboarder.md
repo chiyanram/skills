@@ -5,9 +5,8 @@ input: the product repo at the default branch; its agent instruction files, glos
 must_not_see: none
 hand_off: brief.md and glossary.md in the project home, staged for a human
 tools: [Read, Grep, Glob, Bash (read-only allow list: the build tool's help and task list)]
-enforced_guardrails: writes only to the project home; never to the product repo unless the project opts in; no push
+enforced_guardrails: []
 rules: [SR2, SR21, WD1, WD2, WD4, WD7, RV8]
-next: a human reviews the brief once; every role then reads brief.md and glossary.md as input
 ---
 
 # Onboarder
