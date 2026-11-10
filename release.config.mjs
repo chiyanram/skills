@@ -3,7 +3,9 @@
 // RELEASE_PLUGIN picks the plugin; CI runs it once for each. Scope `toolbox` releases only the toolbox (ADR-0009).
 import { releaseNotes } from './scripts/release_notes.mjs'
 
-const DESIGN = ['research', 'review', 'repo'].map((scope) => ({ scope, release: false }))
+// Design work never releases and is not listed in the notes, even as a feat or fix (#287).
+const DESIGN_SCOPES = ['research', 'review', 'repo']
+const DESIGN = DESIGN_SCOPES.map((scope) => ({ scope, release: false }))
 
 // commit-analyzer keeps the highest release among matching rules, and a later `false` beats an earlier one, so the
 // catch-all comes first: every commit is "no release" unless a toolbox-scoped rule below raises it.
@@ -19,7 +21,7 @@ const TOOLBOX_ONLY = [
 const PLUGINS = {
   rulebook: {
     releaseRules: [...DESIGN, { scope: 'toolbox', release: false }],
-    keep: (scope) => scope !== 'toolbox',
+    keep: (scope) => scope !== 'toolbox' && !DESIGN_SCOPES.includes(scope),
     changelogFile: 'CHANGELOG.md',
     changelogTitle:
       '# Changelog\n\nWhat the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on\n`main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.',

@@ -25,6 +25,9 @@ COMMITS = [
     "Co-Authored-By: A Tool <noreply@example.com>\nClaude-Session: https://example.com/s",
     "docs(repo): an adr (#15)",
     "ci(repo): a workflow (#16)",
+    "fix(repo): a release-tooling fix (#17)",
+    "feat(research): a design note (#18)",
+    "feat(review): a review finding (#19)",
 ]
 
 
@@ -56,6 +59,11 @@ class ReleaseNotesTest(unittest.TestCase):
     def test_should_hide_changes_that_ship_nothing(self):
         self.assertNotIn("an adr", self.notes)
         self.assertNotIn("a workflow", self.notes)
+
+    def test_should_hide_design_work_even_when_it_is_a_feat_or_fix(self):
+        for subject in ("a release-tooling fix", "a design note", "a review finding"):
+            with self.subTest(subject):
+                self.assertNotIn(subject, self.notes)
 
     def test_should_end_with_the_update_command_for_the_plugin(self):
         for plugin in ("rulebook", "toolbox"):
