@@ -2,7 +2,8 @@
 
 Status: accepted
 
-Amended by [ADR-0009](0009-a-second-plugin-of-typed-only-tools.md).
+Amended by [ADR-0009](0009-a-second-plugin-of-typed-only-tools.md), and by #276 and #285: a release runs only when
+someone starts `release.yml` on `main`.
 
 ## Context
 
@@ -10,8 +11,8 @@ Claude Code pins a plugin to the `version` in its manifest. Users see an update 
 
 ## Decision
 
-semantic-release cuts every release from the Conventional Commits on `main`. A `feat` or `fix` to what ships bumps
-the version, writes `CHANGELOG.md` and tags `rulebook--v<version>`.
+semantic-release cuts every release from the Conventional Commits on `main`, when someone runs `release.yml` by hand.
+A `feat` or `fix` to what ships bumps the version, writes `CHANGELOG.md` and tags `rulebook--v<version>`.
 
 ## Consequences
 

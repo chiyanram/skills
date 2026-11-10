@@ -29,7 +29,7 @@ The repo ships two plugins from their own folders: `rulebook` from `plugins/rule
 
 - A commit scoped `toolbox` releases only the toolbox: `feat(toolbox)` is a minor, `fix(toolbox)` a patch.
 - Every other scope that ships releases only the rulebook, as today. `research`, `review` and `repo` release nothing.
-- `release.config.mjs` takes the plugin to release, and CI runs semantic-release once for each plugin.
+- `release.config.mjs` takes the plugin to release, and `release.yml` runs semantic-release once for each plugin.
 - Tags are `rulebook--v<version>` and `toolbox--v<version>`, the form `claude plugin tag` uses.
 - The toolbox changelog is `CHANGELOG-toolbox.md` at the root, beside the rulebook's. Neither ships.
 - `check_versions.py` checks each plugin's marketplace entry against its own `plugin.json`. `set_version.py` writes one
