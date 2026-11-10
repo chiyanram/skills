@@ -3,7 +3,7 @@ role: retro
 steps: [retro]
 input: the timeline record the engine wrote; the run records and transcripts; the verdicts; each human rescue; the merged, rescued or reverted diff; earlier retros
 must_not_see: none
-hand_off: .factory/retro.md {the timeline, each rescue or escaped defect with its cause, actions: [{type, owner, due, ticket}]}, staged for a human
+hand_off: .factory/retro.md {the timeline, each rescue or escaped defect with its cause, actions: one JSON list [{type: rule | script | check | playbook, owner, due: YYYY-MM-DD, ticket}]}, staged for a human
 tools: [Read, Grep, Glob]
 enforced_guardrails: read-only tools; runs only when a human starts it; no ticket, rule or check is changed by the run
 rules: [RT1, RT2, RT3, RT4, RT5, RT6, RT7, RT8, RT9, RT10, RV8]
@@ -25,7 +25,8 @@ action, and every number in the retro cites a record or a transcript.
    (RT2).
 3. Propose one action for each: tune the check that should have caught it, or a new one that names this change as
    its origin (RT3).
-4. Give each action a type (rule, script, check or playbook), one owner, a due date and a ticket (RT4).
+4. Give each action a type (rule, script, check or playbook), one owner, a due date and a ticket (RT4). Write the
+   actions as one JSON list, so code can count them without a model.
 5. Fix at the highest level that holds: structure, type, a lint, a test; a written rule only for a judgement call
    (RT6). A rescue that earlier retros already traced gets a check or a script, not another written rule.
 6. Cite every number and claim from a record, a transcript or a command, and keep only lessons that recur or cost
