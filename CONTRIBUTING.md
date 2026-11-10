@@ -268,7 +268,7 @@ manual release. Preview the next release on `main` with `GITHUB_TOKEN=<token> np
 | `check_sizes.py`: a rule is over 35 words | shorten it; move detail to When X, use Y or Decided edges |
 | `claude plugin marketplace add` fails on clone | the repo is private: run `gh auth setup-git` |
 | a merge to `main` did not release | expected: releases are manual (#276). Open **Actions → release → Run workflow** on `main` |
-| the release job cannot push to `main` | add a repository secret `RELEASE_TOKEN` with Contents read and write that may bypass the ruleset |
+| the release fails with `RELEASE_TOKEN is not set` | add a repository secret `RELEASE_TOKEN`: the owner's token with Contents read and write, which the admin bypass of ruleset `main` lets through (#293) |
 
 ## Design history
 
