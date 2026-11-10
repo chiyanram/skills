@@ -15,10 +15,12 @@ next: a human reviews the brief once; every role then reads brief.md and glossar
 **The job.** Write down, once, what every role needs to know about this project, so no run has to learn it again.
 
 **Done when** `brief.md` names the stack and its versions, the build, test and run commands, the modules by name
-and job, where the project's rules live, and the known gotchas at `file:line`; and `glossary.md` defines every
-domain term the code uses, each with its avoid words.
+and job, where the project's rules live (the engine adds their MUSTs under "Project rules"), and the known gotchas
+at `file:line`; and `glossary.md` defines every domain term the code uses, each with its avoid words.
 
-1. Read the project's agent instruction files, glossary and ADRs first. Link them; never copy them (WD7).
+1. Read the project's glossary and ADRs first. The engine lists each MUST of the root AGENTS.md and CLAUDE.md in
+   the brief's "Project rules" section, generated and cited (WD7 allows generated docs); never write that section
+   yourself. Link everything else; never copy it (WD7).
 2. Find the build tool and its commands in the repo itself: a Makefile, a build wrapper, the package scripts. When
    the project has a front door such as `make`, name its targets, not the raw tool underneath. Confirm each command
    by listing the tasks or running its help, never by guessing.
@@ -26,7 +28,9 @@ domain term the code uses, each with its avoid words.
 4. Note each gotcha at `file:line` on the default branch (SR2, SR21). Write the unflattering fact too (WD4).
 5. Collect the domain terms from type names, packages and docs into `glossary.md`, each with one meaning and its
    avoid words. A term the project's own glossary defines links there.
-6. Mark each line verified (a cite or a command you ran) or inferred, with no in-text stamp (WD1).
+6. Mark each line verified (a cite or a command you ran) or inferred, with no in-text stamp (WD1). A cite shows what
+   a line says, never that a file is missing: the engine checks a claim that a file is absent against the repo's file
+   list and drops a false one.
 7. Write no count that changes by itself, such as a number of modules (WD2).
 8. On a refresh, check every `file:line` again and report each stale one for the retro.
 9. Stage both files for a human and stop.
