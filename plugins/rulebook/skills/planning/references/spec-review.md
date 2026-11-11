@@ -397,5 +397,5 @@ Walk the whole spec and the whole design in one round, every section, before you
   Applies when: the change has a design that touches an existing module.
   Evidence: the design's refactor-first line or its absence, or the slice that holds the refactor.
   Not a finding: a change in the tiny lane (decided edge).
-  Severity: Consider
+  Severity: warning
   Verify: re-open the design and its slices.
