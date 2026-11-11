@@ -26,6 +26,10 @@ check an implementer's evidence rows.
   cause or a bug ticket with the failing value, because a re-run until green hides failures.
 - **VB10** — Copy each evidence row's result from its command's output; never cite a gate run as evidence for file
   content or for more than one criterion, because a gate proves only what its tests check.
+- **VB11** — Quarantine one failing test, never a whole job, with an owner, a ticket and an expiry within the
+  project's quarantine limit, because a broad or endless quarantine hides the next real failure.
+- **VB12** — When a check passes only because a test is quarantined, say so where people read the result, naming each
+  test and its expiry, because a green that hides a failure reads as all clear.
 
 ## When X, use Y
 
@@ -43,6 +47,9 @@ check an implementer's evidence rows.
 | a check fails and the cause is in the change | fix the code; never re-run hoping for green (VB9) | a fail is a fail |
 | a check fails and looks flaky | report it red; a person may re-run it once, naming the cause or filing a bug ticket with the failing value (VB9) | a flaky test re-run until green hides an intermittent bug |
 | the person's one re-run fails again | it stays red: fix it or file the bug, with no second re-run (VB9) | a second re-run is the automatic retry again |
+| a test fails again and again for a cause outside the change | a person quarantines that one test, with an owner, a ticket and an expiry within the project's limit (VB11) | the rest of the check still guards the change |
+| only job names are known, not test ids | the job is quarantined as a stated limit, with the shortest expiry, and the ticket says so (VB11) | a job-wide entry hides any new failure in that job |
+| a check is green only because of a quarantined test | the PR's status note names each quarantined test and its expiry (VB12) | people read the status note, not the log |
 
 ## Good / Bad
 
@@ -100,3 +107,8 @@ Walk the PR body, its commits and the diff of its tests.
   finding.
 - [ ] VB10 — For each evidence row, find a result copied from command output. A described result, a gate run as the
   evidence for file content, or one gate run on more than one criterion's row, is a finding.
+- [ ] VB11 — For each quarantine entry the change adds or renews, find one test id (or a stated job-only limit), an
+  owner, a ticket and an expiry within the project's limit. A missing field, a whole job with no stated limit, or an
+  expiry past the limit is a finding.
+- [ ] VB12 — For each check that passed with a quarantined test, find the status note naming each test and its expiry.
+  A green with a quarantine named only in a log, or not at all, is a finding.
