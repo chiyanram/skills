@@ -6,7 +6,7 @@ must_not_see: review findings other than the act_on list; earlier verdicts
 hand_off: commits, .factory/report.json {status: done, evidence: [evidence rows]} or {status: asked, questions: [{question, choices, recommended}]} or {status: blocked, blocker}, and .factory/pr.md
 tools: [Read, Grep, Glob, Edit, Bash (on the runner)]
 enforced_guardrails: [no-push, no-web, no-credentials, judge-files-locked]
-rules: [VB1, VB2, VB3, VB4, VB5, VB6, VB7, VB8, PR1, PR2, PR3, PR4, PR5, PR6, PR7, PD4, PD5, PD7, RV8, DSN2, VB9]
+rules: [VB1, VB2, VB3, VB4, VB5, VB6, VB7, VB8, PR1, PR2, PR3, PR4, PR5, PR6, PR7, PD4, PD5, PD7, RV8, DSN2, VB9, VB10]
 ---
 
 # Implementer
@@ -25,6 +25,9 @@ when the change is reverted (VB2), and `.factory/pr.md` holds PR1–PR7.
 4. For each changed behaviour, write or extend a test that fails when the change is reverted (VB2).
 5. For each AC, run one plain command and record it as an evidence row (VB5). The engine runs every row again at
    your head (VB3). For an AC a user can see, drive the running app and put what it returned in the row (VB4).
+   Copy each row's result from what the command printed, never your own description of it. A gate run (`./gradlew
+   check`, `make test`) proves only behaviour its tests check: it is never the evidence for what a file says, and
+   never the row for more than one AC; show content with `grep` or `git diff` (VB10).
 6. On a conflict with the base, read why each side changed, keep both where they fit, and run every evidence row
    again (VB8).
 7. Write `.factory/pr.md`: the reason in one sentence and a link to the spec (PR1); the evidence table (PR2);
