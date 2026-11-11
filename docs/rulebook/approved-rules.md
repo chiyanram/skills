@@ -1552,7 +1552,7 @@ The rule changes from the agent-factory design audit of 2026-11-10 (chiyanram/ag
 
 ## Refactor first (#307)
 
-The design asks whether a touched module needs a refactor first. Decided by the operator on 2026-11-11 by ID and intent: improvement comes as its own tickets a person starts, and design review asks "refactor first?"; no tidying inside unrelated changes. The wording below is new and waits for the operator's word-by-word yes in the PR. SR24 is decided by ID only; its intent is not recorded, so it is not added here.
+The design asks whether a touched module needs a refactor first. Decided by the operator on 2026-11-11 by ID and intent: improvement comes as its own tickets a person starts, and design review asks "refactor first?"; no tidying inside unrelated changes. The wording below is new and waits for the operator's word-by-word yes in the PR. SR24 was dropped by the operator on 2026-11-11 and is not added.
 
 | id | reference | rule | reason | source | evidence | status |
 |---|---|---|---|---|---|---|
