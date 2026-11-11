@@ -16,12 +16,9 @@ request. `AGENTS.md` holds the hard rules; `CONTRIBUTING.md` holds the procedure
   the goal and the limits, not every step.
 - **K7** — Where a check can run, ship a script or lint, not a prose rule.
 
-## What lives elsewhere
+## Formats and changes
 
-These live in agent-factory's constitution, `docs/CONSTITUTION.md` in
-[chiyanram/agent-factory](https://github.com/chiyanram/agent-factory), and are not copied here:
-
-- **The contract between the repos (P18):** the engine publishes the versioned format of cards, lanes and findings,
-  and this repo's CI checks against it.
-- **How a change is measured (P11):** a change to a card, rule or reference is kept only if its eval says so.
-- **Which general principle each K covers:** the mapping page in agent-factory's `docs/explanation/`.
+- **This repo owns its formats:** the role cards, the lanes file and the findings it ships. Each format is versioned,
+  and CI checks every file against it.
+- **A change is measured:** a change to a card, rule or reference is kept only if it is no worse on what it must hold
+  and better on what it aims at. Where no eval exists yet, its pull request says "untested by an eval".
