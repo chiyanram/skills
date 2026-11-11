@@ -16,7 +16,7 @@ approved Good/Bad pair, `references/examples/<name>.md` holds them all.
 | [api-design](references/api-design.md) | AP1–AP7 | when you write or review a list endpoint, a page response, a change to a published request or response type, a client of another service, or a request mapping's path |
 | [comments](references/comments.md) | CM1–CM5, CM7, CMN1 | when you write or review a comment, a Javadoc block or a suppression, in any file type |
 | [concurrency](references/concurrency.md) | CC1–CC20 | when you write or review code that starts threads, submits async work, calls a remote service, retries, locks, builds a pool or a cache, or handles a request or message that creates work |
-| [design](references/design.md) | SEAM1, DSN1 | when you write or review a method that chooses an outcome, a method that does I/O, or a method with many branches |
+| [design](references/design.md) | SEAM1, DSN1–DSN2 | when you write or review a method that chooses an outcome, a method that does I/O, or a method with many branches |
 | [errors](references/errors.md) | ER1–ER8, ER10–ER11, ERN1–ERN2 | when you write or review a `throw`, a `catch`, an exception handler, an error response or request validation |
 | [java](references/java.md) | U4, JV1–JV9, JVN1, CV3 | when you write or review Java production code |
 | [messaging](references/messaging.md) | MS4, MS6–MS12, MSN1–MSN2 | when you write or review a message consumer, a stream producer, a scheduled job, or an operation that can run twice |

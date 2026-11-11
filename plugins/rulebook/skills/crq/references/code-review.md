@@ -20,6 +20,8 @@ before you split a change.
   it; a skipped, no-throw, snapshot-only or mock-call check does not count, because such a test passes while seeing nothing.
 - **CR7** — For each removed or replaced chunk, name the behaviour or contract it carried and where the change
   re-establishes or retires it, because a removed guard leaves no line to review.
+- **CR8** — Report a codebase-health finding only where the project's module numbers show a touched module got
+  worse; with no number, report none, because a health finding without a measure is opinion.
 
 ## When X, use Y
 
@@ -37,6 +39,9 @@ before you split a change.
 | the diff adds a test | the junk patterns of V3 (`testing/value-bar.md`) | that is where a new test's worth is judged |
 | the diff edits an existing test, a snapshot or a golden file | TI1–TI5 (`test-integrity`) | that is where an edit to a test's check is judged |
 | the diff removes or replaces a check, a default, an error path or a call | where the change puts it back, or why it is retired on purpose; a reference left pointing at the removed code is a finding (CR7) | the removal shows as red lines nobody reads for what they did |
+| the project publishes module numbers (complexity, size, coupling, coverage) and a touched module's number got worse | a codebase-health finding citing the number before and after (CR8) | the number makes the drift visible |
+| the project has no module numbers | no codebase-health finding; the design and DSN2 carry the judgement (CR8) | a health finding with no measure is a taste call |
+| a touched module's number got worse and the PR names a refactor ticket for it | a finding that links the ticket, for the human to weigh (CR8) | the cost is named and its fix is planned |
 
 ## Good / Bad
 
@@ -113,3 +118,5 @@ Walk the approved spec and design, then the whole diff.
   with none, or covered only by a skipped, no-throw, snapshot-only or mock-call check, is a finding.
 - [ ] CR7 — For each removed or replaced chunk, find the behaviour it carried and where it is re-established or why
   it is retired. One with neither, or a reference left to removed code, is a finding.
+- [ ] CR8 — Where the project publishes module numbers, compare each touched module's numbers before and after. A
+  number that got worse is a finding. With no numbers, report nothing for codebase health.

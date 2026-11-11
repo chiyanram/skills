@@ -11,6 +11,8 @@ Contents: Rules · When X, use Y · Good / Bad · Decided edges · Review checks
   because logic tangled with I/O cannot be tested without the I/O.
 - **DSN1** — Keep each method under the project's complexity gate (cyclomatic 10 if none is set), splitting by guard
   clauses or extracted helpers, because a highly branched method hides paths no test reaches.
+- **DSN2** — Leave each touched module no worse than you found it; if the change would worsen one, say so and propose
+  the refactor as its own ticket, because the next change pays for it.
 
 ## When X, use Y
 
@@ -21,6 +23,8 @@ Contents: Rules · When X, use Y · Good / Bad · Decided edges · Review checks
 | a method with many branches | guard clauses or extracted helpers, under the project's gate or cyclomatic 10 (DSN1) | a highly branched method hides paths no test reaches |
 | a value that may be absent | `Optional`, a sealed type or an enum (TY1, `types.md`) | a forgotten null check throws `NullPointerException` |
 | code to check for smells | the smell baseline in `smells.md` | one smell list for the rulebook |
+| a change adds a branch to a method already at the complexity gate, or a new dependency between modules | split or extract within the touched lines, or name the cost and propose the refactor as its own ticket (DSN2) | the next change starts from a worse module |
+| the module was in poor shape before the change | keep the touched lines no worse, leave the rest alone, and propose a refactor ticket if one is wanted (DSN2) | tidying outside the change mixes two reviews into one |
 
 ## Good / Bad
 
@@ -44,3 +48,5 @@ Walk every changed method.
   finding. An I/O method that branches on what it read to choose what happens next is a finding.
 - [ ] DSN1 — Where a gate measures cyclomatic complexity (for example Checkstyle `CyclomaticComplexity`), cite the
   gate and skip the count. Otherwise a method above cyclomatic complexity 10 is a finding.
+- [ ] DSN2 — For each touched module, compare the touched code before and after. A longer method, a deeper branch, a
+  new dependency between modules or a lost test, with no note naming it and no proposed refactor ticket, is a finding.
