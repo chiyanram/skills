@@ -40,7 +40,7 @@ before you split a change.
 | the diff edits an existing test, a snapshot or a golden file | TI1–TI5 (`test-integrity`) | that is where an edit to a test's check is judged |
 | the diff removes or replaces a check, a default, an error path or a call | where the change puts it back, or why it is retired on purpose; a reference left pointing at the removed code is a finding (CR7) | the removal shows as red lines nobody reads for what they did |
 | the project publishes module numbers (complexity, size, coupling, coverage) and a touched module's number got worse | a codebase-health finding citing the number before and after (CR8) | the number makes the drift visible |
-| the project has no module numbers | no codebase-health finding; the design and DSN2 carry the judgement (CR8) | a health finding with no measure is a taste call |
+| the project has no module numbers | no codebase-health finding; the design carries the judgement (CR8) | a health finding with no measure is a taste call |
 | a touched module's number got worse and the PR names a refactor ticket for it | a finding that links the ticket, for the human to weigh (CR8) | the cost is named and its fix is planned |
 
 ## Good / Bad
