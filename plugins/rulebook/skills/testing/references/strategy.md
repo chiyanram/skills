@@ -25,6 +25,8 @@ Contents: Rules · When X, use Y · Good / Bad (S1, S2, TM1, TM2, S5) · Decided
   regression test that never failed proves the mock, not the fix.
 - **S6** — Run a bug fix's failing test locally, before you push, and paste its command and failure output in the
   pull request, because a red run sent to CI costs minutes and proves no more.
+- **S7** — Ship each check or scanner with planted good and bad cases, and turn a miss found in review into a
+  failing planted case before the fix, because a check never seen failing may never fire.
 
 ## When X, use Y
 
@@ -38,6 +40,8 @@ Contents: Rules · When X, use Y · Good / Bad (S1, S2, TM1, TM2, S5) · Decided
 | an acceptance criterion is reached through the API | an IT | a `.feature` tier with no Gherkin runtime left an orphan copy of an IT (AT1) |
 | an acceptance criterion is reached through the UI | a smoke spec | a `.feature` tier with no Gherkin runtime left an orphan copy of an IT (AT1) · tier choice: `scenario-to-tests.md` |
 | a bug fix's failing test | run it locally first, then paste its command and failure in the pull request | a red run sent to CI costs minutes and proves no more (S6) |
+| a new check, lint or scanner | planted cases it must pass and planted cases it must fail, each run by the tests (S7) | a check that never failed may match nothing |
+| review finds a case a check missed | that case planted first, failing, then the fix to the check (S7) | the planted case proves the fix and keeps the miss from coming back |
 | an IT or smoke spec reaches the LLM | a scripted fake model | we do not own it (TM2) |
 | an IT or smoke spec reaches third-party HTTP | WireMock at the wire, or the vendor's container sandbox when it ships one (IT5) | we do not own it (TM2) |
 | an IT or smoke spec reaches our own service, repository or Redis consumer | the real one | a fake of our own code leaves its real query untested (TM2) |
@@ -284,3 +288,5 @@ Walk every changed test file, and the MR that carries it.
 - [ ] S6 — For a bug fix, find the failing test's command and failure output in the pull request. No command and
   output is a finding. A red run made only as a CI job is a finding, unless an acceptance criterion asks for CI proof
   or the bug reproduces only in a clean CI environment.
+- [ ] S7 — For each new or changed check, lint or scanner, find its planted good and bad cases run by the tests. A fix
+  for a miss found in review with no planted case that failed before it is a finding.
