@@ -7,6 +7,9 @@ twice, or names one the plugin does not ship;
 when a role card is not one of the known roles, misses a frontmatter field or adds one, cites a rule ID no Rules section
 holds, or lacks the job, a "done when" line, numbered steps or an "it's working if" list; or when a role has fewer
 than three eval scenarios, each a folder with a `prompt.md` and a grader under `graders/`.
+
+The roles, the card fields, the guardrail IDs and the lanes come from the versioned schemas the plugin ships in
+process/schema/ (card, lanes, finding); the check fails when one is missing or uses a keyword schema_lite cannot run.
 """
 import json
 import re
@@ -14,12 +17,9 @@ import sys
 from pathlib import Path
 
 from index_table import RULE_ID, rules
+from schema_lite import unknown_keywords, validate
 
-ROLES = {"coordinator", "design-reviewer", "test-first", "implementer", "cleanup", "finder", "verify-pass", "retro",
-         "onboarder"}
-FIELDS = ["role", "steps", "input", "must_not_see", "hand_off", "tools", "enforced_guardrails", "rules"]
-LANES = ["tiny", "bug", "feature", "one-way door"]
-LANE_FIELDS = {"lane", "approval", "starts_on", "design_review", "test_first", "lenses", "retro"}
+SCHEMAS = {"card": "card-v1.schema.json", "lanes": "lanes-v1.schema.json", "finding": "finding-v1.schema.json"}
 CITED = re.compile(r"\b[A-Z]+\d+[a-z]?\b")
 FIELD = re.compile(r"^([a-z_]+):\s*(.*)$")
 BODY_PARTS = [(re.compile(r"\*\*The job\.\*\*"), "the job"), (re.compile(r"\*\*Done when\*\*"), "a \"done when\" line"),
@@ -28,7 +28,14 @@ BODY_PARTS = [(re.compile(r"\*\*The job\.\*\*"), "the job"), (re.compile(r"\*\*D
 MIN_SCENARIOS = 3
 
 
-def frontmatter(text: str) -> tuple[dict[str, str], str] | None:
+def value(raw: str) -> str | list[str]:
+    """A frontmatter value: `[a, b]` is a list, anything else a string."""
+    if raw.startswith("[") and raw.endswith("]"):
+        return [item.strip() for item in raw[1:-1].split(",") if item.strip()]
+    return raw
+
+
+def frontmatter(text: str) -> tuple[dict, str] | None:
     if not text.startswith("---\n") or "\n---\n" not in text[4:]:
         return None
     head, body = text[4:].split("\n---\n", 1)
@@ -36,7 +43,7 @@ def frontmatter(text: str) -> tuple[dict[str, str], str] | None:
     for line in head.splitlines():
         found = FIELD.match(line)
         if found:
-            fields[found.group(1)] = found.group(2).strip()
+            fields[found.group(1)] = value(found.group(2).strip())
     return fields, body
 
 
@@ -55,39 +62,41 @@ def scenario_problems(plugin: Path, role: str) -> list[str]:
     return found
 
 
-def card_problems(card: Path, plugin: Path, ids: set[str]) -> list[str]:
+def card_problems(card: Path, plugin: Path, ids: set[str], schema: dict) -> list[str]:
     parsed = frontmatter(card.read_text())
     if parsed is None:
         return [f"{card}: no frontmatter"]
     fields, body = parsed
     found = []
-    if card.stem not in ROLES:
-        found.append(f"{card}: `{card.stem}` is not a role ({', '.join(sorted(ROLES))})")
     if fields.get("role") != card.stem:
         found.append(f"{card}: role `{fields.get('role')}` is not its file name")
-    found += [f"{card}: frontmatter field `{f}` is missing or empty" for f in FIELDS if not fields.get(f)]
-    found += [f"{card}: frontmatter field `{f}` is not a card field" for f in fields if f not in FIELDS]
+    found += [f"{card}: {problem}" for problem in validate(fields, schema)]
+    cited = fields.get("rules") if isinstance(fields.get("rules"), list) else []
     found += [f"{card}: rule `{rule}` is in no reference's Rules section"
-              for rule in CITED.findall(fields.get("rules", "")) if rule not in ids]
+              for rule in cited if CITED.fullmatch(rule) and rule not in ids]
     found += [f"{card}: the body lacks {what}" for pattern, what in BODY_PARTS if not pattern.search(body)]
     return found + scenario_problems(plugin, card.stem)
 
 
-def lanes_problems(path: Path) -> list[str]:
+def lanes_problems(path: Path, schema: dict) -> list[str]:
     try:
-        lanes = json.loads(path.read_text()).get("lanes", [])
-    except (json.JSONDecodeError, AttributeError):
-        return [f"{path}: not a JSON object with a `lanes` list"]
-    found = []
-    if [lane.get("lane") for lane in lanes] != LANES:
-        found.append(f"{path}: lanes are not {', '.join(LANES)}, in that order")
-    for lane in lanes:
-        missing = LANE_FIELDS - set(lane)
-        if missing:
-            found.append(f"{path}: lane `{lane.get('lane')}` misses {', '.join(sorted(missing))}")
-        if lane.get("lane") != "tiny" and lane.get("approval") is not True:
-            found.append(f"{path}: lane `{lane.get('lane')}` drops approval, below the approval floor")
-    return found
+        lanes = json.loads(path.read_text())
+    except json.JSONDecodeError:
+        return [f"{path}: not JSON"]
+    return [f"{path}: {problem}" for problem in validate(lanes, schema)]
+
+
+def load_schemas(process: Path) -> tuple[dict[str, dict], list[str]]:
+    schemas, found = {}, []
+    for part, name in SCHEMAS.items():
+        path = process / "schema" / name
+        try:
+            schemas[part] = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError):
+            found.append(f"{path}: missing, or not JSON")
+            continue
+        found += [f"{path}: {problem}" for problem in unknown_keywords(schemas[part])]
+    return schemas, found
 
 
 def baseline_problems(path: Path, plugin: Path) -> list[str]:
@@ -119,13 +128,17 @@ def problems(root: Path) -> list[str]:
         plugin = root / entry["source"]
         ids = known_ids(plugin)
         for process in sorted(plugin.glob("skills/*/process/")):
+            schemas, schema_found = load_schemas(process)
+            found += schema_found
+            if schema_found:
+                continue
             lanes = process / "lanes.json"
-            found += lanes_problems(lanes) if lanes.is_file() else [f"{process}: no lanes.json"]
+            found += lanes_problems(lanes, schemas["lanes"]) if lanes.is_file() else [f"{process}: no lanes.json"]
             review = process / "review.json"
             found += baseline_problems(review, plugin) if review.is_file() else [f"{process}: no review.json"]
             if not (process / "glossary.md").is_file():
                 found.append(f"{process}: no glossary.md")
-            found += [p for card in sorted(process.glob("roles/*.md")) for p in card_problems(card, plugin, ids)]
+            found += [p for card in sorted(process.glob("roles/*.md")) for p in card_problems(card, plugin, ids, schemas["card"])]
     return found
 
 
