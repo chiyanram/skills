@@ -129,33 +129,33 @@ Walk every doc file that the change adds or edits: designs, specs, guides, READM
   Applies when: the change adds or edits a doc line.
   Evidence: the marker, quoted, at its `file:line`.
   Not a finding: a date that is part of the fact (decided edge).
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the line and confirm the marker only says someone checked the claim.
 - [ ] WD2 — Each number in an added line either is a chosen value or is a finding. A count of files, tests,
   endpoints, modules or rules is a finding.
   Applies when: an added doc line holds a number.
   Evidence: the number, quoted, and what it counts.
   Not a finding: a chosen value such as a version, a port, a limit or a time-to-live (decided edge).
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the line and confirm the number counts things other work adds or removes.
 - [ ] WD4 — For each added claim of "always", "never", "only" or "guaranteed", open the code or config it describes.
   A claim the code does not hold is a finding.
   Applies when: an added doc line says "always", "never", "only" or "guaranteed".
   Evidence: the claim, quoted, and the code or config `file:line` that does not hold it.
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the code or config and walk the case the claim gets wrong.
 - [ ] WD5 — A new spec whose subject is a bug fix is a finding: name the spec it should correct. A chore with no
   problem, scope or criteria in its work item is a finding.
   Applies when: the change adds a spec, or is a chore.
   Evidence: the new spec's subject and the spec it should correct, or the work item with the missing part.
   Not a finding: a bug in behaviour no spec owns, handled as a chore (decided edge).
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the spec it should correct, or the work item.
 - [ ] WD7 — For each added fact, search the docs for the same fact. A second copy without a link to its owner is a
   finding. An edit to a generated file with no matching edit to its source is a finding.
   Applies when: the change adds a fact to a doc, or edits a generated file.
   Evidence: both copies at `file:line`, or the generated file and its source.
   Not a finding: a copy of an expensive lookup that names its owner (decided edge).
-  Severity: Act on
+  Severity: blocker
   Verify: search the docs for the fact again, or re-open the generator's source.

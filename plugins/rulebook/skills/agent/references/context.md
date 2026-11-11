@@ -133,40 +133,40 @@ Walk every changed request builder, history window, compactor, cache breakpoint 
   Applies when: code creates a model request
   Evidence: each creation site at `file:line`
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open each site and the builder it calls
 - [ ] AE22 — Open the window and the compactor. A cut by message count that can fall between a call and its result,
   or no repair step before the request, is a finding.
   Applies when: code windows or compacts history
   Evidence: the cut and the repair call at `file:line`
   Not a finding: a run with one turn per request (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the cut and the code that sends the request
 - [ ] AE23 — Read the request from its first byte. A timestamp, id or unsorted collection before the per-turn
   content, or a rewritten earlier message, is a finding.
   Applies when: the provider caches prompts
   Evidence: the request builder at `file:line`
   Not a finding: no prompt cache or no shared prefix (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the builder and the order of its parts
 - [ ] AE24 — Find where cache breakpoints are set. A breakpoint outside the adapter, or one not at the end of the
   stable prefix, is a finding.
   Applies when: a request carries cache breakpoints
   Evidence: the breakpoint at `file:line`
   Not a finding: no prompt cache (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the adapter's request mapping
 - [ ] AE25 — Open the compaction trigger. A trigger on message count or characters, or a compaction that rewrites
   stored turns, is a finding.
   Applies when: code compacts or summarises history
   Evidence: the trigger and the write at `file:line`
   Not a finding: a run with one turn per request (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the trigger and what it stores
 - [ ] AE26 — For each tool that can return a list, a document or a page, find its bound. No bound, or a cut result
   that does not say it was cut, is a finding.
   Applies when: a tool result enters context
   Evidence: the result mapping at `file:line`
   Not a finding: a result small by its type (decided edge)
-  Severity: Consider
+  Severity: warning
   Verify: re-open the mapping and the run-record write
