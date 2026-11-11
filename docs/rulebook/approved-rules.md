@@ -1567,3 +1567,11 @@ The design asks whether a touched module needs a refactor first. Decided by the 
 | id | reference | rule | reason | source | evidence | status |
 |---|---|---|---|---|---|---|
 | SR23 | planning/references/spec-review.md | In each design, say whether a touched module needs a refactor first, and propose it as its own ticket. | because a change built on a module that resists it makes the next change harder too | operator decision 2026-11-11 (#307): design review asks "refactor first?", and improvement comes as its own tickets a person starts | OURS: no outside source | APPROVED BY ID AND INTENT 2026-11-11 (#307) · OPERATOR PREFERENCE · wording awaits the operator's yes in the PR |
+
+## Evidence is real output (#302)
+
+Decided by the operator on 2026-11-10 (#302): a row's result is copied from what its command printed, and a gate run is never the evidence for file content or for more than one acceptance criterion. The card wording is the issue's; the rule wording below is new and waits for the operator's word-by-word yes in the PR.
+
+| id | reference | rule | reason | source | evidence | status |
+|---|---|---|---|---|---|---|
+| VB10 | crq/references/verify-done.md | Copy each evidence row's result from its command's output; never cite a gate run as evidence for file content or for more than one criterion. | because a gate proves only what its tests check | operator decision 2026-11-10 (#302) | OURS: a rework run put one gate run on every acceptance-criterion row with "I read it by hand" as the result (#302) | APPROVED 2026-11-10 (#302) · OPERATOR PREFERENCE · wording awaits the operator's yes in the PR |
