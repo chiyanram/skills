@@ -203,41 +203,41 @@ Walk the whole design and every slice in it. During the build phase, also walk t
   Applies when: the design adds, removes or reroutes a call, or moves a call to a new caller.
   Evidence: the prose that tells the call change, and the call tree it is missing from.
   Not a finding: a text, style or data-only change with no call change (decided edge).
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the call tree and the prose, and confirm the call change is real.
 - [ ] PD2 — Compare the file-tree `diff` with the files the change touches. A missing file, a missing test file for a
   behaviour change, or a file with no purpose is a finding.
   Applies when: the design adds, changes or deletes a file.
   Evidence: the file-tree `diff`, and the file that is missing or has no purpose.
   Not a finding: no test file for a change with no behaviour (decided edge).
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the file tree and the list of touched files.
 - [ ] PD3 — Each new type, interface and public signature appears in the design with no body, after the caller's usage.
   A type the design does not show is a finding.
   Applies when: the design adds a type, an interface or a public signature, or changes a public signature.
   Evidence: the type or signature, and where the design should show it.
   Not a finding: private code inside a body (decided edge).
-  Severity: Act on
+  Severity: blocker
   Verify: search the design for the type or signature again.
 - [ ] PD4 — Each slice runs end-to-end and can be tried. A step that builds one layer only (a table, a service, an
   endpoint or a screen alone) is a finding, unless it is part of an expand–contract wide refactor.
   Applies when: the design lists a slice.
   Evidence: the slice, quoted, and the one layer it builds.
   Not a finding: an expand–contract wide refactor that no slice can land green (decided edge).
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the slice and the design's other slices.
 - [ ] PD5 — Each slice names a command with its test filter, and a manual step or "Manual: none". A slice that says
   only "tests pass" is a finding.
   Applies when: the design lists a slice.
   Evidence: the slice's check text, quoted.
   Not a finding: "Manual: none" for a slice with no surface to try (decided edge).
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the slice.
 - [ ] PD6 — Search the spec for file paths, signatures and code blocks. Each one is a finding: move it to the design.
   Applies when: the change adds or edits a spec.
   Evidence: the spec line with the path, signature or code block.
   Not a finding: a behaviour a user or an outside system sees (decided edge).
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the spec line.
 - [ ] PD7 — Compare each type, signature and file placement in the diff with the approved design and the PR's
   `[writer] DEVIATION:` notes. A difference with no note, an edit to the approved design, or a note that changes
@@ -245,26 +245,26 @@ Walk the whole design and every slice in it. During the build phase, also walk t
   Applies when: the build phase has a diff.
   Evidence: the diff's `file:line`, and the approved design's text it differs from, or the note.
   Not a finding: a change inside a body while every approved type, signature and placement holds (decided edge).
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the approved design and the diff line.
 - [ ] PD9 — Add up the files and lines the slices plan to change, generated files excluded. A plan over 400 lines or
   15 files with no slice moved to its own issue is a finding.
   Applies when: the design plans slices.
   Evidence: the planned file and line counts, per slice.
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: add up the counts again from the file tree and the slices.
 - [ ] PD10 — For each design decision backed by a prototype, find the verdict and its evidence in the design and the
   prototype's branch. Prototype code in the pull request's diff is a finding.
   Applies when: a design decision is backed by a prototype.
   Evidence: the decision, its missing verdict or evidence, or the prototype code's `file:line` in the diff.
   Not a finding: a question that code or docs settle, with no prototype (decided edge).
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the design, the prototype's branch and the diff.
 - [ ] PD11 — For each slice, find the AC-n it delivers. For each AC in the spec, find a slice that names it. A slice
   with no AC-n, or an AC that no slice names, is a finding.
   Applies when: the design lists slices.
   Evidence: the slice, quoted, or the AC line with no slice.
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the spec's ACs and every slice in the design.

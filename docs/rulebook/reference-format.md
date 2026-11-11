@@ -37,7 +37,7 @@ field:
   Applies when: <an observable predicate: a file type, a section, a lane, a kind of step>
   Evidence: <what a finding quotes>
   Not a finding: <the case in a few words> (decided edge), or none
-  Severity: Act on | Consider | Act on <hard tier>; Consider <soft tier>
+  Severity: blocker | warning | blocker <hard tier>; warning <soft tier>
   Verify: <what the verify pass re-opens before the finding is posted>
 ```
 
@@ -47,9 +47,10 @@ field:
 - **Not a finding** names a case from this reference's Decided edges, in a few words, marked "(decided edge)" or
   "(decided edges)". The full Skip when / Do not
   skip when wording stays in Decided edges. Write "none" when no edge applies. Never add an exception here.
-- **Severity** is fixed per check. **Act on**: the writer fixes it before the gate. **Consider**: the human decides.
-  A check with two tiers, such as a soft and a hard limit, names both: `Act on over the hard limit; Consider over
-  the soft limit`. A nit is never a check's severity.
+- **Severity** is fixed per check: **blocker** or **warning**, as the `crq` glossary defines them. The cited rule's
+  severity decides the verify pass's bucket: a blocker becomes Act on (fixed before the gate), a warning becomes
+  Consider (the human decides). A check with two tiers, such as a soft and a hard limit, names both: `blocker over
+  the hard limit; warning over the soft limit`. A nit is never a check's severity.
 - **Verify** names what to re-open: a line, a section, a command. What the verify pass does with it is the `crq`
   skill's `review-process` reference.
 
@@ -114,7 +115,7 @@ Why this is right.
   Applies when: …
   Evidence: …
   Not a finding: … (decided edge), or none
-  Severity: Act on
+  Severity: blocker
   Verify: …
 ````
 

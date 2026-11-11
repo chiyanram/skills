@@ -9,7 +9,7 @@ from schema_lite import unknown_keywords, validate  # noqa: E402
 
 SCHEMA_DIR = ROOT / "plugins" / "rulebook" / "skills" / "crq" / "process" / "schema"
 FINDING = {"id": "F1", "lens": "standards", "axis": "standards", "kind": "rule", "file": "src/a.py", "line": 12,
-           "rule": "CR1", "category": "style", "severity": "blocker", "grade": "walked", "evidence": "a.py:12 reads x",
+           "rule": "CR1", "category": "style", "severity": "nit", "grade": "walked", "evidence": "a.py:12 reads x",
            "finding": "the name hides the unit", "fix": "rename to timeout_ms"}
 
 
@@ -26,6 +26,8 @@ class SchemaLiteTest(unittest.TestCase):
         self.assertEqual(validate(FINDING, self.finding), [])
         self.assertEqual(validate({**FINDING, "kind": "logic", "rule": None, "line": "40-44"}, self.finding), [])
         self.assertEqual(validate({**FINDING, "line": "12"}, self.finding), [])
+        self.assertEqual(validate({**FINDING, "category": "bug", "severity": "blocker"}, self.finding), [])
+        self.assertEqual(validate({**FINDING, "category": "observability", "severity": "warning"}, self.finding), [])
 
     def test_should_fail_a_broken_finding(self):
         cases = {"bad-grade": {**FINDING, "grade": "guessed"}, "bad-axis": {**FINDING, "axis": "style"},
@@ -34,7 +36,9 @@ class SchemaLiteTest(unittest.TestCase):
                  "line-not-a-cite": {**FINDING, "line": "near the top"}, "line-open-range": {**FINDING, "line": "40-"},
                  "extra-field": {**FINDING, "confidence": "high"},
                  "free-text-severity": {**FINDING, "severity": "Act on"},
-                 "unknown-category": {**FINDING, "category": "naming"}}
+                 "unknown-category": {**FINDING, "category": "naming"},
+                 "style-blocker": {**FINDING, "severity": "blocker"},
+                 "other-category": {**FINDING, "category": "other"}}
         for case, finding in cases.items():
             with self.subTest(case):
                 self.assertTrue(validate(finding, self.finding))

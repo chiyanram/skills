@@ -25,7 +25,7 @@ The finding:
 
 ```json
 {"id": "F1", "lens": "errors", "file": "src/main/java/library/ReminderJob.java", "line": 31,
- "rule": "correctness", "severity": "Act on", "grade": "walked",
+ "rule": "correctness", "severity": "blocker", "grade": "walked",
  "finding": "member.email() can be null for a member with no address; strip() then throws and the job stops.",
  "fix": "Skip members with no email address."}
 ```

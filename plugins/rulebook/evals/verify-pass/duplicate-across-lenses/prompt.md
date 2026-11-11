@@ -24,11 +24,11 @@ The findings:
 
 ```json
 [{"id": "F1", "lens": "spec", "file": "src/main/java/bank/AccountService.java", "line": 21,
-  "rule": "CR1", "severity": "Act on", "grade": "walked",
+  "rule": "CR1", "severity": "blocker", "grade": "walked",
   "finding": "A withdrawal of exactly the balance now throws; the contract allows it.",
   "fix": "Restore >."},
  {"id": "F2", "lens": "boundaries", "file": "src/main/java/bank/AccountService.java", "line": 21,
-  "rule": "CR1", "severity": "Act on", "grade": "walked",
+  "rule": "CR1", "severity": "blocker", "grade": "walked",
   "finding": "amount == balance is rejected, against the contract.",
   "fix": "Compare with >."}]
 ```
