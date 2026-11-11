@@ -26,7 +26,7 @@ The finding:
 
 ```json
 {"id": "F1", "lens": "spec", "file": "src/main/java/library/LoanQuery.java", "line": 16,
- "rule": "CR1", "severity": "Act on", "grade": "cited",
+ "rule": "CR1", "severity": "blocker", "grade": "cited",
  "finding": "AC-2 makes page 1 the first page; page * size skips the first page of loans.",
  "fix": "Use (page - 1) * size."}
 ```

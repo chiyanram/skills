@@ -188,62 +188,62 @@ Walk every AC in the spec's acceptance-criteria section that the change adds or 
   Applies when: the change adds or edits acceptance criteria.
   Evidence: the file and line where the criteria are written outside the spec.
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open that file and confirm it holds the criterion text, not a link.
 - [ ] GA2 — An AC that is not its own `AC-n` line, or an approved number that changed or was reused, is a finding.
   Applies when: the change adds or edits an AC.
   Evidence: the AC line, and the old and new number when a number changed.
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the AC, and the approved spec for a changed number.
 - [ ] GA4 — Two ACs or more that differ only in values, or a table with no expected-result column, are a finding.
   Applies when: the change adds or edits two ACs or more with the same text apart from values, or a table under an AC.
   Evidence: the ACs side by side, or the table header.
   Not a finding: cases that differ in more than input and expected result (decided edge).
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the ACs or the table.
 - [ ] GA5 — An AC with no observable outcome, or one that names a class or a test level, is a finding, and so is a
   behaviour with no failure or refusal AC.
   Applies when: the change adds or edits an AC.
   Evidence: the AC line, quoted, or the behaviour and its list of ACs.
   Not a finding: a second visible effect of the same event; a failure path in a sibling AC (decided edges).
-  Severity: Act on
+  Severity: blocker
   Verify: re-open every AC of the behaviour, siblings included.
 - [ ] GA6 — AC text that does not start with "should" or that names no behaviour is a finding.
   Applies when: the change adds or edits AC text.
   Evidence: the AC line, quoted.
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the AC line.
 - [ ] AC7 — Open the change. When it alters stored data or a default, an AC set with no pre-change starting state is a
   finding.
   Applies when: the change alters stored data or a default.
   Evidence: the stored data or default that changes, and the ACs' starting states.
   Not a finding: a new table with no rows before the change (decided edge).
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the change to the data or default, and the ACs.
 - [ ] AC8 — A table column with one value on every row is a finding.
   Applies when: the change adds or edits a table under an AC.
   Evidence: the column header and its one value.
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the table.
 - [ ] AC9 — A noun not in the glossary, a related spec or this spec's own definitions is a finding.
   Applies when: the change adds or edits AC text.
   Evidence: the noun, the AC line, and where you looked for it.
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: search the glossary, the related specs and this spec for the noun again.
 - [ ] AC10 — Compare the acceptance-criteria text with the approved version. A changed text with no new approval is a
   finding.
   Applies when: the spec has passed the approval gate.
   Evidence: the old and new text, and the change request with no new approval.
   Not a finding: a whitespace or typo edit that keeps the meaning (decided edge).
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the approved version and the change request.
 - [ ] AC12 — For a bug, find the current, expected and must-not-change behaviour. Each part missing is a finding.
   Applies when: the ticket is a bug.
   Evidence: the spec's sections, and which part is missing.
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the bug spec.

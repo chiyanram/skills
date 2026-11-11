@@ -134,40 +134,40 @@ Walk every changed eval harness, golden set, grader, judge and eval sandbox.
   Applies when: code runs an eval of an agent capability
   Evidence: the call into the agent and the baseline comparison at `file:line`
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the harness and the entry point it calls
 - [ ] AEN4 — List the tools each evaluated capability can call. A tool that writes, sends or acts outside the run
   and does not point at a sandbox, or a grader that does not read the sandbox's end state, is a finding.
   Applies when: an eval runs a capability with side-effecting tools
   Evidence: the tool wiring at `file:line`
   Not a finding: a capability with no side-effecting tool (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the eval's tool wiring against the capability's tool list
 - [ ] AE44 — Open the case status type. An infrastructure error, timeout or truncation counted as a failed case is a
   finding.
   Applies when: code records an eval case's outcome
   Evidence: the status mapping at `file:line`
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the mapping and the pass-rate calculation
 - [ ] AE45 — For each judge call, name the property it grades. A property code can check, or a candidate output put
   into the judge's instructions, is a finding.
   Applies when: an eval calls an LLM judge
   Evidence: the judge call at `file:line`
   Not a finding: an open-ended property (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the judge's input builder
 - [ ] AE46 — For each judge that gates, find its calibration against human labels and the stored model and prompt
   version. A missing one is a finding.
   Applies when: a threshold reads an LLM judge's score
   Evidence: the calibration record and the score record at `file:line`
   Not a finding: a judge that only reports (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the score record's fields
 - [ ] AE48 — For each case with a safe and an unsafe path, find the trajectory assertions and the end-state check. A
   text-only assertion, no forbidden-call check, or no declared match mode is a finding.
   Applies when: an eval case runs tools
   Evidence: the assertions at `file:line`
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the case and its grader

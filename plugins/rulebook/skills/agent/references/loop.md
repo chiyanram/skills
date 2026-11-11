@@ -155,68 +155,68 @@ Walk every changed agent loop, step handler, tool executor, approval pause and r
   Applies when: code decides the next step from a model reply
   Evidence: the branch at `file:line`
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the step type and every switch over it
 - [ ] AE20 — Find where tool results are added to history. Results split over messages, out of call order, or a
   call with no result is a finding.
   Applies when: a reply can hold more than one tool call
   Evidence: the history append at `file:line`
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the append and the call-id match
 - [ ] AE16 — For an unknown tool, invalid arguments and a denied approval, find what the model receives. A run that
   ends on one of them, or an error result that names no valid form, is a finding.
   Applies when: code dispatches tool calls
   Evidence: the branch for each fault at `file:line`
   Not a finding: a platform fault (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the dispatcher's error branches
 - [ ] AE17 — Find each tool error text sent to the model. An exception message, a stack trace or a class name in it
   is a finding.
   Applies when: code turns a tool exception into a tool result
   Evidence: the text built at `file:line`
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the error mapping and the log call beside it
 - [ ] AE18 — Find the per-tool failure cap and the repeated-call cap. A loop with either missing, or a cap that only
   logs, is a finding.
   Applies when: code runs a tool loop
   Evidence: the caps at `file:line`, or their absence
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the loop and what happens at each cap
 - [ ] AE19 — List every path that calls the model: main loop, resume, summariser, judge. A path with no call-ceiling
   check before the call is a finding.
   Applies when: code calls the model inside a run
   Evidence: each call site at `file:line` and its check
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open each call site
 - [ ] AE13 — Find how a run pauses for approval and how it resumes. A pause not persisted by call id, or a resume
   path outside the main loop, is a finding.
   Applies when: a tool can need approval
   Evidence: the pause and the resume at `file:line`
   Not a finding: a run with no approval step (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the resume entry point and the loop it calls
 - [ ] AE14 — Open the resume entry point. A call taken from the client's request, or a resume that skips
   authorization or tool guards, is a finding.
   Applies when: a client can resume a paused run
   Evidence: the resume code at `file:line`
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the lookup of the stored call and the checks after it
 - [ ] AE15 — Find where tool results are persisted. A result stored only with its whole step, or a resume that runs
   calls with a stored result, is a finding.
   Applies when: a run can be resumed or restarted
   Evidence: the store and the resume filter at `file:line`
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the store's key and the resume filter
 - [ ] AEN3 — For each side-effecting tool, find the idempotency key it sends. No key, or a key that is not the
   call's result key (run id, step, call id), is a finding.
   Applies when: a tool writes, sends, pays or changes state outside the run
   Evidence: the key at `file:line`
   Not a finding: a read-only tool; a remote end that takes no key (decided edges)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the tool's request builder

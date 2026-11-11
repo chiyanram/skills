@@ -41,6 +41,8 @@ reach for a word under "avoid", use the term instead.
 | **judge files** | tests, test config, the gate command and what it runs | test setup, harness |
 | **gate** | the full test run before a human is asked to merge: CI, a queue, or a local run on a runner | — |
 | **finding** | one problem at `file:line`, with the rule it breaks | comment, remark |
+| **severity** | how bad a finding is, set by the finder: blocker, warning or nit; each review check's Severity line gives it, and a style finding is always a nit | Act on, Consider (for a severity) |
+| **bucket** | what happens to a finding, set by the verify pass: Act on (`act_on`), Consider (`consider`), noted or dismissed; the cited rule's severity decides it, blocker → Act on and warning → Consider | severity (for a bucket) |
 | **lens** | one rubric a fresh finder applies | perspective, reviewer type |
 
 ## Roles

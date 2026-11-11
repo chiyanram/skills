@@ -77,7 +77,7 @@ Walk every changed budget check, usage record and model call inside a run with a
   Applies when: a run or a workspace has a budget
   Evidence: the check and the settlement at `file:line`
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open each model call path, resume included
 - [ ] AEN6 — Open the workspace budget store. A read-then-write check, a counter held in one process while several
   processes spend from it, a failed call that does not settle from its usage so far, or a reservation with no expiry,
@@ -85,5 +85,5 @@ Walk every changed budget check, usage record and model call inside a run with a
   Applies when: more than one run can spend from one budget
   Evidence: the reserve or check at `file:line`
   Not a finding: one run at a time per workspace; a failed stream settled from its usage so far (decided edges)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the store's reserve and settle operations
