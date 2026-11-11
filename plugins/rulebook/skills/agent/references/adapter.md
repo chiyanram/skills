@@ -176,68 +176,68 @@ Walk every changed model adapter, model port decorator, retry policy, stream han
   Applies when: code reads a stop or finish reason from a provider reply
   Evidence: the read or the switch at `file:line`
   Not a finding: a library's closed stop-reason type (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the mapping and every switch over its result
 - [ ] AE2 — Find each path that runs tool calls from a reply. A path that does not first require the tool-call stop
   reason is a finding.
   Applies when: code runs tool calls from a model reply
   Evidence: the path at `file:line` and the condition it checks
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the loop's step from reply to tool run
 - [ ] AE6 — Find where tool-call arguments are parsed. Hand-built parsing, an empty-object fallback, or no schema
   check before the tool runs is a finding.
   Applies when: code parses tool-call arguments
   Evidence: the parse and the tool run at `file:line`
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the parse and the branch for a malformed call
 - [ ] AE5 — Open the retry policy for streamed calls. A retry that does not check that no chunk reached a consumer is
   a finding.
   Applies when: a streamed model call can be retried
   Evidence: the retry condition at `file:line`
   Not a finding: a stream still buffered in the adapter (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open where chunks are forwarded and where the retry decides
 - [ ] AE3 — Find each retry loop around a model call. A retry inside an adapter, or an adapter error without status,
   retry-after, request id, timeout-or-network and response-started, is a finding.
   Applies when: an adapter or its caller handles a failed model call
   Evidence: the retry or the error type at `file:line`
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the error type and every caller that retries
 - [ ] AEN2 — Find what the circuit breaker counts. A 429 or a response with retry-after counted as a breaker failure,
   or an overload counted before the retry policy gives up, is a finding.
   Applies when: a breaker wraps a model call
   Evidence: the record call, where it sits against the retry policy, and the errors that reach it, at `file:line`
   Not a finding: a used-up quota with no retry-after (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the breaker's failure predicate
 - [ ] AE8 — Open the stream's event handler. An error event that does not fail the request, or an unknown or
   keep-alive event that throws or ends the stream, is a finding.
   Applies when: code reads a provider's event stream
   Evidence: the event branch at `file:line`
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the handler's branches and its fall-through
 - [ ] AE7 — Open the usage mapping. Usage summed across stream events, or a cache or reasoning count dropped or
   counted twice, is a finding.
   Applies when: code reads provider usage
   Evidence: the mapping at `file:line`
   Not a finding: a library's own usage record (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the mapping against the record's fields
 - [ ] AE9 — Find where each call's output-token cap is set. A literal in the adapter, or a call with no cap, is a
   finding.
   Applies when: code builds a model request
   Evidence: the cap's source at `file:line`
   Not a finding: a default in agent configuration (decided edge)
-  Severity: Consider
+  Severity: warning
   Verify: re-open the request builder and the configuration it reads
 - [ ] AE10 — Find each fallback to another model. Fallback inside an adapter, no explicit model mapping, or cost priced
   on the primary model is a finding.
   Applies when: a second model can answer a failed call
   Evidence: the fallback and the pricing call at `file:line`
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the decorator and the cost calculation

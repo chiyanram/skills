@@ -103,33 +103,33 @@ cites the `file:line` and the rule ID.
   existing test file
   Evidence: the old and new line at `file:line`, and the spec searched
   Not a finding: behaviour change named in the spec (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the spec and the acceptance criteria at the head
 - [ ] TI2 — For each rewritten test, write the criterion it checked before and the one it checks now. A different
   criterion that no spec line explains is a finding.
   Applies when: the setup, action or assertions of an existing test change
   Evidence: the two criteria, and the test at `file:line` before and after
   Not a finding: behaviour change named in the spec (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the test at the base and at the head
 - [ ] TI3 — For each mock, stub or fake that now stands where an existing test called real code, find the pull
   request's reason. One with no reason is a finding.
   Applies when: an existing test gains a double for code it called before
   Evidence: the double at `file:line` and the real call it replaces
   Not a finding: a slow, flaky or outside call with a named reason (decided edge)
-  Severity: Consider
+  Severity: warning
   Verify: re-open the test at the base to confirm it called the real code
 - [ ] TI4 — For each matcher an existing test widens, find what the criterion promises about that value. A widened
   matcher on a promised value is a finding.
   Applies when: an exact matcher in an existing test becomes `any()`, `_`, `contains`, `startsWith` or a type match
   Evidence: the old and new matcher at `file:line`, and the criterion
   Not a finding: a value outside the promise or unknowable in the test (decided edge)
-  Severity: Consider
+  Severity: warning
   Verify: re-open the criterion and the old matcher
 - [ ] TI5 — For each changed line in an existing snapshot or golden file, find the code or spec change in this diff
   that explains it. A line none explains is a finding.
   Applies when: an existing snapshot or golden file changes
   Evidence: the changed snapshot line at `file:line`, and the code searched
   Not a finding: a new snapshot or golden file (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the snapshot diff and the code change it traces to

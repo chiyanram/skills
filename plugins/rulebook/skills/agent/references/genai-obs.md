@@ -121,33 +121,33 @@ Walk every changed span, metric, log call and call record around a model call, a
   Applies when: code calls a model
   Evidence: the span and its attributes at `file:line`
   Not a finding: a library's conventions-based instrumentation (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the span and the constants it uses
 - [ ] AE38 — For each tool call and run, find the tool span and the agent span. A missing span, a span not linked by
   call id, or a tool span that stays OK on an error result, is a finding.
   Applies when: code runs a tool or an agent run
   Evidence: the span code at `file:line`
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the tool executor and its error branch
 - [ ] AE39 — `grep -nE "INPUT_MESSAGES|OUTPUT_MESSAGES|SYSTEM_INSTRUCTIONS|TOOL_CALL_ARGUMENTS|prompt|completion"` in
   spans and log calls. A capture of content not guarded by the one deployment setting is a finding.
   Applies when: a span or log call is added near a model or tool call
   Evidence: the attribute or log call at `file:line`
   Not a finding: capture turned on by the deployment setting (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the setting and every use of it
 - [ ] AE40 — Find each GenAI attribute or metric name. A string literal outside the one constants file, or a file
   with no pinned conventions version, is a finding.
   Applies when: code names a GenAI attribute or metric
   Evidence: the literal at `file:line`
   Not a finding: a library's conventions-based instrumentation (decided edge)
-  Severity: Consider
+  Severity: warning
   Verify: re-open the constants file
 - [ ] AE41 — List every path that calls a model. A path that writes no call record on failure, or a record without
   request id, served model, retry count or final-attempt latency, is a finding.
   Applies when: code calls a model
   Evidence: the record write, or its absence, at `file:line`
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open each call path and its error branch

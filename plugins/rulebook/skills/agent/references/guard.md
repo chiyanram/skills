@@ -147,47 +147,47 @@ content reaches the model.
   Applies when: code runs a tool call
   Evidence: each path at `file:line`
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open each caller of the tool executor
 - [ ] AE28 — For each guard, find what happens when it throws, times out or has no configuration. A path that lets
   the action continue, or a setting that turns the guard off, is a finding.
   Applies when: a guard can fail or be configured
   Evidence: the catch, timeout or setting at `file:line`
   Not a finding: a tuned threshold (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the guard's error paths and its configuration
 - [ ] AE31 — Find where approval is decided. A decision read from the model, from a tool's annotations or from its
   description is a finding; so is an unclassed tool that runs without approval.
   Applies when: code decides whether a tool call needs approval
   Evidence: the decision at `file:line`
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the risk configuration and its default
 - [ ] AE34 — Open each guard's return type and the runner. A guard that only logs, a runner that does not stop at the
   first short-circuit, or no record of which guard fired is a finding.
   Applies when: code adds or runs a guard
   Evidence: the guard and the runner at `file:line`
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the runner's order and its record
 - [ ] AE29 — Find each place where outside content enters a request. Content put in system or user text, or a tool
   result that is not encoded or not labelled with its source, is a finding.
   Applies when: content from a tool, retrieval, MCP server or the web reaches the model
   Evidence: the request part at `file:line`
   Not a finding: fixed text your system wrote (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the request builder
 - [ ] AE30 — For each sink of model output (store, cache, message, API), find the output check before it and the
   placeholder on rejection. A missing check, or a rejected output kept anywhere, is a finding.
   Applies when: model output is stored, cached or sent
   Evidence: the sink and the check at `file:line`
   Not a finding: none
-  Severity: Act on
+  Severity: blocker
   Verify: re-open every write of the output
 - [ ] AE36 — For each MCP tool, find its exposed name and the check on its result. An unprefixed name, or a result
   that enters context with no schema or size check, is a finding.
   Applies when: the agent loads tools from an MCP server
   Evidence: the registration and the result mapping at `file:line`
   Not a finding: no MCP server (decided edge)
-  Severity: Act on
+  Severity: blocker
   Verify: re-open the MCP tool adapter
