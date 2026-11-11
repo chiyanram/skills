@@ -25,11 +25,14 @@ class SchemaLiteTest(unittest.TestCase):
     def test_should_accept_a_finding(self):
         self.assertEqual(validate(FINDING, self.finding), [])
         self.assertEqual(validate({**FINDING, "kind": "logic", "rule": None, "line": "40-44"}, self.finding), [])
+        self.assertEqual(validate({**FINDING, "line": "12"}, self.finding), [])
 
     def test_should_fail_a_broken_finding(self):
         cases = {"bad-grade": {**FINDING, "grade": "guessed"}, "bad-axis": {**FINDING, "axis": "style"},
                  "no-evidence": {k: v for k, v in FINDING.items() if k != "evidence"},
-                 "line-not-number-or-text": {**FINDING, "line": [12]}, "empty-finding": {**FINDING, "finding": ""}}
+                 "line-not-number-or-text": {**FINDING, "line": [12]}, "empty-finding": {**FINDING, "finding": ""},
+                 "line-not-a-cite": {**FINDING, "line": "near the top"}, "line-open-range": {**FINDING, "line": "40-"},
+                 "extra-field": {**FINDING, "confidence": "high"}}
         for case, finding in cases.items():
             with self.subTest(case):
                 self.assertTrue(validate(finding, self.finding))
