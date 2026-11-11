@@ -4,7 +4,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tests.support import run_check
+from tests.support import ROOT, run_check
+
+SCHEMA_DIR = ROOT / "plugins" / "rulebook" / "skills" / "crq" / "process" / "schema"
+SCHEMAS = {f"skills/crq/process/schema/{f.name}": f.read_text() for f in SCHEMA_DIR.glob("*.schema.json")}
 
 MARKETPLACE = {"name": "m", "owner": {"name": "o"}, "plugins": [{"name": "p", "source": "./plugins/p"}]}
 REFERENCE = "# Demo\n\nRead it when testing.\n\n## Rules\n\n- **DM1** — Do one thing, because two break.\n"
@@ -32,6 +35,19 @@ PLANTED = {
     "lane-drops-approval": ("skills/crq/process/lanes.json",
                             json.dumps(LANES).replace('"feature", "approval": true', '"feature", "approval": false')),
     "lane-missing": ("skills/crq/process/lanes.json", json.dumps({"lanes": LANES["lanes"][:3]})),
+    "lane-out-of-order": ("skills/crq/process/lanes.json",
+                          json.dumps({"lanes": [LANES["lanes"][0], LANES["lanes"][2], LANES["lanes"][1],
+                                                LANES["lanes"][3]]})),
+    "lane-approval-not-boolean": ("skills/crq/process/lanes.json",
+                                  json.dumps(LANES).replace('"bug", "approval": true', '"bug", "approval": "yes"')),
+    "lane-field-missing": ("skills/crq/process/lanes.json", json.dumps(LANES).replace('"lenses": "1", ', "", 1)),
+    "unknown-guardrail": ("skills/crq/process/roles/finder.md", CARD.replace("[read-only]", "[read-only, no-sudo]")),
+    "empty-field": ("skills/crq/process/roles/finder.md", CARD.replace("input: the diff", "input:")),
+    "no-card-schema": ("skills/crq/process/schema/card-v1.schema.json", None),
+    "no-finding-schema": ("skills/crq/process/schema/finding-v1.schema.json", None),
+    "schema-unknown-keyword": ("skills/crq/process/schema/lanes-v1.schema.json",
+                               SCHEMAS["skills/crq/process/schema/lanes-v1.schema.json"].replace(
+                                   '"minItems": 4', '"maxItems": 4, "minItems": 4')),
     "no-glossary": ("skills/crq/process/glossary.md", None),
     "no-review": ("skills/crq/process/review.json", None),
     "baseline-empty": ("skills/crq/process/review.json", json.dumps({"baseline": []})),
@@ -51,6 +67,7 @@ def process_tree() -> tempfile.TemporaryDirectory:
         "skills/crq/process/lanes.json": json.dumps(LANES),
         "skills/crq/process/review.json": json.dumps(REVIEW),
         "skills/crq/process/roles/finder.md": CARD,
+        **SCHEMAS,
         **{f"evals/finder/c{n}/prompt.md": "Review it.\n" for n in (1, 2, 3)},
         **{f"evals/finder/c{n}/graders/g.md": "---\ntype: llm\n---\nPASS if it finds.\n" for n in (1, 2, 3)},
     }
@@ -86,6 +103,13 @@ class CheckProcessTest(unittest.TestCase):
             router.parent.mkdir(parents=True)
             router.write_text("# Tidy\n\n## Rules\n\n- **TD1** — Tidy only, because a fix hides.\n")
             plant(Path(root), "skills/crq/process/roles/finder.md", CARD.replace("[DM1]", "[DM1, TD1]"))
+            result = run_check("process", Path(root))
+            self.assertEqual(result.returncode, 0, result.stdout)
+
+    def test_should_accept_prose_guardrails_in_version_1(self):
+        with process_tree() as root:
+            plant(Path(root), "skills/crq/process/roles/finder.md",
+                  CARD.replace("[read-only]", "read-only tools; no push"))
             result = run_check("process", Path(root))
             self.assertEqual(result.returncode, 0, result.stdout)
 

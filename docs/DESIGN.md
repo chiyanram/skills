@@ -57,8 +57,13 @@ The crq process gets a side an engine can read, so an engine runs the same proce
 **Role cards.** One markdown file per role: coordinator, design-reviewer, test-first, implementer, cleanup, finder,
 verify pass, retro and onboarder. The onboarder writes a project's brief and glossary once, for every other role.
 - **Frontmatter** (the same fields everywhere): role, steps, input, `must_not_see`, hand-off, tools, enforced
-  guardrails (IDs from the engine's closed list, agent-factory #424), rules (by id). An engine enforces it. `next` is
-  dropped: the lanes hold the flow.
+  guardrails (IDs from the closed list in the card schema), rules (by id). An engine enforces it. `next` is dropped:
+  the lanes hold the flow.
+- **Schemas** (#305): this repo owns the format of its cards, lanes and findings. Each is a versioned JSON schema in
+  `process/schema/` that ships with the plugin, so an engine reads the version it pins; a new version is a new file
+  beside the old one. `check_process.py` checks every card and lanes file against them. A card and a finding take no
+  field the schema does not name, and a finding's `line` is a number, or text such as `12` or `40-44`, so every cite
+  points at a real line.
 - **Body:** the job, a "done when" line, numbered steps, and an "it's working if" list.
 - **No persona and no capitals.** A prohibition appears only for a hard guardrail.
 - **One glossary** is used by every card.

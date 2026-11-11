@@ -95,8 +95,8 @@ This repo publishes the versioned format of its cards, lanes and findings, and i
 **Why.** This repo stands alone and owns its formats. A tool that uses it pins a version and reads that version's
 format.
 
-**How it's checked.** `check_process.py` fails a role card that misses or adds a field, and a lanes file that misses
-one.
+**How it's checked.** `check_process.py` validates every role card and the lanes file against the versioned schemas in
+`process/schema/`, and fails when a schema is missing.
 
 ## K9
 
