@@ -4,6 +4,10 @@ This repo ships two Claude Code plugins (ADR-0009): `rulebook` from `plugins/rul
 tools, from `plugins/toolbox/`. Everything else keeps them correct and releases them. People start at `README.md`;
 `CONTRIBUTING.md` holds the procedures.
 
+Codebase health: each change leaves the modules it touches no worse than it found them. If the change would make one
+worse, say so in the design and propose the refactor as its own ticket. We care about the next change being easy, not
+only this one working.
+
 ## Check
 
 Run all three before you push. CI runs `make lint` and `make test` on every pull request and on push to `main`.
@@ -47,6 +51,7 @@ docs/DESIGN.md                                   the design on one page: rules, 
 
 ## Pointers
 
+- The principles behind the plugins, K1–K9: `PRINCIPLES.md`.
 - A new rule, reference or check: `CONTRIBUTING.md`.
 - Commit and PR format: `CONTRIBUTING.md#commit-messages`. Commit types and what each releases:
   `CONTRIBUTING.md#releases`.

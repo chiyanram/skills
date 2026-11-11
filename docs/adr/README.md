@@ -13,3 +13,4 @@ Each file records one decision about the shape of the plugins: its context, the 
 | [7](0007-releases-cut-from-commit-messages.md) | Releases are cut from commit messages |
 | [8](0008-crq-pipeline-is-a-workflow-skill.md) | The /crq pipeline ships inside the rulebook as the `crq` skill |
 | [9](0009-a-second-plugin-of-typed-only-tools.md) | A second plugin, `toolbox`, of typed-only tools |
+| [10](0010-plugins-may-ship-small-check-scripts.md) | Plugins may ship small check scripts |
