@@ -44,6 +44,8 @@ Contents: Rules · When X, use Y · Good / Bad (SR2, SR3, SR4, SR10, SR11) · De
   and why it is shaped so (commits, PRs, issues), because changing code without its reason reintroduces old bugs.
 - **SR22** — Give a research helper neutral questions about how the current code works, and keep the wanted change
   out of them, because a helper that knows the goal reports what supports it.
+- **SR23** — In each design, say whether a touched module needs a refactor first, and propose it as its own ticket,
+  because a change built on a module that resists it makes the next change harder too.
 
 ## When X, use Y
 
@@ -73,6 +75,8 @@ Contents: Rules · When X, use Y · Good / Bad (SR2, SR3, SR4, SR10, SR11) · De
 | research on more than one module or service | two to four read-only helpers, each on one angle, then one synthesis: overview, key concepts, how it works, where things live, gotchas (SR21) | each angle stays inside one context |
 | code that looks odd or redundant | its history: `git log` and `git blame` on the lines, then the pull requests and issues they cite (SR21) | the odd line is often the fix for a past bug |
 | a brief for a research helper or subagent | questions on how it works today ("how does X reach Y?"), with the wanted change kept in the design notes, not the brief (SR22) | the helper looks for what is there, not for what fits the goal |
+| a design adds to a module that is hard to change: long methods, tangled dependencies, no tests around the touched code | a "refactor first?" line naming the module and why, with the refactor proposed as its own ticket for a person to start (SR23) | a change built on it inherits the mess and leaves it worse |
+| a touched module is easy to change | one line: "refactor first: no", with the reason (SR23) | the answer is on record, so the reviewer need not ask |
 
 ## Good / Bad
 
@@ -257,6 +261,8 @@ Each failure has a trigger, a chain and a sign someone can check.
   — **Do not skip when** the change is in the one-way-door lane (SR20, LN3). — **Confidence** high
 - **Skip when** the change only adds new code and touches no existing behaviour: there is no history to read. —
   **Do not skip when** the design plans to delete or reshape existing code (SR21). — **Confidence** high
+- **Skip when** the change is in the tiny lane: it has no design (LN2). — **Do not skip when** a design in any other
+  lane touches an existing module (SR23). — **Confidence** high
 
 ## Review checks
 
@@ -386,3 +392,10 @@ Walk the whole spec and the whole design in one round, every section, before you
   Not a finding: none
   Severity: Act on
   Verify: re-open the brief.
+- [ ] SR23 — In the design, find the "refactor first?" answer for each existing module it touches. A missing answer,
+  or a refactor folded into this change's slices instead of its own ticket, is a finding.
+  Applies when: the change has a design that touches an existing module.
+  Evidence: the design's refactor-first line or its absence, or the slice that holds the refactor.
+  Not a finding: a change in the tiny lane (decided edge).
+  Severity: Consider
+  Verify: re-open the design and its slices.
