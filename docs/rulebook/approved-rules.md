@@ -1583,3 +1583,12 @@ Decided by the operator on 2026-11-11 (#312): every check or scanner ships with 
 | id | reference | rule | reason | source | evidence | status |
 |---|---|---|---|---|---|---|
 | S7 | testing/references/strategy.md | Ship each check or scanner with planted good and bad cases, and turn a miss found in review into a failing planted case before the fix. | because a check never seen failing may never fire | operator decision 2026-11-11 (#312) | OURS: no outside source | APPROVED 2026-11-11 (#312) · OPERATOR PREFERENCE · wording awaits the operator's yes in the PR |
+
+## Quarantine (operator, 2026-11-11)
+
+Decided by the operator on 2026-11-11, from lessons on another project's CI quarantine: quarantine one test, never a whole job; each entry has an owner, a ticket and a capped expiry; a green that hides a quarantined failure says so where people read it. The cap is the project's setting, not a number in the rule. The wording below was shown to the operator and approved word for word.
+
+| id | reference | rule | reason | source | evidence | status |
+|---|---|---|---|---|---|---|
+| VB11 | crq/references/verify-done.md | Quarantine one failing test, never a whole job, with an owner, a ticket and an expiry within the project's quarantine limit. | because a broad or endless quarantine hides the next real failure | operator decision 2026-11-11 | OURS: a job-wide, uncapped quarantine let real failures through on another project | APPROVED 2026-11-11 · OPERATOR PREFERENCE · wording approved word for word |
+| VB12 | crq/references/verify-done.md | When a check passes only because a test is quarantined, say so where people read the result, naming each test and its expiry. | because a green that hides a failure reads as all clear | operator decision 2026-11-11 | OURS: a quarantined failure shown only in a log was missed on another project | APPROVED 2026-11-11 · OPERATOR PREFERENCE · wording approved word for word |

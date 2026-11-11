@@ -63,5 +63,5 @@ An engine reads these to run the same process a person runs with `/crq`.
 | [retro](references/retro.md) | RT1–RT10 | when the engine writes a merge's timeline record, when a human starts a full retro, or when you write a lesson's PR |
 | [review-process](references/review-process.md) | RV1–RV9 | before you run, write or tune a review |
 | [test-integrity](references/test-integrity.md) | TI1–TI5 | when you review a diff that edits an existing test, a snapshot or a golden file |
-| [verify-done](references/verify-done.md) | VB1–VB10 | when you build a change, before you call it ready, or when you check an implementer's evidence rows |
+| [verify-done](references/verify-done.md) | VB1–VB12 | when you build a change, before you call it ready, or when you check an implementer's evidence rows |
 <!-- /index -->
