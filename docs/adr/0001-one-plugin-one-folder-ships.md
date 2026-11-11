@@ -2,7 +2,8 @@
 
 Status: accepted
 
-Amended by [ADR-0009](0009-a-second-plugin-of-typed-only-tools.md).
+Amended by [ADR-0009](0009-a-second-plugin-of-typed-only-tools.md). Superseded in part by
+[ADR-0010](0010-plugins-may-ship-small-check-scripts.md): a plugin may ship small check scripts.
 
 ## Context
 
@@ -15,4 +16,5 @@ The repo ships one plugin, `rulebook`, from `plugins/rulebook/`. The marketplace
 ## Consequences
 
 - A project installs one thing.
-- Design work, scripts and tests never reach an agent's plugin cache.
+- Design work, the repo's own scripts and tests never reach an agent's plugin cache (ADR-0010 lets a plugin ship small
+  check scripts).
