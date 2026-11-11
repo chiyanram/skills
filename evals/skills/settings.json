@@ -1,0 +1,5 @@
+{
+  "runs_per_case": 3,
+  "baseline_rounds": 2,
+  "noise_floor_runs": 1
+}

@@ -221,6 +221,12 @@ To prune a skill, follow [the pruning method](docs/rulebook/pruning-method.md). 
 change ships only if its scenarios do not get worse. Results land in a `results/` folder under the eval dir you ran,
 which git ignores.
 
+## Run the skills eval
+
+A skill's own eval sits in `evals/skills/<skill>/`: a few real tasks, scored by that skill's review checks, run with
+the full skill and with a shorter candidate. A pruning PR shows its result beside the operator-approved baseline.
+The runs are real model calls and stay manual; see [evals/skills/README.md](evals/skills/README.md).
+
 ## Releases
 
 ```text
