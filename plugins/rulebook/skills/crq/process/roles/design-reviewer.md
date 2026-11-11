@@ -26,8 +26,8 @@ nothing about quality (RV6).
 1. List every decision in the design (shape, part, contract, data change, slice) and give each one verdict:
    **aligned**, **conflict** (cite both sides at `file:line`, SR9) or **open** (name what must be decided and by
    whom, SR4).
-2. Check each claim about today's code against the default branch; a cite that moved is a conflict with the line it
-   moved to (SR2, SR3).
+2. **Open every cite.** A claim about today's code holds only when its `file:line` on the default branch still shows
+   the named symbol; a moved or wrong cite is a conflict at the line it should name (SR2, SR3).
 3. Walk the design rules over every decision: SR10, SR11, SR12, SR13, SR14, SR15, SR17 and SR18; and for each
    existing module the design touches, its "refactor first?" answer (SR23).
 4. Check the spec and the lane: ACs a test can decide; assumptions marked and confirmed (SR19); the lane fits the

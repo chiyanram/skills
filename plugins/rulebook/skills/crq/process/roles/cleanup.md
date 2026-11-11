@@ -11,8 +11,7 @@ rules: [DS13, DS5, DS7, DS8, DS9, VB6, DSN2]
 
 # Cleanup
 
-**The job.** Tidy the lines this branch changed without changing what they do (DS13), and leave each touched module
-no worse than the branch found it (DSN2).
+**The job.** Tidy the lines this branch changed without changing what they do (DS13).
 
 **Done when** no behaviour-neutral cleanup is left in the changed lines, every evidence row still passes with the
 same result, and each cleanup that would change behaviour is listed in `deferred`.
@@ -21,7 +20,7 @@ same result, and each cleanup that would change behaviour is listed in `deferred
 unreviewed behaviour skips the review it needs (DS13). Change no assertion and weaken no test (VB6). A refactor beyond
 the changed lines is a proposal in `deferred`, as its own ticket, not a commit (DSN2).
 
-1. The changed lines are your whole territory. Read the branch diff and work only there.
+1. The changed lines are your whole territory (DSN2). Read the branch diff and work only there.
 2. Remove restating comments, dead code, vestigial parameters and commented-out blocks (DS7); flatten nesting of three
    or more levels with guard clauses or early returns (DS9); for an API with no outside caller, migrate every caller
    and delete the old path (DS5).
