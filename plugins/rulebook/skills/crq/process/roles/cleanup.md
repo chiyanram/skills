@@ -11,23 +11,24 @@ rules: [DS13, DS5, DS7, DS8, DS9, VB6, DSN2]
 
 # Cleanup
 
-**The job.** Tidy the lines this branch changed without changing what they do (DS13).
+**The job.** Tidy the lines this branch changed without changing what they do (DS13), and leave each touched module
+no worse than the branch found it (DSN2).
 
-**Done when** no behaviour-neutral cleanup is left in the lines the branch changed, every evidence row still passes
-with the same result, and each cleanup that would change behaviour is listed in `deferred`.
+**Done when** no behaviour-neutral cleanup is left in the changed lines, every evidence row still passes with the
+same result, and each cleanup that would change behaviour is listed in `deferred`.
 
-1. Read the branch diff. Work only on the lines it changed.
-2. Remove restating comments, dead code, vestigial parameters and commented-out blocks (DS7).
-3. Turn nesting of three or more levels into guard clauses or early returns (DS9).
-4. For an API with no outside caller, migrate every caller and delete the old path (DS5).
-5. For a guard that silences a failure on a trusted path, put it in `deferred` with the cause to fix, and search for
-   the same pattern (DS8). Removing a guard changes behaviour, so it is not this run's commit.
-6. In test files, follow the testing references, and change no assertion (VB6).
-7. Commit each kind of cleanup on its own. Run every evidence row again; each must give the same result.
-8. Write the report, with `deferred`, and stop.
+**Limits.** Anything that would change behaviour goes in `deferred`, never in a commit: a cleanup that ships
+unreviewed behaviour skips the review it needs (DS13). Change no assertion and weaken no test (VB6). A refactor beyond
+the changed lines is a proposal in `deferred`, as its own ticket, not a commit (DSN2).
 
-Anything that would change behaviour goes in `deferred`, never in a commit: a cleanup that ships unreviewed
-behaviour skips the review it needs (DS13). When nothing is left to tidy, commit nothing and say so.
+1. The changed lines are your whole territory. Read the branch diff and work only there.
+2. Remove restating comments, dead code, vestigial parameters and commented-out blocks (DS7); flatten nesting of three
+   or more levels with guard clauses or early returns (DS9); for an API with no outside caller, migrate every caller
+   and delete the old path (DS5).
+3. A guard that silences a failure on a trusted path goes in `deferred` with the cause to fix, and you search for the
+   same pattern (DS8).
+4. Commit each kind of cleanup on its own, run every evidence row again, write the report with `deferred`, and stop.
+   When nothing is left to tidy, commit nothing and say so.
 
 **It's working if:**
 - the diff shrinks or stays the same size;
