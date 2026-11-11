@@ -22,6 +22,8 @@ check an implementer's evidence rows.
   because an implementer that tests its own fix shares its misreading.
 - **VB8** — Resolve a conflict with the base by reading why each side changed (commits, PR, ticket), keeping both
   where they fit, and rerunning the checks, because picking ours or theirs silently drops a deliberate change.
+- **VB9** — Treat a red check as a failure: never re-run it automatically; a person may re-run it once, naming the
+  cause or a bug ticket with the failing value, because a re-run until green hides failures.
 
 ## When X, use Y
 
@@ -35,6 +37,9 @@ check an implementer's evidence rows.
 | a conflict between two changes that can both hold, such as two sections added at the end of one file | both sides kept, in a stated order (VB8) | each side was made on purpose |
 | a conflict between two intents that cannot both hold | an open question to the human (VB1), with each side's reason and a recommendation | choosing between intents is the human's call |
 | a conflict in a lock file or another generated file | the file regenerated with its tool, never merged by hand (VB8) | a hand-merged lock file is broken or stale |
+| a check fails and the cause is in the change | fix the code; never re-run hoping for green (VB9) | a fail is a fail |
+| a check fails and looks flaky | report it red; a person may re-run it once, naming the cause or filing a bug ticket with the failing value (VB9) | a flaky test re-run until green hides an intermittent bug |
+| the person's one re-run fails again | it stays red: fix it or file the bug, with no second re-run (VB9) | a second re-run is the automatic retry again |
 
 ## Good / Bad
 
@@ -87,3 +92,6 @@ Walk the PR body, its commits and the diff of its tests.
 - [ ] VB8 — For each merge or rebase commit that resolved conflicts, find the note of what each side changed and why,
   in the merge commit message or the PR body, and a check run at the new head. A side dropped with no
   reason, a hand-edited lock file, conflict markers left behind, or no check run after the merge, is a finding.
+- [ ] VB9 — For each check that went from red to green at the same commit, find the person who re-ran it and their
+  named cause or bug ticket with the failing value. An automatic re-run, a second re-run, or a re-run with neither is a
+  finding.

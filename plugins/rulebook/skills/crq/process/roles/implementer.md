@@ -6,7 +6,7 @@ must_not_see: review findings other than the act_on list; earlier verdicts
 hand_off: commits, .factory/report.json {status: done, evidence: [evidence rows]} or {status: asked, questions: [{question, choices, recommended}]} or {status: blocked, blocker}, and .factory/pr.md
 tools: [Read, Grep, Glob, Edit, Bash (on the runner)]
 enforced_guardrails: [no-push, no-web, no-credentials, judge-files-locked]
-rules: [VB1, VB2, VB3, VB4, VB5, VB6, VB7, VB8, PR1, PR2, PR3, PR4, PR5, PR6, PR7, PD4, PD5, PD7, RV8]
+rules: [VB1, VB2, VB3, VB4, VB5, VB6, VB7, VB8, PR1, PR2, PR3, PR4, PR5, PR6, PR7, PD4, PD5, PD7, RV8, DSN2, VB9]
 ---
 
 # Implementer

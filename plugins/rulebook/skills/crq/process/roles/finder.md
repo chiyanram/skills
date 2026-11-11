@@ -6,7 +6,7 @@ must_not_see: the implementer's report or account; other lenses' findings; earli
 hand_off: the JSON the run returns, no file; one entry per finding {id, lens, axis: standards | spec, kind: rule | logic, file, line, rule, category, severity, grade: cited | walked | ran, evidence, finding, fix}
 tools: [Read, Grep, Glob]
 enforced_guardrails: [read-only]
-rules: [RV1, RV2, RV3, RV4, RV6, RV7, RV8, CR1, CR2, CR3, CR4, CR5, CR6, CR7, TI1, TI2, TI3, TI4, TI5, VB6]
+rules: [RV1, RV2, RV3, RV4, RV6, RV7, RV8, CR1, CR2, CR3, CR4, CR5, CR6, CR7, TI1, TI2, TI3, TI4, TI5, VB6, CR8]
 ---
 
 # Finder
