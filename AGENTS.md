@@ -47,6 +47,7 @@ docs/DESIGN.md                                   the design on one page: rules, 
 
 ## Pointers
 
+- The principles behind the plugins, K1–K7: `PRINCIPLES.md`.
 - A new rule, reference or check: `CONTRIBUTING.md`.
 - Commit and PR format: `CONTRIBUTING.md#commit-messages`. Commit types and what each releases:
   `CONTRIBUTING.md#releases`.
