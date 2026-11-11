@@ -1,6 +1,6 @@
 # Principles
 
-What this repo holds to, K1–K7. Each is guidance: a change that departs from one says which and why in its pull
+What this repo holds to, K1–K9. Each is guidance: a change that departs from one says which and why in its pull
 request. `AGENTS.md` holds the hard rules; `CONTRIBUTING.md` holds the procedures.
 
 - **K1** — What ships is knowledge only. The plugins hold instructions, data and the small check scripts a skill tells
@@ -15,10 +15,8 @@ request. `AGENTS.md` holds the hard rules; `CONTRIBUTING.md` holds the procedure
 - **K6** — Say only what the model wouldn't do anyway, and keep it short: prune and condense rules like code, and give
   the goal and the limits, not every step.
 - **K7** — Where a check can run, ship a script or lint, not a prose rule.
-
-## Formats and changes
-
-- **This repo owns its formats:** the role cards, the lanes file and the findings it ships. Each format is versioned,
-  and CI checks every file against it.
-- **A change is measured:** a change to a card, rule or reference is kept only if it is no worse on what it must hold
-  and better on what it aims at. Where no eval exists yet, its pull request says "untested by an eval".
+- **K8** — This repo publishes the versioned format of its cards, lanes and findings, and its CI checks every card
+  against it.
+- **K9** — A change to a rule, card or reference ships only if this repo's evals, on cases it was not tuned on, show it
+  no worse, and better than the noise on what it aims at. Until an eval covers it, its pull request says "untested by
+  an eval".
