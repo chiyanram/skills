@@ -24,6 +24,8 @@ check an implementer's evidence rows.
   where they fit, and rerunning the checks, because picking ours or theirs silently drops a deliberate change.
 - **VB9** — Treat a red check as a failure: never re-run it automatically; a person may re-run it once, naming the
   cause or a bug ticket with the failing value, because a re-run until green hides failures.
+- **VB10** — Copy each evidence row's result from its command's output; never cite a gate run as evidence for file
+  content or for more than one criterion, because a gate proves only what its tests check.
 
 ## When X, use Y
 
@@ -33,6 +35,7 @@ check an implementer's evidence rows.
 | a test fails and the test looks wrong | an open question, not an edit to the test (VB6, VB1) | the test may be the only record of the behaviour |
 | a criterion a user sees: a screen, an API response, a message | a run of the app: the call made and what came back (VB4) | the test may miss how the parts fit |
 | a criterion only code sees | the test that proves it, by name (VB5) | the test is the evidence |
+| a criterion about what a file says | `grep` or `git diff` on that file, and what it printed (VB10) | a gate run passes whatever the file says |
 | a bug fix | a test-first run writes the failing test first (VB7); the implementer runs it locally and pastes the failure (S6) | the test and the fix stay independent |
 | a conflict between two changes that can both hold, such as two sections added at the end of one file | both sides kept, in a stated order (VB8) | each side was made on purpose |
 | a conflict between two intents that cannot both hold | an open question to the human (VB1), with each side's reason and a recommendation | choosing between intents is the human's call |
@@ -95,3 +98,5 @@ Walk the PR body, its commits and the diff of its tests.
 - [ ] VB9 — For each check that went from red to green at the same commit, find the person who re-ran it and their
   named cause or bug ticket with the failing value. An automatic re-run, a second re-run, or a re-run with neither is a
   finding.
+- [ ] VB10 — For each evidence row, find a result copied from command output. A described result, a gate run as the
+  evidence for file content, or one gate run on more than one criterion's row, is a finding.
