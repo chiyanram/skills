@@ -9,7 +9,7 @@ from schema_lite import unknown_keywords, validate  # noqa: E402
 
 SCHEMA_DIR = ROOT / "plugins" / "rulebook" / "skills" / "crq" / "process" / "schema"
 FINDING = {"id": "F1", "lens": "standards", "axis": "standards", "kind": "rule", "file": "src/a.py", "line": 12,
-           "rule": "CR1", "category": "naming", "severity": "Act on", "grade": "walked", "evidence": "a.py:12 reads x",
+           "rule": "CR1", "category": "style", "severity": "blocker", "grade": "walked", "evidence": "a.py:12 reads x",
            "finding": "the name hides the unit", "fix": "rename to timeout_ms"}
 
 
@@ -32,7 +32,9 @@ class SchemaLiteTest(unittest.TestCase):
                  "no-evidence": {k: v for k, v in FINDING.items() if k != "evidence"},
                  "line-not-number-or-text": {**FINDING, "line": [12]}, "empty-finding": {**FINDING, "finding": ""},
                  "line-not-a-cite": {**FINDING, "line": "near the top"}, "line-open-range": {**FINDING, "line": "40-"},
-                 "extra-field": {**FINDING, "confidence": "high"}}
+                 "extra-field": {**FINDING, "confidence": "high"},
+                 "free-text-severity": {**FINDING, "severity": "Act on"},
+                 "unknown-category": {**FINDING, "category": "naming"}}
         for case, finding in cases.items():
             with self.subTest(case):
                 self.assertTrue(validate(finding, self.finding))

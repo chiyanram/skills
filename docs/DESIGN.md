@@ -63,7 +63,9 @@ verify pass, retro and onboarder. The onboarder writes a project's brief and glo
   `process/schema/` that ships with the plugin, so an engine reads the version it pins; a new version is a new file
   beside the old one. `check_process.py` checks every card and lanes file against them. A card and a finding take no
   field the schema does not name, and a finding's `line` is a number, or text such as `12` or `40-44`, so every cite
-  points at a real line.
+  points at a real line. Each other finding field has one closed set of values, set here: `severity` is blocker,
+  warning or nit; `category` is one of bug, security, concurrency, data, api, perf, test_gap, doc_defect, style or
+  speculative; `rule` is a rule ID or null.
 - **Body:** the job, a "done when" line, numbered steps, and an "it's working if" list.
 - **No persona and no capitals.** A prohibition appears only for a hard guardrail.
 - **One glossary** is used by every card.
