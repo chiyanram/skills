@@ -1567,3 +1567,11 @@ The design asks whether a touched module needs a refactor first. Decided by the 
 | id | reference | rule | reason | source | evidence | status |
 |---|---|---|---|---|---|---|
 | SR23 | planning/references/spec-review.md | In each design, say whether a touched module needs a refactor first, and propose it as its own ticket. | because a change built on a module that resists it makes the next change harder too | operator decision 2026-11-11 (#307): design review asks "refactor first?", and improvement comes as its own tickets a person starts | OURS: no outside source | APPROVED BY ID AND INTENT 2026-11-11 (#307) · OPERATOR PREFERENCE · wording awaits the operator's yes in the PR |
+
+## Planted cases for checks (#312)
+
+Decided by the operator on 2026-11-11 (#312): every check or scanner ships with planted good and bad cases, and a miss found in review is first added as a planted case that fails, then fixed. The wording below is new and waits for the operator's word-by-word yes in the PR. The ticket's second part, a number written only as a settings key, ships as `scripts/check_settings_keys.py`, not as a rule.
+
+| id | reference | rule | reason | source | evidence | status |
+|---|---|---|---|---|---|---|
+| S7 | testing/references/strategy.md | Ship each check or scanner with planted good and bad cases, and turn a miss found in review into a failing planted case before the fix. | because a check never seen failing may never fire | operator decision 2026-11-11 (#312) | OURS: no outside source | APPROVED 2026-11-11 (#312) · OPERATOR PREFERENCE · wording awaits the operator's yes in the PR |
