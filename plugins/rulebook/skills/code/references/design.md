@@ -11,6 +11,8 @@ Contents: Rules · When X, use Y · Good / Bad · Decided edges · Review checks
   because logic tangled with I/O cannot be tested without the I/O.
 - **DSN1** — Keep each method under the project's complexity gate (cyclomatic 10 if none is set), splitting by guard
   clauses or extracted helpers, because a highly branched method hides paths no test reaches.
+- **DSN2** — Tidy only inside the lines the change touches, and propose anything beyond them as its own ticket,
+  because a tidy outside the change mixes two reviews into one.
 
 ## When X, use Y
 
@@ -21,6 +23,8 @@ Contents: Rules · When X, use Y · Good / Bad · Decided edges · Review checks
 | a method with many branches | guard clauses or extracted helpers, under the project's gate or cyclomatic 10 (DSN1) | a highly branched method hides paths no test reaches |
 | a value that may be absent | `Optional`, a sealed type or an enum (TY1, `types.md`) | a forgotten null check throws `NullPointerException` |
 | code to check for smells | the smell baseline in `smells.md` | one smell list for the rulebook |
+| a changed line is itself untidy: a restating comment, deep nesting, a dead parameter | tidy it in this change (DSN2) | it is already under review |
+| untidy code sits next to the changed lines but outside them | leave it, and propose the tidy or refactor as its own ticket (DSN2) | the reviewer reviews only what the change is about |
 
 ## Good / Bad
 
@@ -44,3 +48,5 @@ Walk every changed method.
   finding. An I/O method that branches on what it read to choose what happens next is a finding.
 - [ ] DSN1 — Where a gate measures cyclomatic complexity (for example Checkstyle `CyclomaticComplexity`), cite the
   gate and skip the count. Otherwise a method above cyclomatic complexity 10 is a finding.
+- [ ] DSN2 — Compare each tidy in the diff with the lines the change needed. A tidy outside them (a reformat, a rename,
+  an extracted helper in untouched code) is a finding; a refactor proposed as its own ticket is not.
