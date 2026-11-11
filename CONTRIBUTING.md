@@ -217,7 +217,7 @@ claude plugin eval plugins/rulebook --eval-dir evals/finder --runs 1 --no-publis
 claude plugin eval plugins/rulebook --case planted-instruction --runs 1 --no-publish # one case
 ```
 
-Each case runs with and without the plugin; read the score difference in the report, not only the exit code. A card
+To prune a skill, follow [the pruning method](docs/rulebook/pruning-method.md). Each case runs with and without the plugin; read the score difference in the report, not only the exit code. A card
 change ships only if its scenarios do not get worse. Results land in a `results/` folder under the eval dir you ran,
 which git ignores.
 
