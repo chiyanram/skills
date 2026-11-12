@@ -3,6 +3,37 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [2.0.0](https://github.com/chiyanram/skills/compare/rulebook--v1.1.2...rulebook--v2.0.0) (2026-11-12)
+
+### ⚠️ Breaking changes
+
+* **crq** — the onboarder card leaves the plugin; the engine owns it (#345) (#347)
+* **testing** — one short procedure in place of thirteen references (#339) (#343)
+
+### ✨ Features
+
+* **crq** — apply the agent-factory design audit's rule changes · [#295](https://github.com/chiyanram/skills/issues/295) (PR [#296](https://github.com/chiyanram/skills/pull/296))
+* **crq** — codebase health (DSN2, CR8) and a red check stays red (VB9) · [#308](https://github.com/chiyanram/skills/issues/308) (PR [#318](https://github.com/chiyanram/skills/pull/318))
+* **crq** — coordinator card follows K6 and design review asks refactor first (SR23) · [#307](https://github.com/chiyanram/skills/issues/307) (PR [#317](https://github.com/chiyanram/skills/pull/317))
+* **crq** — evidence is real command output, never a gate run as proof of content · [#302](https://github.com/chiyanram/skills/issues/302) (PR [#322](https://github.com/chiyanram/skills/pull/322))
+* **crq** — new design-reviewer, cleanup and onboarder card bodies · [#311](https://github.com/chiyanram/skills/issues/311) (PR [#319](https://github.com/chiyanram/skills/pull/319))
+* **crq** — one closed set of values per finding field · [#305](https://github.com/chiyanram/skills/issues/305) (PR [#320](https://github.com/chiyanram/skills/pull/320))
+* **crq** — quarantine one test with a capped expiry, and say so where people read ([chiyanram/agent-factory#460](https://github.com/chiyanram/agent-factory/issues/460)) · PR [#326](https://github.com/chiyanram/skills/pull/326)
+* **crq** — role card format and role-eval rubric for the shared records · [#298](https://github.com/chiyanram/skills/issues/298) (PR [#301](https://github.com/chiyanram/skills/pull/301))
+* **crq** — role cards list guardrail ids and drop next · [#295](https://github.com/chiyanram/skills/issues/295) (PR [#297](https://github.com/chiyanram/skills/pull/297))
+* **crq** — severity is blocker, warning or nit, and the bucket is the verify pass's · [#305](https://github.com/chiyanram/skills/issues/305) (PR [#321](https://github.com/chiyanram/skills/pull/321))
+* **crq** — the onboarder card leaves the plugin; the engine owns it · [#345](https://github.com/chiyanram/skills/issues/345) (PR [#347](https://github.com/chiyanram/skills/pull/347))
+* **crq** — versioned card, lanes and finding schemas, and check every card and lanes file against them · [#305](https://github.com/chiyanram/skills/issues/305) (PR [#316](https://github.com/chiyanram/skills/pull/316))
+* **testing** — one short procedure in place of thirteen references · [#339](https://github.com/chiyanram/skills/issues/339) (PR [#343](https://github.com/chiyanram/skills/pull/343))
+* **testing** — planted cases for every check, and numbers only as settings keys · [#312](https://github.com/chiyanram/skills/issues/312) (PR [#323](https://github.com/chiyanram/skills/pull/323))
+
+### 🐛 Fixes
+
+* **crq** — a quarantine is one test, never a job, and a person's quarantine is not a VB6 skip ([chiyanram/agent-factory#460](https://github.com/chiyanram/agent-factory/issues/460)) · PR [#336](https://github.com/chiyanram/skills/pull/336)
+* **crq** — the onboarder card says the engine lists the project's MUSTs in the brief · [#299](https://github.com/chiyanram/skills/issues/299) (PR [#300](https://github.com/chiyanram/skills/pull/300))
+
+Update: `claude plugin update rulebook@chiyanram`
+
 ## [1.1.2](https://github.com/chiyanram/skills/compare/rulebook--v1.1.1...rulebook--v1.1.2) (2026-11-10)
 
 ### 🐛 Fixes
