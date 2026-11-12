@@ -19,7 +19,8 @@ The issue tracker, labels and domain docs are a separate setup; if the repo has 
   or test. A command you could not confirm is marked "unconfirmed".
 - The stacks, from the files: Spock or Spring Boot (`build.gradle`, `pom.xml`, `src/integrationTest`), Playwright
   (`playwright.config.*`), a model SDK in the dependencies.
-- `AGENTS.md` and `CLAUDE.md` at the root, and whether either already has a `## Rulebook` block.
+- `AGENTS.md` and `CLAUDE.md` at the root: which one holds the instructions, and whether it already has a
+  `## Rulebook` block. A repo with no code yet gets only the lines that apply now.
 
 ## 2. Draft and ask
 
@@ -42,6 +43,7 @@ differs per machine.
 
 ## 3. Write
 
-- Edit `CLAUDE.md` if it exists, else `AGENTS.md`. If neither exists, ask which to create.
+- Edit the file that holds the instructions: `AGENTS.md` when `CLAUDE.md` only imports it (`@AGENTS.md`), else
+  `CLAUDE.md` if it exists, else `AGENTS.md`. If neither exists, ask which to create.
 - Replace an existing `## Rulebook` block in place; never append a second one, and never touch the rest of the file.
 - Change no other file. Do not commit: tell the person the file is ready to review.
