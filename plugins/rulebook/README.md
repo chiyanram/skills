@@ -3,10 +3,10 @@
 Generic engineering rules for coding agents. The agent that writes the code and the agent that reviews it read the same
 file. Project-specific values (commands, paths, module names) stay in each project's own `AGENTS.md`.
 
-Each domain is one skill: `testing`, `code`, `agent`, `migrations`, `obs`, `planning` and `meta`. Its `SKILL.md` lists every reference in the
-domain and when to read it, and the agent opens only the references the task needs. From a project's nested
-`AGENTS.md`, point at a reference by name, never by path, because the plugin's install folder differs per machine and
-per version:
+Each domain is one skill: `testing`, `code`, `agent`, `migrations`, `obs`, `planning` and `meta`. A skill is moving to
+one short procedure in `SKILL.md`, with a file beside it only for what some runs need, such as one stack's traps
+(`testing` is the first). From a project's `AGENTS.md`, point at a skill or its file by name, never by path, because
+the plugin's install folder differs per machine and per version:
 
 ```text
 Tests here call the model: use the `testing` skill (rulebook plugin) and read its `model-calls` notes.
@@ -25,33 +25,22 @@ npx skills add chiyanram/skills
 
 The repo is private. See the [root README](../../README.md#quick-start) for credentials and the worker-container setup.
 
-## What a reference holds
+## Two shapes, for now
 
-Every reference has the same five sections, in this order, so an agent knows where to look without reading the
-whole file.
-
-```mermaid
-flowchart LR
-    R["<b>Rules</b><br/>one line each, ≤ 35 words,<br/>with an ID and a <i>because</i>"]
-    W["<b>When X, use Y</b><br/>situation → rule → action"]
-    G["<b>Good / Bad</b><br/>neutral-domain example pairs"]
-    E["<b>Decided edges</b><br/>cases settled once,<br/>not argued again"]
-    C["<b>Review checks</b><br/>what a reviewer looks for"]
-    R --> W --> G --> E --> C
-```
-
-The writer reads it top to bottom. The reviewer starts at **Review checks** and follows each one back to its rule
-ID. When a reference cannot fit every approved pair, the rest sit in `references/examples/<topic>.md`.
+`testing` is a short procedure: `SKILL.md` holds the steps and the rules, each with its reason, and Good / Bad pairs
+only where a model's default is wrong. The other skills still have a router `SKILL.md` and references with five
+sections (Rules, When X use Y, Good / Bad, Decided edges, Review checks), described in
+[reference-format.md](../../docs/rulebook/reference-format.md), until each is rewritten.
 
 ## Skills
 
-Each skill's `SKILL.md` lists its references, their rule IDs and when to read each one. `make index` builds that list
-from the references, and `make lint` fails when it is stale.
+A router skill's `SKILL.md` lists its references, their rule IDs and when to read each one. `make index` builds that
+list from the references, and `make lint` fails when it is stale.
 
 | skill | read it when you |
 |---|---|
 | [crq](skills/crq/SKILL.md) | take a change from request to merge, or run one phase: lanes, spec, design, build, review, pull request, retro |
-| [testing](skills/testing/SKILL.md) | choose, write or review a test: its tier, its value, its boundaries, Spock, ITs, model calls, mutation |
+| [testing](skills/testing/SKILL.md) | choose, write or review a test: where it goes, which cases, junk tests, mutation testing; Spock, ITs, Playwright and model calls in its notes |
 | [code](skills/code/SKILL.md) | write or review production code: Java, Spring, types, errors, services, API design, security, concurrency, persistence, scheduled jobs, Redis, Angular |
 | [agent](skills/agent/SKILL.md) | write or review code that calls a model or runs an agent: adapter, tool loop, context, guards, GenAI spans, evals, budgets |
 | [deslop](skills/deslop/SKILL.md) | clean up an implemented branch's diff, behaviour-neutral, before review |
