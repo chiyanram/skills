@@ -20,7 +20,7 @@ Redis Streams consumers and pub/sub are MS7–MS12 in `messaging.md`. Retries on
 - **RD4** — Share one multiplexed Lettuce connection or a bounded pool (CC10), never a connection per call, and give
   blocking reads their own connection, because a blocking command stalls every request that shares it.
 - **RD5** — Reconnect with jittered backoff, retry an idempotent command (CC8) on `READONLY` or a connection error, and
-  test failover with a proxy cut (TM4), because clients that mishandle failover take the service down.
+  test failover with a proxy cut (`testing`'s stack notes), because clients that mishandle failover take the service down.
 - **RD6** — Name keys in lowercase, colon-separated, with a service or tenant prefix (`billing:order:42:lines`),
   because mixed schemes make scans, ACLs and cleanup per prefix impossible.
 
@@ -36,7 +36,7 @@ Redis Streams consumers and pub/sub are MS7–MS12 in `messaging.md`. Retries on
 | starts with Redis down | a start that succeeds, with the features that need Redis degraded (RD3) | a hard boot dependency turns a Redis outage into a full outage |
 | connects with Lettuce | one shared, multiplexed connection; a separate connection for `BLPOP` or `XREADGROUP … BLOCK` (RD4) | a blocking command holds the shared connection for its whole wait |
 | connects with a pooling client (Jedis) | a pool with a fixed maximum and an acquire timeout (RD4, CC10) | a connection per call costs a handshake each time and floods the server |
-| meets a failover | jittered reconnect backoff, a retry of idempotent commands on `READONLY`, and a Toxiproxy IT that cuts Redis (RD5, TM4) | every client reconnecting at once floods the new primary |
+| meets a failover | jittered reconnect backoff, a retry of idempotent commands on `READONLY`, and a Toxiproxy IT that cuts Redis (RD5; `testing`'s stack notes) | every client reconnecting at once floods the new primary |
 | names a key | `<service>:<entity>:<id>[:<part>]` in lowercase (RD6) | one scheme lets scans, ACLs and cleanup target a prefix |
 
 ## Good / Bad
@@ -114,6 +114,6 @@ Walk every Redis call, cache configuration, connection factory and key name adde
 - [ ] RD4 — For each `RedisConnectionFactory` and client, a connection opened per call, or a blocking read on the
   shared connection, is a finding.
 - [ ] RD5 — Find the reconnect backoff with jitter, a retry of idempotent commands on `READONLY`, and a Toxiproxy IT
-  that cuts Redis (TM4). Any one missing is a finding.
+  that cuts Redis (`testing`'s stack notes). Any one missing is a finding.
 - [ ] RD6 — For each new key pattern, a name that is not lowercase and colon-separated with a service or tenant
   prefix is a finding.

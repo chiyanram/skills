@@ -87,7 +87,7 @@ the message is generated, an `argThat` on the promised part only, the loan numbe
 - **Skip TI4 when** the widened value is outside what the test promises, or the test cannot know it (a generated
   id, a timestamp): constrain the fields it can know. — **Do not skip when** the criterion promises that value. —
   **Confidence** high
-- **Skip TI5 when** the snapshot or golden file is new: it is a new test (V3). — **Do not skip when** an existing
+- **Skip TI5 when** the snapshot or golden file is new: it is a new test (`testing` skill, Junk tests). — **Do not skip when** an existing
   file changes, even in one line. — **Confidence** high
 - **Skip the floor-guard moves when** a floor guard ran at the head and its result is in the PR. — **Do not
   skip when** no floor guard ran: report them under VB6, CR3, CR4, CM7 or ER3. — **Confidence** high

@@ -9,7 +9,7 @@ domain and when to read it, and the agent opens only the references the task nee
 per version:
 
 ```text
-Tests here call the model: use the `testing` skill (rulebook plugin) and read its `llm-tests` reference.
+Tests here call the model: use the `testing` skill (rulebook plugin) and read its `model-calls` notes.
 ```
 
 ## Install

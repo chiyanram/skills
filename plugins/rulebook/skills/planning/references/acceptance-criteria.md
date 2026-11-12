@@ -18,7 +18,7 @@ How each AC becomes its tests is owned by the `testing` skill.
 - **GA5** — Write each AC as one observable outcome that names no class or test level, and give each behaviour an AC
   for its failure or refusal, because an AC no test can fail proves nothing.
 - **GA6** — Write each AC's text as a "should …" behaviour sentence, standard form "should X when Y", so the test
-  name is that text verbatim (GT1), because a statement cannot become a test name without rewording.
+  name is that text verbatim, because a statement cannot become a test name without rewording.
 - **AC7** — When a change alters stored data or a default, give one AC or more a pre-change starting state
   (an old row, an unset key), because new-row ACs test the default, not the migration.
 - **AC8** — Move a GA4 table column whose value is the same on every row into the AC line, because a constant column

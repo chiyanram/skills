@@ -65,7 +65,7 @@ reservation with the real cost; a failed call settles from the usage reported be
 - **Skip when** only one run can use a workspace at a time, enforced by a lock or a queue: a check before each call
   and a record after it meet AEN6. — **Do not skip when** two runs, workers or replicas can spend from the same
   budget. — **Confidence** high
-- **Skip when** the response that crosses the budget has already arrived: keep it and count it (LS6), then stop
+- **Skip when** the response that crosses the budget has already arrived: keep it and count it, then stop
   before the next call. — **Do not skip when** the code drops or re-requests that response. — **Confidence** high
 
 ## Review checks

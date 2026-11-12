@@ -38,8 +38,8 @@ Contents: Rules · When X, use Y · Good / Bad (AE14, AE15, AEN3, AE16) · Decid
 | a tool call names an unknown tool, has invalid arguments or is denied | an error tool result naming the valid form; the run goes on | the model can fix it (AE16) · its test: the `testing` skill's model-calls notes |
 | a tool or the platform throws | a generic, actionable error text for the model; the exception goes to the log | raw text leaks internals into the model's output (AE17) · the HTTP twin: ER10 (`code`'s `errors`) |
 | the same tool fails again, or the same call repeats | a per-tool failure cap and a repeat cap that end or escalate the run | one broken call can use up the step budget (AE18) |
-| a path calls the model: main loop, resume, summariser, judge | the run's call-ceiling check before the call | a ceiling only in the main loop leaves other paths unbounded (AE19) · the cap's test: LT8 |
-| a tool needs human approval | a persisted pending request keyed by call id; resume through the same loop | a second resume path skips budget and guards (AE13) · its test: LS8 |
+| a path calls the model: main loop, resume, summariser, judge | the run's call-ceiling check before the call | a ceiling only in the main loop leaves other paths unbounded (AE19) · the cap's test: `testing`'s model-calls.md |
+| a tool needs human approval | a persisted pending request keyed by call id; resume through the same loop | a second resume path skips budget and guards (AE13) · its test: `testing`'s model-calls.md |
 | a client resumes a run with an approval or a call | a match against the stored call this agent made, then authorization and guards again | a client can forge a call or an approval (AE14) |
 | a tool finishes | its result stored by run, step and call id before the next step | resume otherwise repeats side effects (AE15) |
 | a tool changes something outside the run | its result key (run id, step, call id) sent to the remote end as the idempotency key | a call with no stored result runs again on resume (AEN3) · the remote end: CC15, CC19 (`code`'s `concurrency`) |
