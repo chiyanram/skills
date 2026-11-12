@@ -153,7 +153,7 @@ When review finds a case a check missed, plant that case first and watch it fail
 Each role card, `plugins/rulebook/skills/crq/process/roles/<role>.md`, gets three scenarios, each with graders,
 under `plugins/rulebook/evals/<role>/<case>/`: a `prompt.md` and a `graders/` folder, the format `claude plugin eval`
 reads. The role folders are `coordinator`, `design-reviewer`, `test-first`, `implementer`, `cleanup`, `finder`,
-`verify-pass`, `retro` and `onboarder`. A folder appears with its first scenario. Give each case a name no other role
+`verify-pass` and `retro`. A folder appears with its first scenario. Give each case a name no other role
 uses, because the report lists cases by folder name only.
 
 These test the plugin on its own, in plain Claude Code. They do not test an engine, which keeps its own set.
