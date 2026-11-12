@@ -1,28 +1,93 @@
 ---
 name: testing
-description: Use when you write, change or review a test, or choose a test's tier: unit and Spock specs, integration tests, Playwright smoke specs, property-based and mutation tests, and tests of code that calls a language model. Lists each testing reference and when to read it.
+description: Use when you write, change or review a test, or choose where a test goes - unit tests and Spock specs, integration tests, Playwright smoke specs, property-based and mutation tests, and tests of code that calls a language model.
 ---
 
 # Testing
 
-Read only the references the task needs. Each one holds Rules, When X use Y, Good / Bad, Decided edges and Review
-checks, so a writer reads it top to bottom and a reviewer starts at Review checks. Where a reference cannot hold every
-Good/Bad pair, `references/examples/<name>.md` holds them all.
+A test earns its place by failing when a real defect ships. Everything below serves that.
 
-<!-- index: built by `make index` from each reference; do not edit by hand -->
-| reference | rule IDs | read it |
-|---|---|---|
-| [boundaries](references/boundaries.md) | B1–B3 | when you write or review tests for logic that takes a number, a collection, a formatted string, an enum or sealed set, a time value or an optional input |
-| [coverage-design](references/coverage-design.md) | C1–C4 | when you write or review tests for new logic, or a test of a call to an external dependency |
-| [integration-tests](references/integration-tests.md) | IT1–IT5, TM4, SP1–SP11 | when you write or review an IT, a fake port, a test slice or a test configuration |
-| [llm-live-tests](references/llm-live-tests.md) | LS11, LS13, LS15–LS16, LS19–LS20, LT14–LT18 | when you write or review a test that calls a real model provider, or an eval that scores model quality |
-| [llm-tests](references/llm-tests.md) | LT1–LT13, LS1–LS10 | when you write or review a test whose code under test calls the model: the scripted fake, the agent loop, agent scenarios or recorded traffic |
-| [mutation](references/mutation.md) | M1–M6, M8–M10 | when you change a PIT configuration, read a mutation report, or write a test that answers a surviving mutant |
-| [property-based](references/property-based.md) | P1–P4, P6–P8, P10 | when you write or review a property test, a generator, or a requirement that says "for any input" |
-| [scenario-to-tests](references/scenario-to-tests.md) | GT1, GT3–GT6, CV2 | when you write or review a test for an AC in a ticket's acceptance criteria |
-| [smoke-specs](references/smoke-specs.md) | EA1–EA6, EB2–EB4, EC1–EC5, ED3 | when you write or review a Playwright smoke spec, or a fixture that such specs import |
-| [spock](references/spock.md) | K1–K2, K2b, K3–K20 | when you write or review a Spock spec, unit or integration: its interactions, data tables, shared state, cleanup or assertions |
-| [strategy](references/strategy.md) | S1–S4, S6–S7, TM1–TM3, AT1 | when you choose where a new test goes, when you fix a bug, or when you review the tier and the doubles of a changed test |
-| [unit-tests](references/unit-tests.md) | U1–U3 | when you write or review a unit test or a Spock spec |
-| [value-bar](references/value-bar.md) | V1–V5 | before you add a test, when you fix a bug, and when you review or remove a test |
-<!-- /index -->
+## Before you write a test
+
+Answer each in one line. If one has no answer, do not write the test.
+
+1. Which contract does it protect?
+2. Which realistic change would make it fail?
+3. Why does no existing test catch that already?
+
+Then put it at the seam that owns the behaviour:
+
+- Pure logic: a unit test.
+- A real boundary (database, cache, HTTP, framework wiring): an integration test against the real thing in a
+  container. Add unit tests only for branches the integration test cannot reach cheaply.
+- A user journey: a smoke spec in the browser.
+- An acceptance criterion: one test at one tier, named with the criterion's words. Add a second tier only for a risk
+  the first cannot see.
+
+Before you change code, run the tests that touch it and note what was green.
+
+## Fixing a bug
+
+1. Write one test that fails for the bug's reason, at the seam that owns the behaviour. Run it and watch it fail.
+2. Fix the code and watch it pass.
+3. Put the command and the failure output in the PR. Do not copy the test into every layer the bug crosses.
+
+## Choosing cases
+
+For new logic, walk RIGHT-BICEP: Right results, Boundaries, Inverse, Cross-check, Error, Performance. For each input,
+walk CORRECT: Conformance, Ordering, Range, Reference, Existence (null, empty, missing), Cardinality (0, 1, many),
+Time.
+
+- For a range, test just inside and just outside each edge: 1..10 gives 0, 1, 10, 11.
+- For each external dependency, test the outage: a predictable failure, a WARN or ERROR log, no hang.
+- Write the expected value out by hand. Never compute it with the code under test or a copy of its logic.
+- Name each case you skip on purpose in the PR: what is missing and the risk.
+- When the requirement says "for any input" (round-trip, idempotence, an invariant), write a property test and keep
+  the edge examples beside it. Print the seed on failure; never commit a fixed seed or retry a failing property.
+
+## Writing the test
+
+- Assert observable behaviour, never a field default or the input you just passed in.
+- Double only what you do not own. Prefer the real object, then an in-memory fake of the port, then a stub. Mock only
+  a call that is itself the behaviour. Never mock your own classes, a value object, or the class under test.
+- Verify only the interactions the test name promises, with arguments matched by value. Count calls only when the
+  count is the contract; never count logs, metrics or retries.
+- Fix the clock. Share no mutable state. Every test passes when run alone and in any order.
+- Wait on a condition, never on time.
+- Let nothing turn a failure green: no catch around the assertion, no `|| true`, no assertion inside an `if`.
+
+## Junk tests
+
+Do not add a test, and flag one in review, when it:
+
+- has no assertion, or only a poll;
+- compares a value with itself or a copy of it;
+- hand-copies an enum or a registry list;
+- greps source text instead of running the code;
+- takes its expected value from the code under test;
+- has a mock that implements the behaviour it asserts;
+- proves again, at another layer, a contract already proven, with no new risk;
+- breaks on a rename that keeps behaviour.
+
+Prove a test is junk before you delete it. Keep it if it is the only guard of a contract (API, protocol, config,
+migration, storage, security, a promised default). A test that fails on main may be catching a real bug: reproduce
+it, never delete it.
+
+## Mutation testing
+
+Run mutation testing on the code you changed: PIT on the JVM, Stryker for TypeScript. It shows whether the tests
+would catch a bug, which coverage cannot.
+
+- Read each surviving mutant as a missing case. Name the RIGHT-BICEP or CORRECT case it reveals and add that test, not
+  a test aimed at the mutated line.
+- NO_COVERAGE means the code is never reached; SURVIVED means it is reached and not asserted.
+- Keep the default mutators. Exclude only code with no decisions in it, such as wiring and config, and never to raise
+  the score.
+- Keep it a report, not a CI gate, until someone picks a threshold from a measured score.
+
+## Stack notes
+
+Read the one that matches the code:
+
+- Spock, Spring Boot integration tests, Playwright: [stack.md](stack.md).
+- Code that calls a language model: [model-calls.md](model-calls.md).

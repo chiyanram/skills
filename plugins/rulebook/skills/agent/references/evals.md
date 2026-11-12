@@ -25,7 +25,7 @@ Contents: Rules · When X, use Y · Good / Bad (AE43, AEN4, AE45, AE48) · Decid
 
 | situation | use | why |
 |---|---|---|
-| an eval runs an agent capability | its versioned golden set, through the real entry point, against the stored baseline | a harness that bypasses the entry point tests something else (AE43) · thresholds over repeated runs: LT18 (`testing`'s `llm-live-tests`) |
+| an eval runs an agent capability | its versioned golden set, through the real entry point, against the stored baseline | a harness that bypasses the entry point tests something else (AE43) · thresholds over repeated runs: the `testing` skill's model-calls notes |
 | the agent's tools write, send or act outside the run | a sandbox for those tools, a test store or a recording fake, and a grader that reads its end state | live tools send real messages and change real data (AEN4) |
 | a case ends in an infrastructure error, a timeout or a truncation | its own status, kept out of the pass rate | it measures the harness, not the agent (AE44) |
 | a property can be checked by code: a field, a number, a format, a tool call | a code grader | a judge is costlier, noisier and injectable (AE45) |

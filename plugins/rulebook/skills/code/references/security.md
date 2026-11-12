@@ -92,8 +92,8 @@ on a handler, such as `@PreAuthorize`.
 
 ### Security tests
 
-- **SS22** — Authenticate security ITs through the real login and filter chain (IT3,
-  [integration-tests.md](../../testing/references/integration-tests.md)), with `@WithMockUser` or `jwt()` only in a
+- **SS22** — Authenticate security ITs through the real login and filter chain (`testing`
+  skill's stack notes), with `@WithMockUser` or `jwt()` only in a
   guard bean's unit spec, because mock users skip the filter building authorities.
 - **SS23** — Give each guarded controller a matrix IT: caller kind (anonymous, each role, another tenant's member, a
   machine client) × endpoint → status, a refusal changing nothing, because one wrong-role test misses other caller

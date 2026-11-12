@@ -37,7 +37,7 @@ Contents: Rules · When X, use Y · Good / Bad (U4, JV1, JV5, CV3) · Decided ed
 
 | situation | use | why |
 |---|---|---|
-| the logic reads the current time | an injected `Clock`, called as `now(clock)` (U4); the test's fixed clock is U1 ([unit-tests.md](../../testing/references/unit-tests.md)) | a test cannot fix the wall clock, so a test that reads it flakes at midnight or across zones |
+| the logic reads the current time | an injected `Clock`, called as `now(clock)` (U4); the test fixes the clock (`testing` skill) | a test cannot fix the wall clock, so a test that reads it flakes at midnight or across zones |
 | a point or a span of time | `Instant`, `Duration` or another `java.time` type; `Date` only at a library or display edge (JV1) | `Date`, `Calendar` and their formatters are mutable and not thread-safe |
 | a stream in request- or queue-serving code | a sequential stream (JV2) | a parallel stream runs on the JVM-wide common pool, so one blocking task stalls every user of it |
 | an I/O, logging or state-changing step in a stream | that step outside the pipeline (JV3) | the stream may skip a lambda's call, so the effect silently does not happen |

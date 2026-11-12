@@ -36,7 +36,7 @@ before you split a change.
 | a changed behaviour | its smallest realistic regression (a branch inverted, a default dropped, a field left out) and the test assertion that fails on it (CR6) | "this line could go without a test failing" names no regression |
 | the test that seems to cover it is skipped, flaky, not run by default, only checks that nothing was thrown, compares a snapshot, or checks a mock or log call | a finding: that test does not count (CR6) | it passes whether or not the behaviour is right |
 | a test the diff touches still asserts the old behaviour, or no longer exercises anything | a finding naming what it should assert, or that it should go (CR6) | a stale test pins the wrong outcome |
-| the diff adds a test | the junk patterns of V3 (`testing/value-bar.md`) | that is where a new test's worth is judged |
+| the diff adds a test | the junk-test list (`testing` skill) | that is where a new test's worth is judged |
 | the diff edits an existing test, a snapshot or a golden file | TI1–TI5 (`test-integrity`) | that is where an edit to a test's check is judged |
 | the diff removes or replaces a check, a default, an error path or a call | where the change puts it back, or why it is retired on purpose; a reference left pointing at the removed code is a finding (CR7) | the removal shows as red lines nobody reads for what they did |
 | the project publishes module numbers (complexity, size, coupling, coverage) and a touched module's number got worse | a codebase-health finding citing the number before and after (CR8) | the number makes the drift visible |

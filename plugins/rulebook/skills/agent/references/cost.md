@@ -17,7 +17,7 @@ Contents: Rules · When X, use Y · Good / Bad (AEN6) · Decided edges · Review
 
 | situation | use | why |
 |---|---|---|
-| a run or a workspace has a budget | a check before each model call and a settlement from actual usage after it | per-turn estimates let concurrent runs overspend (AE51) · the crossing response: LS6 (`testing`'s `llm-tests`) |
+| a run or a workspace has a budget | a check before each model call and a settlement from actual usage after it | per-turn estimates let concurrent runs overspend (AE51) · the crossing response: the `testing` skill's model-calls notes |
 | a budget is crossed | the turn ends with a typed reason, such as `BudgetExceeded(WORKSPACE)` | the caller can tell a budget stop from a failure (AE51) |
 | several runs share one workspace budget | an atomic reserve of the call's maximum cost in a shared store, then a settle | runs that each check, then record, all pass the check together (AEN6) |
 | a caller may call the provider at all | a per-caller rate limit and quota, before any budget | that limit is SE8 (`code`'s `security`) |

@@ -31,7 +31,7 @@ Contents: Rules · When X, use Y · Good / Bad (AE28, AE29, AE31, AE33) · Decid
 | a tool call is about to run | the one pipeline: schema check, global guards, agent guards, approval gate, execute, output guards | a check placed per call site is skipped on some path (AE33) |
 | a guard throws, times out or has no configuration | a block of the action | a guard that fails open protects nothing under load (AE28) |
 | a tool needs a decision on approval | its risk class in your own configuration | the model and the tool's annotations are not yours to trust (AE31) · arguments still untrusted: SE10 (`code`'s `security`) |
-| a guard decides | `Continue` or `ShortCircuit(result)`, with the guard's name recorded | a verdict that only logs cannot be audited (AE34) · its test: LS7 (`testing`'s `llm-tests`) |
+| a guard decides | `Continue` or `ShortCircuit(result)`, with the guard's name recorded | a verdict that only logs cannot be audited (AE34) · its test: the `testing` skill's model-calls notes |
 | content from a tool, a retrieval, an MCP server or the web goes to the model | a tool result, JSON-encoded, labelled with its source | in system or user text the model reads it as instructions (AE29) · its test: LS10 |
 | the model's output goes to a store, a cache or a sink | an output check first; a placeholder wherever a rejected output would go | a rejected answer returns through history or cache (AE30) |
 | the agent uses tools from MCP servers | a server-prefixed name per tool, and a schema and size check on each result | server names are not unique, and results are untrusted (AE36) |

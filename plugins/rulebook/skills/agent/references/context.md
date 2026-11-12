@@ -27,7 +27,7 @@ Contents: Rules · When X, use Y · Good / Bad (AE21, AE22, AE23, AE26) · Decid
 | situation | use | why |
 |---|---|---|
 | code builds a request for the chat, a resume, a summariser or a judge | the one request builder, called with the run record | a second assembly path drifts and drops history, guards or cache order (AE21) |
-| history is cut to a window or compacted | whole call-and-result pairs, then the repair step before the request | providers reject unpaired calls and results (AE22) · its test: LS1 (`testing`'s `llm-tests`) |
+| history is cut to a window or compacted | whole call-and-result pairs, then the repair step before the request | providers reject unpaired calls and results (AE22) · its test: the `testing` skill's model-calls notes |
 | the provider caches prompts | stability order: sorted tools, frozen system prompt, append-only history, per-turn content last | an early change invalidates the cache (AE23) · its test: LS3 |
 | the request carries cache breakpoints | breakpoints set in the adapter, at the end of the stable prefix | a breakpoint elsewhere caches nothing or misses every turn (AE24) · its tests: LS4, LS16 |
 | history grows toward the context limit | a token count from the provider or the last usage, and one appended summary per crossing | rewriting stored turns re-summarises every turn (AE25) · its test: LS2 |

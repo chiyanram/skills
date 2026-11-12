@@ -27,8 +27,8 @@ each phase applies.
 | design | coordinator | the chosen shape and a rejected alternative; slices with their proving commands | `program-design`, `spec-review`, `diagrams` (planning) |
 | design review | a design-reviewer run, then a verify pass | a verdict per decision and findings | `review-process`, `spec-review` (planning) |
 | — | **human** | an explicit approval of the spec and design, at the PR's head, recorded with both hashes | `lanes` |
-| build | for a bug, a test-first run; then one fresh implementer run per PR | the slices as commits | `verify-done`, `strategy` (testing) and the `code` references the diff touches |
-| verify | implementer, then the engine's ready check at the pushed commit | an evidence row per AC | `verify-done`, `value-bar` (testing) |
+| build | for a bug, a test-first run; then one fresh implementer run per PR | the slices as commits | `verify-done`, the `testing` skill and the `code` references the diff touches |
+| verify | implementer, then the engine's ready check at the pushed commit | an evidence row per AC | `verify-done`, the `testing` skill |
 | cleanup | cleanup | a behaviour-neutral tidy diff | `deslop` skill |
 | code review | automated review: one finder run per lens, then a verify pass | findings in buckets | `review-process`, `code-review`, `test-integrity` when the diff edits an existing test, and the Review checks of every reference in scope |
 | gate | the gate: CI, a queue or a local run | green at the head commit | — |
