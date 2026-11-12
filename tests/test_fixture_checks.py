@@ -11,7 +11,7 @@ CASES = {
     "plugin": (["good"], ["source-is-root", "root-is-a-plugin", "no-readme", "no-icon", "no-license"]),
     "index": (["good"], ["unlisted", "stale", "no-block", "no-read-it"]),
     "routers": (["good"], ["unlisted", "no-router"]),
-    "provenance": (["good"], ["citation", "preference", "credit", "date", "evidence", "agent-factory", "neutral",
+    "provenance": (["good"], ["citation", "preference", "credit", "date", "evidence", "repo-ref", "neutral",
                               "fileline", "section", "url", "nested-fence"]),
     "ledger": (["good"], ["duplicate", "marker"]),
     "settings_keys": (["good"], ["number-after-key", "number-before-key", "value-in-span", "wrapped-line"]),

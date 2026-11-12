@@ -1,7 +1,7 @@
 # Third-party notices
 
 Each toolbox skill below is copied or adapted from another repo. This file is the one place in the plugin that says
-where each came from, at which commit, under which licence, and what we changed (ADR-0009). The licence texts follow.
+where each came from, at which commit, under which licence, and what we changed. The licence texts follow.
 
 ## correct
 

@@ -1,5 +1,5 @@
 """Each skill folder that ships references has a SKILL.md router linking every one, because an agent reaches a
-reference only through its skill (agent-factory research/48)."""
+reference only through its skill."""
 import json
 import sys
 from pathlib import Path

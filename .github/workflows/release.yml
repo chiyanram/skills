@@ -28,7 +28,7 @@ jobs:
       pull-requests: write  # comment "released in" on the merged pull requests
     steps:
       # Ruleset main requires the checks; its bypass is the admin role, so the release commit is pushed with the
-      # owner's token. The GitHub Actions app cannot bypass a ruleset on a user-owned repo (chiyanram/agent-factory#350).
+      # owner's token. The GitHub Actions app cannot bypass a ruleset on a user-owned repo.
       - name: The release token is set
         env:
           RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
@@ -66,7 +66,7 @@ jobs:
       - name: Install release tooling
         run: npm ci --no-fund --no-audit
 
-      # One release line per plugin (ADR-0009).
+      # One release line per plugin.
       - name: semantic-release, once per plugin
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}

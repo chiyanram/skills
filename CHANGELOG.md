@@ -7,7 +7,7 @@ What the `rulebook` plugin ships, by version. semantic-release writes this file 
 
 ### 🐛 Fixes
 
-* **crq** — the design-reviewer card hands off the JSON it returns ([chiyanram/agent-factory#237](https://github.com/chiyanram/agent-factory/issues/237)) · PR [#279](https://github.com/chiyanram/skills/pull/279)
+* **crq** — the design-reviewer card hands off the JSON it returns · PR [#279](https://github.com/chiyanram/skills/pull/279)
 * **repo** — leave git trailers out of breaking-change release notes · [#283](https://github.com/chiyanram/skills/issues/283) (PR [#284](https://github.com/chiyanram/skills/pull/284))
 
 Update: `claude plugin update rulebook@chiyanram`
@@ -16,7 +16,7 @@ Update: `claude plugin update rulebook@chiyanram`
 
 ### Bug Fixes
 
-* **crq:** ask every open question at once, with choices ([chiyanram/agent-factory#320](https://github.com/chiyanram/agent-factory/issues/320)) ([#275](https://github.com/chiyanram/skills/issues/275)) ([bd1622b](https://github.com/chiyanram/skills/commit/bd1622b4b00e4941d68a7b2db7f130b1add2a3e8))
+* **crq:** ask every open question at once, with choices ([#275](https://github.com/chiyanram/skills/issues/275)) ([bd1622b](https://github.com/chiyanram/skills/commit/bd1622b4b00e4941d68a7b2db7f130b1add2a3e8))
 * **crq:** the finder card hands off the design's finding contract ([#237](https://github.com/chiyanram/skills/issues/237)) ([#274](https://github.com/chiyanram/skills/issues/274)) ([44d4a13](https://github.com/chiyanram/skills/commit/44d4a13678621bb21d143e503abd7a501d274147))
 
 ## [1.1.0](https://github.com/chiyanram/skills/compare/rulebook--v1.0.0...rulebook--v1.1.0) (2026-11-09)
@@ -145,19 +145,19 @@ Claude-Session: https://claude.ai/code/session_012EphAgXmJeLDVFfEgSjwGe
 
 ### Bug Fixes
 
-* **crq:** approval gate counts a human-only control recorded with the spec hash ([#210](https://github.com/chiyanram/skills/issues/210)) ([#222](https://github.com/chiyanram/skills/issues/222)) ([2c54c46](https://github.com/chiyanram/skills/commit/2c54c4677c51e0a363a3c1329911414180c4472f)), closes [agent-factory#30](https://github.com/chiyanram/agent-factory/issues/30)
+* **crq:** approval gate counts a human-only control recorded with the spec hash ([#210](https://github.com/chiyanram/skills/issues/210)) ([#222](https://github.com/chiyanram/skills/issues/222)) ([2c54c46](https://github.com/chiyanram/skills/commit/2c54c4677c51e0a363a3c1329911414180c4472f))
 
 ## [0.32.0](https://github.com/chiyanram/skills/compare/rulebook--v0.31.1...rulebook--v0.32.0) (2026-11-06)
 
 ### Features
 
-* **crq:** review never approves, approval is human-signed, new deps go to the human ([#210](https://github.com/chiyanram/skills/issues/210)) ([#221](https://github.com/chiyanram/skills/issues/221)) ([abfec90](https://github.com/chiyanram/skills/commit/abfec90f3d72dfd4be2b1ca38c5efe956ac57018)), closes [agent-factory#30](https://github.com/chiyanram/agent-factory/issues/30)
+* **crq:** review never approves, approval is human-signed, new deps go to the human ([#210](https://github.com/chiyanram/skills/issues/210)) ([#221](https://github.com/chiyanram/skills/issues/221)) ([abfec90](https://github.com/chiyanram/skills/commit/abfec90f3d72dfd4be2b1ca38c5efe956ac57018))
 
 ## [0.31.1](https://github.com/chiyanram/skills/compare/rulebook--v0.31.0...rulebook--v0.31.1) (2026-11-06)
 
 ### Bug Fixes
 
-* **crq:** name the approval gate, not a /approved token ([#210](https://github.com/chiyanram/skills/issues/210)) ([#220](https://github.com/chiyanram/skills/issues/220)) ([02b0d50](https://github.com/chiyanram/skills/commit/02b0d50c9416ca41723d38669531afee29721008)), closes [chiyanram/agent-factory#30](https://github.com/chiyanram/agent-factory/issues/30)
+* **crq:** name the approval gate, not a /approved token ([#210](https://github.com/chiyanram/skills/issues/210)) ([#220](https://github.com/chiyanram/skills/issues/220)) ([02b0d50](https://github.com/chiyanram/skills/commit/02b0d50c9416ca41723d38669531afee29721008))
 
 ## [0.31.0](https://github.com/chiyanram/skills/compare/rulebook--v0.30.0...rulebook--v0.31.0) (2026-11-06)
 
@@ -217,7 +217,7 @@ Claude-Session: https://claude.ai/code/session_012EphAgXmJeLDVFfEgSjwGe
 
 ### Features
 
-* **code:** modern-java reference for current JDKs ([chiyanram/agent-factory#60](https://github.com/chiyanram/agent-factory/issues/60)) ([#208](https://github.com/chiyanram/skills/issues/208)) ([c1a2f70](https://github.com/chiyanram/skills/commit/c1a2f70f947251e6621438509abe8f5f3564c90f))
+* **code:** modern-java reference for current JDKs ([#208](https://github.com/chiyanram/skills/issues/208)) ([c1a2f70](https://github.com/chiyanram/skills/commit/c1a2f70f947251e6621438509abe8f5f3564c90f))
 
 ## [0.21.4](https://github.com/chiyanram/skills/compare/rulebook--v0.21.3...rulebook--v0.21.4) (2026-11-04)
 
@@ -229,68 +229,68 @@ Claude-Session: https://claude.ai/code/session_012EphAgXmJeLDVFfEgSjwGe
 
 ### Features
 
-* **repo:** rule files hold only rules; check_provenance enforces it ([chiyanram/agent-factory#59](https://github.com/chiyanram/agent-factory/issues/59)) ([#204](https://github.com/chiyanram/skills/issues/204)) ([e81dd2d](https://github.com/chiyanram/skills/commit/e81dd2dc2880aba4059ba374c9e43ed3cfd0c980))
+* **repo:** rule files hold only rules; check_provenance enforces it ([#204](https://github.com/chiyanram/skills/issues/204)) ([e81dd2d](https://github.com/chiyanram/skills/commit/e81dd2dc2880aba4059ba374c9e43ed3cfd0c980))
 
 ### Bug Fixes
 
-* **code:** drop CM6; ER1, MS6 and DS12 examples keep decisions free of I/O ([chiyanram/agent-factory#59](https://github.com/chiyanram/agent-factory/issues/59)) ([#206](https://github.com/chiyanram/skills/issues/206)) ([b7c3511](https://github.com/chiyanram/skills/commit/b7c3511c808dd57f3438797424b36ca9091ff215))
+* **code:** drop CM6; ER1, MS6 and DS12 examples keep decisions free of I/O ([#206](https://github.com/chiyanram/skills/issues/206)) ([b7c3511](https://github.com/chiyanram/skills/commit/b7c3511c808dd57f3438797424b36ca9091ff215))
 
 ## [0.21.2](https://github.com/chiyanram/skills/compare/rulebook--v0.21.1...rulebook--v0.21.2) (2026-11-04)
 
 ### Bug Fixes
 
-* **obs:** migrations and obs files hold only rules ([chiyanram/agent-factory#59](https://github.com/chiyanram/agent-factory/issues/59)) ([#203](https://github.com/chiyanram/skills/issues/203)) ([6b23875](https://github.com/chiyanram/skills/commit/6b2387534012d8f77a5b00afb3a274dcc07c1670))
+* **obs:** migrations and obs files hold only rules ([#203](https://github.com/chiyanram/skills/issues/203)) ([6b23875](https://github.com/chiyanram/skills/commit/6b2387534012d8f77a5b00afb3a274dcc07c1670))
 
 ## [0.21.1](https://github.com/chiyanram/skills/compare/rulebook--v0.21.0...rulebook--v0.21.1) (2026-11-04)
 
 ### Bug Fixes
 
-* **code:** industry re-check applied; code files hold only rules ([chiyanram/agent-factory#59](https://github.com/chiyanram/agent-factory/issues/59)) ([#200](https://github.com/chiyanram/skills/issues/200)) ([985d4dd](https://github.com/chiyanram/skills/commit/985d4ddaf3452c081014d66c97a2016246645f31))
-* **planning:** planning and meta files hold only rules; SRC2 keeps provenance in the ledger ([chiyanram/agent-factory#59](https://github.com/chiyanram/agent-factory/issues/59)) ([#202](https://github.com/chiyanram/skills/issues/202)) ([8cb3682](https://github.com/chiyanram/skills/commit/8cb36826a11179eec5c40b8b286f3e12fde29f1b))
-* **testing:** testing files hold only rules ([chiyanram/agent-factory#59](https://github.com/chiyanram/agent-factory/issues/59)) ([#201](https://github.com/chiyanram/skills/issues/201)) ([e9d9a0f](https://github.com/chiyanram/skills/commit/e9d9a0f9804e9d9b194ac516d1e44ee8d0f031f3))
+* **code:** industry re-check applied; code files hold only rules ([#200](https://github.com/chiyanram/skills/issues/200)) ([985d4dd](https://github.com/chiyanram/skills/commit/985d4ddaf3452c081014d66c97a2016246645f31))
+* **planning:** planning and meta files hold only rules; SRC2 keeps provenance in the ledger ([#202](https://github.com/chiyanram/skills/issues/202)) ([8cb3682](https://github.com/chiyanram/skills/commit/8cb36826a11179eec5c40b8b286f3e12fde29f1b))
+* **testing:** testing files hold only rules ([#201](https://github.com/chiyanram/skills/issues/201)) ([e9d9a0f](https://github.com/chiyanram/skills/commit/e9d9a0f9804e9d9b194ac516d1e44ee8d0f031f3))
 
 ## [0.21.0](https://github.com/chiyanram/skills/compare/rulebook--v0.20.0...rulebook--v0.21.0) (2026-11-04)
 
 ### Features
 
-* **rulebook:** build each router's reference table with make index ([#199](https://github.com/chiyanram/skills/issues/199)) ([638d357](https://github.com/chiyanram/skills/commit/638d357ec5bba9700c2ef572b10d69bfcb5d6acf)), closes [chiyanram/agent-factory#46](https://github.com/chiyanram/agent-factory/issues/46)
+* **rulebook:** build each router's reference table with make index ([#199](https://github.com/chiyanram/skills/issues/199)) ([638d357](https://github.com/chiyanram/skills/commit/638d357ec5bba9700c2ef572b10d69bfcb5d6acf))
 
 ## [0.20.0](https://github.com/chiyanram/skills/compare/rulebook--v0.19.0...rulebook--v0.20.0) (2026-11-02)
 
 ### Features
 
-* **meta:** writing-references reference from industry sources ([#197](https://github.com/chiyanram/skills/issues/197)) ([314a934](https://github.com/chiyanram/skills/commit/314a9349bdab212164f6f8d7bdc106ec01f871ac)), closes [agent-factory#33](https://github.com/chiyanram/agent-factory/issues/33)
-* **planning:** diagrams reference from industry sources ([#195](https://github.com/chiyanram/skills/issues/195)) ([b4b67ff](https://github.com/chiyanram/skills/commit/b4b67ff7fa6a329673b00dabbd42900fa2847414)), closes [agent-factory#33](https://github.com/chiyanram/agent-factory/issues/33)
-* **planning:** writing-docs reference from industry sources ([#196](https://github.com/chiyanram/skills/issues/196)) ([519f082](https://github.com/chiyanram/skills/commit/519f08256f89db537408b15f94015c6152afd97b)), closes [agent-factory#33](https://github.com/chiyanram/agent-factory/issues/33)
+* **meta:** writing-references reference from industry sources ([#197](https://github.com/chiyanram/skills/issues/197)) ([314a934](https://github.com/chiyanram/skills/commit/314a9349bdab212164f6f8d7bdc106ec01f871ac))
+* **planning:** diagrams reference from industry sources ([#195](https://github.com/chiyanram/skills/issues/195)) ([b4b67ff](https://github.com/chiyanram/skills/commit/b4b67ff7fa6a329673b00dabbd42900fa2847414))
+* **planning:** writing-docs reference from industry sources ([#196](https://github.com/chiyanram/skills/issues/196)) ([519f082](https://github.com/chiyanram/skills/commit/519f08256f89db537408b15f94015c6152afd97b))
 
 ## [0.19.0](https://github.com/chiyanram/skills/compare/rulebook--v0.18.0...rulebook--v0.19.0) (2026-11-02)
 
 ### Features
 
-* **planning:** program-design reference from industry sources ([#194](https://github.com/chiyanram/skills/issues/194)) ([7dee76f](https://github.com/chiyanram/skills/commit/7dee76f11a9f83fa5f25611dec6b9f96d39bce99)), closes [agent-factory#33](https://github.com/chiyanram/agent-factory/issues/33)
+* **planning:** program-design reference from industry sources ([#194](https://github.com/chiyanram/skills/issues/194)) ([7dee76f](https://github.com/chiyanram/skills/commit/7dee76f11a9f83fa5f25611dec6b9f96d39bce99))
 
 ## [0.18.0](https://github.com/chiyanram/skills/compare/rulebook--v0.17.0...rulebook--v0.18.0) (2026-11-02)
 
 ### Features
 
-* **planning:** spec-review reference from industry sources ([#193](https://github.com/chiyanram/skills/issues/193)) ([07e2efa](https://github.com/chiyanram/skills/commit/07e2efadcbde309db29dade23499c68274179f37)), closes [agent-factory#33](https://github.com/chiyanram/agent-factory/issues/33)
+* **planning:** spec-review reference from industry sources ([#193](https://github.com/chiyanram/skills/issues/193)) ([07e2efa](https://github.com/chiyanram/skills/commit/07e2efadcbde309db29dade23499c68274179f37))
 
 ## [0.17.0](https://github.com/chiyanram/skills/compare/rulebook--v0.16.3...rulebook--v0.17.0) (2026-11-02)
 
 ### Features
 
-* **planning:** acceptance-criteria reference from industry sources ([#192](https://github.com/chiyanram/skills/issues/192)) ([0d19d09](https://github.com/chiyanram/skills/commit/0d19d0920dd99110a9d92c4b98e9d3b9128b7192)), closes [agent-factory#33](https://github.com/chiyanram/agent-factory/issues/33)
+* **planning:** acceptance-criteria reference from industry sources ([#192](https://github.com/chiyanram/skills/issues/192)) ([0d19d09](https://github.com/chiyanram/skills/commit/0d19d0920dd99110a9d92c4b98e9d3b9128b7192))
 
 ## [0.16.3](https://github.com/chiyanram/skills/compare/rulebook--v0.16.2...rulebook--v0.16.3) (2026-11-01)
 
 ### Bug Fixes
 
-* **code:** comments-concurrency-ui-services Good/Bad pairs come from sources, not project code ([#189](https://github.com/chiyanram/skills/issues/189)) ([6aba449](https://github.com/chiyanram/skills/commit/6aba449f933fd076589b8e51727eb62da2c4a4d2)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
-* **code:** errors-messaging Good/Bad pairs come from sources, not project code ([#187](https://github.com/chiyanram/skills/issues/187)) ([d25e8f5](https://github.com/chiyanram/skills/commit/d25e8f59cf8d57ac38e8bb3cf8cd1fd7b03cae18)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
-* **code:** java-types Good/Bad pairs come from sources, not project code ([#188](https://github.com/chiyanram/skills/issues/188)) ([0d694b2](https://github.com/chiyanram/skills/commit/0d694b202114f0a9be7085910a090fbaa77695cc)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
-* **code:** security Good/Bad pairs come from sources, not project code ([#185](https://github.com/chiyanram/skills/issues/185)) ([11ec167](https://github.com/chiyanram/skills/commit/11ec1678cba4cc27d22cb15a4f289ddd3224aaf3)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
-* **code:** smells-design Good/Bad pairs come from sources, not project code ([#186](https://github.com/chiyanram/skills/issues/186)) ([1d77a3e](https://github.com/chiyanram/skills/commit/1d77a3e431c9a4e117867b857980a3ae78ebb848)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
-* **code:** spring Good/Bad pairs come from sources, not project code ([#184](https://github.com/chiyanram/skills/issues/184)) ([d6fe8ab](https://github.com/chiyanram/skills/commit/d6fe8ab88dfa8634790f74d7b20e7b5a25128ae4)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+* **code:** comments-concurrency-ui-services Good/Bad pairs come from sources, not project code ([#189](https://github.com/chiyanram/skills/issues/189)) ([6aba449](https://github.com/chiyanram/skills/commit/6aba449f933fd076589b8e51727eb62da2c4a4d2))
+* **code:** errors-messaging Good/Bad pairs come from sources, not project code ([#187](https://github.com/chiyanram/skills/issues/187)) ([d25e8f5](https://github.com/chiyanram/skills/commit/d25e8f59cf8d57ac38e8bb3cf8cd1fd7b03cae18))
+* **code:** java-types Good/Bad pairs come from sources, not project code ([#188](https://github.com/chiyanram/skills/issues/188)) ([0d694b2](https://github.com/chiyanram/skills/commit/0d694b202114f0a9be7085910a090fbaa77695cc))
+* **code:** security Good/Bad pairs come from sources, not project code ([#185](https://github.com/chiyanram/skills/issues/185)) ([11ec167](https://github.com/chiyanram/skills/commit/11ec1678cba4cc27d22cb15a4f289ddd3224aaf3))
+* **code:** smells-design Good/Bad pairs come from sources, not project code ([#186](https://github.com/chiyanram/skills/issues/186)) ([1d77a3e](https://github.com/chiyanram/skills/commit/1d77a3e431c9a4e117867b857980a3ae78ebb848))
+* **code:** spring Good/Bad pairs come from sources, not project code ([#184](https://github.com/chiyanram/skills/issues/184)) ([d6fe8ab](https://github.com/chiyanram/skills/commit/d6fe8ab88dfa8634790f74d7b20e7b5a25128ae4))
 
 ## [0.16.2](https://github.com/chiyanram/skills/compare/rulebook--v0.16.1...rulebook--v0.16.2) (2026-11-01)
 
@@ -302,19 +302,19 @@ Claude-Session: https://claude.ai/code/session_012EphAgXmJeLDVFfEgSjwGe
 
 ### Bug Fixes
 
-* **code:** angular-ui rules cite two sources or the preference label ([#170](https://github.com/chiyanram/skills/issues/170)) ([1deeabc](https://github.com/chiyanram/skills/commit/1deeabc03d1153f4ef858c071428d347f47b124e)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
-* **code:** comments rules cite two sources or the preference label ([#171](https://github.com/chiyanram/skills/issues/171)) ([6cba5f6](https://github.com/chiyanram/skills/commit/6cba5f60c0a5983136008bfa43fd047439308e3a)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
-* **code:** concurrency rules cite two sources or the preference label ([#172](https://github.com/chiyanram/skills/issues/172)) ([b3d8f0f](https://github.com/chiyanram/skills/commit/b3d8f0f9c8bdebbbb935227e81ef8791eb82750f)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
-* **code:** design rules cite two sources or the preference label ([#173](https://github.com/chiyanram/skills/issues/173)) ([2f5bc75](https://github.com/chiyanram/skills/commit/2f5bc750f33401c221e7f0634977c92f43342e50)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
-* **code:** deslop rules cite two sources or the preference label ([#174](https://github.com/chiyanram/skills/issues/174)) ([48a9229](https://github.com/chiyanram/skills/commit/48a92296a1a322f3a05882c50afb98041e960a89)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
-* **code:** errors rules cite two sources or the preference label ([#175](https://github.com/chiyanram/skills/issues/175)) ([5c34e38](https://github.com/chiyanram/skills/commit/5c34e38ec4ba00a9eaf5ebc3004bf73321c75e84)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
-* **code:** java rules cite two sources or the preference label ([#176](https://github.com/chiyanram/skills/issues/176)) ([742aa95](https://github.com/chiyanram/skills/commit/742aa956423926f727cf9356224d5028776d7400)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
-* **code:** messaging rules cite two sources or the preference label ([#177](https://github.com/chiyanram/skills/issues/177)) ([4d7c66e](https://github.com/chiyanram/skills/commit/4d7c66e24a989ed7af6a41f5f8d707d396491999)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
-* **code:** security rules cite two sources or the preference label ([#178](https://github.com/chiyanram/skills/issues/178)) ([4263af4](https://github.com/chiyanram/skills/commit/4263af4dda20c5f76478d23a91d482f51cef2d64)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
-* **code:** services rules cite two sources or the preference label ([#179](https://github.com/chiyanram/skills/issues/179)) ([d258c52](https://github.com/chiyanram/skills/commit/d258c52b421bf0746d2c95636ccfe13a40757671)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
-* **code:** smells rules cite two sources or the preference label ([#180](https://github.com/chiyanram/skills/issues/180)) ([fda57e4](https://github.com/chiyanram/skills/commit/fda57e4be1ac28ad37444a5a95a477b0aae7f54a)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
-* **code:** spring rules cite two sources or the preference label ([#181](https://github.com/chiyanram/skills/issues/181)) ([3ae91ca](https://github.com/chiyanram/skills/commit/3ae91ca5bfb924d8f9d90bf490d1676f789c67bc)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
-* **code:** types rules cite two sources or the preference label ([#182](https://github.com/chiyanram/skills/issues/182)) ([7a6f307](https://github.com/chiyanram/skills/commit/7a6f30725f16b4c7408846deba9437d66bb46a31)), closes [agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)
+* **code:** angular-ui rules cite two sources or the preference label ([#170](https://github.com/chiyanram/skills/issues/170)) ([1deeabc](https://github.com/chiyanram/skills/commit/1deeabc03d1153f4ef858c071428d347f47b124e))
+* **code:** comments rules cite two sources or the preference label ([#171](https://github.com/chiyanram/skills/issues/171)) ([6cba5f6](https://github.com/chiyanram/skills/commit/6cba5f60c0a5983136008bfa43fd047439308e3a))
+* **code:** concurrency rules cite two sources or the preference label ([#172](https://github.com/chiyanram/skills/issues/172)) ([b3d8f0f](https://github.com/chiyanram/skills/commit/b3d8f0f9c8bdebbbb935227e81ef8791eb82750f))
+* **code:** design rules cite two sources or the preference label ([#173](https://github.com/chiyanram/skills/issues/173)) ([2f5bc75](https://github.com/chiyanram/skills/commit/2f5bc750f33401c221e7f0634977c92f43342e50))
+* **code:** deslop rules cite two sources or the preference label ([#174](https://github.com/chiyanram/skills/issues/174)) ([48a9229](https://github.com/chiyanram/skills/commit/48a92296a1a322f3a05882c50afb98041e960a89))
+* **code:** errors rules cite two sources or the preference label ([#175](https://github.com/chiyanram/skills/issues/175)) ([5c34e38](https://github.com/chiyanram/skills/commit/5c34e38ec4ba00a9eaf5ebc3004bf73321c75e84))
+* **code:** java rules cite two sources or the preference label ([#176](https://github.com/chiyanram/skills/issues/176)) ([742aa95](https://github.com/chiyanram/skills/commit/742aa956423926f727cf9356224d5028776d7400))
+* **code:** messaging rules cite two sources or the preference label ([#177](https://github.com/chiyanram/skills/issues/177)) ([4d7c66e](https://github.com/chiyanram/skills/commit/4d7c66e24a989ed7af6a41f5f8d707d396491999))
+* **code:** security rules cite two sources or the preference label ([#178](https://github.com/chiyanram/skills/issues/178)) ([4263af4](https://github.com/chiyanram/skills/commit/4263af4dda20c5f76478d23a91d482f51cef2d64))
+* **code:** services rules cite two sources or the preference label ([#179](https://github.com/chiyanram/skills/issues/179)) ([d258c52](https://github.com/chiyanram/skills/commit/d258c52b421bf0746d2c95636ccfe13a40757671))
+* **code:** smells rules cite two sources or the preference label ([#180](https://github.com/chiyanram/skills/issues/180)) ([fda57e4](https://github.com/chiyanram/skills/commit/fda57e4be1ac28ad37444a5a95a477b0aae7f54a))
+* **code:** spring rules cite two sources or the preference label ([#181](https://github.com/chiyanram/skills/issues/181)) ([3ae91ca](https://github.com/chiyanram/skills/commit/3ae91ca5bfb924d8f9d90bf490d1676f789c67bc))
+* **code:** types rules cite two sources or the preference label ([#182](https://github.com/chiyanram/skills/issues/182)) ([7a6f307](https://github.com/chiyanram/skills/commit/7a6f30725f16b4c7408846deba9437d66bb46a31))
 
 ## [0.16.0](https://github.com/chiyanram/skills/compare/rulebook--v0.15.0...rulebook--v0.16.0) (2026-10-31)
 
@@ -365,29 +365,29 @@ Claude-Session: https://claude.ai/code/session_012EphAgXmJeLDVFfEgSjwGe
 
 ### Features
 
-* **code:** security rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#150](https://github.com/chiyanram/skills/issues/150)) ([bf58042](https://github.com/chiyanram/skills/commit/bf58042cdf97236f6ae5f4cc69cc32a08abaf8ff))
+* **code:** security rule file ([#150](https://github.com/chiyanram/skills/issues/150)) ([bf58042](https://github.com/chiyanram/skills/commit/bf58042cdf97236f6ae5f4cc69cc32a08abaf8ff))
 
 ## [0.9.0](https://github.com/chiyanram/skills/compare/rulebook--v0.8.0...rulebook--v0.9.0) (2026-10-31)
 
 ### Features
 
-* **code:** angular-ui rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#151](https://github.com/chiyanram/skills/issues/151)) ([4ad861b](https://github.com/chiyanram/skills/commit/4ad861bd4939348a6b75e7fa990b7104fce3dc5e))
-* **code:** messaging rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#149](https://github.com/chiyanram/skills/issues/149)) ([62353ea](https://github.com/chiyanram/skills/commit/62353ea8156e57267bcba66e52698ac0d006ab67))
+* **code:** angular-ui rule file ([#151](https://github.com/chiyanram/skills/issues/151)) ([4ad861b](https://github.com/chiyanram/skills/commit/4ad861bd4939348a6b75e7fa990b7104fce3dc5e))
+* **code:** messaging rule file ([#149](https://github.com/chiyanram/skills/issues/149)) ([62353ea](https://github.com/chiyanram/skills/commit/62353ea8156e57267bcba66e52698ac0d006ab67))
 
 ## [0.8.0](https://github.com/chiyanram/skills/compare/rulebook--v0.7.0...rulebook--v0.8.0) (2026-10-31)
 
 ### Features
 
-* **code:** concurrency rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#148](https://github.com/chiyanram/skills/issues/148)) ([3505519](https://github.com/chiyanram/skills/commit/3505519849aff3c28755fccd4edeeef6d3e8f03c))
-* **code:** services rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#146](https://github.com/chiyanram/skills/issues/146)) ([1865f60](https://github.com/chiyanram/skills/commit/1865f6041fc1fe8220ecb7cfed02bf0f428feffe))
-* **code:** spring rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#147](https://github.com/chiyanram/skills/issues/147)) ([49209e6](https://github.com/chiyanram/skills/commit/49209e6d80dbb2549cdedb681165c57f887f6a36))
+* **code:** concurrency rule file ([#148](https://github.com/chiyanram/skills/issues/148)) ([3505519](https://github.com/chiyanram/skills/commit/3505519849aff3c28755fccd4edeeef6d3e8f03c))
+* **code:** services rule file ([#146](https://github.com/chiyanram/skills/issues/146)) ([1865f60](https://github.com/chiyanram/skills/commit/1865f6041fc1fe8220ecb7cfed02bf0f428feffe))
+* **code:** spring rule file ([#147](https://github.com/chiyanram/skills/issues/147)) ([49209e6](https://github.com/chiyanram/skills/commit/49209e6d80dbb2549cdedb681165c57f887f6a36))
 * **migrations:** postgres-design reference from industry sources ([#157](https://github.com/chiyanram/skills/issues/157)) ([7f685cf](https://github.com/chiyanram/skills/commit/7f685cf2e1c20e1a9bb8ce1c3a7ae6fdb1f88e3d))
 
 ## [0.7.0](https://github.com/chiyanram/skills/compare/rulebook--v0.6.1...rulebook--v0.7.0) (2026-10-31)
 
 ### Features
 
-* **code:** deslop rule skill ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#145](https://github.com/chiyanram/skills/issues/145)) ([38dbd61](https://github.com/chiyanram/skills/commit/38dbd619bf999f5cb207e782bdf8537e484573ab))
+* **code:** deslop rule skill ([#145](https://github.com/chiyanram/skills/issues/145)) ([38dbd61](https://github.com/chiyanram/skills/commit/38dbd619bf999f5cb207e782bdf8537e484573ab))
 
 ## [0.6.1](https://github.com/chiyanram/skills/compare/rulebook--v0.6.0...rulebook--v0.6.1) (2026-10-31)
 
@@ -399,51 +399,51 @@ Claude-Session: https://claude.ai/code/session_012EphAgXmJeLDVFfEgSjwGe
 
 ### Features
 
-* **code:** comments rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#143](https://github.com/chiyanram/skills/issues/143)) ([5f3b9e0](https://github.com/chiyanram/skills/commit/5f3b9e007861a5fc3a3d863e86fce41f3d1d45dc))
-* **code:** errors rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#142](https://github.com/chiyanram/skills/issues/142)) ([001ad6e](https://github.com/chiyanram/skills/commit/001ad6e1d1234314761a4013d278d59f167b31e2))
-* **code:** smells rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#144](https://github.com/chiyanram/skills/issues/144)) ([fef4eb5](https://github.com/chiyanram/skills/commit/fef4eb55d7ae7d4e48846cb27cd7c50f48713ab4))
+* **code:** comments rule file ([#143](https://github.com/chiyanram/skills/issues/143)) ([5f3b9e0](https://github.com/chiyanram/skills/commit/5f3b9e007861a5fc3a3d863e86fce41f3d1d45dc))
+* **code:** errors rule file ([#142](https://github.com/chiyanram/skills/issues/142)) ([001ad6e](https://github.com/chiyanram/skills/commit/001ad6e1d1234314761a4013d278d59f167b31e2))
+* **code:** smells rule file ([#144](https://github.com/chiyanram/skills/issues/144)) ([fef4eb5](https://github.com/chiyanram/skills/commit/fef4eb55d7ae7d4e48846cb27cd7c50f48713ab4))
 
 ## [0.5.0](https://github.com/chiyanram/skills/compare/rulebook--v0.4.0...rulebook--v0.5.0) (2026-10-30)
 
 ### Features
 
-* **code:** java rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#141](https://github.com/chiyanram/skills/issues/141)) ([f1a4d94](https://github.com/chiyanram/skills/commit/f1a4d94c8f4ed9b3e0e88189e09c4e21d5ec1270))
+* **code:** java rule file ([#141](https://github.com/chiyanram/skills/issues/141)) ([f1a4d94](https://github.com/chiyanram/skills/commit/f1a4d94c8f4ed9b3e0e88189e09c4e21d5ec1270))
 
 ## [0.4.0](https://github.com/chiyanram/skills/compare/rulebook--v0.3.0...rulebook--v0.4.0) (2026-10-30)
 
 ### Features
 
-* **code:** types rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#140](https://github.com/chiyanram/skills/issues/140)) ([08c0e1b](https://github.com/chiyanram/skills/commit/08c0e1bdfc5637807c8753fb7c24a8a099f3d75b))
+* **code:** types rule file ([#140](https://github.com/chiyanram/skills/issues/140)) ([08c0e1b](https://github.com/chiyanram/skills/commit/08c0e1bdfc5637807c8753fb7c24a8a099f3d75b))
 
 ## [0.3.0](https://github.com/chiyanram/skills/compare/rulebook--v0.2.0...rulebook--v0.3.0) (2026-10-30)
 
 ### Features
 
-* **code:** design rule file ([chiyanram/agent-factory#32](https://github.com/chiyanram/agent-factory/issues/32)) ([#139](https://github.com/chiyanram/skills/issues/139)) ([4bea42f](https://github.com/chiyanram/skills/commit/4bea42f73edcdecf06e73de08fcf77de5a71e551))
+* **code:** design rule file ([#139](https://github.com/chiyanram/skills/issues/139)) ([4bea42f](https://github.com/chiyanram/skills/commit/4bea42f73edcdecf06e73de08fcf77de5a71e551))
 
 ### Bug Fixes
 
-* **repo:** link cross-repo issue references to their own repo in release notes ([#129](https://github.com/chiyanram/skills/issues/129)) ([ba2a7a2](https://github.com/chiyanram/skills/commit/ba2a7a21c0713104c8d89ad9e380f9c8559a4817)), closes [#N](https://github.com/chiyanram/skills/issues/N) [agent-factory#31](https://github.com/chiyanram/agent-factory/issues/31) [owner/repo#N](https://github.com/owner/repo/issues/N) [repo#N](https://github.com/chiyanram/repo/issues/N) [owner/repo#N](https://github.com/owner/repo/issues/N) [agent-factory#31](https://github.com/chiyanram/agent-factory/issues/31)
+* **repo:** link cross-repo issue references to their own repo in release notes ([#129](https://github.com/chiyanram/skills/issues/129)) ([ba2a7a2](https://github.com/chiyanram/skills/commit/ba2a7a21c0713104c8d89ad9e380f9c8559a4817)), closes [#N](https://github.com/chiyanram/skills/issues/N) [owner/repo#N](https://github.com/owner/repo/issues/N) [repo#N](https://github.com/chiyanram/repo/issues/N) [owner/repo#N](https://github.com/owner/repo/issues/N)
 
 ## [0.2.0](https://github.com/chiyanram/skills/compare/rulebook--v0.1.0...rulebook--v0.2.0) (2026-10-30)
 
 ### Features
 
-* **testing:** boundaries rule file ([chiyanram/agent-factory#31](https://github.com/chiyanram/agent-factory/issues/31), 1 of 11) ([#113](https://github.com/chiyanram/skills/issues/113)) ([7a4d5e0](https://github.com/chiyanram/skills/commit/7a4d5e04828e2822b77119697902a4bfa81082b7)), closes [skills#112](https://github.com/chiyanram/skills/issues/112)
-* **testing:** coverage-design rule file ([chiyanram/agent-factory#31](https://github.com/chiyanram/agent-factory/issues/31)) ([#116](https://github.com/chiyanram/skills/issues/116)) ([24f6c0b](https://github.com/chiyanram/skills/commit/24f6c0b2357279b720fa890bbb056cd340de6faa))
-* **testing:** integration-tests rule file ([chiyanram/agent-factory#31](https://github.com/chiyanram/agent-factory/issues/31)) ([#119](https://github.com/chiyanram/skills/issues/119)) ([55187cc](https://github.com/chiyanram/skills/commit/55187cc89840da348a911ed35d846ceab1f60605))
-* **testing:** mutation rule file ([chiyanram/agent-factory#31](https://github.com/chiyanram/agent-factory/issues/31)) ([#122](https://github.com/chiyanram/skills/issues/122)) ([09f7674](https://github.com/chiyanram/skills/commit/09f7674bbcdffc008feb432f848cb4fb08ba0176))
-* **testing:** property-based rule file ([chiyanram/agent-factory#31](https://github.com/chiyanram/agent-factory/issues/31)) ([#123](https://github.com/chiyanram/skills/issues/123)) ([70ef00f](https://github.com/chiyanram/skills/commit/70ef00f6e768831267e2fc1754a66ce3dc6713a7))
-* **testing:** scenario-to-tests rule file ([chiyanram/agent-factory#31](https://github.com/chiyanram/agent-factory/issues/31)) ([#121](https://github.com/chiyanram/skills/issues/121)) ([715aa11](https://github.com/chiyanram/skills/commit/715aa111795cecbf998b15e3b75f54a3909543fa))
-* **testing:** smoke-specs rule file ([chiyanram/agent-factory#31](https://github.com/chiyanram/agent-factory/issues/31)) ([#124](https://github.com/chiyanram/skills/issues/124)) ([b57c2f8](https://github.com/chiyanram/skills/commit/b57c2f8e38012e9d97549884f923e9d8d1f82b87))
-* **testing:** spock rule file ([chiyanram/agent-factory#31](https://github.com/chiyanram/agent-factory/issues/31)) ([#120](https://github.com/chiyanram/skills/issues/120)) ([366dcec](https://github.com/chiyanram/skills/commit/366dceccaa0bef2a7af300772922290527ef1c6b))
-* **testing:** strategy rule file ([chiyanram/agent-factory#31](https://github.com/chiyanram/agent-factory/issues/31)) ([#115](https://github.com/chiyanram/skills/issues/115)) ([782b7a7](https://github.com/chiyanram/skills/commit/782b7a7c3aac16315ff9853f71a1577d6b1837b4))
-* **testing:** unit-tests rule file ([chiyanram/agent-factory#31](https://github.com/chiyanram/agent-factory/issues/31)) ([#118](https://github.com/chiyanram/skills/issues/118)) ([7b25c8a](https://github.com/chiyanram/skills/commit/7b25c8ace1f6fdb1b98d332f998a43a0a3907cb4))
-* **testing:** value-bar rule file ([chiyanram/agent-factory#31](https://github.com/chiyanram/agent-factory/issues/31)) ([#117](https://github.com/chiyanram/skills/issues/117)) ([cd0e23b](https://github.com/chiyanram/skills/commit/cd0e23ba493e0e9ba04a5eaa1e66d57fff1318f9))
+* **testing:** boundaries rule file (, 1 of 11) ([#113](https://github.com/chiyanram/skills/issues/113)) ([7a4d5e0](https://github.com/chiyanram/skills/commit/7a4d5e04828e2822b77119697902a4bfa81082b7)), closes [skills#112](https://github.com/chiyanram/skills/issues/112)
+* **testing:** coverage-design rule file ([#116](https://github.com/chiyanram/skills/issues/116)) ([24f6c0b](https://github.com/chiyanram/skills/commit/24f6c0b2357279b720fa890bbb056cd340de6faa))
+* **testing:** integration-tests rule file ([#119](https://github.com/chiyanram/skills/issues/119)) ([55187cc](https://github.com/chiyanram/skills/commit/55187cc89840da348a911ed35d846ceab1f60605))
+* **testing:** mutation rule file ([#122](https://github.com/chiyanram/skills/issues/122)) ([09f7674](https://github.com/chiyanram/skills/commit/09f7674bbcdffc008feb432f848cb4fb08ba0176))
+* **testing:** property-based rule file ([#123](https://github.com/chiyanram/skills/issues/123)) ([70ef00f](https://github.com/chiyanram/skills/commit/70ef00f6e768831267e2fc1754a66ce3dc6713a7))
+* **testing:** scenario-to-tests rule file ([#121](https://github.com/chiyanram/skills/issues/121)) ([715aa11](https://github.com/chiyanram/skills/commit/715aa111795cecbf998b15e3b75f54a3909543fa))
+* **testing:** smoke-specs rule file ([#124](https://github.com/chiyanram/skills/issues/124)) ([b57c2f8](https://github.com/chiyanram/skills/commit/b57c2f8e38012e9d97549884f923e9d8d1f82b87))
+* **testing:** spock rule file ([#120](https://github.com/chiyanram/skills/issues/120)) ([366dcec](https://github.com/chiyanram/skills/commit/366dceccaa0bef2a7af300772922290527ef1c6b))
+* **testing:** strategy rule file ([#115](https://github.com/chiyanram/skills/issues/115)) ([782b7a7](https://github.com/chiyanram/skills/commit/782b7a7c3aac16315ff9853f71a1577d6b1837b4))
+* **testing:** unit-tests rule file ([#118](https://github.com/chiyanram/skills/issues/118)) ([7b25c8a](https://github.com/chiyanram/skills/commit/7b25c8ace1f6fdb1b98d332f998a43a0a3907cb4))
+* **testing:** value-bar rule file ([#117](https://github.com/chiyanram/skills/issues/117)) ([cd0e23b](https://github.com/chiyanram/skills/commit/cd0e23ba493e0e9ba04a5eaa1e66d57fff1318f9))
 
 ### Bug Fixes
 
-* **testing:** examples obey every rule; four rule conflicts resolved ([chiyanram/agent-factory#31](https://github.com/chiyanram/agent-factory/issues/31)) ([#126](https://github.com/chiyanram/skills/issues/126)) ([26d92b1](https://github.com/chiyanram/skills/commit/26d92b17c56b5e2dda022b4989606ff81e48e86b))
+* **testing:** examples obey every rule; four rule conflicts resolved ([#126](https://github.com/chiyanram/skills/issues/126)) ([26d92b1](https://github.com/chiyanram/skills/commit/26d92b17c56b5e2dda022b4989606ff81e48e86b))
 
 ## 0.1.0 (2026-10-17)
 

@@ -25,6 +25,10 @@ to run, never engine code; the repo's own tests and design stay outside them. It
 **Why.** Plain files can be read by any agent, and `/crq` runs on a laptop with no engine installed. Small check
 scripts may ship so that K7 can hold.
 
+The `toolbox` plugin follows the same rule and adds two: every tool is typed-only (`disable-model-invocation: true`),
+with no push or merge, because a person chooses when a tool runs; and it versions and releases on its own line, so a
+tool change never bumps the rulebook.
+
 **How it's checked.** `check_plugin.py` fails a plugin that is not in its own folder under `plugins/`, and only those
 folders ship. That no engine code enters them is review only.
 

@@ -2,7 +2,7 @@ import unittest
 
 from tests.test_release_config import node
 
-# The shape of the release notes (#276), the same as chiyanram/agent-factory#157: emoji sections, one bullet per change
+# The shape of the release notes (#276): emoji sections, one bullet per change
 # as `**scope** — subject · #ticket (PR #pr)`, and an update line for the plugin.
 NOTES = """
 import { generateNotes } from '@semantic-release/release-notes-generator'
@@ -19,7 +19,7 @@ console.log(JSON.stringify(await generateNotes(options, { commits, logger, cwd: 
 REPO = "https://github.com/chiyanram/skills"
 COMMITS = [
     "feat(crq): a rule (#10) (#11)",
-    "fix(code): a wrong example (chiyanram/agent-factory#320) (#12)",
+    "fix(code): a wrong example (chiyanram/other#320) (#12)",
     "perf(code): a faster check (#13)",
     "feat(planning)!: rename a rule id (#14)\n\nBREAKING CHANGE: rule GA3 is removed.\n\n"
     "Co-Authored-By: A Tool <noreply@example.com>\nClaude-Session: https://example.com/s",
@@ -47,7 +47,7 @@ class ReleaseNotesTest(unittest.TestCase):
         self.assertIn(f"* **crq** — a rule · [#10]({REPO}/issues/10) (PR [#11]({REPO}/pull/11))", self.notes)
 
     def test_should_link_a_reference_to_its_own_repo(self):
-        self.assertIn("[chiyanram/agent-factory#320](https://github.com/chiyanram/agent-factory/issues/320)", self.notes)
+        self.assertIn("[chiyanram/other#320](https://github.com/chiyanram/other/issues/320)", self.notes)
 
     def test_should_list_the_breaking_change_under_its_scope(self):
         self.assertIn("* **planning** — rule GA3 is removed.", self.notes)

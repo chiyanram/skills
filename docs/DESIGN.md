@@ -1,26 +1,24 @@
 # rulebook design
 
-This page says what the rulebook plugin is, how a person and an engine use it, what changes from today, and the order we
-build it in. Decisions live in `docs/adr/` and in the ledger, and this page points at them. The words follow
-agent-factory's `GLOSSARY.md` (chiyanram/agent-factory#144), which uses Matt Pocock's software-factory vocabulary.
+This page says what the rulebook plugin is, how a person and an engine use it, and how its content stays good. Decisions live in `PRINCIPLES.md` and in the ledger, and this page points at them.
 
 ## 1. What it is
 
 `rulebook@chiyanram` is a Claude Code plugin with two kinds of content:
 
-| kind | what | today |
+| kind | what | state |
 |---|---|---|
-| **rules** | skills with references: `code`, `testing`, `planning`, `migrations`, `obs`, `deslop`, `meta` | built (ADR-0002, 0004) |
-| **process** | `crq`: the change pipeline from request to merge, with lanes and phases | built as a workflow skill (ADR-0008) |
+| **rules** | skills with references: `code`, `testing`, `planning`, `migrations`, `obs`, `deslop`, `meta` | built |
+| **process** | `crq`: the change pipeline from request to merge, with lanes and phases | built as a workflow skill |
 
-It stays generic: no project names, no engine names and no provenance in `plugins/` (ADR-0001, 0005). The role cards
+It stays generic: no project names, no engine names and no provenance in `plugins/`. The role cards
 name the process's own files (the spec, `.factory/report.json`, `.factory/pr.md`) as part of a contract any engine can
 keep, never as a product's paths.
 
 ## 2. Who uses it, and how
 
 ```text
-a person in Claude Code            an engine (for example agent-factory)
+a person in Claude Code            an engine (any orchestrator)
   installs rulebook@chiyanram        lists rulebook@chiyanram in a project's settings, pinned
   types /crq, or the skills          reads the lanes file and the role cards,
   load as they work                  runs each card as a fresh run, enforces its frontmatter
@@ -36,7 +34,7 @@ a person in Claude Code            an engine (for example agent-factory)
 - **An engine** gives the automated review the enabled plugins, plus the repo's own files from the default branch. No
   special "(rulebook plugin)" wording is needed.
 
-## 4. The process: lanes and role cards (new)
+## 4. The process: lanes and role cards
 
 The crq process gets a side an engine can read, so an engine runs the same process a person runs with `/crq`.
 
@@ -73,7 +71,7 @@ verify pass, retro and onboarder. The onboarder writes a project's brief and glo
   - Its factory words: task, trigger, run, runner, ticket tracker, git host, orchestrator, automated review.
   - Its process words: spec, AC, design, slice, lane, evidence row, finding, lens, judge files, hand-off, ask, ready
     check.
-- **Questions** (decided, [operator 2026-11-09](https://github.com/chiyanram/agent-factory/issues/30#issuecomment-6744864148)):
+- **Questions** (decided, operator 2026-11-09):
   a run that needs decisions asks every open question at once, in one numbered round. Each question carries 2 to 4
   short choices and one recommended choice, so the human answers with taps, "1A 2B", or "accept all". The project
   setting `questions` can be `one-at-a-time` instead. Never a guess. A coordinator round holds at most 3 questions;
@@ -88,58 +86,18 @@ verify pass, retro and onboarder. The onboarder writes a project's brief and glo
 
 **Evals live here, for this plugin.**
 - Three scenarios per role card, each with a grader. A card change ships only if its scenarios do not get worse.
-- The finder's set starts from the three review cases (skills PR #229). Every role's scenarios sit in
-  `plugins/rulebook/evals/<role>/<case>/`, apart from the cards, so they fit whichever placement section 8 picks.
-- These test the plugin on its own, in plain Claude Code. agent-factory's golden set (chiyanram/agent-factory#214) tests
-  the engine's whole automated review. **Two sets, two jobs** (decided 2026-11-09).
+- Every role's scenarios sit in `plugins/rulebook/evals/<role>/<case>/`, apart from the cards.
+- These test the plugin on its own, in plain Claude Code. An engine's own golden set tests
+  its whole automated review. **Two sets, two jobs** (decided 2026-11-09).
 
-## 5. What changes from today (`main` `27880dc`)
-
-| today | changes to |
-|---|---|
-| crq is prose for a person only | plus a lanes file and role cards an engine can run |
-| the implementer and review prompts live in agent-factory | they live here, as role cards |
-| crq says writer and reviewer | implementer, finder and verify pass, per the term map (chiyanram/agent-factory#144 phase 6) |
-| the approval is recorded with the spec's hash only (LN4, `crq/references/lanes.md:14-15`), though the human approves spec and design (`crq/SKILL.md:29`) | the approval covers spec and design |
-| no review-round cap in the skill (the engine has 3) | the cap is stated in the skill |
-| CR2 splits a change beyond 20 files; PD9 makes a slice over 15 files its own issue | one size rule |
-| acceptance criteria must be Gherkin scenarios (GA1–GA6); the role cards use numbered lines | numbered AC-n lines, each decidable by a test, for specs and cards (decided 2026-11-09, #237 decision 2; #244): GA1, GA2, GA4–GA6 superseded; GA3, CV1 and GT2 dropped; no Gherkin |
-| `check-cites` is named only as an example (`planning/references/spec-review.md:115`), and no script exists | the script is added, or the example names no missing tool |
-| test protection is one sentence (VB6) | plus a `test-integrity` rubric for the review lens |
-| "fails on revert" (VB2) and "the smallest regression" (CR6) are judged by reading | a revert script, and mutation on the changed lines, where a project can run them |
-| crq assumes a CI system | the gate is whatever the project has: CI, a queue, or a local run |
-| some findings are cosmetic: the PR5 file tree, a mandatory alternative for a small feature | demoted to nits or dropped; decided with the operator per rule |
-
-## 6. How the content stays good
+## 5. How the content stays good
 
 Every card and rubric follows the same discipline as the references:
-- the five-section format where it applies (ADR-0004);
-- a ledger row for every rule (ADR-0005);
+- the five-section format where it applies;
+- a ledger row for every rule;
 - the scripted checks;
 - its evals;
-- releases cut from commits (ADR-0007).
+- releases cut from commits.
 
 A card that grows is proven with its scenarios first. Mechanical rules move to checks, and prose is kept for judgement
 calls (RT6).
-
-## 7. Order of work
-
-| step | what | ticket | needed by |
-|---|---|---|---|
-| 1 | crq fixes: spec + design approval, round cap, size rule, `check-cites` | #234 | the factory's safety core |
-| 2 | `test-integrity` rubric | #235 | the review lens |
-| 3 | the rulebook's own evals: keep the review cases here as the finder's set | #236 | the role cards' evals |
-| 4 | the lanes file, the glossary and nine role cards, each with 3 eval scenarios | #237 | the factory's plugin step, then the ledger pilot |
-| 5 | crq's own wording moves to the glossary's words | #244 | the cards and references match |
-| later | agent-engineering references | #130 #134 | an RCA agent at work |
-
-New content needs the operator's yes and a ledger row, as every rule does.
-
-## 8. Open
-
-- **Placement:** where the lanes file and the cards sit in the plugin (`plugins/rulebook/skills/crq/...` or a sibling
-  folder), and how `check_*.py` and `make index` treat them. Decided with the first card.
-- **Card status:** whether a role card counts as a rule (it needs a ledger row) or as a prompt that cites rules (it
-  needs eval scenarios). Proposed: the card cites rules by id and needs eval scenarios, and the rules keep their ledger
-  rows.
-- **The PR body:** written by the implementer, as crq gives the PR phase to the build. To be confirmed.

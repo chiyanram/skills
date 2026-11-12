@@ -16,7 +16,7 @@ Edit the right-hand column to match whatever vocabulary you actually use.
 
 ## Type labels
 
-Each issue form sets one type label (#276). chiyanram/agent-factory and chiyanram/rca-agent use the same three.
+Each issue form sets one type label (#276).
 
 | Label | Form | Meaning |
 | ----- | ---- | ------- |
