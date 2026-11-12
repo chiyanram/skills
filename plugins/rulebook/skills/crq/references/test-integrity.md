@@ -38,7 +38,7 @@ When one ran at the head and its result is in the PR, leave these to it:
 | the diff | owner when no floor guard ran |
 |---|---|
 | deletes a test or a test file | VB6 (`verify-done`) |
-| adds a skip marker | VB6 (`verify-done`) |
+| adds a skip marker | VB6 (`verify-done`); a person's quarantine entry is VB11 (`verify-done`) |
 | removes an assertion line from a test that stays | VB6 (`verify-done`) |
 | adds a suppression with no reason, or an empty `catch` | CR4 (config); CM7 (`code/comments`); ER3 (`code/errors`) |
 | edits a judge file: a build file, a file the verify command runs, test config | CR3 (`code-review`) |

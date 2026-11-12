@@ -48,7 +48,7 @@ check an implementer's evidence rows.
 | a check fails and looks flaky | report it red; a person may re-run it once, naming the cause or filing a bug ticket with the failing value (VB9) | a flaky test re-run until green hides an intermittent bug |
 | the person's one re-run fails again | it stays red: fix it or file the bug, with no second re-run (VB9) | a second re-run is the automatic retry again |
 | a test fails again and again for a cause outside the change | a person quarantines that one test, with an owner, a ticket and an expiry within the project's limit (VB11) | the rest of the check still guards the change |
-| only job names are known, not test ids | the job is quarantined as a stated limit, with the shortest expiry, and the ticket says so (VB11) | a job-wide entry hides any new failure in that job |
+| only job names are known, not test ids | no quarantine: an open question to a person, and a ticket to report test ids (VB11, VB1) | a job-wide entry hides any new failure in that job |
 | a check is green only because of a quarantined test | the PR's status note names each quarantined test and its expiry (VB12) | people read the status note, not the log |
 
 ## Good / Bad
@@ -78,6 +78,8 @@ Each criterion points at a command and its result at the pushed commit.
   screen, a response or a message (VB4). — **Confidence** high
 - **Skip VB6 when** the spec removes a behaviour and its test goes with it, named in the PR. — **Do not skip
   when** a test is removed, skipped or loosened while its behaviour stays (VB6). — **Confidence** high
+- **Skip VB6 when** a person quarantines one test under VB11, with each field VB11 names. — **Do not skip when** the
+  implementer adds the skip, or the entry lacks a VB11 field (VB6). — **Confidence** high
 - **Skip the test-first run when** the bug cannot be reproduced in a test: say so, and ask. — **Do not skip
   when** the bug spec names inputs and an expected result (VB7). — **Confidence** medium
 - **Skip the history read when** both sides of the conflict are this branch's own commits: their reason is already
@@ -107,8 +109,7 @@ Walk the PR body, its commits and the diff of its tests.
   finding.
 - [ ] VB10 — For each evidence row, find a result copied from command output. A described result, a gate run as the
   evidence for file content, or one gate run on more than one criterion's row, is a finding.
-- [ ] VB11 — For each quarantine entry the change adds or renews, find one test id (or a stated job-only limit), an
-  owner, a ticket and an expiry within the project's limit. A missing field, a whole job with no stated limit, or an
-  expiry past the limit is a finding.
+- [ ] VB11 — For each quarantine entry the change adds or renews, find one test id, an owner, a ticket and an
+  expiry within the project's limit. A missing field, a whole job, or an expiry past the limit is a finding.
 - [ ] VB12 — For each check that passed with a quarantined test, find the status note naming each test and its expiry.
   A green with a quarantine named only in a log, or not at all, is a finding.
