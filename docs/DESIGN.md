@@ -53,7 +53,8 @@ The crq process gets a side an engine can read, so an engine runs the same proce
   human starts it (RT1–RT6).
 
 **Role cards.** One markdown file per role: coordinator, design-reviewer, test-first, implementer, cleanup, finder,
-verify pass, retro and onboarder. The onboarder writes a project's brief and glossary once, for every other role.
+verify pass and retro. The onboarder, which writes a project's brief and glossary, is the engine's card: its job is what
+the engine strips, lists and stages.
 - **Frontmatter** (the same fields everywhere): role, steps, input, `must_not_see`, hand-off, tools, enforced
   guardrails (IDs from the closed list in the card schema), rules (by id). An engine enforces it. `next` is dropped:
   the lanes hold the flow.

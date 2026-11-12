@@ -50,7 +50,7 @@ An engine reads these to run the same process a person runs with `/crq`.
   [coordinator](process/roles/coordinator.md), [design-reviewer](process/roles/design-reviewer.md),
   [test-first](process/roles/test-first.md), [implementer](process/roles/implementer.md),
   [cleanup](process/roles/cleanup.md), [finder](process/roles/finder.md), [verify
-  pass](process/roles/verify-pass.md), [retro](process/roles/retro.md), [onboarder](process/roles/onboarder.md).
+  pass](process/roles/verify-pass.md), [retro](process/roles/retro.md). The onboarder's card is the engine's own.
 
 ## References
 

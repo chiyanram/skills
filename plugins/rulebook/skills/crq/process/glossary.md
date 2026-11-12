@@ -59,4 +59,4 @@ A **role card** is one markdown file per role. The engine enforces its frontmatt
 | **finder** | one fresh run per lens that reports findings; it never approves | reviewer (alone) |
 | **verify pass** | the run that tries to refute each finding and gives it one bucket: act_on, consider, noted or dismissed | verifier |
 | **retro** | the timeline record the engine writes for every merge, and the full retro run a human starts | — |
-| **onboarder** | writes a project's brief and glossary once, for every other role; it writes only to the project home | — |
+| **onboarder** | writes a project's brief and glossary once, for every other role; it writes only to the project home; its card is the engine's | — |
