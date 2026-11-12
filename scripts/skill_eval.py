@@ -183,7 +183,8 @@ def main(argv: list[str]) -> int:
                    "--slice", args.slice] + (["--candidate", str(args.candidate)] if args.candidate else [])
         print(f"staged {staged}\n\nrun (real model calls):\n  {' '.join(command)}\nthen:\n  {' '.join(summary)}")
         if args.go:
-            subprocess.run(command, check=True)
+            # --go is the operator's say-so; the staged copy is this repo's own plugin, and --json cannot ask
+            subprocess.run(command + ["--trust-plugin"], check=True)
             return main(summary[2:])
         return 0
 
