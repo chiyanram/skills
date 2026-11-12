@@ -7,7 +7,7 @@ Contents: Rules · When X, use Y · Good / Bad (GA2, GA4–GA6, AC7–AC9) · De
 
 ## Rules
 
-How each AC becomes its tests is owned by `testing/references/scenario-to-tests.md` (GT1, GT3–GT6).
+How each AC becomes its tests is owned by the `testing` skill.
 
 - **GA1** — Write a ticket's ACs only in its spec's acceptance-criteria section, as numbered lines; a design, a test or
   a PR links to them, because a second copy drifts into a second source of truth.
@@ -18,7 +18,7 @@ How each AC becomes its tests is owned by `testing/references/scenario-to-tests.
 - **GA5** — Write each AC as one observable outcome that names no class or test level, and give each behaviour an AC
   for its failure or refusal, because an AC no test can fail proves nothing.
 - **GA6** — Write each AC's text as a "should …" behaviour sentence, standard form "should X when Y", so the test
-  name is that text verbatim (GT1), because a statement cannot become a test name without rewording.
+  name is that text verbatim, because a statement cannot become a test name without rewording.
 - **AC7** — When a change alters stored data or a default, give one AC or more a pre-change starting state
   (an old row, an unset key), because new-row ACs test the default, not the migration.
 - **AC8** — Move a GA4 table column whose value is the same on every row into the AC line, because a constant column
@@ -40,7 +40,7 @@ How each AC becomes its tests is owned by `testing/references/scenario-to-tests.
 | a value that is the same in every row | that value in the AC line, not a column (AC8) | a constant column is copied into every test table |
 | an outcome | what a user or caller can observe: a status, a response, a message, stored state (GA5) | an AC that no running test can check proves nothing |
 | an AC with only a success path | one more AC for its failure or refusal path (GA5) | a behaviour tested only on success leaves its failure path unproven |
-| a test level or a class name in an AC | the outcome instead; the test level is S1's call (`testing/strategy.md`) (GA5) | an AC that picks the test level decides it before the tests are written |
+| a test level or a class name in an AC | the outcome instead; the test level is the `testing` skill's call (GA5) | an AC that picks the test level decides it before the tests are written |
 | an AC's text | a "should …" sentence about behaviour, in the standard form "should X when Y" (GA6) | the text becomes the test name |
 | a change to stored data or a default | an AC that starts from state from before the change (AC7) | existing rows need a backfill |
 | a noun in AC text | the glossary's word; a new noun defined in the spec first (AC9) | one shared, ubiquitous language; the AC text becomes the test name, so a wrong word reaches the code |

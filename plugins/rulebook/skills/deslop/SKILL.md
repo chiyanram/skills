@@ -55,7 +55,7 @@ the report line is posted.
 | dead code | an unused member, a vestigial parameter, a commented-out block | DS7 |
 | deep nesting | three or more levels, a nested ternary | DS9 |
 | style drift | naming, control flow, imports or formatting that fight the file around them | the `code` reference for the file's language |
-| test shape | labelled blocks and feature names that fight the spec around them | U2 ([`unit-tests.md`](../testing/references/unit-tests.md)) |
+| test shape | labelled blocks and feature names that fight the spec around them | the `testing` skill's Spock notes |
 
 ### Fix or report
 

@@ -42,9 +42,9 @@ Contents: Rules · When X, use Y · Good / Bad (AE2, AE5, AEN2, AE10) · Decided
 | the provider answers with a 429 or an explicit retry-after | back-pressure: the retry policy and the rate limiter, not the breaker | throttling otherwise trips a healthy breaker (AEN2) · the breaker itself: CC11 |
 | the provider answers with an overload and no retry-after | the retry policy first; a breaker failure only once it gives up | one overload burst that a retry would ride out does not open the breaker (AEN2) |
 | a stream sends an error event, a keep-alive or an event type you do not know | the error ends the request as failed; the other two are skipped | providers fail mid-stream after a 200, and add event types (AE8) |
-| the provider reports token usage | one usage record, from the final cumulative value | providers split and repeat the counts differently (AE7) · its live test: LS16 (`testing`'s `llm-live-tests`) |
+| the provider reports token usage | one usage record, from the final cumulative value | providers split and repeat the counts differently (AE7) · its live test: the `testing` skill's model-calls notes |
 | a call needs an output-token cap | a value from agent or model configuration, sized as a backstop | a hidden low cap truncates answers and wastes retries (AE9) |
-| a second model may answer when the first fails | a fallback decorator over the port, with an explicit model mapping | the primary's model name is wrong on another provider (AE10) · its test: LS9 (`testing`'s `llm-tests`) |
+| a second model may answer when the first fails | a fallback decorator over the port, with an explicit model mapping | the primary's model name is wrong on another provider (AE10) · its test: the `testing` skill's model-calls notes |
 
 ## Good / Bad
 

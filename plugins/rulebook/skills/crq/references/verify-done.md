@@ -40,7 +40,7 @@ check an implementer's evidence rows.
 | a criterion a user sees: a screen, an API response, a message | a run of the app: the call made and what came back (VB4) | the test may miss how the parts fit |
 | a criterion only code sees | the test that proves it, by name (VB5) | the test is the evidence |
 | a criterion about what a file says | `grep` or `git diff` on that file, and what it printed (VB10) | a gate run passes whatever the file says |
-| a bug fix | a test-first run writes the failing test first (VB7); the implementer runs it locally and pastes the failure (S6) | the test and the fix stay independent |
+| a bug fix | a test-first run writes the failing test first (VB7); the implementer runs it locally and pastes the failure (`testing` skill, Fixing a bug) | the test and the fix stay independent |
 | a conflict between two changes that can both hold, such as two sections added at the end of one file | both sides kept, in a stated order (VB8) | each side was made on purpose |
 | a conflict between two intents that cannot both hold | an open question to the human (VB1), with each side's reason and a recommendation | choosing between intents is the human's call |
 | a conflict in a lock file or another generated file | the file regenerated with its tool, never merged by hand (VB8) | a hand-merged lock file is broken or stale |

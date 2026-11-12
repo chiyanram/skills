@@ -8,9 +8,8 @@ description: Use when you write or review code that calls an LLM or language mod
 Read only the references the task needs. Each one holds Rules, When X use Y, Good / Bad, Decided edges and Review
 checks, so a writer reads it top to bottom and a reviewer starts at Review checks.
 
-These rules cover the production code of an agent. The tests of that code are in the `testing` skill: its
-`llm-tests` reference for the fake model, and its `llm-live-tests` reference for real models and the eval gate
-(LT17, LT18). The eval harness itself is this skill's `evals` reference.
+These rules cover the production code of an agent. The tests of that code are in the `testing` skill's
+`model-calls.md`: the fake model, and live tests against real models with the eval gate. The eval harness itself is this skill's `evals` reference.
 
 <!-- index: built by `make index` from each reference; do not edit by hand -->
 | reference | rule IDs | read it |

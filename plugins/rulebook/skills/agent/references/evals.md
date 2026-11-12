@@ -25,11 +25,11 @@ Contents: Rules · When X, use Y · Good / Bad (AE43, AEN4, AE45, AE48) · Decid
 
 | situation | use | why |
 |---|---|---|
-| an eval runs an agent capability | its versioned golden set, through the real entry point, against the stored baseline | a harness that bypasses the entry point tests something else (AE43) · thresholds over repeated runs: LT18 (`testing`'s `llm-live-tests`) |
+| an eval runs an agent capability | its versioned golden set, through the real entry point, against the stored baseline | a harness that bypasses the entry point tests something else (AE43) · thresholds over repeated runs: the `testing` skill's model-calls notes |
 | the agent's tools write, send or act outside the run | a sandbox for those tools, a test store or a recording fake, and a grader that reads its end state | live tools send real messages and change real data (AEN4) |
 | a case ends in an infrastructure error, a timeout or a truncation | its own status, kept out of the pass rate | it measures the harness, not the agent (AE44) |
 | a property can be checked by code: a field, a number, a format, a tool call | a code grader | a judge is costlier, noisier and injectable (AE45) |
-| a property needs judgement: tone, faithfulness, helpfulness | an LLM judge that gets the candidate output as data | code cannot check it (AE45) · the verdict form: LT17 |
+| a property needs judgement: tone, faithfulness, helpfulness | an LLM judge that gets the candidate output as data | code cannot check it (AE45) · the verdict form: `testing`'s model-calls.md |
 | a judge is about to gate a release | its agreement with human labels on a sample, and its model and prompt version stored with each score | an uncalibrated judge drifts unseen (AE46) |
 | a case has a safe and an unsafe path | required and forbidden tool calls on the trajectory, with a declared match mode, and the end state | the path proves safety and the end state proves the task (AE48) |
 

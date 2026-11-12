@@ -17,7 +17,7 @@ Contents: Rules · When X, use Y · Good / Bad (AEN6) · Decided edges · Review
 
 | situation | use | why |
 |---|---|---|
-| a run or a workspace has a budget | a check before each model call and a settlement from actual usage after it | per-turn estimates let concurrent runs overspend (AE51) · the crossing response: LS6 (`testing`'s `llm-tests`) |
+| a run or a workspace has a budget | a check before each model call and a settlement from actual usage after it | per-turn estimates let concurrent runs overspend (AE51) · the crossing response: the `testing` skill's model-calls notes |
 | a budget is crossed | the turn ends with a typed reason, such as `BudgetExceeded(WORKSPACE)` | the caller can tell a budget stop from a failure (AE51) |
 | several runs share one workspace budget | an atomic reserve of the call's maximum cost in a shared store, then a settle | runs that each check, then record, all pass the check together (AEN6) |
 | a caller may call the provider at all | a per-caller rate limit and quota, before any budget | that limit is SE8 (`code`'s `security`) |
@@ -65,7 +65,7 @@ reservation with the real cost; a failed call settles from the usage reported be
 - **Skip when** only one run can use a workspace at a time, enforced by a lock or a queue: a check before each call
   and a record after it meet AEN6. — **Do not skip when** two runs, workers or replicas can spend from the same
   budget. — **Confidence** high
-- **Skip when** the response that crosses the budget has already arrived: keep it and count it (LS6), then stop
+- **Skip when** the response that crosses the budget has already arrived: keep it and count it, then stop
   before the next call. — **Do not skip when** the code drops or re-requests that response. — **Confidence** high
 
 ## Review checks
