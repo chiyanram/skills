@@ -3,6 +3,14 @@
 What the `toolbox` plugin ships, by version. semantic-release writes this file from the `toolbox`-scoped
 commit messages on `main`; do not edit it by hand.
 
+## [0.4.0](https://github.com/chiyanram/skills/compare/toolbox--v0.3.0...toolbox--v0.4.0) (2026-11-12)
+
+### ✨ Features
+
+* **toolbox** — /onboard writes a repo's rulebook block · [#346](https://github.com/chiyanram/skills/issues/346) (PR [#348](https://github.com/chiyanram/skills/pull/348))
+
+Update: `claude plugin update toolbox@chiyanram`
+
 ## [0.3.0](https://github.com/chiyanram/skills/compare/toolbox--v0.2.0...toolbox--v0.3.0) (2026-11-09)
 
 ### Features
