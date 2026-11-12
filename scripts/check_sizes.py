@@ -1,8 +1,8 @@
-"""Size budgets from agent-factory docs/adr/0003-rulebook-layout-across-tools.md.
+"""Size budgets for the rulebook.
 
-- root AGENTS.md under 200 lines (ADR-0003:14)
-- each rule in a reference's `## Rules` section at most 35 words (ADR-0003:20-21); the id does not count
-- each root-to-leaf AGENTS.md chain within Codex's 32 KiB (G20; agent-factory research/22:11,22)
+- root AGENTS.md under 200 lines
+- each rule in a reference's `## Rules` section at most 35 words ; the id does not count
+- each root-to-leaf AGENTS.md chain within Codex's 32 KiB
 """
 import re
 import sys

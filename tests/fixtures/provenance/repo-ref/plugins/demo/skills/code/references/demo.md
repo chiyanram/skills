@@ -11,7 +11,7 @@ Read it when you write a demo.
 
 | situation | use | why |
 |---|---|---|
-| a closed set | a sealed type (D1) | a new case fails to compile (agent-factory#59) |
+| a closed set | a sealed type (D1) | a new case fails to compile (chiyanram/other#59) |
 
 ## Good / Bad
 

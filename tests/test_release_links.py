@@ -6,13 +6,13 @@ from tests.support import ROOT
 
 CONTEXT = {"host": "https://github.com", "owner": "chiyanram", "repository": "skills"}
 SKILLS = "https://github.com/chiyanram/skills/issues"
-FACTORY = "https://github.com/chiyanram/agent-factory/issues"
+OTHER = "https://github.com/chiyanram/other/issues"
 
 # subject as the conventionalcommits preset renders it -> subject after scripts/release_links.mjs
 CASES = {
     "bare repo#N, the 0.2.0 bug": (
-        f"boundaries rule file (agent-factory[#31]({SKILLS}/31), 1 of 11) ([#113]({SKILLS}/113))",
-        f"boundaries rule file ([chiyanram/agent-factory#31]({FACTORY}/31), 1 of 11) ([#113]({SKILLS}/113))"),
+        f"boundaries rule file (other[#31]({SKILLS}/31), 1 of 11) ([#113]({SKILLS}/113))",
+        f"boundaries rule file ([chiyanram/other#31]({OTHER}/31), 1 of 11) ([#113]({SKILLS}/113))"),
     "owner/repo#N": (
         f"strategy (other-org/tool[#7]({SKILLS}/7))",
         "strategy ([other-org/tool#7](https://github.com/other-org/tool/issues/7))"),

@@ -1,5 +1,5 @@
-# Commit-message prompts for `cz commit` (chiyanram/skills#281, chiyanram/agent-factory#341, chiyanram/rca-agent#51).
-# The same file in all three repos. commitizen only writes the message: semantic-release cuts the releases, and CI
+# Commit-message prompts for `cz commit` (chiyanram/skills#281).
+# commitizen only writes the message: semantic-release cuts the releases, and CI
 # checks the PR title. Format and rules: CONTRIBUTING.md#commit-messages.
 [tool.commitizen]
 name = "cz_customize"

@@ -1,8 +1,7 @@
 # rulebook design
 
 This page says what the rulebook plugin is, how a person and an engine use it, what changes from today, and the order we
-build it in. Decisions live in `docs/adr/` and in the ledger, and this page points at them. The words follow
-agent-factory's `GLOSSARY.md` (chiyanram/agent-factory#144), which uses Matt Pocock's software-factory vocabulary.
+build it in. Decisions live in `PRINCIPLES.md` and in the ledger, and this page points at them.
 
 ## 1. What it is
 
@@ -10,17 +9,17 @@ agent-factory's `GLOSSARY.md` (chiyanram/agent-factory#144), which uses Matt Poc
 
 | kind | what | today |
 |---|---|---|
-| **rules** | skills with references: `code`, `testing`, `planning`, `migrations`, `obs`, `deslop`, `meta` | built (ADR-0002, 0004) |
-| **process** | `crq`: the change pipeline from request to merge, with lanes and phases | built as a workflow skill (ADR-0008) |
+| **rules** | skills with references: `code`, `testing`, `planning`, `migrations`, `obs`, `deslop`, `meta` | built |
+| **process** | `crq`: the change pipeline from request to merge, with lanes and phases | built as a workflow skill |
 
-It stays generic: no project names, no engine names and no provenance in `plugins/` (ADR-0001, 0005). The role cards
+It stays generic: no project names, no engine names and no provenance in `plugins/`. The role cards
 name the process's own files (the spec, `.factory/report.json`, `.factory/pr.md`) as part of a contract any engine can
 keep, never as a product's paths.
 
 ## 2. Who uses it, and how
 
 ```text
-a person in Claude Code            an engine (for example agent-factory)
+a person in Claude Code            an engine (any orchestrator)
   installs rulebook@chiyanram        lists rulebook@chiyanram in a project's settings, pinned
   types /crq, or the skills          reads the lanes file and the role cards,
   load as they work                  runs each card as a fresh run, enforces its frontmatter
@@ -73,7 +72,7 @@ verify pass, retro and onboarder. The onboarder writes a project's brief and glo
   - Its factory words: task, trigger, run, runner, ticket tracker, git host, orchestrator, automated review.
   - Its process words: spec, AC, design, slice, lane, evidence row, finding, lens, judge files, hand-off, ask, ready
     check.
-- **Questions** (decided, [operator 2026-11-09](https://github.com/chiyanram/agent-factory/issues/30#issuecomment-6744864148)):
+- **Questions** (decided, operator 2026-11-09):
   a run that needs decisions asks every open question at once, in one numbered round. Each question carries 2 to 4
   short choices and one recommended choice, so the human answers with taps, "1A 2B", or "accept all". The project
   setting `questions` can be `one-at-a-time` instead. Never a guess. A coordinator round holds at most 3 questions;
@@ -90,16 +89,15 @@ verify pass, retro and onboarder. The onboarder writes a project's brief and glo
 - Three scenarios per role card, each with a grader. A card change ships only if its scenarios do not get worse.
 - The finder's set starts from the three review cases (skills PR #229). Every role's scenarios sit in
   `plugins/rulebook/evals/<role>/<case>/`, apart from the cards, so they fit whichever placement section 8 picks.
-- These test the plugin on its own, in plain Claude Code. agent-factory's golden set (chiyanram/agent-factory#214) tests
-  the engine's whole automated review. **Two sets, two jobs** (decided 2026-11-09).
+- These test the plugin on its own, in plain Claude Code. An engine's own golden set tests
+  its whole automated review. **Two sets, two jobs** (decided 2026-11-09).
 
 ## 5. What changes from today (`main` `27880dc`)
 
 | today | changes to |
 |---|---|
 | crq is prose for a person only | plus a lanes file and role cards an engine can run |
-| the implementer and review prompts live in agent-factory | they live here, as role cards |
-| crq says writer and reviewer | implementer, finder and verify pass, per the term map (chiyanram/agent-factory#144 phase 6) |
+| crq says writer and reviewer | implementer, finder and verify pass, per the process glossary |
 | the approval is recorded with the spec's hash only (LN4, `crq/references/lanes.md:14-15`), though the human approves spec and design (`crq/SKILL.md:29`) | the approval covers spec and design |
 | no review-round cap in the skill (the engine has 3) | the cap is stated in the skill |
 | CR2 splits a change beyond 20 files; PD9 makes a slice over 15 files its own issue | one size rule |
@@ -113,11 +111,11 @@ verify pass, retro and onboarder. The onboarder writes a project's brief and glo
 ## 6. How the content stays good
 
 Every card and rubric follows the same discipline as the references:
-- the five-section format where it applies (ADR-0004);
-- a ledger row for every rule (ADR-0005);
+- the five-section format where it applies;
+- a ledger row for every rule;
 - the scripted checks;
 - its evals;
-- releases cut from commits (ADR-0007).
+- releases cut from commits.
 
 A card that grows is proven with its scenarios first. Mechanical rules move to checks, and prose is kept for judgement
 calls (RT6).

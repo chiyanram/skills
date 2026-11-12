@@ -1,5 +1,5 @@
 """Builds a skill router's reference table from the references themselves, so a row is never written by hand and two
-PRs never merge rows by hand (agent-factory#46)."""
+PRs never merge rows by hand."""
 import re
 from pathlib import Path
 

@@ -52,7 +52,7 @@ jobs:
       - name: Title follows Conventional Commits
         env:
           TITLE: ${{ github.event.pull_request.title }}
-        # One rule in chiyanram/skills, agent-factory and rca-agent (#276): a scope, a lower-case summary and the issue
+        # One rule (#276): a scope, a lower-case summary and the issue
         # it works on, as (#N) or (owner/repo#N). Dependabot (scope deps) and the release commit name no issue.
         run: |
           pattern='^(feat|fix|perf|revert|docs|style|refactor|test|build|ci|chore)\([a-z0-9-]+\)!?: [^A-Z].*\([^)]*#[0-9]+[^)]*\)'

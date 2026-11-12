@@ -1,4 +1,4 @@
-"""The toolbox plugin holds typed-only tools, each with its licence notice, and none that pushes or merges (ADR-0009).
+"""The toolbox plugin holds typed-only tools, each with its licence notice, and none that pushes or merges.
 
 Fails when a toolbox `SKILL.md` lacks `disable-model-invocation: true`; when a toolbox skill has no section in
 `THIRD_PARTY_NOTICES.md` naming its source, commit and licence; or when a toolbox file holds a `git push`, a

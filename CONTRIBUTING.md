@@ -1,7 +1,7 @@
 # Contributing
 
-This repo ships two plugins: [`rulebook`](plugins/rulebook/), and [`toolbox`](plugins/toolbox/), typed-only tools
-(ADR-0009). Coding agents also read [AGENTS.md](AGENTS.md).
+This repo ships two plugins: [`rulebook`](plugins/rulebook/), and [`toolbox`](plugins/toolbox/), typed-only tools.
+Coding agents also read [AGENTS.md](AGENTS.md).
 
 **The one hard rule:** no rule enters a reference without the operator's explicit yes. A rule that is not approved
 stays out, even when an agent likes it or another repo has it.
@@ -51,7 +51,7 @@ A good pull request does one thing and adds a test with every change to a check.
 
 ## Commit messages
 
-One format in chiyanram/skills, chiyanram/agent-factory and chiyanram/rca-agent (#281). It has the commitizen sections:
+One format (#281). It has the commitizen sections:
 
 ```
 type(scope): lower-case summary (#issue)
@@ -73,7 +73,7 @@ description** as its body, so write the description as the commit body. The bran
 anything. CI checks the PR title.
 
 To get the prompts, install [commitizen](https://commitizen-tools.github.io/commitizen/) once (`pipx install
-commitizen`) and run `cz commit`. `.cz.toml` holds the prompts; it is the same file in all three repos. commitizen only
+commitizen`) and run `cz commit`. `.cz.toml` holds the prompts. commitizen only
 writes the message: semantic-release still cuts the releases.
 
 ## Add a rule
@@ -141,7 +141,7 @@ When review finds a case a check missed, plant that case first and watch it fail
 | `check_plugin.py` | a plugin is not under `plugins/`, has no README or icon, or the repo has no LICENSE |
 | `check_index.py` | a plugin README does not link every skill router, or a router's table differs from what `make index` builds |
 | `check_routers.py` | a skill folder ships references but has no `SKILL.md`, or its `SKILL.md` does not link each one |
-| `check_provenance.py` | a shipped skill file carries provenance outside code: a source citation, a URL, a preference line, a credit, an evidence note, a date or an agent-factory reference. In the toolbox it reads only each `SKILL.md` |
+| `check_provenance.py` | a shipped skill file carries provenance outside code: a source citation, a URL, a preference line, a credit, an evidence note, a date or a reference to another repository's issue. In the toolbox it reads only each `SKILL.md` |
 | `check_ledger.py` | the ledger repeats a rule ID for the same reference without "Supersedes" in the later row, or holds a conflict marker |
 | `check_routing.py` | a skill router has no `evals/routing/<name>.json`, a file has fewer than 8 `should` or 8 `near_miss` requests, a `should` request does not rank its router first, a near miss does not rank its named owner above that router, or two router descriptions are 75% alike. It skips a typed-only skill, which nothing routes to. Word matching only: a model-graded run (`claude plugin eval`) costs tokens and stays manual |
 | `check_process.py` | a crq process schema (card, lanes or finding, in `process/schema/`) is missing or uses a keyword `scripts/schema_lite.py` does not run; the lanes file or a role card's frontmatter does not validate against its schema, which covers a lane that is missing, out of order or drops approval above tiny, and a guardrail ID outside the card schema's list; the review file's baseline is empty, has an entry that is not exactly a skill and a reference, names one twice, or names a reference the plugin does not ship; a role card is not a known role, misses or adds a frontmatter field, cites a rule ID that no Rules section holds, or lacks the job, a "done when" line, numbered steps or an "it's working if" list; or its role has fewer than 3 eval scenarios, each a `prompt.md` and a grader |
@@ -241,8 +241,7 @@ open **Actions → release → Run workflow** on `main`, or run `gh workflow run
 from `ci.yml` first (#285); semantic-release then runs after the checks pass. Pull requests are squash-merged, so **the
 pull request title becomes the commit** that decides the release. CI fails a title that is not `type(scope): lower-case
 summary (#issue)`, such as `feat(testing): spock cleanup rules (#123)`. The issue can be in another repo:
-`(chiyanram/agent-factory#320)`. Only Dependabot (scope `deps`) and the release commit name no issue.
-chiyanram/agent-factory and chiyanram/rca-agent use the same rule.
+`(chiyanram/other#320)`. Only Dependabot (scope `deps`) and the release commit name no issue.
 
 The release notes group changes under ⚠️ Breaking changes, ✨ Features, 🐛 Fixes, ⚡ Performance and ⏪ Reverts, one
 bullet per change as `**scope** — summary · #issue (PR #pr)` ([`scripts/release_notes.mjs`](scripts/release_notes.mjs)).
@@ -257,7 +256,7 @@ Other types ship nothing and are not listed.
 | any type with scope `research`, `review` or `repo` | none | design work, even when it is a `feat` |
 | `feat(toolbox)`, `fix(toolbox)`, `feat(toolbox)!` | the toolbox only | a tool is added, changed or removed |
 
-Each plugin releases on its own line (ADR-0009): scope `toolbox` releases only the toolbox, and every other scope that
+Each plugin releases on its own line: scope `toolbox` releases only the toolbox, and every other scope that
 ships releases only the rulebook, so a pull request changes one plugin. A release bumps that plugin's version in
 `marketplace.json` and its `plugin.json` (`scripts/set_version.py --plugin <name>`), writes its changelog
 (`CHANGELOG.md` or `CHANGELOG-toolbox.md`), tags `<plugin>--v<version>` and creates a GitHub release. Users stay on a
@@ -278,13 +277,6 @@ manual release. Preview the next release on `main` with `GITHUB_TOKEN=<token> np
 | `claude plugin marketplace add` fails on clone | the repo is private: run `gh auth setup-git` |
 | a merge to `main` did not release | expected: releases are manual (#276). Open **Actions → release → Run workflow** on `main` |
 | the release fails with `RELEASE_TOKEN is not set` | add a repository secret `RELEASE_TOKEN`: the owner's token with Contents read and write, which the admin bypass of ruleset `main` lets through (#293) |
-
-## Design history
-
-The research, review pages and old tickets from the design phase are under `docs/archive/` at git tag
-`design-archive-2026-11`. A cite `research/NN` or `review/…` in the ledger means that file there:
-`git show design-archive-2026-11:docs/archive/research/<file>`. The tag's parent, `design-archive-2026-11^`, holds
-them at their old paths, before the move.
 
 ## Code of conduct
 

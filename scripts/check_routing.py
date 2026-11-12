@@ -15,7 +15,7 @@ cosine similarity. The check fails when:
 - two descriptions are near-duplicates (cosine at or above COLLISION).
 
 A typed-only skill (`disable-model-invocation: true`) is skipped: its description is not in the model's context, so
-nothing routes to it (ADR-0009).
+nothing routes to it.
 
 It approximates the real router: it sees words, not meaning. A model-graded run (`claude plugin eval`) costs tokens,
 so it stays a manual step and never runs here.

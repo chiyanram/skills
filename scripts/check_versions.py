@@ -1,4 +1,4 @@
-"""Each plugin carries one version: its marketplace entry and its plugin.json agree. Plugins version apart (ADR-0009)."""
+"""Each plugin carries one version: its marketplace entry and its plugin.json agree. Plugins version apart."""
 import json
 import sys
 from pathlib import Path

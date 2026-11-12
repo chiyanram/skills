@@ -1,11 +1,11 @@
 """A rule file holds only what an agent needs to act; where a rule came from lives in the ledger
-(docs/rulebook/approved-rules.md) and the research behind it (agent-factory#59).
+(docs/rulebook/approved-rules.md).
 
 Fails on a shipped skill file (a SKILL.md or a reference under plugins/*/skills/; in the toolbox, a SKILL.md only)
 that carries provenance:
 a source citation (`pstack :15`, `r47 :456`, `file.md:13`, `§Section`, a URL, `ADR-0007`, `research/41`), an
 "Operator preference" line, a credit or label on an example (`**Bad** (from …)`, `(neutral)`), a "Real evidence"
-note, a date or an agent-factory reference. Code fences and inline code spans are skipped.
+note, a date or a reference to another repository's issue. Code fences and inline code spans are skipped.
 Tool names stay when they are the action itself, and cross-references to other rules stay.
 """
 import re
@@ -25,7 +25,7 @@ PATTERNS = [
     (re.compile(r"\*\*(?:Bad|Good)\*\*\s*\((?:from|neutral|adapted|real|source|n/a)", re.I), "a credit or label on an example"),
     (re.compile(r"Real evidence|Evidence: ledger", re.I), "a ledger-evidence note"),
     (re.compile(r"\b20\d\d-\d\d-\d\d\b"), "a date"),
-    (re.compile(r"agent-factory\W"), "an agent-factory reference"),
+    (re.compile(r"\b[\w.-]+/[\w.-]+#\d+"), "a reference to another repository's issue"),
 ]
 FENCE = re.compile(r"^\s*(`{3,}|~{3,})")
 CODE_SPAN = re.compile(r"(`+)(?!`).*?(?<!`)\1(?!`)")
@@ -33,7 +33,7 @@ CODE_SPAN = re.compile(r"(`+)(?!`).*?(?<!`)\1(?!`)")
 
 def shipped(root: Path) -> list[Path]:
     """Skill files under plugins/. In the toolbox only each SKILL.md: the files beside a copied tool's SKILL.md are
-    the tool's own content, and its source sits in THIRD_PARTY_NOTICES.md (ADR-0009)."""
+    the tool's own content, and its source sits in THIRD_PARTY_NOTICES.md."""
     found = []
     for f in files(root, "*.md"):
         parts = f.relative_to(root).parts

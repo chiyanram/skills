@@ -1,5 +1,5 @@
 """Each plugin README links every skill router, and each router's index block is what `make index` builds from its
-references, so a reference is never missing from its router and two PRs never merge rows by hand (agent-factory#46)."""
+references, so a reference is never missing from its router and two PRs never merge rows by hand."""
 import json
 import sys
 from pathlib import Path

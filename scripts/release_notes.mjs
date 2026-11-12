@@ -1,4 +1,4 @@
-// The shape of the release notes (#276), the same as chiyanram/agent-factory#157: emoji sections, one bullet per change
+// The shape of the release notes (#276): emoji sections, one bullet per change
 // as `**scope** — subject · #ticket (PR #pr)`, and an update line for the plugin. release.config.mjs calls
 // `releaseNotes(plugin, keep)`; tests/test_release_notes.py renders fixture commits with it.
 //
@@ -60,7 +60,7 @@ function refsLine({ tickets, pr }, { host, owner, repository }) {
 const TRAILER = /^[A-Za-z][\w-]*: \S/
 
 // A breaking-change note runs to the end of the message, so it picks up the git trailers after it, such as
-// `Co-Authored-By:`; drop each trailing paragraph made only of trailers (chiyanram/skills#283, agent-factory#343).
+// `Co-Authored-By:`; drop each trailing paragraph made only of trailers (chiyanram/skills#283).
 export function withoutTrailers(text) {
   const paragraphs = text.split(/\n\s*\n/)
   while (paragraphs.length > 1 && paragraphs.at(-1).split('\n').every((line) => TRAILER.test(line))) paragraphs.pop()
@@ -78,7 +78,7 @@ function transform(commit, context) {
   return { ...entry, subject, notes, references: [], refs: refsLine(refs, context) }
 }
 
-// `keep(scope)` says whether a commit belongs to this plugin's release line (ADR-0009).
+// `keep(scope)` says whether a commit belongs to this plugin's release line.
 export function releaseNotes(plugin, keep) {
   return {
     preset: 'conventionalcommits',

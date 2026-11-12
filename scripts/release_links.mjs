@@ -1,4 +1,4 @@
-// The conventionalcommits preset links every `#N` in a commit subject to this repo, so `agent-factory#31` came out
+// The conventionalcommits preset links every `#N` in a commit subject to this repo, so `other#31` came out
 // as a link to chiyanram/skills#31. This rewrites a `repo#N` or `owner/repo#N` link to point at its own repo; a bare
 // repo name takes this repo's owner. Footer references (`Closes owner/repo#N`) are already linked right.
 const CROSS_REPO = /(?<![\w./-])(?:([\w.-]+)\/)?([\w.-]+)\[#(\d+)\]\([^)\s]*\)/g

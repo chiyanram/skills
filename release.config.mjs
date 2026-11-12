@@ -1,6 +1,6 @@
-// semantic-release config, one release line per plugin (ADR-0009). A module, not JSON, because the release notes need
+// semantic-release config, one release line per plugin. A module, not JSON, because the release notes need
 // their own templates and transform, which live in scripts/release_notes.mjs (#276).
-// RELEASE_PLUGIN picks the plugin; CI runs it once for each. Scope `toolbox` releases only the toolbox (ADR-0009).
+// RELEASE_PLUGIN picks the plugin; CI runs it once for each. Scope `toolbox` releases only the toolbox.
 import { releaseNotes } from './scripts/release_notes.mjs'
 
 // Design work never releases and is not listed in the notes, even as a feat or fix (#287).
