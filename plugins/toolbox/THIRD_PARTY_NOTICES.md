@@ -40,6 +40,14 @@ where each came from, at which commit, under which licence, and what we changed.
 - Licence: MIT, Copyright (c) 2026 Matt Pocock
 - Changes: none; copied as written, and typed-only upstream.
 
+## onboard
+
+- Source: mattpocock/skills, `skills/engineering/setup-matt-pocock-skills/SKILL.md`
+- Commit: 697d4ce9742da558fd1ba6697c8e9775e2e302dd
+- Licence: MIT, Copyright (c) 2026 Matt Pocock
+- Changes: its method only, rewritten (explore, show a draft, write one block in place in the file that exists). It
+  writes the rulebook's block (commands, stack notes, codebase health), not the issue tracker, labels or domain docs.
+
 ## MIT License
 
 Applies to every section above, each with its own copyright line:
