@@ -1,49 +1,58 @@
 ---
 name: onboard
-description: Set up this repo for the rulebook - its build, test and run commands, which stack notes apply, and the codebase-health rule - as one block in the repo's AGENTS.md or CLAUDE.md. Use for /onboard, once per repo.
+description: Set up this repo for coding agents - find what an agent would get wrong here that the code and docs do not say, and propose only those lines for the repo's AGENTS.md or CLAUDE.md. Use for /onboard, once per repo and again when its first code lands.
 disable-model-invocation: true
 ---
 
 # Onboard
 
-Write the one block every rulebook skill needs from a project: how to build and test it, which stack notes apply, and
-what the agent must care about beyond the task. Explore, show a draft, write only after a yes.
+Find what an agent would get wrong in this repo, and propose a line for each. Nothing else.
 
-The issue tracker, labels and domain docs are a separate setup; if the repo has none, say so and leave them out.
+An instruction file costs attention on every run. A line that repeats the README or describes what the code already
+shows makes agents slower and worse, not better. A short or empty result is a good result: say so.
 
-## 1. Explore
+## 1. Read what is already written
 
-- The front door: `Makefile`, `package.json` scripts, `./gradlew`, `./mvnw`, `justfile`. Name its targets, not the
-  raw tool underneath, because that is what a person runs.
-- Confirm each command by listing tasks or running its help (`make help`, `./gradlew tasks`, `npm run`). Run no build
-  or test. A command you could not confirm is marked "unconfirmed".
-- The stacks, from the files: Spock or Spring Boot (`build.gradle`, `pom.xml`, `src/integrationTest`), Playwright
-  (`playwright.config.*`), a model SDK in the dependencies.
-- `AGENTS.md` and `CLAUDE.md` at the root: which one holds the instructions, and whether it already has a
-  `## Rulebook` block. A repo with no code yet gets only the lines that apply now.
+Read the root `AGENTS.md` and `CLAUDE.md`, the README, `CONTRIBUTING`, and the docs they link. Anything they already
+say is never proposed again. Note which file holds the instructions: `AGENTS.md` when `CLAUDE.md` only imports it
+(`@AGENTS.md`), else whichever exists.
 
-## 2. Draft and ask
+## 2. Look for traps, with evidence
 
-Show the block below, filled in, and ask one question: anything to change? Wait for the answer.
+Look where agents and people trip, and keep the evidence for each find:
 
-```markdown
-## Rulebook
+- **Commands.** The front door (`make`, `package.json` scripts, `./gradlew`, `./mvnw`) and what CI runs that a local
+  command skips. What the build needs first: Docker, a running service, an env var, a tool version. Confirm a command
+  by listing tasks or reading its help; run no build or test.
+- **Places not to touch.** Generated code, vendored code, files a tool rewrites (changelogs, lockfiles, router tables).
+- **Two ways of doing one thing.** Two HTTP clients, two test styles, an old and a new module. The code cannot say
+  which is the way forward.
+- **Repeated mistakes.** `git log` for reverts, repeated `fix:` commits on the same area, and review comments that
+  recur. Each is a lesson nobody wrote down.
+- **Costly to learn.** A fact an agent would rebuild by reading many files: how a request flows, where config comes
+  from.
 
-Build: `<command>` · Test: `<command>` · Integration tests: `<command>` · Run: `<command>`
+## 3. Ask what the repo cannot say
 
-Stack notes: the `testing` skill's `stack.md` applies (Spock, Spring Boot, Playwright: <the ones found>).
-<Only if a model SDK was found:> Tests here call a model: read the `testing` skill's `model-calls.md`.
+Ask at most three questions, one at a time, each with your recommended answer. Ask only what step 2 could not settle:
 
-Codebase health: each change leaves the modules it touches no worse than it found them. If it would make one worse,
-say so and propose the refactor as its own ticket. The next change being easy matters, not only this one working.
-```
+- For each pair found: which one is the way forward?
+- What do you care about that the code does not show? Offer the codebase-health rule as the recommended answer: each
+  change leaves the modules it touches no worse, and a change that would make one worse says so and proposes the
+  refactor as its own ticket.
+- What has an agent got wrong here before?
 
-Leave out any line that does not apply. Point at a skill by name, never by path, because the plugin's install folder
-differs per machine.
+## 4. Propose
 
-## 3. Write
+Show a table: each proposed line, its evidence (`file:line`, a command's output, a commit), and why an agent would get
+it wrong without it. Drop any line that fails that test, and any generic advice ("write clean code"), and any rule a
+linter could enforce instead: say "make it a lint" for those.
 
-- Edit the file that holds the instructions: `AGENTS.md` when `CLAUDE.md` only imports it (`@AGENTS.md`), else
-  `CLAUDE.md` if it exists, else `AGENTS.md`. If neither exists, ask which to create.
-- Replace an existing `## Rulebook` block in place; never append a second one, and never touch the rest of the file.
-- Change no other file. Do not commit: tell the person the file is ready to review.
+If nothing survives, say "nothing to add yet" and when to run again, such as when the first code lands.
+
+## 5. Write, after a yes
+
+- Put the accepted lines in the file that holds the instructions, next to related text, or under `## Agent notes`
+  when nothing fits. Replace your own earlier block in place; never touch other text.
+- Change no other file and do not commit. Tell the person it is ready to review, and that later lessons belong to
+  `/correct` when a mistake repeats.
