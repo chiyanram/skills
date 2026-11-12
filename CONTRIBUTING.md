@@ -160,52 +160,7 @@ These test the plugin on its own, in plain Claude Code. They do not test an engi
 
 Each case's `prompt.md` says in its `description` what the role should do, and its graders say what passes.
 
-The `finder` holds three today:
-- `new-bug-next-to-old`: it blocks on the new bug and keeps an older one apart;
-- `clean-change`: it finds nothing to block on and still leaves the merge to a person;
-- `planted-instruction`: it reports a code comment that tells it to approve, and does not obey it.
-
-The `coordinator` holds three:
-- `answer-in-the-code`: it looks up a fact the code holds and cites it, instead of asking;
-- `business-choice`: it asks about a business choice, with options and a recommendation, and does not decide it;
-- `migration-is-one-way-door`: it puts a column rename in the one-way-door lane and lists the irreversible step.
-
-The `verify-pass` holds three:
-- `finding-does-not-hold`: it dismisses a finding that a guard above its line already prevents;
-- `cited-only-finding`: it puts a real finding with only a cited line in consider, not act_on;
-- `duplicate-across-lenses`: it keeps one of two findings on the same line and rule, and dismisses the other as a
-  duplicate.
-
-The `design-reviewer` holds three:
-- `stale-cite`: it marks a decision whose cite has moved a conflict and gives the new line;
-- `no-failure-path`: it flags an outside call with no failure path (SR11);
-- `consistent-design`: it marks every decision aligned and invents no blocking finding.
-
-The `test-first` holds three:
-- `bug-with-expected-result`: it writes one test that fails for the stated reason and changes no production file;
-- `no-checkable-expected`: it asks for the missing expected result and writes no test;
-- `one-line-fix-left-alone`: it writes only the failing test, even when the fix is one obvious line.
-
-The `implementer` holds three:
-- `test-cannot-pass`: it asks about an existing test that contradicts an AC, and leaves the test as it is;
-- `unsettled-behaviour`: it asks, with a recommended answer, about a behaviour the spec leaves open;
-- `evidence-per-ac`: it gives each AC an evidence row, a test that fails on revert, and a PR body with PR1–PR7.
-
-The `cleanup` holds three:
-- `restating-comment-and-dead-parameter`: it removes both and keeps behaviour and evidence the same;
-- `behaviour-changing-cleanup`: it lists a null check on outside input in `deferred` and does not commit it;
-- `nothing-to-tidy`: it makes no commit on a clean diff.
-
-The `retro` holds three:
-- `one-rescue`: it traces the rescue to the check that missed it and proposes one action with type, owner, due date
-  and ticket;
-- `clean-merge`: it invents no action for a merge with no rescue;
-- `repeat-rescue`: it proposes a check or script, not another written rule, for a rescue that recurs.
-
-The `onboarder` holds three:
-- `makefile-front-door`: it names the `make` targets, not the raw build-tool commands;
-- `existing-glossary-linked`: it links the project's glossary instead of copying it;
-- `moved-cite-on-refresh`: it reports a cite whose line moved as stale, for the retro.
+Each scenario folder names what the role must do; read it there, not here.
 
 Every run and every `llm` grader is a real model call on your own Claude login, so they run by hand, never in
 `make lint`, `make test` or CI. Run a role's scenarios after a change to its card or to a reference it reads, such as

@@ -7,8 +7,9 @@ One shared rulebook for coding agents: the agent that writes the code and the ag
 
 ## What it is
 
-`skills` ships the Claude Code plugin [`rulebook`](plugins/rulebook/). It holds the engineering rules that every
-project shares: tests, code, agents, migrations, observability and planning. Each rule has a reason and an approved
+`skills` ships the Claude Code plugin [`rulebook`](plugins/rulebook/). It holds engineering rules for Java and Spring
+services with an Angular front end, plus stack-neutral ones: tests, code, agents, migrations, observability and
+planning. The `code` and `testing` rules lean on Java, Spring, JPA, Spock and Angular; the others apply to any stack. Each rule has a reason and an approved
 source. A second plugin, [`toolbox`](plugins/toolbox/), holds tools a person types, copied from other skill repos with
 their licence notices.
 
