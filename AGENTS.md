@@ -36,8 +36,9 @@ make test   # python3 -m unittest: each check against its planted fixtures, the 
 ## Where things go
 
 ```text
-plugins/rulebook/skills/<domain>/SKILL.md        router; its table is built by make index
-plugins/rulebook/skills/<domain>/references/     one file per topic, five sections
+plugins/rulebook/skills/<domain>/SKILL.md        a short procedure (testing), or a router whose table make index builds
+plugins/rulebook/skills/<domain>/<notes>.md      beside a procedure: what only some runs need, such as one stack's traps
+plugins/rulebook/skills/<domain>/references/     a router's references, one file per topic, five sections, until rewritten
 plugins/toolbox/skills/<tool>/SKILL.md           a typed-only tool, copied as written or with the operator's changes
 plugins/toolbox/THIRD_PARTY_NOTICES.md           each tool's source, commit, licence and changes
 docs/rulebook/approved-rules.md                  the ledger: one row per approved rule
@@ -51,7 +52,8 @@ docs/DESIGN.md                                   the design on one page: rules, 
 
 ## Pointers
 
-- The principles behind the plugins, K1–K9: `PRINCIPLES.md`.
+- The principles behind the plugins, K1–K9: `PRINCIPLES.md`. A change that departs from one changes `PRINCIPLES.md` first, in its
+  own pull request, because skills rewritten against the old principles break them silently.
 - A new rule, reference or check: `CONTRIBUTING.md`.
 - Commit and PR format: `CONTRIBUTING.md#commit-messages`. Commit types and what each releases:
   `CONTRIBUTING.md#releases`.
