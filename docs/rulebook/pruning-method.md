@@ -2,8 +2,8 @@
 
 How this repo cuts a skill down without losing what it does, and how the cut is measured. Read it before you
 prune a skill, a reference or a role card, or before you change the skills eval that judges a cut. K6 says prune
-rules like code; K9 says a change ships only if the evals show it no worse, and better than the noise on what it
-aims at. This page says how both are done.
+rules like code; K9 says a skill is judged by use, with this eval run locally when a cut needs measuring.
+This page says how the cut is measured.
 
 ## The source
 
