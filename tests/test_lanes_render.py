@@ -16,6 +16,7 @@ CRQ = ROOT / "plugins" / "rulebook" / "skills" / "crq"
 MARKETPLACE = {"name": "m", "owner": {"name": "o"}, "plugins": [{"name": "p", "source": "./plugins/p"}]}
 DIAGRAM = "<!-- lanes-diagram: built by make index from process/lanes-v2.json; do not edit by hand -->"
 TABLE = "<!-- lanes-table: built by make index from process/lanes-v2.json; do not edit by hand -->"
+END_TABLE = "<!-- /lanes-table -->"
 DOC = {
     "caps": {"gate_red": 2},
     "conditions": {"design-needed": "more than one module changes"},
@@ -25,7 +26,7 @@ DOC = {
         {"id": "gate", "actor": "engine", "outcomes": {"green": "next", "red": {"to": "intake", "counts": "gate_red"}}},
         {"id": "timeline-record", "actor": "engine", "outcomes": {"done": "end"}},
     ],
-    "lanes": [{"lane": "tiny", "phases": ["intake", "gate", "timeline-record"]},
+    "lanes": [{"lane": "tiny", "phases": ["intake", {"phase": "gate", "when": "design-needed"}, "timeline-record"]},
               {"lane": "bug", "phases": [{"phase": "intake", "when": "design-needed"}, "approval", "gate",
                                          "timeline-record"]}],
 }
@@ -74,6 +75,16 @@ class LanesRenderTest(unittest.TestCase):
         self.assertIn("HUMAN approval", (self.skill / "SKILL.md").read_text())
         self.assertIn("| feature | intake → research", (self.skill / "references" / "lanes.md").read_text())
 
+    def test_should_rewrite_a_stale_block_so_the_index_check_passes(self):
+        self.build()
+        lanes = self.skill / "process" / "lanes-v2.json"
+        lanes.write_text(lanes.read_text().replace('"gate_red": 2', '"gate_red": 4'))
+
+        self.assertEqual(self.build().returncode, 0)
+
+        self.assertIn("gate           red        ─▶ build   cap gate_red = 4", (self.skill / "SKILL.md").read_text())
+        self.assertEqual(run_check("index", self.root).returncode, 0)
+
     def test_should_fail_a_hand_edited_block_naming_the_file(self):
         self.build()
         self.edit("references/lanes.md", "| tiny | intake", "| tiny | start")
@@ -104,6 +115,12 @@ class LanesRenderTest(unittest.TestCase):
 
     def test_should_fail_a_start_marker_with_no_end_marker_after_it(self):
         self.edit("references/lanes.md", "<!-- /lanes-table -->", "")
+
+        self.assert_fails_naming("lanes.md: the `lanes-table` block needs one START marker and one END marker")
+
+    def test_should_fail_an_end_marker_above_its_start_marker(self):
+        self.edit("references/lanes.md", END_TABLE, "")
+        self.edit("references/lanes.md", TABLE, f"{END_TABLE}\n{TABLE}")
 
         self.assert_fails_naming("lanes.md: the `lanes-table` block needs one START marker and one END marker")
 
@@ -158,7 +175,16 @@ class RenderRowsTest(unittest.TestCase):
 
     def test_should_show_a_when_entry_with_its_condition(self):
         self.assertEqual(cell({"phase": "design", "when": "design-needed"}), "design (when design-needed)")
-        self.assertEqual(lanes_table(DOC)[-1], "design-needed: more than one module changes")
+        self.assertEqual(lanes_table(DOC)[-2:], ["", "design-needed: more than one module changes"])
+
+    def test_should_show_each_lane_in_file_order_with_its_when_cells(self):
+        self.assertEqual(lanes_table(DOC)[2:4], [
+            "| tiny | intake → gate (when design-needed) → timeline-record | — |",
+            "| bug | intake (when design-needed) → approval → gate → timeline-record | approval |"])
+
+    def test_should_list_a_condition_once_when_two_lanes_use_it(self):
+        self.assertEqual([line for line in lanes_table(DOC) if line.startswith("design-needed:")],
+                         ["design-needed: more than one module changes"])
 
     def test_should_list_the_lanes_human_phases_as_its_gates(self):
         actors = {phase["id"]: phase["actor"] for phase in DOC["phases"]}
