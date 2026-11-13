@@ -30,7 +30,7 @@ def edges(doc: dict) -> list[tuple[str, str, object]]:
     return [(phase["id"], outcome, value) for phase in doc["phases"] for outcome, value in phase["outcomes"].items()]
 
 
-def twice(doc: dict, roles: list[str]) -> list[str]:
+def duplicate_phase_ids(doc: dict, roles: list[str]) -> list[str]:
     ids = phase_ids(doc)
     return [f"phase `{p}`: appears {ids.count(p)} times in the phase order" for p in dict.fromkeys(ids)
             if ids.count(p) > 1]
@@ -57,7 +57,8 @@ def no_outcomes(doc: dict, roles: list[str]) -> list[str]:
 
 
 def bad_edges(doc: dict, roles: list[str]) -> list[str]:
-    return [f"phase `{phase}`, outcome `{outcome}`: is neither a string nor an object with a string `to`"
+    return [f"phase `{phase}`, outcome `{outcome}`: must be a string, or an object with a string `to`, an optional "
+            f"string `counts` and no other key"
             for phase, outcome, value in edges(doc) if not isinstance(value, str) and not is_edge(value)]
 
 
@@ -86,9 +87,16 @@ def unknown_conditions(doc: dict, roles: list[str]) -> list[str]:
             if isinstance(entry, dict) and entry["when"] not in doc["conditions"]]
 
 
+def condition_fault(text: object) -> str:
+    """Why a condition's text is unusable, or "" when it is usable."""
+    if not isinstance(text, str):
+        return "is not text"
+    return "" if text.strip() else "its text is empty"
+
+
 def empty_conditions(doc: dict, roles: list[str]) -> list[str]:
-    return [f"condition `{name}`: its text is empty" for name, text in doc["conditions"].items()
-            if not isinstance(text, str) or not text.strip()]
+    faults = {name: condition_fault(text) for name, text in doc["conditions"].items()}
+    return [f"condition `{name}`: {fault}" for name, fault in faults.items() if fault]
 
 
 def no_floor(doc: dict, roles: list[str]) -> list[str]:
@@ -117,8 +125,9 @@ def bad_lane_raise(doc: dict, roles: list[str]) -> list[str]:
     return [] if target in phase_ids(doc) else [f"lane_raise: `to` names `{target}`, which is not a phase id"]
 
 
-RULES = [twice, unknown_lane_phases, out_of_order, no_outcomes, bad_edges, bad_targets, uncapped_counts, bad_caps,
-         unknown_conditions, empty_conditions, no_floor, bad_ending, unknown_actors, low_lens_cap, bad_lane_raise]
+RULES = [duplicate_phase_ids, unknown_lane_phases, out_of_order, no_outcomes, bad_edges, bad_targets, uncapped_counts,
+         bad_caps, unknown_conditions, empty_conditions, no_floor, bad_ending, unknown_actors, low_lens_cap,
+         bad_lane_raise]
 
 
 def problems(doc: dict, roles: list[str]) -> list[str]:
