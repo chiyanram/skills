@@ -35,20 +35,9 @@ make test   # python3 -m unittest: each check against its planted fixtures, the 
 
 ## Where things go
 
-```text
-plugins/rulebook/skills/<domain>/SKILL.md        a short procedure (testing), or a router whose table make index builds
-plugins/rulebook/skills/<domain>/<notes>.md      beside a procedure: what only some runs need, such as one stack's traps
-plugins/rulebook/skills/<domain>/references/     a router's references, one file per topic, five sections, until rewritten
-plugins/toolbox/skills/<tool>/SKILL.md           a typed-only tool, copied as written or with the operator's changes
-plugins/toolbox/THIRD_PARTY_NOTICES.md           each tool's source, commit, licence and changes
-docs/rulebook/approved-rules.md                  the ledger: one row per approved rule
-docs/rulebook/reference-format.md                the template every reference follows
-docs/agents/                                     issue tracker, labels, domain-doc conventions
-scripts/check_<name>.py + tests/fixtures/<name>/ one check and its planted fixtures
-evals/routing/<router>.json                      requests each router must pick, and near misses it must not
-evals/skills/<skill>/                            a skill's tasks, run full and shorter, scored by its review checks
-docs/DESIGN.md                                   the design on one page: rules, the crq process, role cards
-```
+- A rulebook skill is `plugins/rulebook/skills/<domain>/SKILL.md`: a short procedure with notes files beside it
+  (`testing`), or a router over `references/` until it is rewritten.
+- Each `scripts/check_<name>.py` ships with planted cases in `tests/fixtures/<name>/`.
 
 ## Pointers
 
