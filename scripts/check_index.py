@@ -17,7 +17,7 @@ def linked(readme: Path) -> set[Path]:
     return {(readme.parent / target).resolve() for target in targets if target}
 
 
-def index_problems(skill: Path) -> list[str]:
+def router_problems(skill: Path) -> list[str]:
     router = skill / "SKILL.md"
     if not any(skill.glob("references/*.md")) or not router.is_file():
         return []  # check_routers reports a skill that ships references without a router
@@ -34,10 +34,6 @@ def lanes_problems(skill: Path) -> list[str]:
                     if text != path.read_text()]
 
 
-def router_problems(skill: Path) -> list[str]:
-    return index_problems(skill) + lanes_problems(skill)
-
-
 def plugin_problems(root: Path, entry: dict) -> list[str]:
     folder = root / entry["source"]
     readme = folder / "README.md"
@@ -46,7 +42,8 @@ def plugin_problems(root: Path, entry: dict) -> list[str]:
     listed = linked(readme)
     unlinked = [f"{readme}: skill router `{router.relative_to(folder)}` is not linked"
                 for router in sorted(folder.glob("skills/*/SKILL.md")) if router.resolve() not in listed]
-    return unlinked + [p for skill in sorted(folder.glob("skills/*/")) for p in router_problems(skill)]
+    skills = sorted(folder.glob("skills/*/"))
+    return unlinked + [p for skill in skills for p in router_problems(skill) + lanes_problems(skill)]
 
 
 def problems(root: Path) -> list[str]:

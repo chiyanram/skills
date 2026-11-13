@@ -10,7 +10,7 @@ from lanes_render import files
 MARKETPLACE = Path(".claude-plugin/marketplace.json")
 
 
-def build_router(skill: Path) -> list[str]:
+def build(skill: Path) -> list[str]:
     router = skill / "SKILL.md"
     if not any(skill.glob("references/*.md")) or not router.is_file():
         return []  # check_routers reports a skill that ships references without a router
@@ -23,19 +23,18 @@ def build_router(skill: Path) -> list[str]:
     return problems
 
 
-def build(skill: Path) -> list[str]:
-    """The router's index table first, then the lanes blocks, which read the updated router."""
-    problems = build_router(skill)
-    updated, lanes_problems = files(skill)
+def build_lanes(skill: Path) -> list[str]:
+    updated, problems = files(skill)
     for path, text in updated.items():
         path.write_text(text)
-    return problems + lanes_problems
+    return problems
 
 
 if __name__ == "__main__":
     root = Path(sys.argv[1] if len(sys.argv) > 1 else ".")
     entries = json.loads((root / MARKETPLACE).read_text()).get("plugins", [])
-    found = [p for entry in entries for skill in sorted((root / entry["source"]).glob("skills/*/")) for p in build(skill)]
+    skills = [skill for entry in entries for skill in sorted((root / entry["source"]).glob("skills/*/"))]
+    found = [p for skill in skills for p in build(skill) + build_lanes(skill)]  # the lanes blocks read the new router
     if found:
         print("\n".join(found))
     sys.exit(1 if found else 0)
