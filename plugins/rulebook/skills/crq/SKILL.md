@@ -43,6 +43,9 @@ An engine reads these to run the same process a person runs with `/crq`.
 
 - [lanes.json](process/lanes.json): per lane, whether it needs approval, design review and test-first, its lenses
   and its retro. An engine may make a lane stricter, never looser.
+- [lanes-v2.json](process/lanes-v2.json): the phase graph, each phase's actor and outcome edges, the round caps and
+  conditions, and per lane its phases, lens cap, review model and effort. It sits beside lanes.json until an engine
+  reads it.
 - [review.json](process/review.json): the baseline references every automated review reads, whatever the repo's
   own instruction files say.
 - [glossary](process/glossary.md): the words every role card and hand-off uses.

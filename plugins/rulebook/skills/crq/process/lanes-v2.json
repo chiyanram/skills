@@ -1,0 +1,40 @@
+{
+  "$schema": "urn:rulebook:crq:lanes:2",
+  "caps": { "design_review_rounds": 3, "code_review_rounds": 3, "ready": 3, "gate_red": 2 },
+  "conditions": {
+    "design-needed": "an internal interface changes, or more than one module changes; the coordinator records yes or no on the ticket"
+  },
+  "lane_raise": { "from": "any phase after intake", "to": "spec", "then": "approval again, in the heavier lane; round counters reset to zero" },
+  "skipped_target": "a back edge to a phase this run skipped lands on the nearest earlier phase the run took",
+  "phases": [
+    { "id": "intake",          "actor": "coordinator",     "outcomes": { "done": "next", "asked": "human, then same" } },
+    { "id": "research",        "actor": "coordinator",     "outcomes": { "done": "next" } },
+    { "id": "clarify",         "actor": "coordinator",     "outcomes": { "done": "next", "asked": "human, then same" } },
+    { "id": "spec",            "actor": "coordinator",     "outcomes": { "done": "next", "asked": "human, then same" } },
+    { "id": "design",          "actor": "coordinator",     "outcomes": { "done": "next", "asked": "human, then same" } },
+    { "id": "design-review",   "actor": "design-reviewer", "outcomes": { "clean": "next", "act-on": { "to": "design", "counts": "design_review_rounds" }, "round-cap": "human" } },
+    { "id": "approval",        "actor": "human",           "outcomes": { "approved": "next", "changes": "design" } },
+    { "id": "test-first",      "actor": "test-first",      "report": "urn:rulebook:crq:report:1", "outcomes": { "done": "next", "asked": "human, then same" } },
+    { "id": "build",           "actor": "implementer",     "report": "urn:rulebook:crq:report:1", "outcomes": { "done": "next", "asked": "human, then same", "blocked": "human, then same" } },
+    { "id": "verify",          "actor": "engine",          "outcomes": { "green": "next", "red": { "to": "build", "counts": "ready" } } },
+    { "id": "cleanup",         "actor": "cleanup",         "report": "urn:rulebook:crq:report:1", "outcomes": { "done": "next" } },
+    { "id": "code-review",     "actor": "finder",          "outcomes": { "clean": "next", "act-on": { "to": "build", "counts": "code_review_rounds" }, "round-cap": "human" } },
+    { "id": "gate",            "actor": "engine",          "outcomes": { "green": "next", "red": { "to": "build", "counts": "gate_red" } } },
+    { "id": "pr",              "actor": "implementer",     "outcomes": { "done": "next" } },
+    { "id": "merge",           "actor": "human",           "outcomes": { "merged": "next", "closed": "next" } },
+    { "id": "timeline-record", "actor": "engine",          "outcomes": { "done": "end" } }
+  ],
+  "lanes": [
+    { "lane": "tiny", "lens_cap": 1, "review_model": "standard", "effort": "low",
+      "phases": ["intake", "build", "verify", "code-review", "gate", "pr", "merge", "timeline-record"] },
+    { "lane": "bug", "lens_cap": 3, "review_model": "standard", "effort": "medium",
+      "phases": ["intake", "research", "spec", { "phase": "design", "when": "design-needed" }, "design-review", "approval",
+                 "test-first", "build", "verify", "cleanup", "code-review", "gate", "pr", "merge", "timeline-record"] },
+    { "lane": "feature", "lens_cap": 3, "review_model": "standard", "effort": "medium",
+      "phases": ["intake", "research", "clarify", "spec", "design", "design-review", "approval",
+                 "build", "verify", "cleanup", "code-review", "gate", "pr", "merge", "timeline-record"] },
+    { "lane": "one-way door", "lens_cap": "all", "review_model": "strongest", "effort": "high",
+      "phases": ["intake", "research", "clarify", "spec", "design", "design-review", "approval",
+                 "build", "verify", "cleanup", "code-review", "gate", "pr", "merge", "timeline-record"] }
+  ]
+}
