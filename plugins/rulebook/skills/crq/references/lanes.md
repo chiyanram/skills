@@ -27,12 +27,20 @@ change, or when a change turns out bigger, riskier or smaller than its lane.
 The phases each lane runs. Every lane ends with the timeline record the engine writes (RT1). A full retro runs only
 when a human starts it (RT7).
 
+<!-- lanes-table: built by make index from process/lanes-v2.json; do not edit by hand -->
 | lane | phases | human gates |
 |---|---|---|
-| tiny | intake → build → verify → code review → gate → PR → the timeline record | merge |
-| bug | intake → research → spec → design (only when an internal interface or more than one module changes) → design review of the spec and any design → build → verify → cleanup → code review → gate → PR → the timeline record | approval, merge |
-| feature | every phase | approval, merge |
-| one-way door | every phase, plus the readiness items of the `pr-readiness` reference | approval with each irreversible step listed, merge |
+| tiny | intake → build → verify → code-review → gate → pr → merge → timeline-record | merge |
+| bug | intake → research → spec → design (when design-needed) → design-review → approval → test-first → build → verify → cleanup → code-review → gate → pr → merge → timeline-record | approval, merge |
+| feature | intake → research → clarify → spec → design → design-review → approval → build → verify → cleanup → code-review → gate → pr → merge → timeline-record | approval, merge |
+| one-way door | intake → research → clarify → spec → design → design-review → approval → build → verify → cleanup → code-review → gate → pr → merge → timeline-record | approval, merge |
+
+design-needed: an internal interface changes, or more than one module changes; the coordinator records yes or no on the
+ticket
+<!-- /lanes-table -->
+
+The one-way-door lane also lists each irreversible step for the human's yes and adds the readiness items of the
+`pr-readiness` reference (LN3).
 
 ## Good / Bad
 

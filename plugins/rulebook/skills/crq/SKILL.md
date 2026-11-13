@@ -8,10 +8,20 @@ description: Use when you take a change from request to merge, or need its lane 
 One pipeline takes every change from a request to a merge. A coordinator talks with the human and plans. Fresh
 runs build and review. Scripts check what a model must not judge. The human approves the plan and merges.
 
+<!-- lanes-diagram: built by make index from process/lanes-v2.json; do not edit by hand -->
 ```text
-intake ─▶ research ─▶ clarify ─▶ spec ─▶ design ─▶ design review ─▶ HUMAN approval
-   ─▶ build ─▶ verify ─▶ cleanup ─▶ code review ─▶ gate ─▶ PR ─▶ HUMAN merge ─▶ timeline record
+intake ─▶ research ─▶ clarify ─▶ spec ─▶ design ─▶ design-review ─▶ HUMAN approval ─▶ test-first
+   ─▶ build ─▶ verify ─▶ cleanup ─▶ code-review ─▶ gate ─▶ pr ─▶ HUMAN merge ─▶ timeline-record
+
+design-review  act-on     ─▶ design  cap design_review_rounds = 3
+design-review  round-cap  ─▶ human
+approval       changes    ─▶ design
+verify         red        ─▶ build   cap ready = 3
+code-review    act-on     ─▶ build   cap code_review_rounds = 3
+code-review    round-cap  ─▶ human
+gate           red        ─▶ build   cap gate_red = 2
 ```
+<!-- /lanes-diagram -->
 
 ## Phases
 
