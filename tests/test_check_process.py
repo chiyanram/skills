@@ -27,7 +27,7 @@ PHASES_V2 = [
     {"id": "intake", "actor": "coordinator", "outcomes": {"done": "next", "asked": "human, then same"}},
     {"id": "approval", "actor": "human", "outcomes": {"approved": "next", "changes": {"to": "intake"}}},
     {"id": "build", "actor": "implementer", "report": "urn:rulebook:crq:report:1", "outcomes": {"done": "next"}},
-    {"id": "gate", "actor": "engine", "outcomes": {"green": "next", "stuck": "human",
+    {"id": "gate", "actor": "engine", "outcomes": {"green": "next", "stuck": "human", "round-cap": "human",
                                                     "red": {"to": "build", "counts": "gate_red"}}},
     {"id": "timeline-record", "actor": "engine", "outcomes": {"done": "end"}},
 ]
@@ -163,6 +163,8 @@ PLANTED = {
                               "phase `gate`, outcome `red`: points at `builds`"),
     "v2-counts-uncapped": (V2, lanes_v2(lambda d: d["phases"][3]["outcomes"]["red"].update(counts="ready")),
                            "phase `gate`, outcome `red`: counts `ready`, which has no cap"),
+    "v2-counted-no-round-cap": (V2, lanes_v2(lambda d: d["phases"][3]["outcomes"].pop("round-cap")),
+                                "phase `gate`: has a counted edge and no `round-cap` outcome"),
     "v2-cap-zero": (V2, lanes_v2(lambda d: d["caps"].update(gate_red=0)), "cap `gate_red`: 0 is not an integer"),
     "v2-cap-text": (V2, lanes_v2(lambda d: d["caps"].update(gate_red="2")), "cap `gate_red`: '2' is not an integer"),
     "v2-cap-boolean": (V2, lanes_v2(lambda d: d["caps"].update(gate_red=True)), "cap `gate_red`: True is not"),

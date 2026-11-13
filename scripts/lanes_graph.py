@@ -8,6 +8,7 @@ ENDS = {"next", "end", "human", "human, then same"}
 ACTORS = {"human", "engine"}
 EDGE_KEYS = {"to", "counts"}
 FLOOR, LAST = "approval", "timeline-record"
+ROUND_CAP = "round-cap"
 
 
 def phase_ids(doc: dict) -> list[str]:
@@ -88,6 +89,13 @@ def uncapped_counts(doc: dict, roles: list[str]) -> list[str]:
             if is_edge(value) and "counts" in value and value["counts"] not in doc["caps"]]
 
 
+def no_round_cap(doc: dict, roles: list[str]) -> list[str]:
+    """A phase that counts its rounds needs a `round-cap` outcome, or a run at the cap has nowhere to go."""
+    counted = {phase for phase, _, value in edges(doc) if is_edge(value) and "counts" in value}
+    return [f"phase `{phase['id']}`: has a counted edge and no `{ROUND_CAP}` outcome" for phase in doc["phases"]
+            if phase["id"] in counted and ROUND_CAP not in phase["outcomes"]]
+
+
 def bad_caps(doc: dict, roles: list[str]) -> list[str]:
     return [f"cap `{name}`: {value!r} is not an integer of at least 1" for name, value in doc["caps"].items()
             if isinstance(value, bool) or not isinstance(value, int) or value < 1]
@@ -138,8 +146,8 @@ def bad_lane_raise(doc: dict, roles: list[str]) -> list[str]:
 
 
 RULES = [duplicate_phase_ids, unknown_lane_phases, out_of_order, no_outcomes, bad_edges, bad_targets, uncapped_counts,
-         bad_caps, unknown_conditions, empty_conditions, no_floor, bad_ending, unknown_actors, low_lens_cap,
-         bad_lane_raise]
+         no_round_cap, bad_caps, unknown_conditions, empty_conditions, no_floor, bad_ending, unknown_actors,
+         low_lens_cap, bad_lane_raise]
 
 
 def problems(doc: dict, roles: list[str]) -> list[str]:
