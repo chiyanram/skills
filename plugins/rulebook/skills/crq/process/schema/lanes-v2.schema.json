@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:rulebook:crq:lanes:2",
+  "title": "Lanes file, version 2",
+  "description": "process/lanes-v2.json: the phase graph, its outcome edges and caps, and the four lanes in order. The process check checks the cross-references and the values of caps, conditions and outcomes.",
+  "type": "object",
+  "required": ["caps", "conditions", "lane_raise", "skipped_target", "phases", "lanes"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {"type": "string", "minLength": 1},
+    "caps": {"type": "object"},
+    "conditions": {"type": "object"},
+    "lane_raise": {
+      "type": "object",
+      "required": ["from", "to", "then"],
+      "additionalProperties": false,
+      "properties": {
+        "from": {"type": "string", "minLength": 1},
+        "to": {"type": "string", "minLength": 1},
+        "then": {"type": "string", "minLength": 1}
+      }
+    },
+    "skipped_target": {"type": "string", "minLength": 1},
+    "phases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "actor", "outcomes"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z]+(-[a-z]+)*$"},
+          "actor": {"type": "string", "minLength": 1},
+          "report": {"const": "urn:rulebook:crq:report:1"},
+          "outcomes": {"type": "object"}
+        }
+      }
+    },
+    "lanes": {
+      "type": "array",
+      "allOf": [
+        {
+          "items": {
+            "type": "object",
+            "required": ["lane", "lens_cap", "review_model", "effort", "phases"],
+            "additionalProperties": false,
+            "properties": {
+              "lane": {"type": "string"},
+              "lens_cap": {"anyOf": [{"type": "integer"}, {"const": "all"}]},
+              "review_model": {"enum": ["standard", "strongest"]},
+              "effort": {"enum": ["low", "medium", "high"]},
+              "phases": {
+                "type": "array",
+                "items": {
+                  "anyOf": [
+                    {"type": "string", "minLength": 1},
+                    {
+                      "type": "object",
+                      "required": ["phase", "when"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "phase": {"type": "string", "minLength": 1},
+                        "when": {"type": "string", "minLength": 1}
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "prefixItems": [
+            {"properties": {"lane": {"const": "tiny"}}},
+            {"properties": {"lane": {"const": "bug"}}},
+            {"properties": {"lane": {"const": "feature"}}},
+            {"properties": {"lane": {"const": "one-way door"}}}
+          ],
+          "minItems": 4,
+          "items": false
+        }
+      ]
+    }
+  }
+}
