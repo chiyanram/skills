@@ -1,7 +1,7 @@
 # Glossary
 
-One word per idea. Every role card, the lanes file and every hand-off use these words, and only these. When you
-reach for a word under "avoid", use the term instead.
+One word per idea. Every role card, lanes-v2 (`lanes-v2.json`) and every hand-off use these words, and only these.
+When you reach for a word under "avoid", use the term instead.
 
 ## The factory
 
@@ -26,7 +26,13 @@ reach for a word under "avoid", use the term instead.
 | term | meaning | avoid |
 |---|---|---|
 | **START** | a human's instruction to open a ticket; nothing runs without one | — |
-| **lane** | how much process a change gets: tiny, bug, feature or one-way door; the lanes file says what each lane runs | size, type, category |
+| **lane** | how much process a change gets: tiny, bug, feature or one-way door; lanes-v2 says which phases each lane takes | size, type, category |
+| **phase** | one step of the flow, named by a kebab id, done by one actor: a role, the engine or a human | stage, step |
+| **outcome** | a named way a phase ends, such as `done`, `act-on` or `red`; each outcome has one edge | result, status |
+| **edge** | where an outcome goes: `next` (the lane's next phase), a named phase, `human` (the ticket waits for a human), `human, then same` (a human answers, then the same phase runs again) or `end`; a back edge to a phase the lane skipped lands on the nearest earlier phase the run took | transition |
+| **cap** | the most times a counted edge may be taken in one ticket, since its last lane raise; a lane's lens cap is the most lenses its code review runs | limit, budget |
+| **lane condition** | a named question the coordinator answers yes or no on the ticket, which decides whether a lane takes a phase marked with it | flag |
+| **lane raise** | moving a change to a heavier lane after intake: it returns to spec, needs approval again, and its round counts restart at zero | upgrade, escalation |
 | **approval** | a human's yes to a spec and its design, bound to their hashes, that releases the build; tiny needs START only; any later edit makes it stale; a model never approves | — |
 | **spec** | the approved contract, one file with the intent, the lane, the ACs, a link to the design or `none`, and what is out of scope | requirements, story (for this file) |
 | **AC** | one acceptance criterion in the spec, named AC-n, decidable by a test | requirement, condition |
@@ -36,7 +42,7 @@ reach for a word under "avoid", use the term instead.
 | **ask** | a run that needs a human's decision ends with status `asked` and every open question at once, in one numbered round; a coordinator asks at most three and turns the rest into marked defaults that "accept all" takes; each question carries 2 to 4 short choices and one recommended choice, so the human answers with taps, "1A 2B" or "accept all"; the project's `questions` setting can be `one-at-a-time` instead; never a guess; the answer goes into the spec | clarify inline, assume |
 | **evidence row** | `{criterion, command, result}`: one AC and the plain command that proves it | proof, output |
 | **hand-off** | what a role leaves for the next role: a file, or the JSON a read-only run returns | summary, notes |
-| **ready check** | the engine re-running every evidence row at the head, checking that every AC has a row, plus the test checks and the lane check | verify (for this step) |
+| **ready check** | the engine re-running every evidence row at the head, checking that every AC has a row, plus the test checks and the lane check; the engine runs it in the `verify` phase | — |
 | **test checks** | what the engine stops without a model: a test removed, a skip added, fewer assertions, a judge file changed | — |
 | **judge files** | tests, test config, the gate command and what it runs | test setup, harness |
 | **gate** | the full test run before a human is asked to merge: CI, a queue, or a local run on a runner | — |
