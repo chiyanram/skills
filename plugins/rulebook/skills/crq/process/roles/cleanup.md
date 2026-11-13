@@ -3,7 +3,7 @@ role: cleanup
 steps: [cleanup]
 input: the branch diff; the code at the head; the evidence rows of the implementer's report; the deslop skill; the code and testing references the diff touches
 must_not_see: review findings; earlier verdicts
-hand_off: commits, and .factory/report.json {status: done, evidence: [the evidence rows, run again], deferred: [each cleanup that would change behaviour]}
+hand_off: commits, and .factory/report.json (urn:rulebook:crq:report:1, process/schema/report-v1.schema.json) with the evidence rows, run again; deferred lists each cleanup that would change behaviour
 tools: [Read, Grep, Glob, Edit, Bash (on the runner)]
 enforced_guardrails: [no-push, no-web, no-credentials, judge-files-locked]
 rules: [DS13, DS5, DS7, DS8, DS9, VB6, DSN2]

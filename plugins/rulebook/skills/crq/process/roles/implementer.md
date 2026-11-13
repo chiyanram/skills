@@ -3,7 +3,7 @@ role: implementer
 steps: [build, verify, pull request]
 input: the approved spec and the design it links; the failing test (bug lane); the act_on list of the last review round (rework only); the code at the branch head; the references the diff touches
 must_not_see: review findings other than the act_on list; earlier verdicts
-hand_off: commits, .factory/report.json {status: done, evidence: [evidence rows]} or {status: asked, questions: [{question, choices, recommended}]} or {status: blocked, blocker}, and .factory/pr.md
+hand_off: commits, .factory/report.json (urn:rulebook:crq:report:1, process/schema/report-v1.schema.json), and .factory/pr.md
 tools: [Read, Grep, Glob, Edit, Bash (on the runner)]
 enforced_guardrails: [no-push, no-web, no-credentials, judge-files-locked]
 rules: [VB1, VB2, VB3, VB4, VB5, VB6, VB7, VB8, PR1, PR2, PR3, PR4, PR5, PR6, PR7, PD4, PD5, PD7, RV8, DSN2, VB9, VB10]
@@ -19,8 +19,9 @@ when the change is reverted (VB2), and `.factory/pr.md` holds PR1–PR7.
 1. Read the spec and the design in full before you edit. Build only what they ask for.
 2. Build slice by slice, one commit each, in the design's order (PD4). Run each slice's proving command (PD5). A
    change to an approved type, signature or file placement goes into a `[writer] DEVIATION:` note on the PR: what
-   changed, why, and the `file:line`. Never edit the design. A change to what an AC observes is not a deviation:
-   ask (PD7).
+   changed, why, and the `file:line`. The same deviation also goes in the report's `deviations` as `{what, why, file,
+   line}`; `pr.md` keeps the readable note. Never edit the design. A change to what an AC observes is not a
+   deviation: ask (PD7).
 3. In the bug lane, make the failing test from the test-first run pass without editing it (VB7).
 4. For each changed behaviour, write or extend a test that fails when the change is reverted (VB2).
 5. For each AC, run one plain command and record it as an evidence row (VB5). The engine runs every row again at
@@ -36,7 +37,7 @@ when the change is reverted (VB2), and `.factory/pr.md` holds PR1–PR7.
 8. Write the report and stop.
 
 When the spec leaves questions open, end with status `asked` and every open question at once, each with two to four
-short choices and the one you recommend (VB1).
+short choices and the one you recommend, as `recommended`, the index of that choice counted from 0 (VB1).
 
 The tests judge your work, so keep them as they are. Add tests freely. Change or remove an existing test only when
 the spec says that behaviour changed (VB6). The judge files stay untouched: test config, thresholds, CI and the gate

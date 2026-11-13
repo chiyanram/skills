@@ -85,6 +85,9 @@ PLANTED = {
     "no-card-schema": ("skills/crq/process/schema/card-v1.schema.json", None),
     "no-finding-schema": ("skills/crq/process/schema/finding-v1.schema.json", None),
     "no-report-schema": ("skills/crq/process/schema/report-v1.schema.json", None, "report-v1.schema.json: missing"),
+    "card-unknown-id": ("skills/crq/process/roles/finder.md",
+                        CARD.replace("hand_off: findings", "hand_off: findings (urn:rulebook:crq:finding:9)"),
+                        "finder.md: cites urn:rulebook:crq:finding:9, which no schema in process/schema/ declares"),
     "schema-unknown-keyword": ("skills/crq/process/schema/lanes-v1.schema.json",
                                SCHEMAS["skills/crq/process/schema/lanes-v1.schema.json"].replace(
                                    '"minItems": 4', '"maxItems": 4, "minItems": 4')),
@@ -115,6 +118,11 @@ PLANTED = {
                             "lanes[2].review_model: 'best'"),
     "v2-effort-missing": (V2, lanes_v2(lambda d: d["lanes"][3].pop("effort")), "lanes[3]: `effort` is missing"),
     "v2-effort-bad": (V2, lanes_v2(lambda d: d["lanes"][3].update(effort="max")), "lanes[3].effort: 'max'"),
+    "v2-unknown-id": (V2, lanes_v2(lambda d: d.update({"$schema": "urn:rulebook:crq:lanes:9"})),
+                      "lanes-v2.json: cites urn:rulebook:crq:lanes:9, which no schema in process/schema/ declares"),
+    "v2-unknown-id-graph-broken": (V2, lanes_v2(lambda d: (d.update({"$schema": "urn:rulebook:crq:lanes:9"}),
+                                                           d["lanes"][0]["phases"].reverse())),
+                                   "lanes-v2.json: cites urn:rulebook:crq:lanes:9"),
     "v2-extra-key": (V2, lanes_v2(lambda d: d.update(notes="x")), "the top level: `notes` is not a known field"),
     "v2-phase-extra-key": (V2, lanes_v2(lambda d: d["phases"][2].update(reports="x")),
                            "phases[2]: `reports` is not a known field"),
@@ -257,6 +265,14 @@ class CheckProcessTest(unittest.TestCase):
         with process_tree() as root:
             plant(Path(root), "skills/crq/process/roles/finder.md",
                   CARD.replace("[read-only]", "read-only tools; no push"))
+            result = run_check("process", Path(root))
+            self.assertEqual(result.returncode, 0, result.stdout)
+
+    def test_should_accept_an_id_from_a_schema_the_check_does_not_load(self):
+        with process_tree() as root:
+            plant(Path(root), "skills/crq/process/schema/note-v1.schema.json", '{"$id": "urn:rulebook:crq:note:1"}')
+            plant(Path(root), "skills/crq/process/roles/finder.md",
+                  CARD.replace("hand_off: findings", "hand_off: findings (urn:rulebook:crq:note:1)"))
             result = run_check("process", Path(root))
             self.assertEqual(result.returncode, 0, result.stdout)
 
