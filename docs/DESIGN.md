@@ -20,7 +20,7 @@ keep, never as a product's paths.
 ```text
 a person in Claude Code            an engine (any orchestrator)
   installs rulebook@chiyanram        lists rulebook@chiyanram in a project's settings, pinned
-  types /crq, or the skills          reads the lanes file and the role cards,
+  types /crq, or the skills          reads lanes-v2 and the role cards,
   load as they work                  runs each card as a fresh run, enforces its frontmatter
 ```
 
@@ -38,17 +38,15 @@ a person in Claude Code            an engine (any orchestrator)
 
 The crq process gets a side an engine can read, so an engine runs the same process a person runs with `/crq`.
 
-**Lanes as data.** One small file holds, per lane:
-
-| lane | approval (releases the build) | design review | test-first | lenses | retro |
-|---|---|---|---|---|---|
-| tiny | no (START only) | no | no | 1 | timeline record |
-| bug | yes | yes | yes | ~3 | timeline record; a full retro run if a human starts one |
-| feature | yes | yes | no | ~3 | the same |
-| one-way door | yes, covering each irreversible step | yes | no | all, on the strongest model | the same |
+**Lanes as data.** Lanes-v2 (`process/lanes-v2.json`) holds the flow. It names the phases, and gives each phase its
+actor and its outcome edges. It holds the caps and the lane conditions. For each lane, it lists the phases the lane
+takes, the lens cap, the review model and the effort. `make index` builds the lanes table from it, in
+[`crq/references/lanes.md`](../plugins/rulebook/skills/crq/references/lanes.md). Read the table there. V1
+(`process/lanes.json`) stays beside v2 until an engine reads v2.
 
 - An engine may make a lane stricter, never looser.
-- No lanes file can drop approval for a lane above tiny: the approval floor is enforced by the engine.
+- The approval floor is a graph rule: every lane above tiny takes the approval phase. `check_process.py` enforces it
+  on lanes-v2 and v1 in this repo. The engine enforces it on any lane change of its own.
 - The timeline record is written by the engine, with no model. A full retro is an extra task, and it runs only when a
   human starts it (RT1–RT6).
 
@@ -57,15 +55,24 @@ verify pass and retro. The onboarder, which writes a project's brief and glossar
 the engine strips, lists and stages.
 - **Frontmatter** (the same fields everywhere): role, steps, input, `must_not_see`, hand-off, tools, enforced
   guardrails (IDs from the closed list in the card schema), rules (by id). An engine enforces it. `next` is dropped:
-  the lanes hold the flow.
+  lanes-v2 holds the flow.
 - **Schemas** (#305): this repo owns the format of its cards, lanes and findings. Each is a versioned JSON schema in
   `process/schema/` that ships with the plugin, so an engine reads the version it pins; a new version is a new file
-  beside the old one. `check_process.py` checks every card and lanes file against them. A card and a finding take no
-  field the schema does not name, and a finding's `line` is a number, or text such as `12` or `40-44`, so every cite
-  points at a real line. Each other finding field has one closed set of values, set here: `severity` is blocker,
-  warning or nit; `category` is one of bug, security, concurrency, data, api, perf, observability, maintainability,
-  test_gap, doc_defect, style or speculative (only "not proven", never "other"); a style finding is always a nit;
-  `rule` is a rule ID or null. Severity is the finder's and the bucket is the verify pass's; the glossary defines both.
+  beside the old one. `check_process.py` fails when a schema is missing or uses a keyword `schema_lite.py` cannot run.
+  The schema files, and how each is checked:
+  - `card-v1.schema.json`: `check_process.py` checks the frontmatter of every role card against it.
+  - `lanes-v1.schema.json`: `check_process.py` checks `process/lanes.json` against it.
+  - `lanes-v2.schema.json`: `check_process.py` checks `process/lanes-v2.json` against it, then checks the graph
+    (`scripts/lanes_graph.py`).
+  - `finding-v1.schema.json`: one finding of a finder run. The repo holds no finding file, so `check_process.py`
+    reads none. `tests/test_schema_lite.py` checks sample findings against it.
+
+  A card and a finding take no field the schema does not name, and a finding's `line` is a number, or text such as
+  `12` or `40-44`, so every cite points at a real line. Each other finding field has one closed set of values, set
+  here: `severity` is blocker, warning or nit; `category` is one of bug, security, concurrency, data, api, perf,
+  observability, maintainability, test_gap, doc_defect, style or speculative (only "not proven", never "other"); a
+  style finding is always a nit; `rule` is a rule ID or null. Severity is the finder's and the bucket is the verify
+  pass's; the glossary defines both.
 - **Body:** the job, a "done when" line, numbered steps, and an "it's working if" list.
 - **No persona and no capitals.** A prohibition appears only for a hard guardrail.
 - **One glossary** is used by every card.

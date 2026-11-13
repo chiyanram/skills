@@ -1,7 +1,7 @@
 # Glossary
 
-One word per idea. Every role card, the lanes file and every hand-off use these words, and only these. When you
-reach for a word under "avoid", use the term instead.
+One word per idea. Every role card, lanes-v2 (`lanes-v2.json`) and every hand-off use these words, and only these.
+When you reach for a word under "avoid", use the term instead.
 
 ## The factory
 
@@ -26,7 +26,13 @@ reach for a word under "avoid", use the term instead.
 | term | meaning | avoid |
 |---|---|---|
 | **START** | a human's instruction to open a ticket; nothing runs without one | — |
-| **lane** | how much process a change gets: tiny, bug, feature or one-way door; the lanes file says what each lane runs | size, type, category |
+| **lane** | how much process a change gets: tiny, bug, feature or one-way door; lanes-v2 says which phases each lane takes | size, type, category |
+| **phase** | one step of the flow, named by a kebab id, done by one actor: a role, the engine or a human | stage, step |
+| **outcome** | a named way a phase ends, such as `done`, `act-on` or `red`; each outcome has one edge | result, status |
+| **edge** | where an outcome goes: `next` (the lane's next phase), a named phase, `human` (the ticket waits for a human), `human, then same` (a human answers, then the same phase runs again) or `end`; a back edge to a phase the lane skipped lands on the nearest earlier phase the run took | transition |
+| **cap** | the most times a counted edge may be taken in one ticket | limit, budget |
+| **lane condition** | a named question the coordinator answers yes or no on the ticket, which decides whether a lane takes a phase marked with it | flag |
+| **lane raise** | moving a change to a heavier lane after intake: it returns to spec, needs approval again, and its round counts restart at zero | upgrade, escalation |
 | **approval** | a human's yes to a spec and its design, bound to their hashes, that releases the build; tiny needs START only; any later edit makes it stale; a model never approves | — |
 | **spec** | the approved contract, one file with the intent, the lane, the ACs, a link to the design or `none`, and what is out of scope | requirements, story (for this file) |
 | **AC** | one acceptance criterion in the spec, named AC-n, decidable by a test | requirement, condition |
