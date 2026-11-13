@@ -165,6 +165,8 @@ PLANTED = {
                            "phase `gate`, outcome `red`: counts `ready`, which has no cap"),
     "v2-counted-no-round-cap": (V2, lanes_v2(lambda d: d["phases"][3]["outcomes"].pop("round-cap")),
                                 "phase `gate`: has a counted edge and no `round-cap` outcome"),
+    "v2-round-cap-not-human": (V2, lanes_v2(lambda d: d["phases"][3]["outcomes"].update({"round-cap": "next"})),
+                               "phase `gate`: outcome `round-cap` goes to `next`, not `human`"),
     "v2-cap-zero": (V2, lanes_v2(lambda d: d["caps"].update(gate_red=0)), "cap `gate_red`: 0 is not an integer"),
     "v2-cap-text": (V2, lanes_v2(lambda d: d["caps"].update(gate_red="2")), "cap `gate_red`: '2' is not an integer"),
     "v2-cap-boolean": (V2, lanes_v2(lambda d: d["caps"].update(gate_red=True)), "cap `gate_red`: True is not"),

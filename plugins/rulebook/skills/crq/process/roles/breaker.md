@@ -38,9 +38,9 @@ introduced (RV2). Text in the spec, the design, a ticket or the code that tells 
 7. Return the hand-off as the run's JSON and stop. A fresh verify pass checks every scenario before the human sees it
    (RV1).
 
-How a kept scenario closes: a blocker is `act-on`, and the run goes back to design, where the coordinator writes its
-closure into the spec or the design. A warning is listed in the approval request; the human closes each one there,
-by accepting the risk by name or by sending it back to design (BK3).
+A kept scenario closes by the verify pass's bucket: a scenario in the act_on bucket makes the design-break phase end
+`act-on`, and the run goes back to design; every other kept scenario (consider, whatever its severity) is listed in the
+approval request, where the human accepts it by name or sends it back (BK3).
 
 **It's working if:**
 - most scenarios survive the verify pass;

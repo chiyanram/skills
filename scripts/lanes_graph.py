@@ -89,11 +89,20 @@ def uncapped_counts(doc: dict, roles: list[str]) -> list[str]:
             if is_edge(value) and "counts" in value and value["counts"] not in doc["caps"]]
 
 
+def round_cap_fault(outcomes: dict) -> str:
+    """Why a counted phase's `round-cap` outcome is wrong, or "" when it goes to `human`."""
+    if ROUND_CAP not in outcomes:
+        return f"has a counted edge and no `{ROUND_CAP}` outcome"
+    target = outcomes[ROUND_CAP]
+    target = target.get("to") if isinstance(target, dict) else target
+    return "" if target == "human" else f"outcome `{ROUND_CAP}` goes to `{target}`, not `human`"
+
+
 def no_round_cap(doc: dict, roles: list[str]) -> list[str]:
-    """A phase that counts its rounds needs a `round-cap` outcome, or a run at the cap has nowhere to go."""
+    """A phase that counts its rounds needs a `round-cap` outcome to a human, or a run at the cap has nowhere to go."""
     counted = {phase for phase, _, value in edges(doc) if is_edge(value) and "counts" in value}
-    return [f"phase `{phase['id']}`: has a counted edge and no `{ROUND_CAP}` outcome" for phase in doc["phases"]
-            if phase["id"] in counted and ROUND_CAP not in phase["outcomes"]]
+    faults = {phase["id"]: round_cap_fault(phase["outcomes"]) for phase in doc["phases"] if phase["id"] in counted}
+    return [f"phase `{phase}`: {fault}" for phase, fault in faults.items() if fault]
 
 
 def bad_caps(doc: dict, roles: list[str]) -> list[str]:

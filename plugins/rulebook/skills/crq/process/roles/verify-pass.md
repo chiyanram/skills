@@ -36,9 +36,9 @@ finder's, and no finding was added.
    bucket by the evidence alone (RV8).
 8. Return the hand-off as the run's JSON and stop. A verify pass writes no file.
 
-A kept breaker scenario closes by its severity: a blocker is `act-on`, and the run goes back to design; a warning
-is listed in the approval request, where the human closes each one by accepting the risk by name or by sending it back
-(BK3).
+A kept scenario closes by the verify pass's bucket: a scenario in the act_on bucket makes the design-break phase end
+`act-on`, and the run goes back to design; every other kept scenario (consider, whatever its severity) is listed in the
+approval request, where the human accepts it by name or sends it back (BK3).
 
 The verify pass adds no finding, and it never approves or merges: zero act_on findings is no signal, and the change
 still waits for a human (RV6).
