@@ -1,10 +1,14 @@
 import json
 import shutil
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 from tests.support import ROOT, run_check
+
+sys.path.insert(0, str(ROOT / "scripts"))
+from schema_lite import validate  # noqa: E402
 
 SCHEMA_DIR = ROOT / "plugins" / "rulebook" / "skills" / "crq" / "process" / "schema"
 SCHEMAS = {f"skills/crq/process/schema/{f.name}": f.read_text() for f in SCHEMA_DIR.glob("*.schema.json")}
@@ -80,6 +84,7 @@ PLANTED = {
     "empty-field": ("skills/crq/process/roles/finder.md", CARD.replace("input: the diff", "input:")),
     "no-card-schema": ("skills/crq/process/schema/card-v1.schema.json", None),
     "no-finding-schema": ("skills/crq/process/schema/finding-v1.schema.json", None),
+    "no-report-schema": ("skills/crq/process/schema/report-v1.schema.json", None, "report-v1.schema.json: missing"),
     "schema-unknown-keyword": ("skills/crq/process/schema/lanes-v1.schema.json",
                                SCHEMAS["skills/crq/process/schema/lanes-v1.schema.json"].replace(
                                    '"minItems": 4', '"maxItems": 4, "minItems": 4')),
@@ -174,6 +179,31 @@ PLANTED = {
                              "lane_raise: `to` names `spec`"),
 }
 
+ROW = {"criterion": "AC-1", "command": "make test", "result": "OK"}
+QUESTION = {"question": "Which lane?", "choices": ["bug", "feature"], "recommended": 1}
+DEVIATION = {"what": "renamed f to g", "why": "g is free", "file": "a.py", "line": "4-6"}
+# Each report case: (the report, a substring of the first problem, or None when it is valid).
+REPORTS = {
+    "done": ({"status": "done", "evidence": [ROW]}, None),
+    "done-deferred-deviations": ({"status": "done", "evidence": [ROW], "deferred": ["inline x"],
+                                  "deviations": [DEVIATION, {**DEVIATION, "line": 4}]}, None),
+    "asked": ({"status": "asked", "questions": [QUESTION, {**QUESTION, "choices": ["a", "b", "c", "d"]}]}, None),
+    "blocked": ({"status": "blocked", "blocker": "the runner has no network"}, None),
+    "unknown-status": ({"status": "stuck", "blocker": "x"}, "'stuck' is not one of"),
+    "done-no-evidence": ({"status": "done"}, "`evidence` is missing"),
+    "done-empty-evidence": ({"status": "done", "evidence": []}, "evidence: has 0 items"),
+    "asked-one-choice": ({"status": "asked", "questions": [{**QUESTION, "choices": ["a"]}]},
+                         "choices: has 1 items, needs at least 2"),
+    "asked-five-choices": ({"status": "asked", "questions": [{**QUESTION, "choices": list("abcde")}]},
+                           "choices[4]: not allowed"),
+    "extra-key": ({"status": "blocked", "blocker": "x", "by": "human"}, "`by` is not a known field"),
+    "row-extra-key": ({"status": "done", "evidence": [{**ROW, "note": "x"}]},
+                      "evidence[0]: `note` is not a known field"),
+    "deviation-bad-line": ({"status": "done", "evidence": [ROW], "deviations": [{**DEVIATION, "line": "near 4"}]},
+                           "deviations[0].line: 'near 4' does not match"),
+    "blocked-empty": ({"status": "blocked", "blocker": ""}, "blocker: is empty"),
+}
+
 
 def process_tree() -> tempfile.TemporaryDirectory:
     tmp = tempfile.TemporaryDirectory()
@@ -239,6 +269,23 @@ class CheckProcessTest(unittest.TestCase):
                 self.assertTrue(result.stdout.strip(), "a failing check names the problem")
                 for words in named:
                     self.assertIn(words, result.stdout)
+
+
+class ReportSchemaTest(unittest.TestCase):
+    def test_should_take_only_the_three_closed_shapes(self):
+        schema = json.loads((SCHEMA_DIR / "report-v1.schema.json").read_text())
+        for case, (report, words) in REPORTS.items():
+            with self.subTest(case):
+                found = validate(report, schema)
+                if words is None:
+                    self.assertEqual(found, [])
+                else:
+                    self.assertTrue(found, "a bad report fails")
+                    self.assertIn(words, found[0])
+
+    def test_should_declare_the_report_id(self):
+        schema = json.loads((SCHEMA_DIR / "report-v1.schema.json").read_text())
+        self.assertEqual(schema["$id"], "urn:rulebook:crq:report:1")
 
 
 if __name__ == "__main__":

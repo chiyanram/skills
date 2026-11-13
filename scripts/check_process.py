@@ -16,8 +16,8 @@ holds, or lacks the job, a "done when" line, numbered steps or an "it's working 
 than three eval scenarios, each a folder with a `prompt.md` and a grader under `graders/`.
 
 The roles, the card fields, the guardrail IDs and the lanes come from the versioned schemas the plugin ships in
-process/schema/ (card, lanes, lanes-v2, finding); the check fails when one is missing or uses a keyword schema_lite
-cannot run.
+process/schema/ (card, lanes, lanes-v2, finding, and report for the writers' .factory/report.json); the check fails
+when one is missing or uses a keyword schema_lite cannot run.
 """
 import json
 import re
@@ -30,7 +30,7 @@ from index_table import RULE_ID, rules
 from schema_lite import unknown_keywords, validate
 
 SCHEMAS = {"card": "card-v1.schema.json", "lanes": "lanes-v1.schema.json", "lanes-v2": "lanes-v2.schema.json",
-           "finding": "finding-v1.schema.json"}
+           "finding": "finding-v1.schema.json", "report": "report-v1.schema.json"}
 CITED = re.compile(r"\b[A-Z]+\d+[a-z]?\b")
 FIELD = re.compile(r"^([a-z_]+):\s*(.*)$")
 BODY_PARTS = [(re.compile(r"\*\*The job\.\*\*"), "the job"), (re.compile(r"\*\*Done when\*\*"), "a \"done when\" line"),

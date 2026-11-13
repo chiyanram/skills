@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:rulebook:crq:report:1",
+  "title": "Writer report, version 1",
+  "description": "The .factory/report.json a writer (implementer, test-first, cleanup) leaves: done with evidence, asked with questions, or blocked with the blocker. Only cleanup writes deferred. recommended is the index of a choice, counted from 0. A line is a number, or text like 12 or 40-44.",
+  "type": "object",
+  "required": ["status"],
+  "properties": {
+    "status": {"enum": ["done", "asked", "blocked"]}
+  },
+  "anyOf": [
+    {
+      "required": ["status", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "status": {"const": "done"},
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["criterion", "command", "result"],
+            "additionalProperties": false,
+            "properties": {
+              "criterion": {"type": "string", "minLength": 1},
+              "command": {"type": "string", "minLength": 1},
+              "result": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        "deferred": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "deviations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["what", "why", "file", "line"],
+            "additionalProperties": false,
+            "properties": {
+              "what": {"type": "string", "minLength": 1},
+              "why": {"type": "string", "minLength": 1},
+              "file": {"type": "string", "minLength": 1},
+              "line": {"type": ["integer", "string"], "pattern": "^[0-9]+(-[0-9]+)?$"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "required": ["status", "questions"],
+      "additionalProperties": false,
+      "properties": {
+        "status": {"const": "asked"},
+        "questions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["question", "choices", "recommended"],
+            "additionalProperties": false,
+            "properties": {
+              "question": {"type": "string", "minLength": 1},
+              "choices": {
+                "type": "array",
+                "prefixItems": [
+                  {"type": "string", "minLength": 1},
+                  {"type": "string", "minLength": 1},
+                  {"type": "string", "minLength": 1},
+                  {"type": "string", "minLength": 1}
+                ],
+                "minItems": 2,
+                "items": false
+              },
+              "recommended": {"type": "integer"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "required": ["status", "blocker"],
+      "additionalProperties": false,
+      "properties": {
+        "status": {"const": "blocked"},
+        "blocker": {"type": "string", "minLength": 1}
+      }
+    }
+  ]
+}
