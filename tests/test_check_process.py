@@ -1,4 +1,5 @@
 import json
+import re
 import shutil
 import sys
 import tempfile
@@ -210,6 +211,19 @@ REPORTS = {
     "deviation-bad-line": ({"status": "done", "evidence": [ROW], "deviations": [{**DEVIATION, "line": "near 4"}]},
                            "deviations[0].line: 'near 4' does not match"),
     "blocked-empty": ({"status": "blocked", "blocker": ""}, "blocker: is empty"),
+    "done-extra-key": ({"status": "done", "evidence": [ROW], "by": "x"}, "`by` is not a known field"),
+    "asked-extra-key": ({"status": "asked", "questions": [QUESTION], "by": "x"}, "`by` is not a known field"),
+    "question-extra-key": ({"status": "asked", "questions": [{**QUESTION, "why": "x"}]},
+                           "questions[0]: `why` is not a known field"),
+    "deviation-extra-key": ({"status": "done", "evidence": [ROW], "deviations": [{**DEVIATION, "by": "x"}]},
+                            "deviations[0]: `by` is not a known field"),
+    "question-no-recommended": ({"status": "asked", "questions": [{"question": "Which lane?", "choices": ["a", "b"]}]},
+                                "questions[0]: `recommended` is missing"),
+    "deviation-no-why": ({"status": "done", "evidence": [ROW],
+                          "deviations": [{"what": "renamed f", "file": "a.py", "line": 4}]},
+                         "deviations[0]: `why` is missing"),
+    "asked-with-evidence": ({"status": "asked", "evidence": [ROW]}, "status: 'asked' is not 'done'"),
+    "deferred-empty-entry": ({"status": "done", "evidence": [ROW], "deferred": [""]}, "deferred[0]: is empty"),
 }
 
 
@@ -298,6 +312,14 @@ class ReportSchemaTest(unittest.TestCase):
                 else:
                     self.assertTrue(found, "a bad report fails")
                     self.assertIn(words, found[0])
+
+    def test_should_have_each_card_cite_its_hand_off_schema(self):
+        roles = SCHEMA_DIR.parent / "roles"
+        cites = {"implementer": "report", "test-first": "report", "cleanup": "report", "finder": "finding"}
+        for role, name in cites.items():
+            with self.subTest(role):
+                hand_off = re.search(r"^hand_off:(.*)$", (roles / f"{role}.md").read_text(), re.M).group(1)
+                self.assertIn(f"(urn:rulebook:crq:{name}:1, process/schema/{name}-v1.schema.json)", hand_off)
 
     def test_should_declare_the_report_id(self):
         schema = json.loads((SCHEMA_DIR / "report-v1.schema.json").read_text())
