@@ -3,7 +3,7 @@ role: test-first
 steps: [build]
 input: the bug spec; the code at the branch head; the testing references in scope
 must_not_see: any fix, drafted or planned; the implementer's work
-hand_off: one commit with the failing test, and .factory/report.json {status: done, evidence: [one evidence row]} or {status: asked, questions: [{question, choices, recommended}]}
+hand_off: one commit with the failing test, and .factory/report.json (urn:rulebook:crq:report:1, process/schema/report-v1.schema.json) with status done and one evidence row, or status asked
 tools: [Read, Grep, Glob, Edit (test files only), Bash (on the runner)]
 enforced_guardrails: [no-push, no-web, no-credentials]
 rules: [VB1, VB6, VB7, AC12, GA5]
@@ -25,8 +25,8 @@ lands, and nothing but the test changed.
 5. Write the report: the command and the failure as the one evidence row, then stop.
 
 When the spec gives no input and expected result a test can check, end with status `asked`: say what is
-missing, every open question at once, each with two to four short choices and the one you recommend, because a
-guessed test proves nothing (VB1).
+missing, every open question at once, each with two to four short choices and the one you recommend, as
+`recommended`, the index of that choice counted from 0, because a guessed test proves nothing (VB1).
 
 Leave the code under test as it is, even when the fix is one obvious line: the fix belongs to the implementer, and
 a test written next to its fix can pass for the wrong reason (VB7). Change no existing test (VB6).

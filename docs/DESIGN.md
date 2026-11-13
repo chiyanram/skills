@@ -66,6 +66,13 @@ the engine strips, lists and stages.
     (`scripts/lanes_graph.py`).
   - `finding-v1.schema.json`: one finding of a finder run. The repo holds no finding file, so `check_process.py`
     reads none. `tests/test_schema_lite.py` checks sample findings against it.
+  - `report-v1.schema.json` (#362): the `.factory/report.json` of the implementer, test-first and cleanup, one of
+    three closed shapes on `status`: done with evidence, asked with questions, or blocked with the blocker. The repo
+    holds no report file, so `check_process.py` reads none: it only loads the schema. `tests/test_check_process.py`
+    checks sample reports against it.
+
+  A card or `lanes-v2.json` may cite a `urn:rulebook:crq:<name>:<n>` id only when a file in `process/schema/`
+  declares it as its `$id`. `check_process.py` fails, naming the file and the id, when no file does.
 
   A card and a finding take no field the schema does not name, and a finding's `line` is a number, or text such as
   `12` or `40-44`, so every cite points at a real line. Each other finding field has one closed set of values, set

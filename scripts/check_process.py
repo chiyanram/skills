@@ -13,11 +13,13 @@ when the review file's baseline is empty, has an entry that is not exactly a ski
 twice, or names one the plugin does not ship;
 when a role card is not one of the known roles, misses a frontmatter field or adds one, cites a rule ID no Rules section
 holds, or lacks the job, a "done when" line, numbered steps or an "it's working if" list; or when a role has fewer
-than three eval scenarios, each a folder with a `prompt.md` and a grader under `graders/`.
+than three eval scenarios, each a folder with a `prompt.md` and a grader under `graders/`; or when a card's
+frontmatter or the lanes-v2 file cites a `urn:rulebook:crq:<name>:<n>` id that no process/schema/*.schema.json file
+declares as its `$id`.
 
 The roles, the card fields, the guardrail IDs and the lanes come from the versioned schemas the plugin ships in
-process/schema/ (card, lanes, lanes-v2, finding); the check fails when one is missing or uses a keyword schema_lite
-cannot run.
+process/schema/ (card, lanes, lanes-v2, finding, and report for the writers' .factory/report.json); the check fails
+when one is missing or uses a keyword schema_lite cannot run.
 """
 import json
 import re
@@ -30,8 +32,9 @@ from index_table import RULE_ID, rules
 from schema_lite import unknown_keywords, validate
 
 SCHEMAS = {"card": "card-v1.schema.json", "lanes": "lanes-v1.schema.json", "lanes-v2": "lanes-v2.schema.json",
-           "finding": "finding-v1.schema.json"}
+           "finding": "finding-v1.schema.json", "report": "report-v1.schema.json"}
 CITED = re.compile(r"\b[A-Z]+\d+[a-z]?\b")
+URN = re.compile(r"urn:rulebook:crq:[a-z0-9-]+:\d+")
 FIELD = re.compile(r"^([a-z_]+):\s*(.*)$")
 BODY_PARTS = [(re.compile(r"\*\*The job\.\*\*"), "the job"), (re.compile(r"\*\*Done when\*\*"), "a \"done when\" line"),
               (re.compile(r"^1\. ", re.M), "numbered steps"), (re.compile(r"\*\*It's working if:\*\*"),
@@ -73,7 +76,17 @@ def scenario_problems(plugin: Path, role: str) -> list[str]:
     return found
 
 
-def card_problems(card: Path, plugin: Path, ids: set[str], schema: dict) -> list[str]:
+def cited_ids(text: str) -> list[str]:
+    """Each schema id the text cites, once, in order."""
+    return list(dict.fromkeys(URN.findall(text)))
+
+
+def unknown_id_problems(path: Path, text: str, declared: set[str]) -> list[str]:
+    return [f"{path}: cites {cited}, which no schema in process/schema/ declares"
+            for cited in cited_ids(text) if cited not in declared]
+
+
+def card_problems(card: Path, plugin: Path, ids: set[str], schema: dict, declared: set[str]) -> list[str]:
     parsed = frontmatter(card.read_text())
     if parsed is None:
         return [f"{card}: no frontmatter"]
@@ -85,6 +98,7 @@ def card_problems(card: Path, plugin: Path, ids: set[str], schema: dict) -> list
     cited = fields.get("rules") if isinstance(fields.get("rules"), list) else []
     found += [f"{card}: rule `{rule}` is in no reference's Rules section"
               for rule in cited if CITED.fullmatch(rule) and rule not in ids]
+    found += unknown_id_problems(card, json.dumps(fields), declared)
     found += [f"{card}: the body lacks {what}" for pattern, what in BODY_PARTS if not pattern.search(body)]
     return found + scenario_problems(plugin, card.stem)
 
@@ -95,6 +109,12 @@ def load_json(path: Path) -> tuple[object, list[str]]:
         return json.loads(path.read_text()), []
     except json.JSONDecodeError:
         return None, [f"{path}: not JSON"]
+
+
+def schema_ids(process: Path) -> set[str]:
+    """The `$id` of every schema in process/schema/, whether SCHEMAS names it or not."""
+    docs = (load_json(path)[0] for path in process.glob("schema/*.schema.json"))
+    return {doc["$id"] for doc in docs if isinstance(doc, dict) and isinstance(doc.get("$id"), str)}
 
 
 def lanes_problems(path: Path, schema: dict) -> list[str]:
@@ -159,8 +179,10 @@ def process_problems(process: Path, plugin: Path, ids: set[str]) -> list[str]:
              ("review.json", lambda path: baseline_problems(path, plugin)),
              ("glossary.md", lambda path: [])]
     found = [line for name, check in files for line in required(process / name, check)]
+    declared, v2 = schema_ids(process), process / "lanes-v2.json"
+    found += unknown_id_problems(v2, v2.read_text(), declared) if v2.is_file() else []
     cards = sorted(process.glob("roles/*.md"))
-    return found + [line for card in cards for line in card_problems(card, plugin, ids, schemas["card"])]
+    return found + [line for card in cards for line in card_problems(card, plugin, ids, schemas["card"], declared)]
 
 
 def problems(root: Path) -> list[str]:

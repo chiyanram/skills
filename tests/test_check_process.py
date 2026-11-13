@@ -1,10 +1,15 @@
 import json
+import re
 import shutil
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 from tests.support import ROOT, run_check
+
+sys.path.insert(0, str(ROOT / "scripts"))
+from schema_lite import validate  # noqa: E402
 
 SCHEMA_DIR = ROOT / "plugins" / "rulebook" / "skills" / "crq" / "process" / "schema"
 SCHEMAS = {f"skills/crq/process/schema/{f.name}": f.read_text() for f in SCHEMA_DIR.glob("*.schema.json")}
@@ -80,6 +85,10 @@ PLANTED = {
     "empty-field": ("skills/crq/process/roles/finder.md", CARD.replace("input: the diff", "input:")),
     "no-card-schema": ("skills/crq/process/schema/card-v1.schema.json", None),
     "no-finding-schema": ("skills/crq/process/schema/finding-v1.schema.json", None),
+    "no-report-schema": ("skills/crq/process/schema/report-v1.schema.json", None, "report-v1.schema.json: missing"),
+    "card-unknown-id": ("skills/crq/process/roles/finder.md",
+                        CARD.replace("hand_off: findings", "hand_off: findings (urn:rulebook:crq:finding:9)"),
+                        "finder.md: cites urn:rulebook:crq:finding:9, which no schema in process/schema/ declares"),
     "schema-unknown-keyword": ("skills/crq/process/schema/lanes-v1.schema.json",
                                SCHEMAS["skills/crq/process/schema/lanes-v1.schema.json"].replace(
                                    '"minItems": 4', '"maxItems": 4, "minItems": 4')),
@@ -110,6 +119,11 @@ PLANTED = {
                             "lanes[2].review_model: 'best'"),
     "v2-effort-missing": (V2, lanes_v2(lambda d: d["lanes"][3].pop("effort")), "lanes[3]: `effort` is missing"),
     "v2-effort-bad": (V2, lanes_v2(lambda d: d["lanes"][3].update(effort="max")), "lanes[3].effort: 'max'"),
+    "v2-unknown-id": (V2, lanes_v2(lambda d: d.update({"$schema": "urn:rulebook:crq:lanes:9"})),
+                      "lanes-v2.json: cites urn:rulebook:crq:lanes:9, which no schema in process/schema/ declares"),
+    "v2-unknown-id-graph-broken": (V2, lanes_v2(lambda d: (d.update({"$schema": "urn:rulebook:crq:lanes:9"}),
+                                                           d["lanes"][0]["phases"].reverse())),
+                                   "lanes-v2.json: cites urn:rulebook:crq:lanes:9"),
     "v2-extra-key": (V2, lanes_v2(lambda d: d.update(notes="x")), "the top level: `notes` is not a known field"),
     "v2-phase-extra-key": (V2, lanes_v2(lambda d: d["phases"][2].update(reports="x")),
                            "phases[2]: `reports` is not a known field"),
@@ -174,6 +188,44 @@ PLANTED = {
                              "lane_raise: `to` names `spec`"),
 }
 
+ROW = {"criterion": "AC-1", "command": "make test", "result": "OK"}
+QUESTION = {"question": "Which lane?", "choices": ["bug", "feature"], "recommended": 1}
+DEVIATION = {"what": "renamed f to g", "why": "g is free", "file": "a.py", "line": "4-6"}
+# Each report case: (the report, a substring of the first problem, or None when it is valid).
+REPORTS = {
+    "done": ({"status": "done", "evidence": [ROW]}, None),
+    "done-deferred-deviations": ({"status": "done", "evidence": [ROW], "deferred": ["inline x"],
+                                  "deviations": [DEVIATION, {**DEVIATION, "line": 4}]}, None),
+    "asked": ({"status": "asked", "questions": [QUESTION, {**QUESTION, "choices": ["a", "b", "c", "d"]}]}, None),
+    "blocked": ({"status": "blocked", "blocker": "the runner has no network"}, None),
+    "unknown-status": ({"status": "stuck", "blocker": "x"}, "'stuck' is not one of"),
+    "done-no-evidence": ({"status": "done"}, "`evidence` is missing"),
+    "done-empty-evidence": ({"status": "done", "evidence": []}, "evidence: has 0 items"),
+    "asked-one-choice": ({"status": "asked", "questions": [{**QUESTION, "choices": ["a"]}]},
+                         "choices: has 1 items, needs at least 2"),
+    "asked-five-choices": ({"status": "asked", "questions": [{**QUESTION, "choices": list("abcde")}]},
+                           "choices[4]: not allowed"),
+    "extra-key": ({"status": "blocked", "blocker": "x", "by": "human"}, "`by` is not a known field"),
+    "row-extra-key": ({"status": "done", "evidence": [{**ROW, "note": "x"}]},
+                      "evidence[0]: `note` is not a known field"),
+    "deviation-bad-line": ({"status": "done", "evidence": [ROW], "deviations": [{**DEVIATION, "line": "near 4"}]},
+                           "deviations[0].line: 'near 4' does not match"),
+    "blocked-empty": ({"status": "blocked", "blocker": ""}, "blocker: is empty"),
+    "done-extra-key": ({"status": "done", "evidence": [ROW], "by": "x"}, "`by` is not a known field"),
+    "asked-extra-key": ({"status": "asked", "questions": [QUESTION], "by": "x"}, "`by` is not a known field"),
+    "question-extra-key": ({"status": "asked", "questions": [{**QUESTION, "why": "x"}]},
+                           "questions[0]: `why` is not a known field"),
+    "deviation-extra-key": ({"status": "done", "evidence": [ROW], "deviations": [{**DEVIATION, "by": "x"}]},
+                            "deviations[0]: `by` is not a known field"),
+    "question-no-recommended": ({"status": "asked", "questions": [{"question": "Which lane?", "choices": ["a", "b"]}]},
+                                "questions[0]: `recommended` is missing"),
+    "deviation-no-why": ({"status": "done", "evidence": [ROW],
+                          "deviations": [{"what": "renamed f", "file": "a.py", "line": 4}]},
+                         "deviations[0]: `why` is missing"),
+    "asked-with-evidence": ({"status": "asked", "evidence": [ROW]}, "status: 'asked' is not 'done'"),
+    "deferred-empty-entry": ({"status": "done", "evidence": [ROW], "deferred": [""]}, "deferred[0]: is empty"),
+}
+
 
 def process_tree() -> tempfile.TemporaryDirectory:
     tmp = tempfile.TemporaryDirectory()
@@ -230,6 +282,14 @@ class CheckProcessTest(unittest.TestCase):
             result = run_check("process", Path(root))
             self.assertEqual(result.returncode, 0, result.stdout)
 
+    def test_should_accept_an_id_from_a_schema_the_check_does_not_load(self):
+        with process_tree() as root:
+            plant(Path(root), "skills/crq/process/schema/note-v1.schema.json", '{"$id": "urn:rulebook:crq:note:1"}')
+            plant(Path(root), "skills/crq/process/roles/finder.md",
+                  CARD.replace("hand_off: findings", "hand_off: findings (urn:rulebook:crq:note:1)"))
+            result = run_check("process", Path(root))
+            self.assertEqual(result.returncode, 0, result.stdout)
+
     def test_should_fail_each_planted_case(self):
         for case, (name, text, *named) in PLANTED.items():
             with self.subTest(case), process_tree() as root:
@@ -239,6 +299,31 @@ class CheckProcessTest(unittest.TestCase):
                 self.assertTrue(result.stdout.strip(), "a failing check names the problem")
                 for words in named:
                     self.assertIn(words, result.stdout)
+
+
+class ReportSchemaTest(unittest.TestCase):
+    def test_should_take_only_the_three_closed_shapes(self):
+        schema = json.loads((SCHEMA_DIR / "report-v1.schema.json").read_text())
+        for case, (report, words) in REPORTS.items():
+            with self.subTest(case):
+                found = validate(report, schema)
+                if words is None:
+                    self.assertEqual(found, [])
+                else:
+                    self.assertTrue(found, "a bad report fails")
+                    self.assertIn(words, found[0])
+
+    def test_should_have_each_card_cite_its_hand_off_schema(self):
+        roles = SCHEMA_DIR.parent / "roles"
+        cites = {"implementer": "report", "test-first": "report", "cleanup": "report", "finder": "finding"}
+        for role, name in cites.items():
+            with self.subTest(role):
+                hand_off = re.search(r"^hand_off:(.*)$", (roles / f"{role}.md").read_text(), re.M).group(1)
+                self.assertIn(f"(urn:rulebook:crq:{name}:1, process/schema/{name}-v1.schema.json)", hand_off)
+
+    def test_should_declare_the_report_id(self):
+        schema = json.loads((SCHEMA_DIR / "report-v1.schema.json").read_text())
+        self.assertEqual(schema["$id"], "urn:rulebook:crq:report:1")
 
 
 if __name__ == "__main__":
