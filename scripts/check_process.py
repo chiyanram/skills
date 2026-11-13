@@ -6,10 +6,9 @@ when the lanes-v2 file is missing or does not validate against its schema, which
 each lane's lens cap, review model and effort; or when its graph breaks (scripts/lanes_graph.py): a lane names a
 phase outside the phase order or out of it, the order holds a phase twice, a phase has no outcomes, an edge is not a
 string or an object with a string `to`, an optional string `counts` and no other key, points at no phase or end, or
-counts a key with no cap, a cap is not an integer of at least 1, a `when` names no condition or a condition is not
-text or is empty, a lane above tiny has no plain approval
-entry, a lane does not end with a plain timeline-record entry, an actor is not a card role, human or engine, a lens cap
-is below 1, or lane_raise goes to no phase;
+counts a key with no cap, a cap is not an integer of at least 1, a `when` names no condition or a condition is not text
+or is empty, a lane above tiny has no plain approval entry, a lane does not end with a plain timeline-record entry, an
+actor is not a card role, human or engine, a lens cap is below 1, or lane_raise goes to no phase;
 when the review file's baseline is empty, has an entry that is not exactly a skill and a reference, names a reference
 twice, or names one the plugin does not ship;
 when a role card is not one of the known roles, misses a frontmatter field or adds one, cites a rule ID no Rules section

@@ -25,6 +25,11 @@ def is_edge(value: object) -> bool:
             and isinstance(value.get("counts", ""), str))
 
 
+def is_valid_edge(value: object) -> bool:
+    """An outcome's value: a target string or an edge object."""
+    return isinstance(value, str) or is_edge(value)
+
+
 def edges(doc: dict) -> list[tuple[str, str, object]]:
     """Every (phase id, outcome, value) in the phase order."""
     return [(phase["id"], outcome, value) for phase in doc["phases"] for outcome, value in phase["outcomes"].items()]
@@ -42,13 +47,20 @@ def unknown_lane_phases(doc: dict, roles: list[str]) -> list[str]:
             for lane in doc["lanes"] for entry in lane["phases"] if entry_phase(entry) not in ids]
 
 
+def order_fault(lane: str, before: str, after: str) -> str:
+    """Why `after` cannot follow `before` in a lane."""
+    if after == before:
+        return f"lane `{lane}`: phase `{after}` appears twice"
+    return f"lane `{lane}`: phase `{after}` comes after `{before}`, against the phase order"
+
+
 def out_of_order(doc: dict, roles: list[str]) -> list[str]:
     rank = {p: n for n, p in reversed(list(enumerate(phase_ids(doc))))}
     found = []
     for lane in doc["lanes"]:
         names = [entry_phase(entry) for entry in lane["phases"] if entry_phase(entry) in rank]
-        found += [f"lane `{lane['lane']}`: phase `{after}` comes after `{before}`, against the phase order"
-                  for before, after in zip(names, names[1:]) if rank[after] <= rank[before]]
+        found += [order_fault(lane["lane"], before, after) for before, after in zip(names, names[1:])
+                  if rank[after] <= rank[before]]
     return found
 
 
@@ -59,13 +71,13 @@ def no_outcomes(doc: dict, roles: list[str]) -> list[str]:
 def bad_edges(doc: dict, roles: list[str]) -> list[str]:
     return [f"phase `{phase}`, outcome `{outcome}`: must be a string, or an object with a string `to`, an optional "
             f"string `counts` and no other key"
-            for phase, outcome, value in edges(doc) if not isinstance(value, str) and not is_edge(value)]
+            for phase, outcome, value in edges(doc) if not is_valid_edge(value)]
 
 
 def bad_targets(doc: dict, roles: list[str]) -> list[str]:
     allowed = ENDS | set(phase_ids(doc))
     targets = [(phase, outcome, value if isinstance(value, str) else value["to"])
-               for phase, outcome, value in edges(doc) if isinstance(value, str) or is_edge(value)]
+               for phase, outcome, value in edges(doc) if is_valid_edge(value)]
     return [f"phase `{phase}`, outcome `{outcome}`: points at `{target}`, which is not a phase id, next, end, human "
             f"or `human, then same`" for phase, outcome, target in targets if target not in allowed]
 
