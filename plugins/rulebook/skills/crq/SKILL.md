@@ -35,17 +35,18 @@ each phase applies.
 | clarify | coordinator with the human | answers on the ticket; each open question with its decider, options and recommendation | `spec-review` (planning) |
 | spec | coordinator | a draft PR with the intent quoted, acceptance criteria a test can decide, non-goals and edge cases | `acceptance-criteria` (planning) |
 | design | coordinator | the chosen shape and a rejected alternative; slices with their proving commands | `program-design`, `spec-review`, `diagrams` (planning) |
-| design review | a design-reviewer run, then a verify pass | a verdict per decision and findings | `review-process`, `spec-review` (planning) |
-| — | **human** | an explicit approval of the spec and design, at the PR's head, recorded with both hashes | `lanes` |
-| build | for a bug, a test-first run; then one fresh implementer run per PR | the slices as commits | `verify-done`, the `testing` skill and the `code` references the diff touches |
+| design-review | a design-reviewer run, then a verify pass | a verdict per decision and findings | `review-process`, `spec-review` (planning) |
+| approval | **human** | an explicit approval of the spec and design, at the PR's head, recorded with both hashes | `lanes` |
+| test-first | test-first, in the bug lane | one commit with a failing test that proves the bug | `verify-done`, the `testing` skill |
+| build | one fresh implementer run per PR | the slices as commits | `verify-done`, the `testing` skill and the `code` references the diff touches |
 | verify | implementer, then the engine's ready check at the pushed commit | an evidence row per AC | `verify-done`, the `testing` skill |
 | cleanup | cleanup | a behaviour-neutral tidy diff | `deslop` skill |
-| code review | automated review: one finder run per lens, then a verify pass | findings in buckets | `review-process`, `code-review`, `test-integrity` when the diff edits an existing test, and the Review checks of every reference in scope |
+| code-review | automated review: one finder run per lens, then a verify pass | findings in buckets | `review-process`, `code-review`, `test-integrity` when the diff edits an existing test, and the Review checks of every reference in scope |
 | gate | the gate: CI, a queue or a local run | green at the head commit | — |
-| PR | implementer | why, evidence, rollback, where to look | `pr-readiness`, `diagrams` (planning) |
-| — | **human** | merge | — |
-| timeline record | engine, no model | rounds, findings, tokens per phase, rescues | `retro` |
-| full retro (only when a human starts one) | retro run | each lesson as a rule, a script, a review check or nothing | `retro` |
+| pr | implementer | why, evidence, rollback, where to look | `pr-readiness`, `diagrams` (planning) |
+| merge | **human** | merge | — |
+| timeline-record | engine, no model | rounds, findings, tokens per phase, rescues | `retro` |
+| full retro (an extra task, not a phase; only when a human starts one) | retro run | each lesson as a rule, a script, a review check or nothing | `retro` |
 
 ## Process files
 
