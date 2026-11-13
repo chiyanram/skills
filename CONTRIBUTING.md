@@ -23,7 +23,7 @@ To try your working copy in Claude Code: `claude plugin marketplace add ./`, the
 
 | target | what it does |
 |---|---|
-| `make index` | rebuilds the reference table in each skill's `SKILL.md` from its references |
+| `make index` | rebuilds the reference table in each skill's `SKILL.md` from its references, and a skill's phase diagram and lanes table from its `process/lanes-v2.json` |
 | `make lint` | runs every `scripts/check_*.py`, then `claude plugin validate --strict` |
 | `make test` | runs the unit tests in `tests/`; one module: `python3 -m unittest tests.test_fixture_checks` |
 | `make check` | `make lint` and `make test`, as CI runs them |
@@ -139,7 +139,7 @@ When review finds a case a check missed, plant that case first and watch it fail
 | `check_links.py` | a relative markdown link points at nothing |
 | `check_sizes.py` | root `AGENTS.md` reaches 200 lines, a rule is over 35 words, or an `AGENTS.md` chain is over 32 KiB |
 | `check_plugin.py` | a plugin is not under `plugins/`, has no README or icon, or the repo has no LICENSE |
-| `check_index.py` | a plugin README does not link every skill router, or a router's table differs from what `make index` builds |
+| `check_index.py` | a plugin README does not link every skill router, a router's table or a lanes block differs from what `make index` builds, or a skill with `process/lanes-v2.json` has no lanes block, holds one twice or without its END marker after START, has a lanes-v2.json that is not valid, or has a process schema missing or not JSON |
 | `check_routers.py` | a skill folder ships references but has no `SKILL.md`, or its `SKILL.md` does not link each one |
 | `check_provenance.py` | a shipped skill file carries provenance outside code: a source citation, a URL, a preference line, a credit, an evidence note, a date or a reference to another repository's issue. In the toolbox it reads only each `SKILL.md` |
 | `check_ledger.py` | the ledger repeats a rule ID for the same reference without "Supersedes" in the later row, or holds a conflict marker |
