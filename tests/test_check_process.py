@@ -20,9 +20,10 @@ LANES = {"lanes": [{"lane": "tiny", "approval": False, **LANE},
 
 PHASES_V2 = [
     {"id": "intake", "actor": "coordinator", "outcomes": {"done": "next", "asked": "human, then same"}},
-    {"id": "approval", "actor": "human", "outcomes": {"approved": "next", "changes": "intake"}},
-    {"id": "build", "actor": "implementer", "outcomes": {"done": "next"}},
-    {"id": "gate", "actor": "engine", "outcomes": {"green": "next", "red": {"to": "build", "counts": "gate_red"}}},
+    {"id": "approval", "actor": "human", "outcomes": {"approved": "next", "changes": {"to": "intake"}}},
+    {"id": "build", "actor": "implementer", "report": "urn:rulebook:crq:report:1", "outcomes": {"done": "next"}},
+    {"id": "gate", "actor": "engine", "outcomes": {"green": "next", "stuck": "human",
+                                                    "red": {"to": "build", "counts": "gate_red"}}},
     {"id": "timeline-record", "actor": "engine", "outcomes": {"done": "end"}},
 ]
 LANE_V2 = {"lens_cap": 3, "review_model": "standard", "effort": "medium"}
@@ -33,11 +34,13 @@ LANES_V2 = {
     "lane_raise": {"from": "any phase after intake", "to": "intake", "then": "approval again"},
     "skipped_target": "the nearest earlier phase the run took",
     "phases": PHASES_V2,
-    "lanes": [{"lane": "tiny", **LANE_V2, "lens_cap": 1, "phases": ["intake", "build", "gate", "timeline-record"]},
+    "lanes": [{"lane": "tiny", **LANE_V2, "lens_cap": 1, "effort": "low",
+               "phases": ["intake", "build", "gate", "timeline-record"]},
               {"lane": "bug", **LANE_V2, "phases": ["intake", "approval", {"phase": "build", "when": "design-needed"},
                                                     "gate", "timeline-record"]},
-              *({"lane": name, **LANE_V2, "phases": ["intake", "approval", "build", "gate", "timeline-record"]}
-                for name in ("feature", "one-way door"))],
+              {"lane": "feature", **LANE_V2, "phases": ["intake", "approval", "build", "gate", "timeline-record"]},
+              {"lane": "one-way door", "lens_cap": "all", "review_model": "strongest", "effort": "high",
+               "phases": ["intake", "approval", "build", "gate", "timeline-record"]}],
 }
 V2 = "skills/crq/process/lanes-v2.json"
 
