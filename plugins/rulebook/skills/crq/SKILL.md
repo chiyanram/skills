@@ -10,16 +10,21 @@ runs build and review. Scripts check what a model must not judge. The human appr
 
 <!-- lanes-diagram: built by make index from process/lanes-v2.json; do not edit by hand -->
 ```text
-intake ─▶ research ─▶ clarify ─▶ spec ─▶ design ─▶ design-review ─▶ HUMAN approval ─▶ test-first
-   ─▶ build ─▶ verify ─▶ cleanup ─▶ code-review ─▶ gate ─▶ pr ─▶ HUMAN merge ─▶ timeline-record
+intake ─▶ research ─▶ clarify ─▶ spec ─▶ design ─▶ design-review ─▶ design-break ─▶ HUMAN approval
+   ─▶ test-first ─▶ build ─▶ verify ─▶ cleanup ─▶ code-review ─▶ gate ─▶ pr ─▶ HUMAN merge
+   ─▶ timeline-record
 
 design-review  act-on     ─▶ design  cap design_review_rounds = 3
 design-review  round-cap  ─▶ human
+design-break   act-on     ─▶ design  cap break_rounds = 2
+design-break   round-cap  ─▶ human
 approval       changes    ─▶ design
 verify         red        ─▶ build   cap ready = 3
+verify         round-cap  ─▶ human
 code-review    act-on     ─▶ build   cap code_review_rounds = 3
 code-review    round-cap  ─▶ human
 gate           red        ─▶ build   cap gate_red = 2
+gate           round-cap  ─▶ human
 ```
 <!-- /lanes-diagram -->
 
@@ -36,6 +41,7 @@ each phase applies.
 | spec | coordinator | a draft PR with the intent quoted, acceptance criteria a test can decide, non-goals and edge cases | `acceptance-criteria` (planning) |
 | design | coordinator | the chosen shape and a rejected alternative; slices with their proving commands | `program-design`, `spec-review`, `diagrams` (planning) |
 | design-review | a design-reviewer run, then a verify pass | a verdict per decision and findings | `review-process`, `spec-review` (planning) |
+| design-break | a breaker run, then a verify pass | break scenarios, each with one closure | `break-the-design` (planning) |
 | approval | **human** | an explicit approval of the spec and design, at the PR's head, recorded with both hashes | `lanes` |
 | test-first | test-first, in the bug lane | one commit with a failing test that proves the bug | `verify-done`, the `testing` skill |
 | build | one fresh implementer run per PR | the slices as commits | `verify-done`, the `testing` skill and the `code` references the diff touches |
@@ -63,8 +69,9 @@ An engine reads these to run the same process a person runs with `/crq`.
 - Role cards, one per role, each with three eval scenarios in the plugin's `evals/<role>/`:
   [coordinator](process/roles/coordinator.md), [design-reviewer](process/roles/design-reviewer.md),
   [test-first](process/roles/test-first.md), [implementer](process/roles/implementer.md),
-  [cleanup](process/roles/cleanup.md), [finder](process/roles/finder.md), [verify
-  pass](process/roles/verify-pass.md), [retro](process/roles/retro.md). The onboarder's card is the engine's own.
+  [breaker](process/roles/breaker.md), [cleanup](process/roles/cleanup.md), [finder](process/roles/finder.md),
+  [verify pass](process/roles/verify-pass.md), [retro](process/roles/retro.md). The onboarder's card is the engine's
+  own.
 
 ## References
 

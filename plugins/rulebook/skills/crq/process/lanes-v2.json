@@ -1,6 +1,6 @@
 {
   "$schema": "urn:rulebook:crq:lanes:2",
-  "caps": { "design_review_rounds": 3, "code_review_rounds": 3, "ready": 3, "gate_red": 2 },
+  "caps": { "design_review_rounds": 3, "break_rounds": 2, "code_review_rounds": 3, "ready": 3, "gate_red": 2 },
   "conditions": {
     "design-needed": "an internal interface changes, or more than one module changes; the coordinator records yes or no on the ticket"
   },
@@ -13,13 +13,14 @@
     { "id": "spec",            "actor": "coordinator",     "outcomes": { "done": "next", "asked": "human, then same" } },
     { "id": "design",          "actor": "coordinator",     "outcomes": { "done": "next", "asked": "human, then same" } },
     { "id": "design-review",   "actor": "design-reviewer", "outcomes": { "clean": "next", "act-on": { "to": "design", "counts": "design_review_rounds" }, "round-cap": "human" } },
+    { "id": "design-break",    "actor": "breaker",         "outcomes": { "clean": "next", "act-on": { "to": "design", "counts": "break_rounds" }, "round-cap": "human" } },
     { "id": "approval",        "actor": "human",           "outcomes": { "approved": "next", "changes": "design" } },
     { "id": "test-first",      "actor": "test-first",      "report": "urn:rulebook:crq:report:1", "outcomes": { "done": "next", "asked": "human, then same" } },
     { "id": "build",           "actor": "implementer",     "report": "urn:rulebook:crq:report:1", "outcomes": { "done": "next", "asked": "human, then same", "blocked": "human, then same" } },
-    { "id": "verify",          "actor": "engine",          "outcomes": { "green": "next", "red": { "to": "build", "counts": "ready" } } },
+    { "id": "verify",          "actor": "engine",          "outcomes": { "green": "next", "red": { "to": "build", "counts": "ready" }, "round-cap": "human" } },
     { "id": "cleanup",         "actor": "cleanup",         "report": "urn:rulebook:crq:report:1", "outcomes": { "done": "next" } },
     { "id": "code-review",     "actor": "finder",          "outcomes": { "clean": "next", "act-on": { "to": "build", "counts": "code_review_rounds" }, "round-cap": "human" } },
-    { "id": "gate",            "actor": "engine",          "outcomes": { "green": "next", "red": { "to": "build", "counts": "gate_red" } } },
+    { "id": "gate",            "actor": "engine",          "outcomes": { "green": "next", "red": { "to": "build", "counts": "gate_red" }, "round-cap": "human" } },
     { "id": "pr",              "actor": "implementer",     "outcomes": { "done": "next" } },
     { "id": "merge",           "actor": "human",           "outcomes": { "merged": "next", "closed": "next" } },
     { "id": "timeline-record", "actor": "engine",          "outcomes": { "done": "end" } }
@@ -34,7 +35,7 @@
       "phases": ["intake", "research", "clarify", "spec", "design", "design-review", "approval",
                  "build", "verify", "cleanup", "code-review", "gate", "pr", "merge", "timeline-record"] },
     { "lane": "one-way door", "lens_cap": "all", "review_model": "strongest", "effort": "high",
-      "phases": ["intake", "research", "clarify", "spec", "design", "design-review", "approval",
+      "phases": ["intake", "research", "clarify", "spec", "design", "design-review", "design-break", "approval",
                  "build", "verify", "cleanup", "code-review", "gate", "pr", "merge", "timeline-record"] }
   ]
 }

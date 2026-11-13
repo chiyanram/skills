@@ -50,9 +50,9 @@ takes, the lens cap, the review model and the effort. `make index` builds the la
 - The timeline record is written by the engine, with no model. A full retro is an extra task, and it runs only when a
   human starts it (RT1–RT6).
 
-**Role cards.** One markdown file per role: coordinator, design-reviewer, test-first, implementer, cleanup, finder,
-verify pass and retro. The onboarder, which writes a project's brief and glossary, is the engine's card: its job is what
-the engine strips, lists and stages.
+**Role cards.** One markdown file per role: coordinator, design-reviewer, breaker, test-first, implementer, cleanup,
+finder, verify pass and retro. The onboarder, which writes a project's brief and glossary, is the engine's card: its
+job is what the engine strips, lists and stages.
 - **Frontmatter** (the same fields everywhere): role, steps, input, `must_not_see`, hand-off, tools, enforced
   guardrails (IDs from the closed list in the card schema), rules (by id). An engine enforces it. `next` is dropped:
   lanes-v2 holds the flow.
