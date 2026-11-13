@@ -50,6 +50,7 @@ When you reach for a word under "avoid", use the term instead.
 | **severity** | how bad a finding is, set by the finder: blocker, warning or nit; each review check's Severity line gives it, and a style finding is always a nit | Act on, Consider (for a severity) |
 | **bucket** | what happens to a finding, set by the verify pass: Act on (`act_on`), Consider (`consider`), noted or dismissed; the cited rule's severity decides it, blocker → Act on and warning → Consider | severity (for a bucket) |
 | **lens** | one rubric a fresh finder applies | perspective, reviewer type |
+| **break scenario** | one way a design fails: a trigger, its chain of effects, the first sign, the AC-n or decision it hits, and one closure (a failure AC, a mitigation or an accepted risk) | edge case, risk (alone), what-if |
 
 ## Roles
 
@@ -59,6 +60,7 @@ A **role card** is one markdown file per role. The engine enforces its frontmatt
 |---|---|---|
 | **coordinator** | talks with the human: research, questions, spec and design; it never approves and never starts a run | — |
 | **design-reviewer** | gives every decision in a design one verdict (aligned, conflict, open) before approval | — |
+| **breaker** | in the `design-break` phase, after design review, tries to break the design and reports each break scenario with one proposed closure; a verify pass then checks each scenario; the lanes file says which lanes run it | red team, attacker, devil's advocate |
 | **test-first** | in the bug lane, the separate run that writes the failing test before the implementer runs | — |
 | **implementer** | builds the spec and proves each AC | writer |
 | **cleanup** | tidies the branch's own lines without changing behaviour; what would change behaviour goes in `deferred` | — |
