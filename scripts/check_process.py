@@ -1,7 +1,14 @@
-"""The crq process files an engine reads: the lanes file, the review baseline and the role cards (docs/DESIGN.md
+"""The crq process files an engine reads: the lanes files, the review baseline and the role cards (docs/DESIGN.md
 section 4, #237).
 
 Fails when a lanes file misses a lane or a field, or lets a lane above tiny run without approval (the approval floor);
+when the lanes-v2 file is missing or does not validate against its schema, which covers the four lanes in order and
+each lane's lens cap, review model and effort; or when its graph breaks (scripts/lanes_graph.py): a lane names a
+phase outside the phase order or out of it, the order holds a phase twice, a phase has no outcomes, an edge is not a
+string or an object with a string `to`, points at no phase or end, or counts a key with no cap, a cap is not an
+integer of at least 1, a `when` names no condition or a condition is empty, a lane above tiny has no plain approval
+entry, a lane does not end with a plain timeline-record entry, an actor is not a card role, human or engine, a lens cap
+is below 1, or lane_raise goes to no phase;
 when the review file's baseline is empty, has an entry that is not exactly a skill and a reference, names a reference
 twice, or names one the plugin does not ship;
 when a role card is not one of the known roles, misses a frontmatter field or adds one, cites a rule ID no Rules section
@@ -9,17 +16,20 @@ holds, or lacks the job, a "done when" line, numbered steps or an "it's working 
 than three eval scenarios, each a folder with a `prompt.md` and a grader under `graders/`.
 
 The roles, the card fields, the guardrail IDs and the lanes come from the versioned schemas the plugin ships in
-process/schema/ (card, lanes, finding); the check fails when one is missing or uses a keyword schema_lite cannot run.
+process/schema/ (card, lanes, lanes-v2, finding); the check fails when one is missing or uses a keyword schema_lite
+cannot run.
 """
 import json
 import re
 import sys
 from pathlib import Path
 
+import lanes_graph
 from index_table import RULE_ID, rules
 from schema_lite import unknown_keywords, validate
 
-SCHEMAS = {"card": "card-v1.schema.json", "lanes": "lanes-v1.schema.json", "finding": "finding-v1.schema.json"}
+SCHEMAS = {"card": "card-v1.schema.json", "lanes": "lanes-v1.schema.json", "lanes-v2": "lanes-v2.schema.json",
+           "finding": "finding-v1.schema.json"}
 CITED = re.compile(r"\b[A-Z]+\d+[a-z]?\b")
 FIELD = re.compile(r"^([a-z_]+):\s*(.*)$")
 BODY_PARTS = [(re.compile(r"\*\*The job\.\*\*"), "the job"), (re.compile(r"\*\*Done when\*\*"), "a \"done when\" line"),
@@ -78,12 +88,24 @@ def card_problems(card: Path, plugin: Path, ids: set[str], schema: dict) -> list
     return found + scenario_problems(plugin, card.stem)
 
 
-def lanes_problems(path: Path, schema: dict) -> list[str]:
+def load_json(path: Path) -> tuple[object, list[str]]:
+    """The parsed file, or one line saying it is not JSON."""
     try:
-        lanes = json.loads(path.read_text())
+        return json.loads(path.read_text()), []
     except json.JSONDecodeError:
-        return [f"{path}: not JSON"]
-    return [f"{path}: {problem}" for problem in validate(lanes, schema)]
+        return None, [f"{path}: not JSON"]
+
+
+def lanes_problems(path: Path, schema: dict) -> list[str]:
+    lanes, found = load_json(path)
+    return found or [f"{path}: {problem}" for problem in validate(lanes, schema)]
+
+
+def lanes_v2_problems(path: Path, schema: dict, roles: list[str]) -> list[str]:
+    """The not-JSON line, else the schema lines, else the graph lines."""
+    lanes, found = load_json(path)
+    found = found or [f"{path}: {problem}" for problem in validate(lanes, schema)]
+    return found or [f"{path}: {problem}" for problem in lanes_graph.problems(lanes, roles)]
 
 
 def load_schemas(process: Path) -> tuple[dict[str, dict], list[str]]:
@@ -121,24 +143,32 @@ def baseline_problems(path: Path, plugin: Path) -> list[str]:
     return found
 
 
+def required(path: Path, check) -> list[str]:
+    """`check(path)` on a file that is there, else one line naming the folder and the missing file."""
+    return check(path) if path.is_file() else [f"{path.parent}: no {path.name}"]
+
+
+def process_problems(process: Path, plugin: Path, ids: set[str]) -> list[str]:
+    schemas, found = load_schemas(process)
+    if found:
+        return found
+    roles = schemas["card"]["properties"]["role"]["enum"]
+    files = [("lanes.json", lambda path: lanes_problems(path, schemas["lanes"])),
+             ("lanes-v2.json", lambda path: lanes_v2_problems(path, schemas["lanes-v2"], roles)),
+             ("review.json", lambda path: baseline_problems(path, plugin)),
+             ("glossary.md", lambda path: [])]
+    found = [line for name, check in files for line in required(process / name, check)]
+    cards = sorted(process.glob("roles/*.md"))
+    return found + [line for card in cards for line in card_problems(card, plugin, ids, schemas["card"])]
+
+
 def problems(root: Path) -> list[str]:
     entries = json.loads((root / ".claude-plugin/marketplace.json").read_text()).get("plugins", [])
     found = []
-    for entry in entries:
-        plugin = root / entry["source"]
+    for plugin in (root / entry["source"] for entry in entries):
         ids = known_ids(plugin)
-        for process in sorted(plugin.glob("skills/*/process/")):
-            schemas, schema_found = load_schemas(process)
-            found += schema_found
-            if schema_found:
-                continue
-            lanes = process / "lanes.json"
-            found += lanes_problems(lanes, schemas["lanes"]) if lanes.is_file() else [f"{process}: no lanes.json"]
-            review = process / "review.json"
-            found += baseline_problems(review, plugin) if review.is_file() else [f"{process}: no review.json"]
-            if not (process / "glossary.md").is_file():
-                found.append(f"{process}: no glossary.md")
-            found += [p for card in sorted(process.glob("roles/*.md")) for p in card_problems(card, plugin, ids, schemas["card"])]
+        found += [line for process in sorted(plugin.glob("skills/*/process/"))
+                  for line in process_problems(process, plugin, ids)]
     return found
 
 
