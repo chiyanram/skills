@@ -22,6 +22,7 @@ cannot run.
 import json
 import re
 import sys
+from collections.abc import Callable
 from pathlib import Path
 
 import lanes_graph
@@ -143,7 +144,7 @@ def baseline_problems(path: Path, plugin: Path) -> list[str]:
     return found
 
 
-def required(path: Path, check) -> list[str]:
+def required(path: Path, check: Callable[[Path], list[str]]) -> list[str]:
     """`check(path)` on a file that is there, else one line naming the folder and the missing file."""
     return check(path) if path.is_file() else [f"{path.parent}: no {path.name}"]
 

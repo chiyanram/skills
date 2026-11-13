@@ -14,12 +14,12 @@ def phase_ids(doc: dict) -> list[str]:
     return [phase["id"] for phase in doc["phases"]]
 
 
-def entry_phase(entry) -> str:
+def entry_phase(entry: str | dict) -> str:
     """A lane entry is a phase id, or {phase, when}."""
     return entry if isinstance(entry, str) else entry["phase"]
 
 
-def is_edge(value) -> bool:
+def is_edge(value: object) -> bool:
     """An edge object: a string `to` and an optional string `counts`, nothing else."""
     return (isinstance(value, dict) and set(value) <= EDGE_KEYS and isinstance(value.get("to"), str)
             and isinstance(value.get("counts", ""), str))
