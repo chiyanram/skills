@@ -52,22 +52,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      - name: Title follows Conventional Commits
-        env:
-          TITLE: ${{ github.event.pull_request.title }}
-        # One rule (#276): a scope, a lower-case summary and the issue
-        # it works on, as (#N) or (owner/repo#N). Dependabot (scope deps) and the release commit name no issue.
-        run: |
-          pattern='^(feat|fix|perf|revert|docs|style|refactor|test|build|ci|chore)\([a-z0-9-]+\)!?: [^A-Z].*\([^)]*#[0-9]+[^)]*\)'
-          exempt='^[a-z]+\(deps\): |^chore\(release\): '
-          if [[ ! "$TITLE" =~ $pattern && ! "$TITLE" =~ $exempt ]]; then
-            echo "::error::PR title \"$TITLE\" must be 'type(scope): lower-case summary (#issue)', e.g. 'feat(testing): spock rule file (#123)'. See CONTRIBUTING.md#releases."
-            exit 1
-          fi
-
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+
+      # The rule has one home, scripts/pr_title.py: a scope, a lower-case summary and the issue it works on.
+      - name: Title follows Conventional Commits
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: python3 scripts/pr_title.py "$TITLE"
 
       # The squash commit carries the title, the description or the commit messages, depending on the repo's merge
       # setting. A skip-ci marker in any of them would skip the push to main, and with it the release.

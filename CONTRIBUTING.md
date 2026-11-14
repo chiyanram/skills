@@ -35,6 +35,9 @@ and `1` with one line per problem.
 The guards no test kills in one file: `python3 scripts/mutate.py scripts/lanes_render.py "python3 -m unittest
 tests.test_lanes_render"`. It exits `0` when every mutant is killed and `1` with one `survivor:` line per survivor.
 
+One pull request title: `python3 scripts/pr_title.py "feat(testing): spock rule file (#123)"`. It exits `0` when the
+title follows the rule and `1` with the error CI prints.
+
 ## How a change lands
 
 One issue, one branch, one pull request.
@@ -217,7 +220,9 @@ open **Actions → release → Run workflow** on `main`, or run `gh workflow run
 from `ci.yml` first; semantic-release then runs after the checks pass. Pull requests are squash-merged, so **the
 pull request title becomes the commit** that decides the release. CI fails a title that is not `type(scope): lower-case
 summary (#issue)`, such as `feat(testing): spock cleanup rules (#123)`. The issue can be in another repo:
-`(chiyanram/other#320)`. Only Dependabot (scope `deps`) and the release commit name no issue.
+`(chiyanram/other#320)`. Only Dependabot (scope `deps`) and the release commit name no issue. The rule has one home,
+[`scripts/pr_title.py`](scripts/pr_title.py), and CI calls it. Before you open a pull request, run
+`python3 scripts/pr_title.py "<title>"` to check the title as CI will.
 
 The release notes group changes under ⚠️ Breaking changes, ✨ Features, 🐛 Fixes, ⚡ Performance and ⏪ Reverts, one
 bullet per change as `**scope** — summary · #issue (PR #pr)` ([`scripts/release_notes.mjs`](scripts/release_notes.mjs)).
