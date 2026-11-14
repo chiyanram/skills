@@ -1,0 +1,17 @@
+create-tech-design 2595 2 483 1
+create-research 2465 2 525 0
+iterate-tech-design 2385 1 106 1
+create-prd 1938 2 410 0
+iterate-prd 1765 1 103 0
+iterate-research 1675 1 66 0
+create-structure-outline 1433 4 1118 0
+iterate-structure-outline 1059 2 311 0
+create-design-discussion 1045 4 937 0
+create-research-questions 1009 2 199 0
+implement-outline 785 1 49 0
+iterate-design-discussion 736 2 230 0
+implement-plan 731 1 82 0
+describe-pr 700 4 2519 2
+iterate-implementation 621 1 48 0
+iterate-research-questions 600 1 82 0
+show-me 406 0 0 0
