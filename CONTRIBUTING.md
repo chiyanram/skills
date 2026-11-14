@@ -27,6 +27,7 @@ To try your working copy in Claude Code: `claude plugin marketplace add ./`, the
 | `make lint` | runs every `scripts/check_*.py`, then `claude plugin validate --strict` |
 | `make test` | runs the unit tests in `tests/`; one module: `python3 -m unittest tests.test_fixture_checks` |
 | `make check` | `make lint` and `make test`, as CI runs them |
+| `make size` | prints the branch's changed lines and files against `origin/main`, split into code, tests, evals and docs, with PD9's limits (400 lines, 15 files); generated blocks do not count; a report, not a gate |
 
 One check against one folder: `python3 scripts/check_links.py tests/fixtures/links/broken`. It exits `0` when clean
 and `1` with one line per problem.
