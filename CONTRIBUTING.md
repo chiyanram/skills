@@ -38,6 +38,9 @@ tests.test_lanes_render"`. It exits `0` when every mutant is killed and `1` with
 One pull request title: `python3 scripts/pr_title.py "feat(testing): spock rule file (#123)"`. It exits `0` when the
 title follows the rule and `1` with the error CI prints.
 
+A spec's proving commands: `python3 scripts/prove_slices.py <spec.md> [<base>]`. It prints what each
+prints today on the base (default `origin/main`), and flags a value that differs from the spec.
+
 ## How a change lands
 
 One issue, one branch, one pull request.
