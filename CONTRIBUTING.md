@@ -44,6 +44,8 @@ One issue, one branch, one pull request.
 
 A good pull request does one thing and adds a test with every change to a check. Before you open it, check that:
 
+- a change to a released format is a new version file, not an edit, and a new check, role or outside skill starts in
+  the toolbox (the format and manual-first MUSTs in [AGENTS.md](AGENTS.md#musts));
 - every new or changed rule has the operator's yes and a row in `docs/rulebook/approved-rules.md`;
 - a new reference follows `docs/rulebook/reference-format.md` and is listed in `plugins/rulebook/README.md` and the root
   `README.md`;

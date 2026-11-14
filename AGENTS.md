@@ -32,6 +32,14 @@ make test   # python3 -m unittest: each check against its planted fixtures, the 
 - Keep `plugins/` generic: no project names, paths or business terms, because every project installs the same files.
 - Never edit a router table, a `version` or a `CHANGELOG*.md` by hand, because `make index` and the release write them.
 - Read Sonar rules for calibration only. Never copy their text, because their licence does not permit it.
+- Never change a format file (`plugins/*/skills/*/process/schema/*-vN.schema.json`) once a release holds it. A change
+  is a new `-v(N+1)` file beside it, because a tool pins a release and reads that version's format, and an edit in place
+  breaks the tool on its next update. `check_formats.py` fails it.
+- Put a new role, phase or field in a new format version, and say in the pull request what a tool must learn to read
+  it, because a tool on the old version keeps working only if the old file stays, and its owner learns the change there.
+- Start a new check, role or outside skill as a typed-only toolbox skill, and move it into the crq process only after
+  measured use, with a person deciding each step up, because a step nobody has run by hand reaches every project's
+  automatic flow unproven.
 
 ## Where things go
 
