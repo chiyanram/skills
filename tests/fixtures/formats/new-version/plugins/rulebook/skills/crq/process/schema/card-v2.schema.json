@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:rulebook:crq:card:2",
+  "type": "object",
+  "properties": {
+    "role": {"enum": ["coordinator", "finder", "breaker"]}
+  }
+}

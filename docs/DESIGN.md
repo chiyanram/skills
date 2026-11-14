@@ -58,7 +58,9 @@ the engine strips, lists and stages.
   lanes-v2 holds the flow.
 - **Schemas** (#305): this repo owns the format of its cards, lanes and findings. Each is a versioned JSON schema in
   `process/schema/` that ships with the plugin, so an engine reads the version it pins; a new version is a new file
-  beside the old one. `check_process.py` fails when a schema is missing or uses a keyword `schema_lite.py` cannot run.
+  beside the old one, because a tool on the old version keeps working only while its file stays as released.
+  `check_formats.py` fails a schema file that differs from the newest `rulebook--v*` tag, or is gone from it.
+  `check_process.py` fails when a schema is missing or uses a keyword `schema_lite.py` cannot run.
   The schema files, and how each is checked:
   - `card-v1.schema.json`: `check_process.py` checks the frontmatter of every role card against it.
   - `lanes-v1.schema.json`: `check_process.py` checks `process/lanes.json` against it.
