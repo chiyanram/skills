@@ -1,11 +1,11 @@
 ---
-description: A design retries a fine's charge on a timeout with no idempotency key. The breaker should find the double charge, reachable from the retry decision, and propose one closure.
+description: A design retries a fine's charge on a timeout with no idempotency key. The tool should find the double charge, reachable from the retry decision, and propose one closure.
 expected_outcome: A blocker scenario for the double charge, with a trigger, a chain, a first sign and decision 2 as its hit, closed by one closure such as an idempotency key.
 max_turns: 12
 allowed_tools: [Read, Glob, Grep, Skill]
 ---
 
-Try to break this design with crq before I approve it. Report each break scenario.
+/toolbox:break-design Try to break this design before I approve it. Report each break scenario.
 
 The spec's AC-1: "A member returning a book 7 or more days late is charged a fine of 2.00."
 
