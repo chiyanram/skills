@@ -1,7 +1,8 @@
 # Third-party notices
 
 Each toolbox skill below is copied or adapted from another repo. This file is the one place in the plugin that says
-where each came from, at which commit, under which licence, and what we changed. The licence texts follow.
+where each came from, at which commit, under which licence, and what we changed. The licence texts follow. A skill
+written in this repo has no source to name; it is listed under [Written here](#written-here) instead.
 
 ## correct
 
@@ -47,6 +48,10 @@ where each came from, at which commit, under which licence, and what we changed.
 - Licence: MIT, Copyright (c) 2026 Matt Pocock
 - Changes: its method only, rewritten (explore, show a draft, write one block in place in the file that exists). It
   writes the rulebook's block (commands, stack notes, codebase health), not the issue tracker, labels or domain docs.
+
+## Written here
+
+None yet.
 
 ## MIT License
 

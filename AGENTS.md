@@ -37,6 +37,9 @@ make test   # python3 -m unittest: each check against its planted fixtures, the 
 
 - A rulebook skill is `plugins/rulebook/skills/<domain>/SKILL.md`: a short procedure with notes files beside it
   (`testing`), or a router over `references/` until it is rewritten.
+- A toolbox skill is `plugins/toolbox/skills/<name>/SKILL.md`, typed-only. It is either copied, with its source,
+  commit and licence in a `THIRD_PARTY_NOTICES.md` section, or written here and listed under that file's
+  `## Written here`.
 - Each `scripts/check_<name>.py` ships with planted cases in `tests/fixtures/<name>/`.
 
 ## Pointers
