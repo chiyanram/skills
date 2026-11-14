@@ -26,7 +26,7 @@ def git(repo: Path, *args: str) -> str:
 
 
 class PureHelpersTest(unittest.TestCase):
-    """The parser on the raw #363 S2 row: pipes in backticks stay, `\\|` is unescaped, non-commands are reported."""
+    """The parser on a raw fixture row: pipes in backticks stay, `\\|` is unescaped, non-commands are reported."""
 
     def cell(self) -> str:
         [(name, cell)] = slices(S2)
