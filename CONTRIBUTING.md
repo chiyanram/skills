@@ -221,7 +221,8 @@ from `ci.yml` first; semantic-release then runs after the checks pass. Pull requ
 pull request title becomes the commit** that decides the release. CI fails a title that is not `type(scope): lower-case
 summary (#issue)`, such as `feat(testing): spock cleanup rules (#123)`. The issue can be in another repo:
 `(chiyanram/other#320)`. Only Dependabot (scope `deps`) and the release commit name no issue. The rule has one home,
-[`scripts/pr_title.py`](scripts/pr_title.py): CI calls it, and so does the coordinator before `gh pr create`.
+[`scripts/pr_title.py`](scripts/pr_title.py), and CI calls it. Before you open a pull request, run
+`python3 scripts/pr_title.py "<title>"` to check the title as CI will.
 
 The release notes group changes under ⚠️ Breaking changes, ✨ Features, 🐛 Fixes, ⚡ Performance and ⏪ Reverts, one
 bullet per change as `**scope** — summary · #issue (PR #pr)` ([`scripts/release_notes.mjs`](scripts/release_notes.mjs)).
