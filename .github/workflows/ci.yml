@@ -56,7 +56,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      # The rule has one home, scripts/pr_title.py (#380): a scope, a lower-case summary and the issue it works on.
+      # The rule has one home, scripts/pr_title.py: a scope, a lower-case summary and the issue it works on.
       - name: Title follows Conventional Commits
         env:
           TITLE: ${{ github.event.pull_request.title }}
