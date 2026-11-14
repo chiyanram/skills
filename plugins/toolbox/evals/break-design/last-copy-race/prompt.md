@@ -1,11 +1,11 @@
 ---
-description: A design checks that a copy is free and then inserts a reservation, with no lock or constraint. The breaker should find two members reserving the last copy at once.
+description: A design checks that a copy is free and then inserts a reservation, with no lock or constraint. The tool should find two members reserving the last copy at once.
 expected_outcome: A scenario for two reservations of the last copy at the same time, tied to decision 1, cited at the code, with one closure such as a failure AC or a unique constraint.
 max_turns: 12
 allowed_tools: [Read, Glob, Grep, Skill]
 ---
 
-Try to break this design with crq before I approve it. Report each break scenario.
+/toolbox:break-design Try to break this design before I approve it. Report each break scenario.
 
 The spec's AC-1: "A member can reserve a copy of a book when a copy is free."
 The spec's AC-2: "A member is told no copy is free when every copy is reserved."

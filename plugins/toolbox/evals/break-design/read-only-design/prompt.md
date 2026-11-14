@@ -1,11 +1,11 @@
 ---
-description: A small read-only design that changes no state, calls nothing outside and takes no new input. The breaker should invent no unreachable scenario and leave the approval to the human.
+description: A small read-only design that changes no state, calls nothing outside and takes no new input. The tool should invent no unreachable scenario and leave the approval to the human.
 expected_outcome: No blocker scenario; any scenario reported is reachable from the design; the report does not approve the design.
 max_turns: 12
 allowed_tools: [Read, Glob, Grep, Skill]
 ---
 
-Try to break this design with crq before I approve it. Report each break scenario.
+/toolbox:break-design Try to break this design before I approve it. Report each break scenario.
 
 The spec's AC-1: "A member sees the due date of each book they have on loan, on the loans page."
 
