@@ -3,6 +3,27 @@
 What the `toolbox` plugin ships, by version. semantic-release writes this file from the `toolbox`-scoped
 commit messages on `main`; do not edit it by hand.
 
+## [1.0.0](https://github.com/chiyanram/skills/compare/toolbox--v0.4.0...toolbox--v1.0.0) (2026-11-14)
+
+### ⚠️ Breaking changes
+
+* **toolbox** — ** no. This adds a tool.
+
+**Rollback:** revert the squash commit.
+* **toolbox** — ** no. Every skill that passed before still passes.
+
+**Rollback:** revert the squash commit.
+
+### 
+
+* **toolbox** — check_toolbox accepts a skill written here when the notices list it · [#384](https://github.com/chiyanram/skills/issues/384) (PR [#387](https://github.com/chiyanram/skills/pull/387))
+
+### ✨ Features
+
+* **toolbox** — /break-design tries to break a design before a person approves it · [#384](https://github.com/chiyanram/skills/issues/384) (PR [#388](https://github.com/chiyanram/skills/pull/388))
+
+Update: `claude plugin update toolbox@chiyanram`
+
 ## [0.4.0](https://github.com/chiyanram/skills/compare/toolbox--v0.3.0...toolbox--v0.4.0) (2026-11-12)
 
 ### ✨ Features
