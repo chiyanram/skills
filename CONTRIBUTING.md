@@ -53,7 +53,7 @@ A good pull request does one thing and adds a test with every change to a check.
 
 ## Commit messages
 
-One format (#281). It has the commitizen sections:
+One format. It has the commitizen sections:
 
 ```
 type(scope): lower-case summary (#issue)
@@ -150,6 +150,7 @@ When review finds a case a check missed, plant that case first and watch it fail
 | `check_settings_keys.py` | a skill file names a settings key for a memory ceiling, machine size, port or timeout in backticks with a number in the same clause, outside fenced code: the rule names the key and the project's settings hold the value |
 | `check_toolbox.py` | a toolbox `SKILL.md` lacks `disable-model-invocation: true`, a toolbox skill has no section with `Source:`, `Commit:` and `Licence:` in `THIRD_PARTY_NOTICES.md` and is not listed under its `## Written here`, that list names no toolbox skill, or a toolbox file holds a `git push`, a `gh pr merge`, a `.cursor/` path or a Grok model |
 | `check_formats.py` | a `*-v<N>.schema.json` in a skill's `process/schema/` that the newest `rulebook--v*` tag holds differs from that tag or is gone, or the repo has no such tag. A change is a new `-v<N+1>` file beside it |
+| `check_history.py` | a line a change adds outside `plugins/` carries history: who decided, an ISO date beside a person or decision word, or an issue number, in markdown prose or a code comment. It reads the diff since `origin/main` (pass another base as the second argument) and spares ledger rows, ADR and `PRINCIPLES.md` status lines, CHANGELOGs, fixtures, `docs/agents/`, `evals/` and one `See #N` / `History: #N` pointer per section or code header |
 
 ## Add a tool
 
@@ -207,9 +208,9 @@ Run workflow on main   ──▶ release.yml
                              └─ release  semantic-release, only after the checks pass
 ```
 
-Releases are manual during the dev phase (#276). A merge to `main` runs `make lint` and `make test` only. To release,
+Releases are manual during the dev phase. A merge to `main` runs `make lint` and `make test` only. To release,
 open **Actions → release → Run workflow** on `main`, or run `gh workflow run release.yml --ref main`. It runs the checks
-from `ci.yml` first (#285); semantic-release then runs after the checks pass. Pull requests are squash-merged, so **the
+from `ci.yml` first; semantic-release then runs after the checks pass. Pull requests are squash-merged, so **the
 pull request title becomes the commit** that decides the release. CI fails a title that is not `type(scope): lower-case
 summary (#issue)`, such as `feat(testing): spock cleanup rules (#123)`. The issue can be in another repo:
 `(chiyanram/other#320)`. Only Dependabot (scope `deps`) and the release commit name no issue.
@@ -243,11 +244,13 @@ manual release. Preview the next release on `main` with `GITHUB_TOKEN=<token> np
 | `check_index.py`: a table is stale | run `make index` and commit the router it rewrote |
 | `make test` fails in `test_release_config`, `test_release_notes` or `test_release_links` | run `npm ci`; the tests load the release config from `node_modules` |
 | `check_provenance.py` fails on a reference | move the citation, URL or date into the rule's ledger row |
+| `check_history.py` fails a line you added | say what and why; drop who decided, the date and the issue, which the PR and git log keep. One `See #N` line per section may point at the history |
+| `check_history.py`: cannot resolve `origin/main` | run `git fetch origin main` |
 | `check_ledger.py`: a rule ID repeats | a merge kept two edits of one row: keep the right one, or mark the newer row "Supersedes" |
 | `check_sizes.py`: a rule is over 35 words | shorten it; move detail to When X, use Y or Decided edges |
 | `claude plugin marketplace add` fails on clone | the repo is private: run `gh auth setup-git` |
-| a merge to `main` did not release | expected: releases are manual (#276). Open **Actions → release → Run workflow** on `main` |
-| the release fails with `RELEASE_TOKEN is not set` | add a repository secret `RELEASE_TOKEN`: the owner's token with Contents read and write, which the admin bypass of ruleset `main` lets through (#293) |
+| a merge to `main` did not release | expected: releases are manual. Open **Actions → release → Run workflow** on `main` |
+| the release fails with `RELEASE_TOKEN is not set` | add a repository secret `RELEASE_TOKEN`: the owner's token with Contents read and write, which the admin bypass of ruleset `main` lets through |
 
 ## Code of conduct
 
