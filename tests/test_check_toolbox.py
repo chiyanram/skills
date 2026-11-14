@@ -57,6 +57,20 @@ class CheckToolboxTest(unittest.TestCase):
         self.repo.skill("sort", notice=None)
         self.assert_fails("no `## sort` section")
 
+    def test_should_pass_a_skill_written_here_with_no_notice(self):
+        self.repo.skill("tidy")
+        self.repo.skill("sort", notice="## Written here\n\n- `{name}`\n")
+        self.assertEqual(self.check().returncode, 0, self.check().stdout)
+
+    def test_should_fail_an_unlisted_skill_when_another_is_written_here(self):
+        self.repo.skill("tidy", notice="## Written here\n\n- `{name}`\n")
+        self.repo.skill("sort", notice=None)
+        self.assert_fails("no `## sort` section")
+
+    def test_should_fail_a_written_here_name_with_no_skill(self):
+        self.repo.skill("tidy", notice="## Written here\n\n- `{name}`\n- `gone`\n")
+        self.assert_fails("`## Written here` lists `gone`, which is no toolbox skill")
+
     def test_should_fail_a_notice_without_its_commit(self):
         self.repo.skill("tidy", notice="## tidy\n\n- Source: owner/repo\n- Licence: MIT\n")
         self.assert_fails("has no `Commit:` line")
