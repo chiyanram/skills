@@ -29,6 +29,8 @@ make test   # python3 -m unittest: each check against its planted fixtures, the 
   licence go only in `plugins/toolbox/THIRD_PARTY_NOTICES.md`.
 - Make every toolbox skill typed-only (`disable-model-invocation: true`), with no push or merge, because a person
   chooses when a tool runs. `check_toolbox.py` fails it.
+- Keep history out of the repo's own docs and code comments: say what and why, never who decided, when or on which
+  issue, because the ledger, git log and pull requests keep it. `check_history.py` fails an added line.
 - Keep `plugins/` generic: no project names, paths or business terms, because every project installs the same files.
 - Never edit a router table, a `version` or a `CHANGELOG*.md` by hand, because `make index` and the release write them.
 - Read Sonar rules for calibration only. Never copy their text, because their licence does not permit it.
