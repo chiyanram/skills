@@ -3,6 +3,397 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [3.0.0](https://github.com/chiyanram/skills/compare/rulebook--v2.0.0...rulebook--v3.0.0) (2026-11-14)
+
+### ⚠️ Breaking changes
+
+* **crq** — ** no. Nothing reads lanes-v2 at run time yet. The
+enum goes back to the published v1.
+
+**Rollback:** revert the squash commit.
+* **crq** — ** no. The card-v1 role enum widens (additive). A
+lanes-v2 file with a counted edge and no
+`round-cap` now fails `check_process.py`; the shipped file is updated.
+
+**Rollback:** revert the PR's squash commit. Nothing reads lanes-v2 at
+run time yet.
+
+**Notes for review.**
+- `tests/test_check_process.py`: the valid fixture's `gate` phase gains
+`"round-cap": "human"`, because the new rule
+(AC-4b) would otherwise reject the valid fixture. The spec changed this
+behaviour; no assertion was removed.
+- `CONTRIBUTING.md` check table and the `check_process.py` docstring
+name the new graph rule.
+
+### Changed files
+
+```
+CONTRIBUTING.md                                   check table: round-cap rule
+docs/DESIGN.md                                    §4 role list names breaker
+docs/rulebook/approved-rules.md                   BK1–BK4, approved
+plugins/rulebook/evals/breaker/                   3 scenarios, 9 graders
+plugins/rulebook/skills/crq/SKILL.md              Phases row, role list, diagram (generated)
+plugins/rulebook/skills/crq/process/glossary.md   break scenario, breaker
+plugins/rulebook/skills/crq/process/lanes-v2.json design-break, break_rounds, round-cap on verify and gate
+plugins/rulebook/skills/crq/process/roles/breaker.md      new card
+plugins/rulebook/skills/crq/process/roles/verify-pass.md  checks scenarios; closures
+plugins/rulebook/skills/crq/process/schema/card-v1.schema.json  enum + breaker
+plugins/rulebook/skills/crq/references/lanes.md   lanes table (generated)
+plugins/rulebook/skills/planning/SKILL.md         router row (generated)
+plugins/rulebook/skills/planning/references/break-the-design.md  new reference
+scripts/check_process.py, scripts/lanes_graph.py  no_round_cap rule
+tests/test_check_process.py                       planted case
+```
+
+### Where to look first
+
+1. `scripts/lanes_graph.py` `no_round_cap`: the only new code.
+2. `lanes-v2.json`: the design-break phase, and `round-cap` on verify
+and gate.
+3. `breaker.md` and `verify-pass.md`: how a kept scenario closes.
+
+### One-way door readiness
+
+Not a one-way door: every change is a file revert.
+
+### Operator review
+
+- **Rules:** BK1–BK4 are new rules under `plugins/`, approved by the
+operator word for word, with ledger rows.
+- **Gate files:** `scripts/lanes_graph.py` and
+`scripts/check_process.py` run in `make lint` on every PR.
+- **Schema:** `card-v1.schema.json` role enum widened in place with
+`breaker` (additive; operator decision Q9).
+- **Size:** 424 added lines, over the 400-line limit. **The operator
+waived the limit for this PR.**
+
+### Review
+
+- Design review: 1 round (6 findings fixed) plus operator decisions D1
+(round-cap → human on every counted phase) and
+  D2 (how kept scenarios close).
+- Code review round 1: 3 findings fixed in 0306a87 with the operator's
+yes (closure by bucket; round-cap must target
+`human`, proved by mutation; docstring width). A 4th, the approval
+request having no owner, is filed as #374.
+* **crq** — ** no. No reader depends on report-v1 yet. The check
+is stricter: a card or lanes-v2 that cites an
+id no schema declares now fails `make lint`. Nothing in the repo does.
+
+**Roll back:** revert the two commits. No data or state to migrate.
+
+### Changed files
+
+```text
+plugins/rulebook/skills/crq/process/
+├── schema/report-v1.schema.json   new: anyOf done | asked | blocked, each closed
+└── roles/
+    ├── implementer.md             hand_off cites report:1; deviation also in report `deviations`; recommended from 0
+    ├── test-first.md              hand_off cites report:1; recommended from 0
+    ├── cleanup.md                 hand_off cites report:1; deferred line kept
+    └── finder.md                  hand_off cites finding:1; category points at the schema
+scripts/check_process.py           SCHEMAS += report; URN, cited_ids, unknown_id_problems, schema_ids
+tests/test_check_process.py        REPORTS table + ReportSchemaTest; PLANTED unknown-id rows; extra-schema pass test
+```
+
+**Where to look first.** `scripts/check_process.py` `process_problems`:
+the lanes-v2 unknown-id line runs beside the
+lanes-v2 schema and graph check, so a schema or graph stop cannot hide
+it. Then `report-v1.schema.json` `choices`:
+the 2-to-4 cap is `prefixItems` of 4 with `items: false`, because
+`schema_lite` has no `maxItems`.
+
+**Notes.**
+- `deviations[].line` copies finding-v1's `line` definition inline:
+`schema_lite` has no `$ref`.
+- The report schema also types `status` at the top level as an enum, so
+an unknown status prints one plain line
+(`status: 'stuck' is not one of done, asked, blocked`) before the anyOf
+line.
+- `card_problems` takes the declared ids as a fifth argument and checks
+the card's parsed frontmatter.
+- The finder card's step 5 said "one of the `hand_off` list" for the
+category; it now says "one of the finding
+schema's `category` list", since the hand_off no longer spells the list
+out.
+
+### Review
+
+- Design review: 1 round, 8 findings, all fixed before approval.
+- Code review round 1: 3 findings, fixed in 7c08dae with the operator's
+yes: 8 report-schema rows that each catch a
+schema mutation (closed done/asked shapes, required fields, status/shape
+mismatch); cleanup and test-first say their
+  allowed status again; one test that each card cites its schema id.
+- Evals (AC-5, one run per case, the operator judged "no worse"):
+implementer 1/3 → 1/3, test-first 3/3 → 3/3,
+  cleanup 1/3 → 2/3.
+* **crq** — ** no.
+
+**Roll back:** revert the commit. No generated file and no check depends
+on the new text.
+
+## Changed files
+
+```text
+docs/DESIGN.md                                   §2 diagram line, §4 Lanes as data, approval floor, Schemas
+plugins/rulebook/skills/crq/process/glossary.md  intro, lane row, six new rows
+```
+
+## Where to look first
+
+`docs/DESIGN.md` §4 "Lanes as data" and the Schemas bullet: the finding
+schema line says plainly that no check reads a
+finding file.
+
+## Notes
+* **crq** — no. Generated docs and repo scripts only; a skill
+without `process/lanes-v2.json` builds as before.
+
+Rollback: revert this PR; the hand-written blocks come back with it.
+
+## Change
+
+```text
+scripts/
+  A lanes_render.py      diagram(doc), lanes_table(doc), with_block, files(skill): pure render + one reader
+  M build_index.py       build(skill) as before, then build_lanes(skill): index table first, lanes blocks second
+  M check_index.py       router_problems as before + lanes_problems: missing / doubled / stale block
+plugins/rulebook/skills/crq/
+  M SKILL.md             diagram between lanes-diagram markers; Phases table rows named by lanes-v2 ids
+  M references/lanes.md  lanes table between lanes-table markers
+M CONTRIBUTING.md        make index and check_index.py rows
+tests/
+  A test_lanes_render.py 20 tests: pure rows, build then check, each failure path
+```
+
+```text
+lanes_render.files(skill)
+  1. no process/lanes-v2.json        -> nothing to do
+  2. check_process.load_schemas      -> a schema missing / not JSON: its line
+  3. check_process.lanes_v2_problems -> any line: "<path>: not valid; run check_process.py"
+  4. render each *.md holding a START marker; a block missing, doubled or with no END after START is a line
+```
+
+## Operator review needed
+
+- **Gate files:** `scripts/check_index.py` runs in `make lint` on every
+PR; `scripts/build_index.py` is `make index`.
+- **Instruction files:** `crq/SKILL.md` and `crq/references/lanes.md`
+(now generated blocks), and two
+  `CONTRIBUTING.md` rows.
+- **Size:** 424 added lines, over the 400-line limit. Production code is
+187 lines; tests are 206. **The operator waived
+  the limit for this PR (tests only).**
+
+## Where to look
+
+1. `scripts/lanes_render.py` `with_block` and `placement`: the marker
+rules (exactly one START and one END, END after
+   START, one file per block).
+2. `scripts/build_index.py` `__main__`: `build` before `build_lanes`, so
+the two blocks in `SKILL.md` never overwrite
+   each other.
+3. The rendered blocks in `crq/SKILL.md` and `crq/references/lanes.md`:
+the formats the design left open
+   (`cap <name> = <value>`, `—` for a lane with no human gate).
+
+## Evidence (base main, head 09bb374)
+
+| AC | command | result |
+|---|---|---|
+| AC-1 | `make index && git diff --exit-code` | no diff, exit 0 |
+| AC-1 | `test_should_rewrite_a_stale_block_so_the_index_check_passes` |
+`gate_red` 2 → 4, build writes `cap gate_red = 4`, check passes |
+| AC-2 | `sed -n '/lanes-diagram:/,/\/lanes-diagram/p' crq/SKILL.md` |
+16 phase ids in order, `HUMAN approval`, `HUMAN merge`, 7 edge lines
+with caps |
+| AC-3 | `test_should_show_each_lane_in_file_order_with_its_when_cells`,
+`test_should_list_a_condition_once_when_two_lanes_use_it` | OK |
+| AC-4 | hand-edit lanes.md, `python3 scripts/check_index.py .` |
+`.../references/lanes.md: lanes block is stale; run make index`, exit 1
+|
+| AC-5 | missing block, twice in one file, in two files, no END, END
+above START | 5 tests OK; END above START prints one line, no traceback
+|
+| AC-6 | `printf '{' > lanes-v2.json && python3 scripts/build_index.py
+.` | `.../lanes-v2.json: not valid; run check_process.py`, exit 1;
+schema-missing and graph-rule tests OK |
+| AC-7 | `grep -c '^\| test-first \|'` · old-names `grep -cE '^[|]
+(design review…) [|]'` · phase-id check | `1` · `0` · `every phase id
+has a Phases row: 16` |
+| AC-8 | `tests.test_build_index`, `-k without_lanes_v2` | OK |
+| all | `make test` · `make lint` | 78 tests OK · exit 0 |
+
+Revert check: removing the `lanes_problems` call from `check_index`
+fails 9 of the lanes tests. Each round-1 test was
+proved by a mutation that made it fail (write → `pass`, the END guard
+removed, `entry_phase` for `cell`, lanes
+reversed, the condition dedupe removed).
+
+Review: design review 3 rounds (12 findings, all fixed). Code review 2
+rounds: round 1 found 5 test and doc gaps,
+fixed in `09bb374`; round 2 clean.
+
+## Notes
+
+- The implementer split `build` and `router_problems` to keep complexity
+at 5 or less; cleanup restored `main`'s names
+  and put `build_lanes` and `lanes_problems` beside them.
+- `lanes_render` prints one summary line for an invalid lanes-v2;
+`check_process` names each broken rule.
+* **crq** — no. lanes-v2.json sits beside lanes.json; nothing reads
+it yet, and v1 is unchanged.
+
+Rollback: revert this PR; no data or reader depends on lanes-v2 yet.
+
+## Change
+
+```text
+plugins/rulebook/skills/crq/
+  A process/lanes-v2.json                 the approved draft, act_on -> act-on
+  A process/schema/lanes-v2.schema.json   urn:rulebook:crq:lanes:2, closed objects, lanes as prefixItems
+  M SKILL.md                              one "Process files" line
+scripts/
+  A lanes_graph.py                        problems(doc, roles): RULES, 15 pure rules
+  M check_process.py                      SCHEMAS += lanes-v2; load_json; lanes_v2_problems; process_problems
+M CONTRIBUTING.md                         check_process.py row lists the lanes-v2 failures
+tests/
+  M test_check_process.py                 valid lanes-v2 in the temp tree; 46 lanes-v2 planted rows, each with its expected text
+```
+
+```text
+check_process.problems
+  └─ process_problems(process)
+       ├─ load_schemas            missing / unknown keyword -> stop
+       ├─ required(lanes.json, lanes-v2.json, review.json, glossary.md)
+       │    └─ lanes_v2_problems  load_json -> validate(schema) -> lanes_graph.problems(doc, card roles)
+       └─ card_problems
+```
+
+## Operator review needed
+
+- **Gate file:** `scripts/check_process.py` runs in `make lint` on every
+PR. A wrong rule blocks every later PR.
+- **Instruction files:** `plugins/rulebook/skills/crq/SKILL.md` (one
+"Process files" line) and the
+  `CONTRIBUTING.md` check_process row.
+- **Size waiver:** the diff is 450 added lines, over the 400-line limit.
+The operator waived the limit for this PR in
+  code review round 1.
+
+## Where to look
+
+1. `scripts/lanes_graph.py` `out_of_order` and `bad_targets`: the rank
+of a duplicated id, and how a `{to, counts}` edge
+   with extra keys is refused.
+2. `scripts/check_process.py` `process_problems`: the file rule list
+replaces the inline checks in `problems()`; the
+   messages for a missing file stay `"<process>: no <file>"`.
+3. `lanes-v2.schema.json`: `$schema` is declared as a string, not pinned
+to `urn:rulebook:crq:lanes:2`.
+
+## Evidence (base 2fdd2bc, head 84c46c1)
+
+`<planted>` plants each named `PLANTED` case in a temp process tree,
+runs `check_process`, and prints the line that
+holds the row's expected text. Every row below exits 1.
+
+| AC | command | result |
+|---|---|---|
+| AC-1 | `make test && make lint; echo exit=$?` | `Ran 58 tests ... OK`;
+`Validation passed` |
+| AC-1 | `sed 's/"act_on"/"act-on"/g' <draft> \| diff -
+process/lanes-v2.json` | `diff exit=0` |
+| AC-2 | `<planted> v2-lane-unknown-phase v2-lane-out-of-phase-order
+v2-lane-phase-repeated v2-phase-twice` | ``lane `feature`: phase
+`triage` is not in the phase order``; ``lane `tiny`: phase `gate` comes
+after `timeline-record`, against the phase order``; ``lane `tiny`: phase
+`intake` appears twice``; ``phase `build`: appears 2 times in the phase
+order`` |
+| AC-3 | `<planted> v2-no-outcomes v2-edge-number v2-edge-extra-key
+v2-edge-target` | ``phase `build`: has no outcomes``; ``phase `build`,
+outcome `done`: must be a string, or an object with a string `to`, an
+optional string `counts` and no other key``; the same for ``phase
+`gate`, outcome `red` ``; ``phase `approval`, outcome `changes`: points
+at `design`, which is not a phase id, next, end, human or `human, then
+same` `` |
+| AC-4 | `<planted> v2-counts-uncapped v2-cap-zero` | ``phase `gate`,
+outcome `red`: counts `ready`, which has no cap``; ``cap `gate_red`: 0
+is not an integer of at least 1`` |
+| AC-5 | `<planted> v2-when-unknown v2-condition-empty
+v2-condition-number` | ``lane `bug`: phase `build` has when
+`big-change`, which names no condition``; ``condition `design-needed`:
+its text is empty``; ``condition `design-needed`: is not text`` |
+| AC-6 | `<planted> v2-no-approval v2-approval-with-when
+v2-no-timeline-record` | ``lane `one-way door`: no plain `approval`
+entry (the approval floor)``; ``lane `feature`: no plain `approval`
+entry (the approval floor)``; ``lane `feature`: does not end with a
+plain `timeline-record` entry`` |
+| AC-7 | `<planted> v2-lane-out-of-order v2-lens-cap-missing
+v2-review-model-bad v2-effort-bad` | `lanes[1].lane: 'feature' is not
+'bug'`; ``lanes[1]: `lens_cap` is missing``; `lanes[2].review_model:
+'best' is not one of standard, strongest`; `lanes[3].effort: 'max' is
+not one of low, medium, high` |
+| AC-7 | accept side: the valid fixture uses `lens_cap` 1, 3 and
+`"all"`, both `review_model` values, all three `effort` values,
+`report`, a `human` target and an edge with no `counts` | removing any
+one of these from the schema or `ENDS` fails `tests.test_check_process`
+|
+| AC-8 | `git diff --quiet main -- process/lanes.json
+process/schema/lanes-v1.schema.json; python3 scripts/check_process.py .`
+| `v1 diff exit=0`; `check_process exit=0` |
+| AC-9 | `<planted> v2-no-schema v2-schema-unknown-keyword` |
+`lanes-v2.schema.json: missing, or not JSON`;
+``#/properties/lanes/allOf/1: unsupported keyword `maxItems` `` |
+| AC-10 | `grep -n 'lanes-v2.json](process/lanes-v2.json)' SKILL.md;
+python3 scripts/check_links.py .` | one match; `check_links exit=0` |
+| AC-11 | `<planted> v2-missing` | `.../skills/crq/process: no
+lanes-v2.json` |
+| AC-12 | `<planted> v2-actor-unknown` | ``phase `build`: actor
+`builder` is not a card role, human or engine`` |
+| AC-13 | `<planted> v2-lens-cap-zero v2-lane-raise-target` | ``lane
+`bug`: lens_cap 0 is below 1``; ``lane_raise: `to` names `spec`, which
+is not a phase id`` |
+
+Revert check: with `RULES = []` in `lanes_graph.py`,
+`tests.test_check_process` fails on every graph row.
+
+Code review: 3 rounds (RV9 cap). Round 3 found 2 test gaps on the accept
+side; `84c46c1` closes both.
+
+## Notes
+
+- DEVIATION: `problems()` in `scripts/check_process.py` is split into
+`required()` and `process_problems()`, instead of
+growing in place, so each function stays at cyclomatic complexity 5 or
+less.
+- The design's ten rule groups are 15 functions in `RULES`: order is
+`duplicate_phase_ids`, `unknown_lane_phases` and
+`out_of_order`; edges is `no_outcomes`, `bad_edges` and `bad_targets`
+(both use `is_valid_edge`); conditions is
+  `unknown_conditions` and `empty_conditions`.
+- Not in this PR: kebab-case enforcement for outcome keys is noted on
+#364.
+
+### 
+
+* **crq** — describe lanes-v2 as the flow in the design doc and glossary · [#364](https://github.com/chiyanram/skills/issues/364) (PR [#371](https://github.com/chiyanram/skills/pull/371))
+
+### ✨ Features
+
+* **crq** — a breaker run tries to break a one-way-door design before approval · [#367](https://github.com/chiyanram/skills/issues/367) (PR [#375](https://github.com/chiyanram/skills/pull/375))
+* **crq** — lanes-v2 holds the phase graph, outcome edges and caps · [#361](https://github.com/chiyanram/skills/issues/361) (PR [#368](https://github.com/chiyanram/skills/pull/368))
+* **crq** — make index builds the lanes diagram and table from lanes-v2 · [#363](https://github.com/chiyanram/skills/issues/363) (PR [#370](https://github.com/chiyanram/skills/pull/370))
+* **crq** — report-v1 schema, and each card cites the schema of its hand-off · [#362](https://github.com/chiyanram/skills/issues/362) (PR [#372](https://github.com/chiyanram/skills/pull/372))
+
+### 🐛 Fixes
+
+* **crq** — the breaker leaves the automatic process, and card-v1 goes back to the roles the engine runs · [#384](https://github.com/chiyanram/skills/issues/384) (PR [#386](https://github.com/chiyanram/skills/pull/386))
+
+Update: `claude plugin update rulebook@chiyanram`
+
 ## [2.0.0](https://github.com/chiyanram/skills/compare/rulebook--v1.1.2...rulebook--v2.0.0) (2026-11-12)
 
 ### ⚠️ Breaking changes
