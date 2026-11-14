@@ -55,7 +55,7 @@ written in this repo has no source to name; it is listed under [Written here](#w
 
 ## MIT License
 
-Applies to every section above, each with its own copyright line:
+Applies to every copied section above, each with its own copyright line:
 
 - Copyright (c) 2026 Lauren Tan
 - Copyright (c) 2026 Matt Pocock
