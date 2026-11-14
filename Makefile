@@ -1,4 +1,4 @@
-.PHONY: check lint test index help
+.PHONY: check lint test index size help
 
 PYTHON ?= python3
 
@@ -26,6 +26,9 @@ test: ## each check against its planted fixtures, the index builder and the rele
 
 index: ## rebuild each skill router's reference table from its references
 	$(PYTHON) scripts/build_index.py .
+
+size: ## changed lines and files against PD9
+	$(PYTHON) scripts/branch_size.py origin/main
 
 help: ## list the targets
 	@grep -E '^[a-z]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-6s %s\n", $$1, $$2}'
