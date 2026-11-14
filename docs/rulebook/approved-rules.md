@@ -1597,6 +1597,8 @@ Decided by the operator on 2026-11-11, from lessons on another project's CI quar
 
 Approved by the operator on 2026-11-13 (#367), word for word as on the issue. A breaker run in the `design-break` phase tries to break a design before approval; at first the lanes file lists the phase only in the one-way-door lane. A verify pass checks each scenario; a blocker goes back to design, and the human closes each warning at approval by accepting the risk by name or sending it back.
 
+Since #384 (operator decision D2, manual first): the `design-break` phase and the breaker role are gone from the process. A person runs these rules by hand before approving a design; the rows below are unchanged.
+
 | id | reference | rule | reason | source | evidence | status |
 |---|---|---|---|---|---|---|
 | BK1 | planning/references/break-the-design.md | Walk the break catalogue once over each design decision that changes state, calls another system or takes new input, and report each unhandled scenario. | because a design read only for compliance hides how it fails | extends SR20's pre-mortem into a separate read-only run, the `design-break` phase (#367) | OURS: in #361, the conditional-approval hole (an `approval` entry with a `when`, which is silently skipped) was a break scenario that design review found only in round 2 | APPROVED 2026-11-13 (#367) · OPERATOR PREFERENCE · wording approved word for word |

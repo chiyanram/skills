@@ -1,6 +1,6 @@
 {
   "$schema": "urn:rulebook:crq:lanes:2",
-  "caps": { "design_review_rounds": 3, "break_rounds": 2, "code_review_rounds": 3, "ready": 3, "gate_red": 2 },
+  "caps": { "design_review_rounds": 3, "code_review_rounds": 3, "ready": 3, "gate_red": 2 },
   "conditions": {
     "design-needed": "an internal interface changes, or more than one module changes; the coordinator records yes or no on the ticket"
   },
@@ -13,7 +13,6 @@
     { "id": "spec",            "actor": "coordinator",     "outcomes": { "done": "next", "asked": "human, then same" } },
     { "id": "design",          "actor": "coordinator",     "outcomes": { "done": "next", "asked": "human, then same" } },
     { "id": "design-review",   "actor": "design-reviewer", "outcomes": { "clean": "next", "act-on": { "to": "design", "counts": "design_review_rounds" }, "round-cap": "human" } },
-    { "id": "design-break",    "actor": "breaker",         "outcomes": { "clean": "next", "act-on": { "to": "design", "counts": "break_rounds" }, "round-cap": "human" } },
     { "id": "approval",        "actor": "human",           "outcomes": { "approved": "next", "changes": "design" } },
     { "id": "test-first",      "actor": "test-first",      "report": "urn:rulebook:crq:report:1", "outcomes": { "done": "next", "asked": "human, then same" } },
     { "id": "build",           "actor": "implementer",     "report": "urn:rulebook:crq:report:1", "outcomes": { "done": "next", "asked": "human, then same", "blocked": "human, then same" } },
@@ -35,7 +34,7 @@
       "phases": ["intake", "research", "clarify", "spec", "design", "design-review", "approval",
                  "build", "verify", "cleanup", "code-review", "gate", "pr", "merge", "timeline-record"] },
     { "lane": "one-way door", "lens_cap": "all", "review_model": "strongest", "effort": "high",
-      "phases": ["intake", "research", "clarify", "spec", "design", "design-review", "design-break", "approval",
+      "phases": ["intake", "research", "clarify", "spec", "design", "design-review", "approval",
                  "build", "verify", "cleanup", "code-review", "gate", "pr", "merge", "timeline-record"] }
   ]
 }

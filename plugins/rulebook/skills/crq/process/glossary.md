@@ -60,7 +60,6 @@ A **role card** is one markdown file per role. The engine enforces its frontmatt
 |---|---|---|
 | **coordinator** | talks with the human: research, questions, spec and design; it never approves and never starts a run | — |
 | **design-reviewer** | gives every decision in a design one verdict (aligned, conflict, open) before approval | — |
-| **breaker** | in the `design-break` phase, after design review, tries to break the design and reports each break scenario with one proposed closure; a verify pass then checks each scenario; the lanes file says which lanes run it | red team, attacker, devil's advocate |
 | **test-first** | in the bug lane, the separate run that writes the failing test before the implementer runs | — |
 | **implementer** | builds the spec and proves each AC | writer |
 | **cleanup** | tidies the branch's own lines without changing behaviour; what would change behaviour goes in `deferred` | — |

@@ -9,7 +9,7 @@
   "properties": {
     "role": {
       "enum": ["coordinator", "design-reviewer", "test-first", "implementer", "cleanup", "finder", "verify-pass",
-               "retro", "onboarder", "breaker"]
+               "retro", "onboarder"]
     },
     "steps": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
     "input": {"type": "string", "minLength": 1},
