@@ -32,6 +32,9 @@ To try your working copy in Claude Code: `claude plugin marketplace add ./`, the
 One check against one folder: `python3 scripts/check_links.py tests/fixtures/links/broken`. It exits `0` when clean
 and `1` with one line per problem.
 
+The guards no test kills in one file: `python3 scripts/mutate.py scripts/lanes_render.py "python3 -m unittest
+tests.test_lanes_render"`. It exits `0` when every mutant is killed and `1` with one `survivor:` line per survivor.
+
 ## How a change lands
 
 One issue, one branch, one pull request.
