@@ -12,7 +12,8 @@ follows the rules; this asks what input, timing or outage breaks it.
 ## Before you start
 
 Load the rulebook's `planning` skill and read its `break-the-design` reference in full: rules BK1–BK4, the break
-catalogue and the closures. If the rulebook is not installed, stop and say this tool needs it.
+catalogue and the closures. If the rulebook is not installed, or its `planning` skill has no `break-the-design`
+reference, stop and say this tool needs a rulebook that ships it. Never break a design from rules you recall.
 
 Ask for the spec and the design if the person did not give them. Read the code at the default branch.
 
