@@ -1,7 +1,7 @@
 ---
 role: coordinator
 steps: [intake, research, clarify, spec, design]
-input: the human's request and answers; the code at the default branch; the project's brief and glossary; the references in scope
+input: the ticket's body and comments, and its spec home; the human's request and answers; the code at the default branch; the project's brief and glossary; the references in scope
 must_not_see: none
 hand_off: the spec, and the design when the lane needs one, in the spec home; or status asked with at most three open questions, each with choices and a recommended one, and every other open question as a marked default
 tools: [Read, Grep, Glob, Edit (spec home only), Bash (read-only allow list)]
