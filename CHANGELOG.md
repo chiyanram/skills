@@ -3,6 +3,18 @@
 What the `rulebook` plugin ships, by version. semantic-release writes this file from the commit messages on
 `main`; do not edit it by hand. Design work under `research/` and `review/` ships nothing and is not listed.
 
+## [3.1.0](https://github.com/chiyanram/skills/compare/rulebook--v3.0.0...rulebook--v3.1.0) (2026-11-15)
+
+### ✨ Features
+
+* **crq** — cleanup runs only when a person types it · [#400](https://github.com/chiyanram/skills/issues/400) (PR [#403](https://github.com/chiyanram/skills/pull/403))
+* **playwright** — a rulebook skill for writing, running and fixing playwright specs · [#376](https://github.com/chiyanram/skills/issues/376) (PR [#402](https://github.com/chiyanram/skills/pull/402))
+* **scripts** — measure a branch against PD9 with make size · [#379](https://github.com/chiyanram/skills/issues/379) (PR [#394](https://github.com/chiyanram/skills/pull/394))
+* **scripts** — mutate schema keywords and if guards · [#377](https://github.com/chiyanram/skills/issues/377) (PR [#397](https://github.com/chiyanram/skills/pull/397))
+* **scripts** — run each slice proof on the base · [#378](https://github.com/chiyanram/skills/issues/378) (PR [#396](https://github.com/chiyanram/skills/pull/396))
+
+Update: `claude plugin update rulebook@chiyanram`
+
 ## [3.0.0](https://github.com/chiyanram/skills/compare/rulebook--v2.0.0...rulebook--v3.0.0) (2026-11-14)
 
 ### ⚠️ Breaking changes
