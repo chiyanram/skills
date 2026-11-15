@@ -47,10 +47,27 @@ One issue, one branch, one pull request.
 
 1. Open or claim an issue. Use a template: *Bug*, *Feature*, *Task*, *Research* or *Grilling*. Labels:
    [triage labels](docs/agents/triage-labels.md).
-2. Branch from `main`, such as `feat/123-spock-cleanup`.
+2. Branch from the latest `main`, such as `feat/123-spock-cleanup`, in its own worktree, never in the main checkout:
+
+   ```bash
+   git fetch origin main
+   git worktree add .claude/worktrees/123-spock-cleanup -b feat/123-spock-cleanup origin/main
+   ```
+
 3. Make the change. Run `make index`, `make lint` and `make test`.
-4. Open a pull request against `main`. Its title and description become the commit on `main`; see
-   [Commit messages](#commit-messages). CI must be green before merge.
+4. Open a pull request against `main`, from [the template](.github/pull_request_template.md), with every line filled
+   in. Its title and description become the commit on `main`; see [Commit messages](#commit-messages). CI must be
+   green before merge.
+5. To take in a newer `main`, rebase onto it and push with a lease. Never merge `main` into the branch, and never
+   force-push without the lease:
+
+   ```bash
+   git fetch origin main
+   git rebase origin/main
+   git push --force-with-lease
+   ```
+
+6. Once it is merged, remove the worktree: `git worktree remove .claude/worktrees/123-spock-cleanup`.
 
 A good pull request does one thing and adds a test with every change to a check. Before you open it, check that:
 

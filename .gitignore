@@ -3,3 +3,5 @@
 __pycache__/
 *.pyc
 node_modules/
+# git worktrees of this repo, one per branch
+.claude/worktrees/
