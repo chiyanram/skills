@@ -5,7 +5,7 @@ file. Project-specific values (commands, paths, module names) stay in each proje
 
 Each domain is one skill: `testing`, `playwright`, `code`, `agent`, `migrations`, `obs`, `planning` and `meta`. A skill is moving to
 one short procedure in `SKILL.md`, with a file beside it only for what some runs need, such as one stack's traps
-(`testing` is the first). From a project's `AGENTS.md`, point at a skill or its file by name, never by path, because
+(`testing` and `code` so far). From a project's `AGENTS.md`, point at a skill or its file by name, never by path, because
 the plugin's install folder differs per machine and per version:
 
 ```text
@@ -27,7 +27,7 @@ The repo is private. See the [root README](../../README.md#quick-start) for cred
 
 ## Two shapes, for now
 
-`testing` is a short procedure: `SKILL.md` holds the steps and the rules, each with its reason, and Good / Bad pairs
+`testing` and `code` are short procedures: `SKILL.md` holds the steps and the rules, each with its reason, and Good / Bad pairs
 only where a model's default is wrong. The other skills still have a router `SKILL.md` and references with five
 sections (Rules, When X use Y, Good / Bad, Decided edges, Review checks), described in
 [reference-format.md](../../docs/rulebook/reference-format.md), until each is rewritten.
@@ -42,7 +42,7 @@ list from the references, and `make lint` fails when it is stale.
 | [crq](skills/crq/SKILL.md) | take a change from request to merge, or run one phase: lanes, spec, design, build, review, pull request, retro |
 | [testing](skills/testing/SKILL.md) | choose, write or review a test: where it goes, which cases, junk tests, mutation testing; Spock, ITs and model calls in its notes |
 | [playwright](skills/playwright/SKILL.md) | write, run, fix or review a Playwright end-to-end or smoke spec: locators, waits, sign-in, fixtures, config, CI, traces, flakes |
-| [code](skills/code/SKILL.md) | write or review production code: Java, Spring, types, errors, services, API design, security, concurrency, persistence, scheduled jobs, Redis, Angular |
+| [code](skills/code/SKILL.md) | write, change or review production code: where logic goes, types, errors, names, comments; Java, Spring, JPA, Angular, concurrency, jobs, Redis, HTTP APIs and security in its notes |
 | [agent](skills/agent/SKILL.md) | write or review code that calls a model or runs an agent: adapter, tool loop, context, guards, GenAI spans, evals, budgets |
 | [deslop](skills/deslop/SKILL.md) | clean up an implemented branch's diff, behaviour-neutral, before review |
 | [migrations](skills/migrations/SKILL.md) | write or review a database migration |

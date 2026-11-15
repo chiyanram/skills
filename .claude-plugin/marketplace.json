@@ -7,7 +7,7 @@
       "name": "rulebook",
       "source": "./plugins/rulebook",
       "version": "3.1.0",
-      "description": "Generic skills, references with neutral-domain examples, and the /crq workflow."
+      "description": "Generic procedures, with Java, Spring, Spock and Angular stack notes, and the /crq workflow."
     },
     {
       "name": "toolbox",

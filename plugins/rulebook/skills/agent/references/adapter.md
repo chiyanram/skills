@@ -34,12 +34,12 @@ Contents: Rules · When X, use Y · Good / Bad (AE2, AE5, AEN2, AE10) · Decided
 
 | situation | use | why |
 |---|---|---|
-| the provider returns a stop or finish reason | the closed `StopReason` set, mapped in the adapter; an unknown value maps to error | an unmapped refusal or truncation reads as success (AE1) · the switch form: TY2 (`code`'s `types`) |
+| the provider returns a stop or finish reason | the closed `StopReason` set, mapped in the adapter; an unknown value maps to error | an unmapped refusal or truncation reads as success (AE1) · the switch form: `code`'s Types rules |
 | a reply holds tool calls | run them only when the stop reason is tool call | truncated arguments parse as a valid partial object (AE2) |
-| a tool call's arguments arrive | a JSON library over the complete arguments, then the tool's schema | an empty-argument fallback runs the tool wrongly (AE6) · the check before a sink: SE10 (`code`'s `security`) |
-| a call fails | one normalised error from the adapter, and one retry policy above it | retries inside adapters multiply attempts (AE3) · one layer retries: CC12 (`code`'s `concurrency`) |
+| a tool call's arguments arrive | a JSON library over the complete arguments, then the tool's schema | an empty-argument fallback runs the tool wrongly (AE6) · the check before a sink: `code`'s `security` notes, Outside input |
+| a call fails | one normalised error from the adapter, and one retry policy above it | retries inside adapters multiply attempts (AE3) · one layer retries: `code`'s `concurrency` notes, Retries |
 | a streamed call fails | a retry only while no chunk has reached a consumer; after that, a typed failure | a retry replays text the user already saw (AE5) |
-| the provider answers with a 429 or an explicit retry-after | back-pressure: the retry policy and the rate limiter, not the breaker | throttling otherwise trips a healthy breaker (AEN2) · the breaker itself: CC11 |
+| the provider answers with a 429 or an explicit retry-after | back-pressure: the retry policy and the rate limiter, not the breaker | throttling otherwise trips a healthy breaker (AEN2) · the breaker itself: `code`'s `concurrency` notes, Retries |
 | the provider answers with an overload and no retry-after | the retry policy first; a breaker failure only once it gives up | one overload burst that a retry would ride out does not open the breaker (AEN2) |
 | a stream sends an error event, a keep-alive or an event type you do not know | the error ends the request as failed; the other two are skipped | providers fail mid-stream after a 200, and add event types (AE8) |
 | the provider reports token usage | one usage record, from the final cumulative value | providers split and repeat the counts differently (AE7) · its live test: the `testing` skill's model-calls notes |
@@ -161,7 +161,7 @@ carries the model that served it, so cost is priced on that model.
   a raw provider field, such as a stop-reason string or a usage map. — **Confidence** medium
 - **Skip when** a stream is still buffered inside the adapter and no chunk has gone to a user, a socket or a store: a
   retry is allowed (AE5). — **Do not skip when** any chunk was forwarded. — **Confidence** high
-- **Skip when** a 429 says a quota or spend cap is used up and carries no retry-after: do not retry it (CC16), and
+- **Skip when** a 429 says a quota or spend cap is used up and carries no retry-after: do not retry it (`code`'s `concurrency` notes, Retries), and
   stop the run with a typed reason; it is not a breaker failure (AEN2). — **Do not skip when** the response asks the
   caller to wait. — **Confidence** medium
 - **Skip when** the output-token cap is a default in agent configuration that a model entry can override: that is

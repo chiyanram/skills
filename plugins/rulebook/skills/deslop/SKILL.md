@@ -48,22 +48,22 @@ the report line is posted.
 
 | category | look for | owner |
 |---|---|---|
-| comment slop | a comment that restates the code, a banner, a divider | CM1, CM2, CM3 (`../code/references/comments.md`) |
-| defensive checks | a null check, `try`/`catch` or guard for a state the types or the callers exclude | DS8 · TY1 (`../code/references/types.md`) |
-| swallowed failure | a `catch` that continues quietly or returns an empty result | ER3 (`../code/references/errors.md`); always a report, never a fix |
+| comment slop | a comment that restates the code, a banner, a divider | `code` [Comments](../code/SKILL.md#comments) |
+| defensive checks | a null check, `try`/`catch` or guard for a state the types or the callers exclude | DS8 · `code` [Types](../code/SKILL.md#types) |
+| swallowed failure | a `catch` that continues quietly or returns an empty result | `code` [Errors](../code/SKILL.md#errors); always a report, never a fix |
 | fake fallback | on an error or missing config, production code that returns a mock, stub, fake or sample data instead of failing | DS8; remove it and fail with the real error |
-| type laundering | a cast through `Object` or a raw type, a new `@SuppressWarnings`, untrusted JSON held as `Map<String, Object>` past the adapter, a string where an enum exists | TY10, TY6 (`../code/references/types.md`) · CM7 (`../code/references/comments.md`) · SE5 (`../code/references/security.md`) |
-| one-use indirection | a helper, wrapper or variable that adds no domain meaning | DS4 (`../code/references/smells.md`); keep anything that carries a domain name |
-| fallbacks and shims | a retry, default, alias or second code path with no named contract and no removal plan | DS5 · DS7 · CC8 (`../code/references/concurrency.md`) |
+| type laundering | a cast through `Object` or a raw type, a new `@SuppressWarnings`, untrusted JSON held as `Map<String, Object>` past the adapter, a string where an enum exists | `code` [Types](../code/SKILL.md#types) and [Comments](../code/SKILL.md#comments) · [security.md](../code/security.md), Outside input |
+| one-use indirection | a helper, wrapper or variable that adds no domain meaning | `code` [Where logic goes](../code/SKILL.md#where-logic-goes); keep anything that carries a domain name |
+| fallbacks and shims | a retry, default, alias or second code path with no named contract and no removal plan | DS5 · DS7 · [concurrency.md](../code/concurrency.md), Retries |
 | dead code | an unused member, a vestigial parameter, a commented-out block | DS7 |
 | deep nesting | three or more levels, a nested ternary | DS9 |
-| style drift | naming, control flow, imports or formatting that fight the file around them | the `code` reference for the file's language |
+| style drift | naming, control flow, imports or formatting that fight the file around them | the `code` skill's [stack.md](../code/stack.md) |
 | test shape | labelled blocks and feature names that fight the spec around them | the `testing` skill's Spock notes |
 
 ### Fix or report
 
 - **Fix inline** only a trivial, provably behaviour-neutral cleanup: a deleted comment, an inlined one-use variable, a
-  `final` on a field the branch added (TY4), an import.
+  `final` on a field the branch added (`code` Types), an import.
 - **Report, never fix**, anything that touches control flow, error handling, a fallback, a cast that changes dispatch,
   or a type that crosses a module boundary. Review and the author decide those (DS13).
 - When you cannot tell which side an edit falls on, report it.
@@ -109,7 +109,7 @@ boundary.
   then contract (ParallelChange): remove the old path only after every consumer has migrated (DS5). — **Do not skip
   when** every caller is in the repo. — **Confidence** high
 - **Skip when** the value crosses a trust boundary, such as request input or a third-party response: validate it there
-  (ER6, `../code/references/errors.md`). — **Do not skip when** the guarded value comes from an injected field or an
+  (`code` [Errors](../code/SKILL.md#errors)). — **Do not skip when** the guarded value comes from an injected field or an
   in-repo caller (DS8). — **Confidence** high
 
 ## Review checks
