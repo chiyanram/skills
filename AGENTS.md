@@ -42,6 +42,14 @@ make test   # python3 -m unittest: each check against its planted fixtures, the 
 - Start a new check, role or outside skill as a typed-only toolbox skill, and move it into the crq process only after
   measured use, with a person deciding each step up, because a step nobody has run by hand reaches every project's
   automatic flow unproven.
+- Make each branch in its own worktree from the latest `origin/main`, never in the main checkout:
+  `git fetch origin main && git worktree add .claude/worktrees/<slug> -b <type>/<issue>-<slug> origin/main`, because
+  agents and people working at once then never share a working tree. Bring the branch up to date with
+  `git rebase origin/main`, never a merge, and push it with `git push --force-with-lease`, because the lease refuses
+  to overwrite a push you have not fetched. Never force-push without a lease, onto another person's branch, or onto
+  `main`.
+- Fill in every line of `.github/pull_request_template.md` and leave no `<placeholder>`, because the squash merge
+  makes the PR title the commit subject and the description its body on `main`, where neither can be edited.
 
 ## Where things go
 
