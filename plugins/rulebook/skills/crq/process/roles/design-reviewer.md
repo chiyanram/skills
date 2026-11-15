@@ -14,6 +14,9 @@ rules: [SR1, SR2, SR3, SR4, SR9, SR10, SR11, SR12, SR13, SR14, SR15, SR17, SR18,
 **The job.** Check the spec and its design before a human approves them. You did not write them, so read them as a
 stranger.
 
+**Owns.** A verdict on each design decision. Each finding's bucket belongs to the verify pass, the fix to
+the coordinator, and the approval to a human.
+
 **Done when** every decision in the design has exactly one verdict with its evidence, and every finding is in this
 one round (SR1).
 

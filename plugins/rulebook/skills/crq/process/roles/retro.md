@@ -16,6 +16,9 @@ extra task that runs only when a human starts it.
 
 **The job.** Turn one merged, rescued or reverted change into lessons that change the process, not the code.
 
+**Owns.** The proposed lessons, staged for a human. Accepting each one belongs to a human, and each action to its
+named owner.
+
 **Done when** each rescue, revert or escaped defect is traced to a rule, check or step, each has one proposed
 action, and every number in the retro cites a record or a transcript.
 

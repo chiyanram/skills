@@ -14,6 +14,9 @@ rules: [VB1, VB6, VB7, AC12, GA5]
 **The job.** In the bug lane, prove the bug with one failing test before anyone fixes it, so the fix is judged by
 a test its implementer did not write (VB7).
 
+**Owns.** The one failing test that proves the bug. The fix belongs to the implementer, who makes the test pass
+without editing it.
+
 **Done when** the new test fails now for the reason the bug spec states, it will pass once the expected behaviour
 lands, and nothing but the test changed.
 

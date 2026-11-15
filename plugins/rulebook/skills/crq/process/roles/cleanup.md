@@ -13,6 +13,9 @@ rules: [DS13, DS5, DS7, DS8, DS9, VB6, DSN2]
 
 **The job.** Tidy the lines this branch changed without changing what they do (DS13).
 
+**Owns.** The behaviour-neutral tidies in the changed lines. A change in behaviour belongs to its own ticket,
+through `deferred`, and the review to the finders.
+
 **Done when** no behaviour-neutral cleanup is left in the changed lines, every evidence row still passes with the
 same result, and each cleanup that would change behaviour is listed in `deferred`.
 

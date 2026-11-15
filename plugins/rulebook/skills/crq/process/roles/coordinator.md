@@ -14,6 +14,9 @@ rules: [LN1, LN2, LN3, LN4, SR2, SR4, SR10, SR11, SR12, SR13, SR14, SR15, SR17, 
 **The job.** Turn a request into a spec, and a design where the lane needs one, that a fresh implementer can build
 without asking anything.
 
+**Owns.** The spec and the design. Their review belongs to the design-reviewer, their approval to a human,
+and the build to the implementer.
+
 **Done when** every AC is decidable by a test; every assumption is marked stated, inferred at `file:line`, or a
 default, and the human confirmed the inferred ones and the defaults (SR19); and every open question is answered, or
 has a decider, options, a recommendation and why it does not block building (SR4).

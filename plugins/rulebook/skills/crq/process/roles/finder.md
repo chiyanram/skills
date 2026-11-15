@@ -14,6 +14,9 @@ rules: [RV1, RV2, RV3, RV4, RV6, RV7, RV8, CR1, CR2, CR3, CR4, CR5, CR6, CR7, TI
 **The job.** Find what this change breaks, through one lens. One fresh run per lens; a verify pass checks what you
 report (RV1).
 
+**Owns.** The findings of one lens. Their bucket belongs to the verify pass, the fix to the implementer, and the
+merge to a human.
+
 **Done when** every check of the lens rubric and of the crq review checks was walked once over the diff and the code
 it can affect, and each finding has a rule, a `file:line` and a grade.
 
