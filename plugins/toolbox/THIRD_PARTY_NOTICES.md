@@ -49,6 +49,22 @@ written in this repo has no source to name; it is listed under [Written here](#w
 - Changes: its method only, rewritten (explore, show a draft, write one block in place in the file that exists). It
   writes the rulebook's block (commands, stack notes, codebase health), not the issue tracker, labels or domain docs.
 
+## create-verification-skill
+
+- Source: cursor/plugins, `pstack/skills/create-verification-skill/` (`SKILL.md` and `references/feature-map-example/`) (pstack)
+- Commit: bf0c7cd80abdbf7fe47b634978a7d1b4071f71a7
+- Licence: MIT, Copyright (c) 2026 Lauren Tan
+- Changes: the generated skill goes in `.claude/skills/verify-<app>/`, not the Cursor folder; it names the maintenance tool
+  as `/toolbox:maintain-verification-skill`. The feature-map example is copied as written.
+
+## maintain-verification-skill
+
+- Source: cursor/plugins, `pstack/skills/maintain-verification-skill/SKILL.md` (pstack)
+- Commit: bf0c7cd80abdbf7fe47b634978a7d1b4071f71a7
+- Licence: MIT, Copyright (c) 2026 Lauren Tan
+- Changes: a "changed" pass ends in one commit made with the operator's yes, and the operator pushes it and opens the
+  PR, where the source ships a PR itself; `.claude/skills/verify-*/` paths, not the Cursor folder.
+
 ## Written here
 
 - `break-design`
