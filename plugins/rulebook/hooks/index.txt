@@ -1,0 +1,6 @@
+Rulebook skills (rulebook plugin). Load the skill before you start, even when the task does not name it.
+- `code`: before you write, change or review production code, a small fix or a refactor included.
+- `testing`: before you write, change or review a test, and with each code change that needs a test.
+- `playwright`: before you write, run or fix a browser end-to-end test, or its CI job.
+- `agent`: before you write or review code that calls a language model or runs an agent.
+Then read the notes file that the skill names for your task.

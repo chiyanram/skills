@@ -36,6 +36,23 @@ For other agent tools:
 npx skills add chiyanram/skills
 ```
 
+Then paste this block into your project's `AGENTS.md`, so the agent loads the skills on a task that does not name
+them:
+
+<!-- agents-index: built by `make index` from plugins/rulebook/hooks/index.txt; do not edit by hand -->
+```text
+Rulebook skills (rulebook plugin). Load the skill before you start, even when the task does not name it.
+- `code`: before you write, change or review production code, a small fix or a refactor included.
+- `testing`: before you write, change or review a test, and with each code change that needs a test.
+- `playwright`: before you write, run or fix a browser end-to-end test, or its CI job.
+- `agent`: before you write or review code that calls a language model or runs an agent.
+Then read the notes file that the skill names for your task.
+```
+<!-- /agents-index -->
+
+If the agent skips the skills, set `RULEBOOK_INDEX=1` in the `env` of `.claude/settings.json`. The plugin then prints
+the same block at the start of each session.
+
 Update with `claude plugin marketplace update chiyanram`. To put the plugin in a worker container, add it to the
 managed settings:
 
