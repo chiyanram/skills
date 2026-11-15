@@ -1,3 +1,4 @@
+import os
 import subprocess
 import sys
 import unittest
@@ -59,6 +60,36 @@ class PrBodyTest(unittest.TestCase):
             "the placeholder <the approved spec; with no spec, the issue> is still there: replace it",
             "line 9 is not ticked: answer it, then tick it: - [ ] Tests: tests/fixtures/provenance/ gains a planted case",
         ])
+
+    def test_passes_a_breaking_change_that_carries_all_three_marks(self):
+        body = (FILLED.replace("Breaking change: no", "Breaking change: yes, the strategy reference moved")
+                .replace("Closes #42", "BREAKING CHANGE: read testing/strategy.md, not references/strategy.md\nCloses #42"))
+        self.assertEqual(pr_body.problems(body, TEMPLATE, "feat(testing)!: move the strategy reference (#42)"), [])
+
+    def test_fails_a_breaking_change_whose_line_footer_and_title_disagree(self):
+        yes = FILLED.replace("Breaking change: no", "Breaking change: Yes, the reference moved")
+        self.assertEqual(pr_body.problems(yes, TEMPLATE, "feat(testing): move the strategy reference (#42)"), [
+            'the "Breaking change:" line says yes: add a "BREAKING CHANGE: " footer, what breaks and what to do',
+            'the "Breaking change:" line says yes: add "!" after the title\'s scope',
+        ])
+        footer = FILLED.replace("Closes #42", "BREAKING CHANGE: the reference moved\nCloses #42")
+        self.assertEqual(pr_body.problems(footer, TEMPLATE, "feat(testing)!: move the strategy reference (#42)"), [
+            'there is a "BREAKING CHANGE:" footer: the "Breaking change:" line must say yes',
+            'the title has "!" after its scope: the "Breaking change:" line must say yes',
+        ])
+
+    def test_checks_the_titles_mark_only_when_a_title_is_given(self):
+        body = (FILLED.replace("Breaking change: no", "Breaking change: yes, the reference moved")
+                .replace("Closes #42", "BREAKING CHANGE: the reference moved\nCloses #42"))
+        self.assertEqual(pr_body.problems(body, TEMPLATE), [])
+
+    def test_reads_the_title_from_pr_title(self):
+        body = FILLED.replace("Breaking change: no", "Breaking change: yes, the reference moved").replace(
+            "Closes #42", "BREAKING CHANGE: the reference moved\nCloses #42")
+        result = subprocess.run([sys.executable, str(SCRIPT)], input=body, capture_output=True, text=True,
+                                env={**os.environ, "PR_TITLE": "feat(testing): move the strategy reference (#42)"})
+        self.assertEqual(result.returncode, 1)
+        self.assertIn('add "!" after the title\'s scope', result.stdout)
 
     def test_allows_angle_brackets_the_template_does_not_hold(self):
         self.assertEqual(pr_body.problems(FILLED + "\n\n<details>list<str></details>", TEMPLATE), [])

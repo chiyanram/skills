@@ -47,10 +47,12 @@ make test   # python3 -m unittest: each check against its planted fixtures, the 
   agents and people working at once then never share a working tree. Bring the branch up to date with
   `git rebase origin/main`, never a merge, and push it with `git push --force-with-lease`, because the lease refuses
   to overwrite a push you have not fetched. Never force-push without a lease, onto another person's branch, or onto
-  `main`.
+  `main`. A cloud session's own fresh clone, on the branch the session was given, counts as its worktree, because git
+  cannot check that branch out a second time.
 - Fill in every line of `.github/pull_request_template.md` and leave no `<placeholder>`, because the squash merge
   makes the PR title the commit subject and the description its body on `main`, where neither can be edited.
-  `pr_body.py` fails a ready PR with a missing line, a placeholder or an unticked item.
+  `pr_body.py` fails a ready PR with a missing line, a placeholder, an unticked item, or a breaking change whose
+  line, `!` and `BREAKING CHANGE:` footer disagree.
 
 ## Where things go
 
