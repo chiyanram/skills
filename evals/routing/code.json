@@ -43,7 +43,7 @@
     },
     {
       "prompt": "Add a Playwright smoke spec for the Angular checkout page",
-      "owner": "testing"
+      "owner": "playwright"
     }
   ]
 }

@@ -1,6 +1,6 @@
 ---
 name: testing
-description: Use when you write, change or review a test, or choose where a test goes - unit tests and Spock specs, integration tests, Playwright smoke specs, property-based and mutation tests, and tests of code that calls a language model.
+description: Use when you write, change or review a test, or choose where a test goes - unit tests and Spock specs, integration tests, property-based and mutation tests, and tests of code that calls a language model.
 ---
 
 # Testing
@@ -108,5 +108,6 @@ would catch a bug, which coverage cannot.
 
 Read the one that matches the code:
 
-- Spock, Spring Boot integration tests, Playwright: [stack.md](stack.md).
+- Spock and Spring Boot integration tests: [stack.md](stack.md).
+- A Playwright end-to-end or smoke spec: the `playwright` skill.
 - Code that calls a language model: [model-calls.md](model-calls.md).

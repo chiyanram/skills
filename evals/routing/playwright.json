@@ -1,0 +1,49 @@
+{
+  "skill": "playwright",
+  "should": [
+    "Write a Playwright smoke spec for the checkout page",
+    "This Playwright test is flaky in CI, fix it",
+    "Add a sign-in setup project with storageState for the browser tests",
+    "Set up playwright.config.ts with webServer for the app",
+    "Read the Playwright trace and tell me why the spec failed",
+    "Write a Playwright page object for the loans screen",
+    "Add visual snapshots to the dashboard end-to-end spec",
+    "Fix the locator strictness error in this browser spec",
+    "Seed the test data for the end-to-end spec through the API",
+    "Add the Playwright job and its report to CI"
+  ],
+  "near_miss": [
+    {
+      "prompt": "Write a Spock spec for this class",
+      "owner": "testing"
+    },
+    {
+      "prompt": "Which tier should this test be?",
+      "owner": "testing"
+    },
+    {
+      "prompt": "Run mutation tests on this module",
+      "owner": "testing"
+    },
+    {
+      "prompt": "Add an integration test for the repository",
+      "owner": "testing"
+    },
+    {
+      "prompt": "Write the acceptance criteria for the checkout spec",
+      "owner": "planning"
+    },
+    {
+      "prompt": "Add a log call when the checkout page fails to load",
+      "owner": "obs"
+    },
+    {
+      "prompt": "Write the Angular component for the loans screen",
+      "owner": "code"
+    },
+    {
+      "prompt": "Which lane and phases does this change take to merge?",
+      "owner": "crq"
+    }
+  ]
+}
