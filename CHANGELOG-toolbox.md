@@ -3,6 +3,14 @@
 What the `toolbox` plugin ships, by version. semantic-release writes this file from the `toolbox`-scoped
 commit messages on `main`; do not edit it by hand.
 
+## [1.1.0](https://github.com/chiyanram/skills/compare/toolbox--v1.0.0...toolbox--v1.1.0) (2026-11-15)
+
+### ✨ Features
+
+* **toolbox** — /weigh-source weighs a shared article against the project's design and the field · [#392](https://github.com/chiyanram/skills/issues/392) (PR [#398](https://github.com/chiyanram/skills/pull/398))
+
+Update: `claude plugin update toolbox@chiyanram`
+
 ## [1.0.0](https://github.com/chiyanram/skills/compare/toolbox--v0.4.0...toolbox--v1.0.0) (2026-11-14)
 
 ### ⚠️ Breaking changes
