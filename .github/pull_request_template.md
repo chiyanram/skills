@@ -1,6 +1,6 @@
 Why: <the reason for this change, in one sentence>. Spec: #<the approved spec; with no spec, the issue>
 
-Breaking change: <no; or yes, and what a project or tool must change>
+Breaking change: <no; or yes, and what a project or tool must change. A yes also takes "!" after the title's scope and a "BREAKING CHANGE:" footer above the Closes line>
 Rollback: <revert this PR; no released format changes. Or how to switch it off>
 Where to look: <one to three places where a mistake would cost most>
 
