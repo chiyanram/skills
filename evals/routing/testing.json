@@ -22,7 +22,7 @@
     },
     {
       "prompt": "Clean up the dead code in this diff before review",
-      "owner": "deslop"
+      "owner": "code"
     },
     {
       "prompt": "Add a migration for the test results table",

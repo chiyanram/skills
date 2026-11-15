@@ -34,8 +34,8 @@
       "owner": "obs"
     },
     {
-      "prompt": "Clean up the diff before review",
-      "owner": "deslop"
+      "prompt": "Remove the restating comments and dead code from this diff",
+      "owner": "code"
     },
     {
       "prompt": "Write a reference for the rulebook with rule lines",

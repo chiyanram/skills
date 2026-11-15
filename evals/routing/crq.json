@@ -27,7 +27,7 @@
     },
     {
       "prompt": "Clean up the diff before review: dead code and restating comments",
-      "owner": "deslop"
+      "owner": "code"
     },
     {
       "prompt": "Add a migration that renames the column",

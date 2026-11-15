@@ -31,7 +31,7 @@
     },
     {
       "prompt": "Clean up the restating comments in this diff before review",
-      "owner": "deslop"
+      "owner": "code"
     },
     {
       "prompt": "Which lane is this change in and which phases run until merge?",
