@@ -50,6 +50,7 @@ make test   # python3 -m unittest: each check against its planted fixtures, the 
   `main`.
 - Fill in every line of `.github/pull_request_template.md` and leave no `<placeholder>`, because the squash merge
   makes the PR title the commit subject and the description its body on `main`, where neither can be edited.
+  `pr_body.py` fails a ready PR with a missing line, a placeholder or an unticked item.
 
 ## Where things go
 
