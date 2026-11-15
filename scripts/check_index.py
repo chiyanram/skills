@@ -1,10 +1,12 @@
 """Each plugin README links every skill router, and each router's index block is what `make index` builds from its
 references, so a reference is never missing from its router and two PRs never merge rows by hand. A skill that ships
-process/lanes-v2.json holds its phase diagram and lanes table once each, as `make index` builds them."""
+process/lanes-v2.json holds its phase diagram and lanes table once each, as `make index` builds them. A plugin that
+ships hooks/index.txt has the same text in the root README's AGENTS.md block."""
 import json
 import sys
 from pathlib import Path
 
+from agents_index import README, built
 from check_links import LINK, prose_lines
 from index_table import table, unreadable, with_table
 from lanes_render import files
@@ -34,6 +36,16 @@ def lanes_problems(skill: Path) -> list[str]:
                     if text != path.read_text()]
 
 
+def agents_index_problems(root: Path, folder: Path) -> list[str]:
+    found = built(root, folder)
+    if found is None:
+        return []
+    current, updated = found
+    if updated is None:
+        return [f"{root / README}: no AGENTS.md block for {folder.name}'s hooks/index.txt; add the `make index` markers"]
+    return [] if updated == current else [f"{root / README}: AGENTS.md block is stale; run `make index`"]
+
+
 def plugin_problems(root: Path, entry: dict) -> list[str]:
     folder = root / entry["source"]
     readme = folder / "README.md"
@@ -43,7 +55,8 @@ def plugin_problems(root: Path, entry: dict) -> list[str]:
     unlinked = [f"{readme}: skill router `{router.relative_to(folder)}` is not linked"
                 for router in sorted(folder.glob("skills/*/SKILL.md")) if router.resolve() not in listed]
     skills = sorted(folder.glob("skills/*/"))
-    return unlinked + [p for skill in skills for p in router_problems(skill) + lanes_problems(skill)]
+    return (unlinked + [p for skill in skills for p in router_problems(skill) + lanes_problems(skill)]
+            + agents_index_problems(root, folder))
 
 
 def problems(root: Path) -> list[str]:

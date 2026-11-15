@@ -51,6 +51,19 @@ class BuildIndexTest(unittest.TestCase):
         self.assertEqual((self.root / ROUTER).read_text(),
                          (FIXTURES / "index" / "no-read-it" / ROUTER).read_text())
 
+    def test_should_copy_the_plugin_index_into_the_readme_so_the_index_check_passes(self):
+        result = self.build("agents-stale")
+
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertEqual(run_check("index", self.root).returncode, 0)
+        self.assertEqual((self.root / "README.md").read_text(), (FIXTURES / "index" / "good" / "README.md").read_text())
+
+    def test_should_name_the_readme_when_it_has_no_block_for_the_plugin_index(self):
+        result = self.build("agents-no-block")
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("README.md: no AGENTS.md block", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

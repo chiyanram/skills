@@ -1,0 +1,15 @@
+{
+  "description": "Prints the rulebook skill index at session start, only when RULEBOOK_INDEX=1.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ \"$RULEBOOK_INDEX\" = 1 ]; then cat \"${CLAUDE_PLUGIN_ROOT}/hooks/index.txt\"; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
