@@ -10,8 +10,8 @@ counts a key with no cap, a phase with a counted edge has no `round-cap` outcome
 cap is not an integer of at least 1, a `when` names no condition or a condition is not text or is empty, a lane above
 tiny has no plain approval entry, a lane does not end with a plain timeline-record entry, an actor is not a card role,
 human or engine, a lens cap is below 1, or lane_raise goes to no phase;
-when the review file's baseline is empty, has an entry that is not exactly a skill and a reference, names a reference
-twice, or names one the plugin does not ship;
+when the review file's baseline is empty, has an entry that is not exactly a skill, or a skill and a reference, names
+an entry twice, or names one the plugin does not ship (a skill alone means its SKILL.md);
 when a role card is not one of the known roles, misses a frontmatter field or adds one, cites a rule ID no Rules section
 holds, or lacks the job, a "done when" line, numbered steps or an "it's working if" list; or when a role has fewer
 than three eval scenarios, each a folder with a `prompt.md` and a grader under `graders/`; or when a card's
@@ -153,14 +153,17 @@ def baseline_problems(path: Path, plugin: Path) -> list[str]:
     found = []
     seen = set()
     for entry in baseline:
-        if not isinstance(entry, dict) or set(entry) != {"skill", "reference"}:
-            found.append(f"{path}: baseline entry {json.dumps(entry)} is not exactly {{skill, reference}}")
+        if not isinstance(entry, dict) or set(entry) not in ({"skill"}, {"skill", "reference"}):
+            found.append(f"{path}: baseline entry {json.dumps(entry)} is not exactly {{skill}} or {{skill, reference}}")
             continue
-        name = f"{entry['skill']}/{entry['reference']}"
+        skill = plugin / "skills" / str(entry["skill"])
+        # A skill with no references is read whole: the entry names only the skill, and the engine reads its SKILL.md.
+        name, file = ((f"{entry['skill']}/{entry['reference']}", skill / "references" / f"{entry['reference']}.md")
+                      if "reference" in entry else (str(entry["skill"]), skill / "SKILL.md"))
         if name in seen:
             found.append(f"{path}: baseline names `{name}` twice")
         seen.add(name)
-        if not (plugin / "skills" / str(entry["skill"]) / "references" / f"{entry['reference']}.md").is_file():
+        if not file.is_file():
             found.append(f"{path}: baseline names `{name}`, which the plugin does not ship")
     return found
 

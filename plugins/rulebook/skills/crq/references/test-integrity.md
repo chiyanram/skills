@@ -40,7 +40,7 @@ When one ran at the head and its result is in the PR, leave these to it:
 | deletes a test or a test file | VB6 (`verify-done`) |
 | adds a skip marker | VB6 (`verify-done`); a person's quarantine entry is VB11 (`verify-done`) |
 | removes an assertion line from a test that stays | VB6 (`verify-done`) |
-| adds a suppression with no reason, or an empty `catch` | CR4 (config); CM7 (`code/comments`); ER3 (`code/errors`) |
+| adds a suppression with no reason, or an empty `catch` | CR4 (config); the `code` skill's Comments and Errors rules |
 | edits a judge file: a build file, a file the verify command runs, test config | CR3 (`code-review`) |
 
 Leave to the gate a failure it already reports: a red test, a lint or type error. A generated snapshot is the
@@ -90,7 +90,7 @@ the message is generated, an `argThat` on the promised part only, the loan numbe
 - **Skip TI5 when** the snapshot or golden file is new: it is a new test (`testing` skill, Junk tests). — **Do not skip when** an existing
   file changes, even in one line. — **Confidence** high
 - **Skip the floor-guard moves when** a floor guard ran at the head and its result is in the PR. — **Do not
-  skip when** no floor guard ran: report them under VB6, CR3, CR4, CM7 or ER3. — **Confidence** high
+  skip when** no floor guard ran: report them under VB6, CR3, CR4, or the `code` skill's Comments or Errors rules. — **Confidence** high
 
 ## Review checks
 

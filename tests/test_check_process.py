@@ -57,7 +57,7 @@ def lanes_v2(change) -> str:
     return json.dumps(doc)
 
 
-REVIEW = {"baseline": [{"skill": "crq", "reference": "demo"}]}
+REVIEW = {"baseline": [{"skill": "crq", "reference": "demo"}, {"skill": "crq"}]}
 
 # Written to a temp dir, never committed: a planted card under plugins/ would be found by the other checks.
 # Each planted case: (a path under the plugin root, its new text or None to delete it, and optionally a substring
@@ -98,6 +98,8 @@ PLANTED = {
     "baseline-unshipped": ("skills/crq/process/review.json",
                            json.dumps({"baseline": [{"skill": "crq", "reference": "missing"}]})),
     "baseline-twice": ("skills/crq/process/review.json", json.dumps({"baseline": REVIEW["baseline"] * 2})),
+    "baseline-skill-unshipped": ("skills/crq/process/review.json",
+                                 json.dumps({"baseline": [{"skill": "missing"}]}), "baseline names `missing`"),
     "baseline-extra-field": ("skills/crq/process/review.json",
                              json.dumps({"baseline": [{"skill": "crq", "reference": "demo", "why": "x"}]})),
     # lanes-v2: (path, new text, a substring the failure must print).
@@ -234,6 +236,7 @@ REPORTS = {
 def process_tree() -> tempfile.TemporaryDirectory:
     tmp = tempfile.TemporaryDirectory()
     texts = {
+        "skills/crq/SKILL.md": "---\nname: crq\ndescription: Use when you demo.\n---\n\n# Crq\n",
         "skills/crq/references/demo.md": REFERENCE,
         "skills/crq/process/glossary.md": "# Glossary\n",
         "skills/crq/process/lanes.json": json.dumps(LANES),

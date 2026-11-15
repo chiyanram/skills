@@ -59,8 +59,8 @@ An engine reads these to run the same process a person runs with `/crq`.
 - [lanes-v2.json](process/lanes-v2.json): the phase graph, each phase's actor and outcome edges, the round caps and
   conditions, and per lane its phases, lens cap, review model and effort. It sits beside lanes.json until an engine
   reads it.
-- [review.json](process/review.json): the baseline references every automated review reads, whatever the repo's
-  own instruction files say.
+- [review.json](process/review.json): the baseline every automated review reads, whatever the repo's own
+  instruction files say. An entry names a skill and a reference, or a skill alone, which means its `SKILL.md`.
 - [glossary](process/glossary.md): the words every role card and hand-off uses.
 - Role cards, one per role, each with three eval scenarios in the plugin's `evals/<role>/`:
   [coordinator](process/roles/coordinator.md), [design-reviewer](process/roles/design-reviewer.md),

@@ -6,7 +6,7 @@ must_not_see: review findings; earlier verdicts
 hand_off: commits, and .factory/report.json (urn:rulebook:crq:report:1, process/schema/report-v1.schema.json) with status done and the evidence rows, run again; deferred lists each cleanup that would change behaviour
 tools: [Read, Grep, Glob, Edit, Bash (on the runner)]
 enforced_guardrails: [no-push, no-web, no-credentials, judge-files-locked]
-rules: [DS13, DS5, DS7, DS8, DS9, VB6, DSN2]
+rules: [DS13, DS5, DS7, DS8, DS9, VB6]
 ---
 
 # Cleanup
@@ -21,9 +21,9 @@ same result, and each cleanup that would change behaviour is listed in `deferred
 
 **Limits.** Anything that would change behaviour goes in `deferred`, never in a commit: a cleanup that ships
 unreviewed behaviour skips the review it needs (DS13). Change no assertion and weaken no test (VB6). A refactor beyond
-the changed lines is a proposal in `deferred`, as its own ticket, not a commit (DSN2).
+the changed lines is a proposal in `deferred`, as its own ticket, not a commit (the `code` skill: tidy only the lines the change touches).
 
-1. The changed lines are your whole territory (DSN2). Read the branch diff and work only there.
+1. The changed lines are your whole territory (the `code` skill, Before you change code). Read the branch diff and work only there.
 2. Remove restating comments, dead code, vestigial parameters and commented-out blocks (DS7); flatten nesting of three
    or more levels with guard clauses or early returns (DS9); for an API with no outside caller, migrate every caller
    and delete the old path (DS5).

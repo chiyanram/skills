@@ -1,32 +1,135 @@
 ---
 name: code
-description: Use when you write or review production code: Java, Spring beans and configuration, types, errors, interfaces, services, HTTP API design, JPA entities and repositories, scheduled and batch jobs, Redis, comments, concurrency, messaging, security, code smells, and Angular UI. Lists each code reference and when to read it.
+description: Use when you write or review production code - where logic goes, services and controllers, types, errors, names, smells and comments - and its notes on Java, Spring beans and configuration, JPA entities and repositories, Angular, concurrency, messaging and scheduled jobs, Redis, HTTP API design and security. Lists each code notes file and when to read it.
 ---
 
 # Code
 
-Read only the references the task needs. Each one holds Rules, When X use Y, Good / Bad, Decided edges and Review
-checks, so a writer reads it top to bottom and a reviewer starts at Review checks. Where a reference cannot hold every
-approved Good/Bad pair, `references/examples/<name>.md` holds them all.
+Code earns its place when the next change is easy and a test can reach every decision. Everything below serves that.
 
-<!-- index: built by `make index` from each reference; do not edit by hand -->
-| reference | rule IDs | read it |
-|---|---|---|
-| [angular-ui](references/angular-ui.md) | NGA1–NGA3, NGA5–NGA7, NGB1–NGB4, NGC1, NGC3, NGD1–NGD3 | when you write or review an Angular component, a `.ts` or template file in an Angular app, or its `tsconfig` |
-| [api-design](references/api-design.md) | AP1–AP7 | when you write or review a list endpoint, a page response, a change to a published request or response type, a client of another service, or a request mapping's path |
-| [comments](references/comments.md) | CM1–CM5, CM7, CMN1 | when you write or review a comment, a Javadoc block or a suppression, in any file type |
-| [concurrency](references/concurrency.md) | CC1–CC20 | when you write or review code that starts threads, submits async work, calls a remote service, retries, locks, builds a pool or a cache, or handles a request or message that creates work |
-| [design](references/design.md) | SEAM1, DSN1–DSN2 | when you write or review a method that chooses an outcome, a method that does I/O, or a method with many branches |
-| [errors](references/errors.md) | ER1–ER8, ER10–ER11, ERN1–ERN2 | when you write or review a `throw`, a `catch`, an exception handler, an error response or request validation |
-| [java](references/java.md) | U4, JV1–JV9, JVN1, CV3 | when you write or review Java production code |
-| [messaging](references/messaging.md) | MS4, MS6–MS12, MSN1–MSN2 | when you write or review a message consumer, a stream producer, a scheduled job, or an operation that can run twice |
-| [modern-java](references/modern-java.md) | MJ1–MJ6, MJ8–MJ10, MJ12–MJ17 | when you write or review Java production code, a record, a `switch`, or a Maven or Gradle build file |
-| [persistence](references/persistence.md) | PS1–PS15 | when you write or review a JPA entity, a repository or query method, a service method that reads entities, or the JPA, Hibernate or Hikari settings |
-| [redis](references/redis.md) | RD1–RD6 | when you write or review code that reads or writes Redis, a Redis cache, a Redis connection setup, or a key name |
-| [scheduling](references/scheduling.md) | SJ1–SJ7 | when you write or review a `@Scheduled` method, a CronJob, a lock on a job, a job that changes many rows, or a job that deletes data |
-| [security](references/security.md) | SE1–SE7, SE7a, SE8, SE10, SEN1–SEN2, SS1–SS11, SS16–SS17, SS19–SS26 | when you write or review code that takes outside input, stores or checks a secret, or touches the security filter chain, a guard, a token or a security test |
-| [services](references/services.md) | LY1–LY3, LYN1 | when you write or review a controller, a service, an interface or a use case that makes two calls |
-| [smells](references/smells.md) | DS1–DS4, DS6, DS11–DS12, DS14, SM1, FW1–FW3, FW5–FW6, FW8, NM1–NM4 | when you write or review production code in any language: the smell baseline, and the shape and naming rules behind it |
-| [spring](references/spring.md) | LY6–LY7, SC1–SC11, SC13–SC17, SC19–SC23, SCN1, X6, SX14, SX18–SX19 | when you write or review a bean, a configuration class, a settings record, a startup hook or a proxied method |
-| [types](references/types.md) | TY1–TY13, TYN1 | when you write or review a field, a parameter, a return type, a record, an enum, a sealed type or a generic type |
-<!-- /index -->
+## Before you change code
+
+1. Read the code around the change and the project's own rules. A project rule wins. Where it and a rule here
+   disagree, fix the disagreement in the same change.
+2. Look for a change that deletes a branch, mode or layer instead of adding one. A moved branch is two copies of one
+   rule, and copies diverge.
+3. Add nothing for a case no current caller has: no parameter, config key, hook or pattern, because every later change
+   must carry unused generality.
+4. Tidy only the lines the change touches. Propose a wider tidy as its own ticket, because a tidy outside the change
+   mixes two reviews into one.
+
+## Where logic goes
+
+- Make each decision a function with no I/O, and keep I/O in a thin method that chooses no outcome, because a test
+  cannot reach a decision tangled with I/O without the I/O.
+- A controller binds, delegates and shapes the response. A branch that chooses an outcome goes in a service, because
+  a test cannot reach it without the web framework. An exhaustive `switch` over an outcome the service returned is
+  shaping.
+- Put operations that must succeed or fail together, such as a change and its audit row, in one use-case method in one
+  transaction, because two calls left to the caller let one commit without the other.
+- Return a response type from a controller, never a persistence entity, because an entity leaks every field it owns
+  and ties the API to the schema.
+- Add an interface only where two implementations exist now (a test fake counts) or at a module boundary. Remove a
+  pass-through method, a single-caller wrapper or a one-implementation adapter. Each adds a layer to trace and hides
+  nothing.
+- When callers read two or more fields of a record to decide something, move that logic onto the record.
+- Keep each method under the project's complexity gate, or cyclomatic 10 if none is set. A method with more than 7
+  parameters, or a change that takes a file past 1000 lines, is a finding unless a structural reason is stated.
+
+**Bad**: an interface with one implementation and no fake.
+```java
+public interface LateFeeCalculator { Money feeFor(Loan loan, LocalDate returnedOn); }
+
+@Service
+public class LateFeeCalculatorImpl implements LateFeeCalculator { ... }
+```
+**Good**: the concrete class. Tests call it with real loans. An interface stays for a boundary such as
+`MemberNotifier`, which has a production adapter and a test fake.
+
+## Types
+
+- Model a closed set (states, roles, modes, outcomes) as a sealed type or enum, never string or int constants. Switch
+  over it with every case listed and no `default`, because a `default` lets a new case compile and be mishandled.
+- Make a forbidden field combination unbuildable with sealed variants. Check in the constructor only what the variants
+  cannot exclude.
+- Add a case as a sealed variant, an enum case or a table row, never a one-off `if` or a second boolean, because two
+  flags that must agree drift apart. A boolean parameter that picks the operation becomes two named methods.
+- Return absence as `Optional` and an empty collection as empty, never `null`. Parse external data (request bodies,
+  rows, config) into domain types in the adapter, so no `null` reaches logic.
+- Strengthen a type only where partiality shows: a cast, a null check, a "never happens" throw. Wrap a primitive in a
+  small record when two same-typed parameters could swap or the value carries an invariant.
+- Hold money as a decimal or a `long` of minor units, never `float` or `double`, because 0.10 has no exact binary form
+  and totals drift.
+- Persist an enum by name, never by ordinal, because a reordered enum remaps every stored row.
+- Declare a field `final` unless it is reassigned after construction, because a mutable field makes the object unsafe
+  to share across threads.
+- Build a simple value with its constructor or a static factory. Add a builder only for a type with many optional
+  parts, because a builder is a second construction API to keep in step.
+
+## Errors
+
+- Return a foreseeable non-success (not found, already exists, over limit) as a case of a sealed, domain-named return
+  type. Throw only faults, because a thrown expected case is not in the signature and callers skip it. Use no
+  `Either`: its left side does not say what failed.
+- Throw a fault as an unchecked exception with a code from the one error catalogue. Return 4xx for a client error and
+  500 for a fault, never 2xx with an error. Put only the catalogue message in the body and the detail in the log,
+  because an exception message, stack trace or SQL in a response shows an attacker the schema.
+- Map exceptions to error responses in one global handler, such as one `@RestControllerAdvice`, and declare no
+  exception handler in a controller, because a local handler runs first and skips the shared, sanitised error shape.
+- Validate request input once, at the boundary, and trust the types inside, because a second check drifts from the
+  first.
+- Handle, rethrow or log every `catch`, and keep the cause on a rethrow. Catch the narrowest type. Catch a broad type
+  only at a must-not-fail boundary, with a comment. A best-effort call (a metric, an audit) logs at WARN with the
+  exception and continues.
+- When you catch `InterruptedException`, rethrow it or call `Thread.currentThread().interrupt()`, because a lost
+  interrupt leaves the thread impossible to cancel or shut down.
+- Validate and compute before you mutate, so a method that fails leaves state as it was.
+
+**Bad**: the expected case is thrown.
+```java
+Loan borrow(String isbn, MemberId member) throws NoCopyOnShelfException { ... }
+```
+**Good**: the expected cases are in the type, and the controller switch must handle each one.
+```java
+sealed interface BorrowOutcome {
+    record Lent(Loan loan) implements BorrowOutcome {}
+    record NoCopyOnShelf() implements BorrowOutcome {}
+    record LoanLimitReached() implements BorrowOutcome {}
+}
+```
+
+## Names and smells
+
+- Name a thing for what it holds or does: no `data`, `result`, `temp` or `item`. When no honest name comes, reshape
+  the code, because a vague name hides an unclear design. A `get` or `is` method never writes.
+- A method that returns a value changes no visible state, except a modifier that returns its own outcome.
+- Give one family of types one naming pattern and matching signatures, and solve one problem one way, so a reader who
+  learns one member can predict the rest.
+- Define the predicate or literal of a rule once and call it from every site. Leave two or three similar lines inline
+  when they are not one rule, because a helper shared by unrelated callers grows a flag per caller.
+- In review, report any other smell from Fowler's catalogue (Feature Envy, Data Clumps, Shotgun Surgery) as
+  "possible <smell>" with its cure. A smell is a judgement, so a documented project rule wins. Skip a smell that a
+  running gate already fails.
+
+## Comments
+
+- Try a rename, an extracted method or a type before a comment. Keep a comment only for what code cannot say: a
+  non-obvious reason, an outside constraint, a contract.
+- Write no comment that restates the code, no banner or divider, and no commented-out code.
+- Check the claim of each comment against the code before it lands, because readers act on a false comment.
+- Document the contract of a public interface method (nulls, errors, side effects). Write none on an override.
+- Fix the code instead of suppressing a warning that guards correctness. Scope a proven-safe suppression to one
+  declaration, with a comment that says why.
+
+## When the change touches more
+
+Read a note only when the change matches it:
+
+- Java, Spring, JPA, a build file, or an Angular component, template or `tsconfig`: [stack.md](stack.md).
+- Threads, async work, remote calls, retries, locks, pools or caches: [concurrency.md](concurrency.md).
+- A message consumer or producer, a scheduled or batch job, or work that can run twice:
+  [async-jobs.md](async-jobs.md).
+- Redis: [redis.md](redis.md).
+- A list endpoint, a change to a published request or response, an API version, or a client of another service:
+  [http-api.md](http-api.md).
+- Outside input, a secret, a token, a guard or the security filter chain: [security.md](security.md).

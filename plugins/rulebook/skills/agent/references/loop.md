@@ -36,13 +36,13 @@ Contents: Rules · When X, use Y · Good / Bad (AE14, AE15, AEN3, AE16) · Decid
 | the loop reads a model reply | a closed step result: final, run again, paused, stopped | status-string branches miss new cases (AE12) · the stop reason it reads: AE1 (`adapter`) |
 | a reply holds several tool calls | one next message with every result, results first, each with its call id | providers reject split, reordered or missing results (AE20) |
 | a tool call names an unknown tool, has invalid arguments or is denied | an error tool result naming the valid form; the run goes on | the model can fix it (AE16) · its test: the `testing` skill's model-calls notes |
-| a tool or the platform throws | a generic, actionable error text for the model; the exception goes to the log | raw text leaks internals into the model's output (AE17) · the HTTP twin: ER10 (`code`'s `errors`) |
+| a tool or the platform throws | a generic, actionable error text for the model; the exception goes to the log | raw text leaks internals into the model's output (AE17) · the HTTP twin: `code`'s Errors rules |
 | the same tool fails again, or the same call repeats | a per-tool failure cap and a repeat cap that end or escalate the run | one broken call can use up the step budget (AE18) |
 | a path calls the model: main loop, resume, summariser, judge | the run's call-ceiling check before the call | a ceiling only in the main loop leaves other paths unbounded (AE19) · the cap's test: `testing`'s model-calls.md |
 | a tool needs human approval | a persisted pending request keyed by call id; resume through the same loop | a second resume path skips budget and guards (AE13) · its test: `testing`'s model-calls.md |
 | a client resumes a run with an approval or a call | a match against the stored call this agent made, then authorization and guards again | a client can forge a call or an approval (AE14) |
 | a tool finishes | its result stored by run, step and call id before the next step | resume otherwise repeats side effects (AE15) |
-| a tool changes something outside the run | its result key (run id, step, call id) sent to the remote end as the idempotency key | a call with no stored result runs again on resume (AEN3) · the remote end: CC15, CC19 (`code`'s `concurrency`) |
+| a tool changes something outside the run | its result key (run id, step, call id) sent to the remote end as the idempotency key | a call with no stored result runs again on resume (AEN3) · the remote end: `code`'s `concurrency` notes, Side effects and idempotency |
 
 ## Good / Bad
 
@@ -138,7 +138,7 @@ The model sees the valid names and calls `findOrder` in the next step.
   harmless (AE15 still stores its result). — **Do not skip when** the tool writes, sends, pays or calls another
   system that changes state. — **Confidence** high
 - **Skip when** the remote end takes no idempotency key: AEN3 cannot apply. Before a resend, mark the call unknown
-  and read the remote state to see whether it ran (CC9). — **Do not skip when** the remote end takes a key under any
+  and read the remote state to see whether it ran (`code`'s `concurrency` notes, Side effects and idempotency). — **Do not skip when** the remote end takes a key under any
   name, such as a request id or a client reference. — **Confidence** medium
 - **Skip when** a tool error is a platform fault, such as a lost database or a missing credential: end the run
   (AE16), with the generic text of AE17. — **Do not skip when** the model's own call caused the fault. —
