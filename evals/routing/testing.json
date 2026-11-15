@@ -4,7 +4,6 @@
     "Write a unit test for the order service",
     "Write a Spock spec for this class",
     "Add an integration test for the repository",
-    "Write a Playwright smoke spec for the checkout page",
     "Add property-based tests for the parser",
     "Run mutation tests on this module",
     "Which tier should this test be?",
@@ -44,6 +43,10 @@
     {
       "prompt": "Design the Spring configuration for the model client",
       "owner": "code"
+    },
+    {
+      "prompt": "Write a Playwright smoke spec for the checkout page",
+      "owner": "playwright"
     }
   ]
 }

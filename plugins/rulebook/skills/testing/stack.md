@@ -76,22 +76,4 @@ The traps a model falls into on these stacks. The general rules are in [SKILL.md
 
 ## Playwright
 
-- Find elements by role, then label or text, test id last; never a CSS class or XPath. Assert something only this
-  feature renders, because shared chrome renders on every page.
-- Check page state with retrying matchers, because a one-shot read runs before the page settles:
-
-  ```ts
-  // Bad: reads once
-  expect(await page.getByRole('status').textContent()).toBe('Saved');
-  // Good: retries until it holds or times out
-  await expect(page.getByRole('status')).toHaveText('Saved');
-  ```
-
-- Never `waitForTimeout` or `networkidle`; wait on an assertion, a response or a URL.
-- Never use `.first()` or `.nth()` to escape a strictness error; narrow the locator. The first match changes with the
-  page.
-- Await every call and `expect`, enforced by the `no-floating-promises` lint rule. An un-awaited `expect` can end the
-  test green before it checks.
-- Reach dependencies through a fake or a local instance. Real internet only in tests tagged `@external` that skip
-  when it is unreachable, or a third-party site decides the result.
-- Skip only for a named missing capability. Quarantine with `test.fixme` naming an open issue.
+A Playwright spec, its config, its CI job and its failures: the `playwright` skill.

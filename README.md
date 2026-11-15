@@ -76,6 +76,7 @@ Tests here call the model: use the `testing` skill (rulebook plugin) and read it
 | skill | load it when you |
 |---|---|
 | [testing](plugins/rulebook/skills/testing/SKILL.md) | choose, write or review a test |
+| [playwright](plugins/rulebook/skills/playwright/SKILL.md) | write, run or fix a Playwright end-to-end or smoke spec |
 | [code](plugins/rulebook/skills/code/SKILL.md) | write or review production code |
 | [agent](plugins/rulebook/skills/agent/SKILL.md) | write or review code that calls a model or runs an agent |
 | [deslop](plugins/rulebook/skills/deslop/SKILL.md) | clean up a branch's diff before review |

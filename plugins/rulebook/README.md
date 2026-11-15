@@ -3,7 +3,7 @@
 Generic engineering rules for coding agents. The agent that writes the code and the agent that reviews it read the same
 file. Project-specific values (commands, paths, module names) stay in each project's own `AGENTS.md`.
 
-Each domain is one skill: `testing`, `code`, `agent`, `migrations`, `obs`, `planning` and `meta`. A skill is moving to
+Each domain is one skill: `testing`, `playwright`, `code`, `agent`, `migrations`, `obs`, `planning` and `meta`. A skill is moving to
 one short procedure in `SKILL.md`, with a file beside it only for what some runs need, such as one stack's traps
 (`testing` is the first). From a project's `AGENTS.md`, point at a skill or its file by name, never by path, because
 the plugin's install folder differs per machine and per version:
@@ -40,7 +40,8 @@ list from the references, and `make lint` fails when it is stale.
 | skill | read it when you |
 |---|---|
 | [crq](skills/crq/SKILL.md) | take a change from request to merge, or run one phase: lanes, spec, design, build, review, pull request, retro |
-| [testing](skills/testing/SKILL.md) | choose, write or review a test: where it goes, which cases, junk tests, mutation testing; Spock, ITs, Playwright and model calls in its notes |
+| [testing](skills/testing/SKILL.md) | choose, write or review a test: where it goes, which cases, junk tests, mutation testing; Spock, ITs and model calls in its notes |
+| [playwright](skills/playwright/SKILL.md) | write, run, fix or review a Playwright end-to-end or smoke spec: locators, waits, sign-in, fixtures, config, CI, traces, flakes |
 | [code](skills/code/SKILL.md) | write or review production code: Java, Spring, types, errors, services, API design, security, concurrency, persistence, scheduled jobs, Redis, Angular |
 | [agent](skills/agent/SKILL.md) | write or review code that calls a model or runs an agent: adapter, tool loop, context, guards, GenAI spans, evals, budgets |
 | [deslop](skills/deslop/SKILL.md) | clean up an implemented branch's diff, behaviour-neutral, before review |
