@@ -1,0 +1,1 @@
+- **SR6** — Check each story for actor, action and benefit.

@@ -1,0 +1,1 @@
+- **SR6** — Check the spec's intent for actor, action and benefit, at each step.
