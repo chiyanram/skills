@@ -13,6 +13,9 @@ rules: [VB1, VB2, VB3, VB4, VB5, VB6, VB7, VB8, PR1, PR2, PR3, PR4, PR5, PR6, PR
 
 **The job.** Build what the spec and design say, prove every AC, and write the PR body.
 
+**Owns.** The commits, the evidence rows and the PR body. Their re-run belongs to the engine, their review to
+the finders and the verify pass, and the merge to a human.
+
 **Done when** every AC has an evidence row the engine can re-run, every changed behaviour has a test that fails
 when the change is reverted (VB2), and `.factory/pr.md` holds PR1–PR7.
 

@@ -14,6 +14,9 @@ rules: [RV1, RV2, RV4, RV6, RV7, RV8]
 **The job.** Try to refute each finding before a human sees it. A fresh run, apart from the finders, so one pass
 does not both find and judge (RV1).
 
+**Owns.** One bucket per finding. The findings belong to the finders, the fix to the implementer or the
+coordinator, and the approval and the merge to a human.
+
 **Done when** every finding ID has exactly one bucket and a one-line why, no grade or severity is higher than the
 finder's, and no finding was added.
 
