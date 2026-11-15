@@ -1,6 +1,7 @@
 // semantic-release config, one release line per plugin. A module, not JSON, because the release notes need
 // their own templates and transform, which live in scripts/release_notes.mjs (#276).
 // RELEASE_PLUGIN picks the plugin; CI runs it once for each. Scope `toolbox` releases only the toolbox.
+import { parserOpts } from './scripts/release_parser.mjs'
 import { releaseNotes } from './scripts/release_notes.mjs'
 
 // Design work never releases and is not listed in the notes, even as a feat or fix (#287).
@@ -42,7 +43,7 @@ export function releaseConfig(plugin) {
     branches: ['main'],
     tagFormat: `${plugin}--v\${version}`,
     plugins: [
-      ['@semantic-release/commit-analyzer', { preset: 'conventionalcommits', releaseRules: settings.releaseRules }],
+      ['@semantic-release/commit-analyzer', { preset: 'conventionalcommits', parserOpts, releaseRules: settings.releaseRules }],
       ['@semantic-release/release-notes-generator', releaseNotes(plugin, settings.keep)],
       ['@semantic-release/changelog', { changelogFile: settings.changelogFile, changelogTitle: settings.changelogTitle }],
       ['@semantic-release/exec', { prepareCmd: `python3 scripts/set_version.py \${nextRelease.version} . --plugin ${plugin}` }],
