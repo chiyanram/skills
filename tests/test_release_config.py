@@ -23,6 +23,12 @@ MATRIX = {
     "feat(toolbox): a tool": (None, "minor"),
     "fix(toolbox): a tool's step": (None, "patch"),
     "feat(toolbox)!: drop a tool": (None, "major"),
+    # Only an upper-case footer at the start of a line is breaking; a PR body's prose line is not.
+    "feat(crq): a rule\n\n**Breaking change:** no. Nothing breaks.": ("minor", None),
+    "fix(testing): an example\n\nBreaking change: no": ("patch", None),
+    "feat(toolbox): a tool\n\n**Breaking change:** no.": (None, "minor"),
+    "feat(crq): drop a rule\n\nBREAKING CHANGE: rule GA3 is removed.": ("major", None),
+    "feat(toolbox): drop a tool\n\nBREAKING-CHANGE: /x is gone.": (None, "major"),
 }
 
 LOAD = """
@@ -49,10 +55,11 @@ NOTES = """
 import { generateNotes } from '@semantic-release/release-notes-generator'
 import { releaseConfig } from './release.config.mjs'
 const logger = { log() {}, error() {} }
-const commits = ['feat(crq): a rule (#1)', 'feat(toolbox): a tool (#2)']
+const [plugins, messages] = JSON.parse(process.argv[1])
+const commits = messages
   .map((message, i) => ({ message, hash: `abc${i}`, commit: { short: `abc${i}` }, committerDate: '2026-01-01' }))
 const out = {}
-for (const plugin of JSON.parse(process.argv[1])) {
+for (const plugin of plugins) {
   const [, options] = releaseConfig(plugin).plugins.find((p) => p[0] === '@semantic-release/release-notes-generator')
   out[plugin] = await generateNotes(options, { commits, logger, cwd: process.cwd(),
     options: { repositoryUrl: 'https://github.com/chiyanram/skills.git' },
@@ -101,11 +108,21 @@ class ReleaseConfigTest(unittest.TestCase):
                     self.assertEqual(got[plugin][message], release)
 
     def test_should_list_only_its_own_commits_in_the_release_notes(self):
-        notes = node(NOTES, PLUGINS)
+        notes = node(NOTES, [PLUGINS, ["feat(crq): a rule (#1)", "feat(toolbox): a tool (#2)"]])
         self.assertIn("a rule", notes["rulebook"])
         self.assertNotIn("a tool", notes["rulebook"])
         self.assertIn("a tool", notes["toolbox"])
         self.assertNotIn("a rule", notes["toolbox"])
+
+    def test_should_list_no_breaking_change_for_a_prose_breaking_change_line(self):
+        notes = node(NOTES, [["toolbox"], ["chore(toolbox): a check (#3)\n\n**Breaking change:** no. Nothing breaks."]])
+        self.assertNotIn("Breaking changes", notes["toolbox"])
+        self.assertNotRegex(notes["toolbox"], r"(?m)^### *$")
+
+    def test_should_list_an_upper_case_footer_as_a_breaking_change(self):
+        notes = node(NOTES, [["toolbox"], ["feat(toolbox): drop a tool (#4)\n\nBREAKING CHANGE: /x is gone."]])
+        self.assertIn("### ⚠️ Breaking changes", notes["toolbox"])
+        self.assertIn("/x is gone.", notes["toolbox"])
 
     def test_should_tag_as_claude_plugin_tag_does(self):
         # `claude plugin tag` and dependency version ranges both use <plugin-name>--v<version>.

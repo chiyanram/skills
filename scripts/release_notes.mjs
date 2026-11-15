@@ -7,6 +7,7 @@
 // commit body into `closes #N`, even an issue the change only waits on.
 import createPreset from 'conventional-changelog-conventionalcommits'
 import { crossRepoLinks, forScope } from './release_links.mjs'
+import { parserOpts } from './release_parser.mjs'
 
 const types = [
   { type: 'feat', section: '✨ Features' },
@@ -83,6 +84,7 @@ export function releaseNotes(plugin, keep) {
   return {
     preset: 'conventionalcommits',
     presetConfig: { types },
+    parserOpts,
     writerOpts: {
       mainTemplate,
       commitPartial,
