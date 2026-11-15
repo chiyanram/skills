@@ -1,7 +1,7 @@
 # Spec review
 
 How a reviewer checks a spec and its design before the approval gate: all findings in one round, cited claims, no
-open question without a decider, complete stories, and a sound design. Read it when you write, revise or review a spec
+open question without a decider, a complete intent, and a sound design. Read it when you write, revise or review a spec
 or a design before the approval gate.
 
 Contents: Rules · When X, use Y · Good / Bad (SR2, SR3, SR4, SR10, SR11) · Decided edges · Review checks
@@ -16,7 +16,7 @@ Contents: Rules · When X, use Y · Good / Bad (SR2, SR3, SR4, SR10, SR11) · De
   check that can be run, because drifted cites are otherwise found only by chance.
 - **SR4** — Before approval, look up what code and docs answer, then give each open question left a decider, options
   with a recommendation, and why it does not block building, because a bare question outlives the build.
-- **SR6** — Check each story for actor, action and benefit, ACs a test can check, and an out-of-scope list,
+- **SR6** — Check the spec's intent for actor, action and benefit, ACs a test can check, and an out-of-scope list,
   because without them the builder guesses who it serves, when it is done, and where it stops.
 - **SR9** — Check each design decision against the ADRs and patterns it touches; report an unnamed departure, or a
   conflict between documents, without resolving it, because a silent departure overrides a recorded decision.
@@ -57,9 +57,9 @@ Contents: Rules · When X, use Y · Good / Bad (SR2, SR3, SR4, SR10, SR11) · De
 | a design carries `file:line` cites | run a check that resolves each cite to its symbol (SR3) | a cite that drifts is a false claim the next reader believes |
 | the spec reaches the approval gate with open questions | resolve each, or give it a decider, options with a recommendation, and why it does not block (SR4) | a bare question outlives the build |
 | an open question the code or the docs can answer | look the fact up, record the answer in the design, and drop the question (SR4) | a question the author could answer costs the human a lookup and invites a guess |
-| a story has no "as a … so that …" line | add actor, action and benefit (SR6) | without actor, action and benefit, the builder guesses who the story serves |
+| the intent names no actor, action or benefit | add the missing one to the intent (SR6) | without actor, action and benefit, the builder guesses who the change serves |
 | an AC says "works well" or "is fast" | rewrite it as a condition a test can check (SR6) | a vague criterion such as "works well" gives no test a pass condition |
-| a story has no out-of-scope list | add one (SR6) | without an out-of-scope list, the builder guesses where the story ends |
+| a spec has no out-of-scope list | add one (SR6) | without an out-of-scope list, the builder guesses where the change ends |
 | a design decision touches an area with an ADR or an established pattern | check the fit, and report a departure or a conflict for the human to settle (SR9) | a silent departure overrides a recorded decision |
 | the design picks one shape | name a rejected alternative and why it lost, and each tradeoff as "we accept X for Y" (SR10) | an unstated cost later reads as an oversight |
 | a step writes data, sends a message or calls another system | state what happens on failure, on a second run, and after a crash halfway (SR11) | partial state turns every retry into debugging |
@@ -295,13 +295,13 @@ Walk the whole spec and the whole design in one round, every section, before you
   Not a finding: an open-questions section in a draft spec (decided edge).
   Severity: blocker
   Verify: re-open the question, and the code or doc that answers it.
-- [ ] SR6 — For each story, check an actor, an action and a benefit, ACs a test can check, and an out-of-scope
-  list. Each one missing is a finding.
-  Applies when: the spec holds a story.
-  Evidence: the story, and the part that is missing.
+- [ ] SR6 — In the spec, check the intent for an actor, an action and a benefit, ACs a test can check, and an
+  out-of-scope list. Each one missing is a finding.
+  Applies when: always.
+  Evidence: the intent or the spec part that is missing.
   Not a finding: none
   Severity: blocker
-  Verify: re-open the story and its ACs.
+  Verify: re-open the intent and its ACs.
 - [ ] SR9 — For each design decision, find the ADRs and patterns in its area. A departure the design does not name, or
   two documents that disagree, is a finding; report it and do not pick the answer.
   Applies when: the design makes a decision.
