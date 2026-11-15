@@ -31,9 +31,9 @@ when a human starts it (RT7).
 | lane | phases | human gates |
 |---|---|---|
 | tiny | intake → build → verify → code-review → gate → pr → merge → timeline-record | merge |
-| bug | intake → research → spec → design (when design-needed) → design-review → approval → test-first → build → verify → cleanup → code-review → gate → pr → merge → timeline-record | approval, merge |
-| feature | intake → research → clarify → spec → design → design-review → approval → build → verify → cleanup → code-review → gate → pr → merge → timeline-record | approval, merge |
-| one-way door | intake → research → clarify → spec → design → design-review → approval → build → verify → cleanup → code-review → gate → pr → merge → timeline-record | approval, merge |
+| bug | intake → research → spec → design (when design-needed) → design-review → approval → test-first → build → verify → code-review → gate → pr → merge → timeline-record | approval, merge |
+| feature | intake → research → clarify → spec → design → design-review → approval → build → verify → code-review → gate → pr → merge → timeline-record | approval, merge |
+| one-way door | intake → research → clarify → spec → design → design-review → approval → build → verify → code-review → gate → pr → merge → timeline-record | approval, merge |
 
 design-needed: an internal interface changes, or more than one module changes; the coordinator records yes or no on the
 ticket

@@ -27,7 +27,7 @@
     },
     {
       "prompt": "Clean up the restating comments in this diff before review",
-      "owner": "deslop"
+      "owner": "code"
     },
     {
       "prompt": "Which lane is this rulebook change in, and its phases to merge?",

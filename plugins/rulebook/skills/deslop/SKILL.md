@@ -1,12 +1,13 @@
 ---
 name: deslop
 description: Use when an implemented branch is ready for review and its diff needs a behaviour-neutral cleanup first — restating comments, defensive checks for states that cannot occur, type laundering, one-use indirection, unnamed fallbacks and shims, dead code, deep nesting, and style that fights the surrounding file. Diff-scoped; never a repo-wide pass, never a replacement for review.
+disable-model-invocation: true
 ---
 
 # Deslop
 
 Clean the branch diff after implementation and before review. Fix only what is provably behaviour-neutral; report the
-rest.
+rest. A person starts it with `/rulebook:deslop`; no crq lane runs it, until hand runs show it finds real things.
 
 ```
 implement ──▶ deslop ──▶ verify ──▶ review
@@ -29,7 +30,7 @@ implement ──▶ deslop ──▶ verify ──▶ review
 ## Steps
 
 1. **Scope the pass.** Run `git diff $(git merge-base <default-branch> HEAD)...HEAD --stat`. That diff is the whole
-   scope (DS13). Use the same base the review uses, so both look at one diff.
+   scope (DS13). Use the same base the review uses, so both look at one diff. Note its `--shortstat` line count.
 2. **Read the rules for each file kind** in the diff before you judge its hunks: the `code` references for the
    language, and the `testing` references for a test.
 3. **Walk every hunk through every category** in the table below. The owner column names the rule that decides the
@@ -38,7 +39,9 @@ implement ──▶ deslop ──▶ verify ──▶ review
 5. **Verify.** Run the project's verify command for each module the pass edited; the project's `AGENTS.md` names it.
 6. **Report** in one to three sentences on the merge request: what changed, what was left, and what the author must
    decide. Name the files. A clean diff still gets its line ("deslop: nothing to clean"), so a skipped pass and an
-   empty one look different.
+   empty one look different. On the ticket, record the diff's line count before and after, and whether every
+   evidence row still passes; after review, add how many style findings it raised. A person reads these numbers to
+   decide whether cleanup goes back into the lanes.
 
 Done when every hunk of the diff has been checked against every category, every module the pass edited is green, and
 the report line is posted.

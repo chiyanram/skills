@@ -26,10 +26,6 @@
       "owner": "obs"
     },
     {
-      "prompt": "Clean up the restating comments and dead code in this diff before review",
-      "owner": "deslop"
-    },
-    {
       "prompt": "Write the spec and acceptance criteria for the booking API",
       "owner": "planning"
     },
@@ -44,6 +40,10 @@
     {
       "prompt": "Add a Playwright smoke spec for the Angular checkout page",
       "owner": "playwright"
+    },
+    {
+      "prompt": "Write a design and work item for the refund feature before the code",
+      "owner": "planning"
     }
   ]
 }

@@ -29,12 +29,12 @@
       "phases": ["intake", "build", "verify", "code-review", "gate", "pr", "merge", "timeline-record"] },
     { "lane": "bug", "lens_cap": 3, "review_model": "standard", "effort": "medium",
       "phases": ["intake", "research", "spec", { "phase": "design", "when": "design-needed" }, "design-review", "approval",
-                 "test-first", "build", "verify", "cleanup", "code-review", "gate", "pr", "merge", "timeline-record"] },
+                 "test-first", "build", "verify", "code-review", "gate", "pr", "merge", "timeline-record"] },
     { "lane": "feature", "lens_cap": 3, "review_model": "standard", "effort": "medium",
       "phases": ["intake", "research", "clarify", "spec", "design", "design-review", "approval",
-                 "build", "verify", "cleanup", "code-review", "gate", "pr", "merge", "timeline-record"] },
+                 "build", "verify", "code-review", "gate", "pr", "merge", "timeline-record"] },
     { "lane": "one-way door", "lens_cap": "all", "review_model": "strongest", "effort": "high",
       "phases": ["intake", "research", "clarify", "spec", "design", "design-review", "approval",
-                 "build", "verify", "cleanup", "code-review", "gate", "pr", "merge", "timeline-record"] }
+                 "build", "verify", "code-review", "gate", "pr", "merge", "timeline-record"] }
   ]
 }

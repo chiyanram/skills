@@ -62,7 +62,7 @@ A **role card** is one markdown file per role. The engine enforces its frontmatt
 | **design-reviewer** | gives every decision in a design one verdict (aligned, conflict, open) before approval | — |
 | **test-first** | in the bug lane, the separate run that writes the failing test before the implementer runs | — |
 | **implementer** | builds the spec and proves each AC | writer |
-| **cleanup** | tidies the branch's own lines without changing behaviour; what would change behaviour goes in `deferred` | — |
+| **cleanup** | tidies the branch's own lines without changing behaviour; what would change behaviour goes in `deferred`; no lane runs it, a person types `/rulebook:deslop` | — |
 | **finder** | one fresh run per lens that reports findings; it never approves | reviewer (alone) |
 | **verify pass** | the run that tries to refute each finding and gives it one bucket: act_on, consider, noted or dismissed | verifier |
 | **retro** | the timeline record the engine writes for every merge, and the full retro run a human starts | — |
