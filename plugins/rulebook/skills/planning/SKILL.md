@@ -1,6 +1,6 @@
 ---
 name: planning
-description: Use when you write or review a spec, its acceptance criteria, a design or a work item before any code exists. Lists each planning reference and when to read it.
+description: Use when you write or review a spec for a new feature, its acceptance criteria, a design or a work item before any code exists. Lists each planning reference and when to read it.
 ---
 
 # Planning

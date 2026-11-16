@@ -38,8 +38,8 @@
       "owner": "code"
     },
     {
-      "prompt": "Write a reference for the rulebook with rule lines",
-      "owner": "meta"
+      "prompt": "Write a unit test for the new refund feature",
+      "owner": "testing"
     },
     {
       "prompt": "Design the HTTP API endpoints for refunds",

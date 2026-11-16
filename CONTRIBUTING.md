@@ -132,16 +132,23 @@ at the approval table and at the merge.
 2. Find two independent sources for each part of each rule: a file and line pinned to a commit, or an official doc
    and its section. Pages from one company count as one source; a vendor's own docs are enough for a rule about that
    vendor's API. Read production incidents too, and mark each as a primary write-up or a summary. Check every source
-   before the table, not after it. The `meta` skill's `writing-references` reference has the full test.
+   before the table, not after it. Two parts of a rule from different sources count only for those parts.
 3. Show the operator one table, one row per rule: the rule as it would ship, where it goes, the sources for each part
    with how many are independent, the incidents, and a recommendation. Say above it what already covers the topic, and
-   below it what was left out and why. A part with one source is decided there, once, as the operator's preference.
+   below it what was left out and why. A part with one source is decided there, once, as the operator's preference,
+   and the ledger row's status says the preference covers the whole rule or only that part, so a reader can tell a
+   choice from industry practice.
    The operator's yes also covers the commits and pushes on the issue's branch until the pull request.
 4. Add a row to the [ledger](docs/rulebook/approved-rules.md): ID, reference, rule, *because* reason, source,
    evidence, status. Add new sections at the end of the file, and change a rule with a new row that says
    "Supersedes", never by editing the old row. Git merges the ledger with `union`, so two pull requests that both
    add a section merge without a conflict.
-5. Write the rule into its reference. The source stays in the ledger, never in the reference. Before you edit a
+5. Write the rule into its reference. The source stays in the ledger, never in the reference: no citation, credit,
+   label, preference mark, evidence note or date (`check_provenance.py` fails it). Write the *because* as the plain
+   reason the choice is right, never a source name. Keep a tool's name only when it is the action itself, such as a
+   check to turn on. A mistake in a project's own code is evidence: its path goes in the ledger row, never in the
+   rule. Adapt a Good / Bad pair from the rule's source into one neutral domain, or write fresh neutral code; never
+   rename a project's code into a neutral domain, because the pair then teaches that project's names. Before you edit a
    `crq` reference, check for an open pull request on the same file: wait if there is one, and note the change on
    the crq issue (#210) when you go ahead.
 6. Have a fresh reviewer check each rule, grep and example, every Good / Bad pair against every rule, and every

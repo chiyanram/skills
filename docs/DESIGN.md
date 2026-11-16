@@ -8,7 +8,7 @@ This page says what the rulebook plugin is, how a person and an engine use it, a
 
 | kind | what | state |
 |---|---|---|
-| **rules** | skills with references: `code`, `testing`, `planning`, `migrations`, `obs`, `deslop`, `meta` | built |
+| **rules** | skills with references: `code`, `testing`, `planning`, `migrations`, `obs`, `deslop` | built |
 | **process** | `crq`: the change pipeline from request to merge, with lanes and phases | built as a workflow skill |
 
 It stays generic: no project names, no engine names and no provenance in `plugins/`. The role cards

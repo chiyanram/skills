@@ -43,10 +43,6 @@
     {
       "prompt": "Which lane is this change in and which phases run until merge?",
       "owner": "crq"
-    },
-    {
-      "prompt": "Write a reference for this rulebook with its Good / Bad pairs",
-      "owner": "meta"
     }
   ]
 }

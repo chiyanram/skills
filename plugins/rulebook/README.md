@@ -3,7 +3,7 @@
 Generic engineering rules for coding agents. The agent that writes the code and the agent that reviews it read the same
 file. Project-specific values (commands, paths, module names) stay in each project's own `AGENTS.md`.
 
-Each domain is one skill: `testing`, `playwright`, `code`, `agent`, `migrations`, `obs`, `planning` and `meta`. A skill is moving to
+Each domain is one skill: `testing`, `playwright`, `code`, `agent`, `migrations`, `obs` and `planning`. A skill is moving to
 one short procedure in `SKILL.md`, with a file beside it only for what some runs need, such as one stack's traps
 (`testing` and `code` so far). From a project's `AGENTS.md`, point at a skill or its file by name, never by path, because
 the plugin's install folder differs per machine and per version:
@@ -48,7 +48,6 @@ list from the references, and `make lint` fails when it is stale.
 | [migrations](skills/migrations/SKILL.md) | write or review a database migration |
 | [obs](skills/obs/SKILL.md) | write or review a log call, a metric or a trace |
 | [planning](skills/planning/SKILL.md) | write or review a spec, its acceptance criteria, a design or a diagram |
-| [meta](skills/meta/SKILL.md) | write or review a reference of this rulebook |
 
 ## Where a rule comes from
 

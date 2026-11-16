@@ -37,10 +37,6 @@
       "owner": "crq"
     },
     {
-      "prompt": "Review the Good / Bad pairs of this rulebook reference",
-      "owner": "meta"
-    },
-    {
       "prompt": "Design the Spring configuration for the model client",
       "owner": "code"
     },

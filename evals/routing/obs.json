@@ -38,8 +38,8 @@
       "owner": "crq"
     },
     {
-      "prompt": "Write a reference for this rulebook on Good / Bad pairs",
-      "owner": "meta"
+      "prompt": "Add a test that checks the warning log line is written",
+      "owner": "testing"
     },
     {
       "prompt": "Add a scheduled job that purges old records",

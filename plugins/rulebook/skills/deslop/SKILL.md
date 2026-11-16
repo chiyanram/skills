@@ -19,7 +19,9 @@ implement ──▶ deslop ──▶ verify ──▶ review
 - **DS13** — Run deslop on the branch diff only, before review and never instead of it; fix only behaviour-neutral
   cleanups and report the rest, because an unreviewed behaviour change ships untested.
 - **DS5** — When an API has no external consumer, migrate every caller and delete the old path; leave no compatibility
-  shim, because two live paths must both be maintained and drift apart.
+  shim, because two live paths must both be maintained and drift apart. When a caller sits outside the repo (a
+  published API, stored data, a webhook URL), expand, migrate, then contract: remove the old path only after every
+  consumer has moved.
 - **DS7** — Remove dead code, vestigial parameters, commented-out blocks and `// removed` shims in the code you touch,
   because dead code confuses future readers and agents.
 - **DS8** — Add no null check or try/catch to silence a failure on a trusted path; fix the cause and search for the
@@ -102,28 +104,3 @@ private void applyInvoicing(final InvoiceTarget placement, final List<UUID> orde
 ```
 One constructor and an injected final collaborator need no null guard. The request decodes to a sealed target at the
 boundary.
-
-## Decided edges
-
-- **Skip when** callers sit outside the repo's control (a published API, stored data, a webhook URL): expand, migrate,
-  then contract (ParallelChange): remove the old path only after every consumer has migrated (DS5). — **Do not skip
-  when** every caller is in the repo. — **Confidence** high
-- **Skip when** the value crosses a trust boundary, such as request input or a third-party response: validate it there
-  (`code` [Errors](../code/SKILL.md#errors)). — **Do not skip when** the guarded value comes from an injected field or an
-  in-repo caller (DS8). — **Confidence** high
-
-## Review checks
-
-Walk every hunk of the branch diff (`git diff $(git merge-base <default-branch> HEAD)...HEAD`) and the pass's report.
-
-- [ ] DS13 — The pass touched only files in the branch diff, ran before review, and every edit it made is
-  behaviour-neutral. An edit outside the diff, or one that changes control flow, error handling or a fallback, is a
-  finding.
-- [ ] DS5 — For each API the branch replaces with no external consumer, grep for callers of the old path
-  (`grep -rn '<old name>'`). A caller left on it, or a kept compatibility shim, is a finding.
-- [ ] DS7 — An unused member, a vestigial parameter, a commented-out block or a `// removed` note in a touched file is
-  a finding.
-- [ ] DS8 — A new null check or `try`/`catch` on a value from an injected field or an in-repo caller is a finding.
-  So is a fallback to a mock, stub, fake or sample data outside test code.
-- [ ] DS9 — Nesting of three or more levels that a guard clause or early return could flatten is a finding, and so is
-  a nested ternary.
