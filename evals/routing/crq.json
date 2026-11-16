@@ -38,8 +38,8 @@
       "owner": "obs"
     },
     {
-      "prompt": "Where is a rule's provenance kept in this rulebook?",
-      "owner": "meta"
+      "prompt": "Review this Java diff for code smells before the merge",
+      "owner": "code"
     },
     {
       "prompt": "Design the HTTP API for change requests",

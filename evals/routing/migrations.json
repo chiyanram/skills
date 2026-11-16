@@ -42,8 +42,8 @@
       "owner": "code"
     },
     {
-      "prompt": "Review the Good / Bad pairs of the migrations reference",
-      "owner": "meta"
+      "prompt": "Log a warning when the column value is missing",
+      "owner": "obs"
     }
   ]
 }

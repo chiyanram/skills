@@ -34,8 +34,8 @@
       "owner": "crq"
     },
     {
-      "prompt": "Review the Good / Bad pairs in this rulebook reference",
-      "owner": "meta"
+      "prompt": "Write a Spock spec for this service class",
+      "owner": "testing"
     },
     {
       "prompt": "Add a Playwright smoke spec for the Angular checkout page",

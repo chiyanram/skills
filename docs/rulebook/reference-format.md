@@ -1,7 +1,7 @@
 # Reference format
 
 The template every reference in `plugins/rulebook/skills/<domain>/references/` follows. Read it before you write or
-rewrite a reference. Which rules a reference may hold is the `meta` skill's `writing-references` reference.
+rewrite a reference. Which rules a reference may hold is in [`CONTRIBUTING.md`](../../CONTRIBUTING.md#add-a-rule).
 
 ## Where a reference sits
 
