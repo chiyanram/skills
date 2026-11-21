@@ -30,6 +30,8 @@ check an implementer's evidence rows.
   project's quarantine limit, because a broad or endless quarantine hides the next real failure.
 - **VB12** — When a check passes only because a test is quarantined, say so where people read the result, naming each
   test and its expiry, because a green that hides a failure reads as all clear.
+- **VB13** — After two failed fixes of one check, name the assumption they shared; after a third, or a cause outside
+  the change, end with status `blocked`, because more guesses on a wrong assumption waste the run.
 
 ## When X, use Y
 
@@ -52,6 +54,20 @@ check an implementer's evidence rows.
 | a check is green only because of a quarantined test | the PR's status note names each quarantined test and its expiry (VB12) | people read the status note, not the log |
 
 ## Good / Bad
+
+### VB2 — The test fails when the change is reverted
+
+**Bad**
+```text
+Added RenewalSpec. It passes.
+```
+A test that passes proves nothing until it has been seen to fail without the change.
+
+**Good**
+```text
+RenewalSpec at 4f2c9e1: 6 passed. Change reverted: 1 failed, expected 409, got 200. Change restored: 6 passed.
+```
+The test fails without the change, for the reason the AC states, and passes with it.
 
 ### VB5 — Every criterion has its evidence
 
@@ -113,3 +129,6 @@ Walk the PR body, its commits and the diff of its tests.
   expiry within the project's limit. A missing field, a whole job, or an expiry past the limit is a finding.
 - [ ] VB12 — For each check that passed with a quarantined test, find the status note naming each test and its expiry.
   A green with a quarantine named only in a log, or not at all, is a finding.
+- [ ] VB13 — For each check that was red more than twice in the run, find the named assumption and the `blocked`
+  status, or the line that shows a cause outside the change. A fourth fix attempt, or a stub or skip around the
+  cause, is a finding.

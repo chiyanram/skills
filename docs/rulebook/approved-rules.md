@@ -1614,3 +1614,14 @@ The spec holds an intent, never a story, as the glossary says, so SR6 checks the
 | id | reference | rule | reason | source | evidence | status |
 |---|---|---|---|---|---|---|
 | SR6 | planning/references/spec-review.md | Check the spec's intent for actor, action and benefit, ACs a test can check, and an out-of-scope list. | because without them the builder guesses who it serves, when it is done, and where it stops | Supersedes the SR6 row above in wording only: "each story" becomes "the spec's intent"; its sources stand | OURS: SR6 checked a story the glossary bans from the spec (#366) | APPROVED 2026-11-15 (#366, operator choice A) |
+
+## crq: review, build and design-review rules
+
+Four crq rules, each applied by the role-card wording that cites it.
+
+| id | reference | rule | reason | source | evidence | status |
+|---|---|---|---|---|---|---|
+| RV10 | crq/references/review-process.md | Grade a correctness finding a blocker when a test fails, production breaks, or data or secrets are lost, and a warning otherwise. | because a logic bug with no severity reads like a nit | gstack review/checklist.md#L232 @bd04289 (blocker by effect) | OURS: finder.md step 6 gave a correctness finding no severity | APPROVED 2026-11-21 (#427, operator: yes to all) |
+| RV11 | crq/references/review-process.md | Dismiss a blocker only with the quoted line that refutes it, and mark a finding nobody could check as consider, "not checked". | because an unchecked finding is neither proven nor refuted | compound-engineering ce-code-review/references/validator-batch-template.md#L8,#L25 @467f92c ("Never use lack of disproof as evidence of confirmation.") | OURS: verify-pass.md step 4 had no bar for a dismissal | APPROVED 2026-11-21 (#427, operator: yes to all) |
+| VB13 | crq/references/verify-done.md | After two failed fixes of one check, name the assumption they shared; after a third, or a cause outside the change, end with status `blocked`. | because more guesses on a wrong assumption waste the run | gstack verify/SKILL.md#L233 @bd04289; compound-engineering ce-work/references/implementation-loop.md#L10 @467f92c | OURS: implementer.md capped only CI re-runs (VB9) | APPROVED 2026-11-21 (#427, operator: yes to all) |
+| SR25 | planning/references/spec-review.md | Read the design as its builder, and make each decision two builders could read two ways an open question. | because a design only its author can read cannot be built | superpowers brainstorming/SKILL.md#L14-16 @22f0b46 (builder check); oh-my-claudecode agents/critic.md#L73,#L81 @dec7e41 ("two competent developers") | OURS: design-reviewer.md had a goal line with no step behind it | APPROVED 2026-11-21 (#427, operator: yes to all) |

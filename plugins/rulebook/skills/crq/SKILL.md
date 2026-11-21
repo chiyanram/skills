@@ -1,12 +1,16 @@
 ---
 name: crq
-description: Use when you take a change from request to merge, or need its lane or the order of its phases. Lists the phases, who runs each, and each crq reference.
+description: Use when the human types /crq, or asks to take a change from request to merge, or asks for its lane or the order of its phases. Runs the whole change in this session, and stops only for the human's answers, approval and push.
 ---
 
 # crq
 
-One pipeline takes every change from a request to a merge. A coordinator talks with the human and plans. Fresh
-runs build and review. Scripts check what a model must not judge. The human approves the plan and merges.
+Take one change from a request to an open PR in this session. You drive every phase. The human answers the grill,
+approves the spec and the design, and allows the push. An engine such as agent-factory runs the same phases from
+`process/` and does not read this file.
+
+When the human only asks which lane or which phase, answer from [lanes](references/lanes.md) and do not start the
+steps.
 
 <!-- lanes-diagram: built by make index from process/lanes-v2.json; do not edit by hand -->
 ```text
@@ -25,48 +29,70 @@ gate           round-cap  ─▶ human
 ```
 <!-- /lanes-diagram -->
 
-## Phases
+## Stops
 
-The lane picks which phases run (`lanes` reference). The `planning`, `testing` and `code` skills hold the rules
-each phase applies.
+Stop only for these five. A phase that ends is not a stop: post its status block (`report.md`) and start the
+next step in the same turn.
 
-| phase | who | produces | rules to apply |
-|---|---|---|---|
-| intake | coordinator | a ticket with its lane; a map of tickets when the work is unclear | `lanes` |
-| research | coordinator, read-only helpers | how the touched code works today, at `file:line`; parts to reuse; test patterns | `spec-review` (planning) |
-| clarify | coordinator with the human | answers on the ticket; each open question with its decider, options and recommendation | `spec-review` (planning) |
-| spec | coordinator | a draft PR with the intent quoted, acceptance criteria a test can decide, non-goals and edge cases | `acceptance-criteria` (planning) |
-| design | coordinator | the chosen shape and a rejected alternative; slices with their proving commands | `program-design`, `spec-review`, `diagrams` (planning) |
-| design-review | a design-reviewer run, then a verify pass | a verdict per decision and findings | `review-process`, `spec-review` (planning) |
-| approval | **human** | an explicit approval of the spec and design, at the PR's head, recorded with both hashes | `lanes` |
-| test-first | test-first, in the bug lane | one commit with a failing test that proves the bug | `verify-done`, the `testing` skill |
-| build | one fresh implementer run per PR | the slices as commits | `verify-done`, the `testing` skill and the `code` references the diff touches |
-| verify | implementer, then the engine's ready check at the pushed commit | an evidence row per AC | `verify-done`, the `testing` skill |
-| cleanup | no lane runs it; a person types `/rulebook:deslop` | a behaviour-neutral tidy diff | `deslop` skill |
-| code-review | automated review: one finder run per lens, then a verify pass | findings in buckets | `review-process`, `code-review`, `test-integrity` when the diff edits an existing test, and the Review checks of every reference in scope |
-| gate | the gate: CI, a queue or a local run | green at the head commit | — |
-| pr | implementer | why, evidence, rollback, where to look | `pr-readiness`, `diagrams` (planning) |
-| merge | **human** | merge | — |
-| timeline-record | engine, no model | rounds, findings, tokens per phase, rescues | `retro` |
-| full retro (an extra task, not a phase; only when a human starts one) | retro run | each lesson as a rule, a script, a review check or nothing | `retro` |
+1. A grill round waits for the human's answers.
+2. The spec and the design wait for the human's approval.
+3. The next act cannot be undone and the human has not allowed it: a push, a PR, a merge, a migration on shared data,
+   a delete.
+4. A review or verify loop ends its third round with findings still open (RV9).
+5. A subagent ends with status `asked` or `blocked`: show its questions or its cause, and wait (VB1, VB13).
+
+A question about how the flow runs (the order of the subagents, a file name, which lens), decide it. Write it in the
+ledger as `Ruling: <what> - <why> - <cost if wrong>` and go on. A question about what the spec or the design means is
+never a ruling: it is a grill question (VB1).
+
+## Steps
+
+Keep a ledger beside the spec, in the spec home: one line per phase done, each ruling, each approval. When a new
+session starts on the same ticket, read the ledger and continue at the first phase it does not record.
+
+Each subagent below starts fresh. Give it the role card's body and the files its `input` names; never give it what
+its `must_not_see` names or this conversation.
+
+1. **Intake.** Restate the request in one sentence. Pick the lane from what it touches ([lanes](references/lanes.md),
+   LN1) and put it in the first status block. A tiny change goes to step 7.
+2. **Research.** Start a read-only subagent on the code the request touches, with neutral questions only (SR22).
+   Do not wait for it: start the grill, and use its facts from round 2.
+3. **Grill.** Follow [grill](grill.md). Done when no question is open and the human says the picture is
+   right.
+4. **Spec and design.** Write them in the spec home, as steps 4 and 5 of the
+   [coordinator](process/roles/coordinator.md) card say. Done when its "Done when" holds.
+5. **Design review.** Run a [design-reviewer](process/roles/design-reviewer.md) subagent, then a
+   [verify pass](process/roles/verify-pass.md) subagent on its findings. Fix each `act_on` finding in the design
+   and run both again, at most three rounds. Then stop (stop 2): show the spec, the design and the open `consider`
+   findings, and ask for approval. Write the human's words and the `git hash-object` of the spec and the design in the
+   ledger (LN4).
+6. **Test-first.** In the bug lane, run a [test-first](process/roles/test-first.md) subagent. Check that its test
+   fails for the reason the spec states.
+7. **Build.** Run an [implementer](process/roles/implementer.md) subagent. Then do the ready check yourself: run
+   every evidence row's command, and check that no test was removed, skipped or weakened (VB6). A red row sends the
+   implementer back with that row, at most three rounds.
+8. **Code review.** Run one [finder](process/roles/finder.md) subagent per lens, up to the lane's lens cap in
+   `process/lanes-v2.json`, each with the baseline in `process/review.json`. Then run one verify pass subagent on all
+   findings. Send the `act_on` list, and only that list, to a new implementer subagent, then repeat the ready check
+   and this step, at most three rounds.
+9. **Deslop.** Use the Skill tool for `rulebook:deslop` on the branch diff. Run every evidence row again after it.
+   Its reported items go into the final report, not into a commit.
+10. **Gate.** Run the project's full test command at the head commit. Red goes back to step 7, at most two rounds.
+11. **PR.** Check that `.factory/pr.md` meets [pr-readiness](references/pr-readiness.md). Then stop (stop 3): show
+    the branch, the push command and the PR title, and push only on the human's yes.
+12. **Report.** Write the final message as `report.md` says.
 
 ## Process files
 
-An engine reads these to run the same process a person runs with `/crq`.
+The engine reads these. The steps above use the same files.
 
-- [lanes.json](process/lanes.json): per lane, whether it needs approval, design review and test-first, its lenses
-  and its retro. An engine may make a lane stricter, never looser.
-- [lanes-v2.json](process/lanes-v2.json): the phase graph, each phase's actor and outcome edges, the round caps and
-  conditions, and per lane its phases, lens cap, review model and effort. It sits beside lanes.json until an engine
-  reads it.
-- [review.json](process/review.json): the baseline every automated review reads, whatever the repo's own
-  instruction files say. An entry names a skill and a reference, or a skill alone, which means its `SKILL.md`.
+- [lanes.json](process/lanes.json) and [lanes-v2.json](process/lanes-v2.json): each lane's phases, caps and lenses.
+- [review.json](process/review.json): the baseline every review reads.
 - [glossary](process/glossary.md): the words every role card and hand-off uses.
-- Role cards, one per role, each with three eval scenarios in the plugin's `evals/<role>/`:
-  [coordinator](process/roles/coordinator.md), [design-reviewer](process/roles/design-reviewer.md),
+- Role cards: [coordinator](process/roles/coordinator.md), [design-reviewer](process/roles/design-reviewer.md),
   [test-first](process/roles/test-first.md), [implementer](process/roles/implementer.md),
-  [cleanup](process/roles/cleanup.md), [finder](process/roles/finder.md), [verify
-  pass](process/roles/verify-pass.md), [retro](process/roles/retro.md). The onboarder's card is the engine's own.
+  [cleanup](process/roles/cleanup.md), [finder](process/roles/finder.md),
+  [verify pass](process/roles/verify-pass.md), [retro](process/roles/retro.md).
 
 ## References
 
@@ -77,7 +103,7 @@ An engine reads these to run the same process a person runs with `/crq`.
 | [lanes](references/lanes.md) | LN1–LN4 | when you take in a new change, or when a change turns out bigger, riskier or smaller than its lane |
 | [pr-readiness](references/pr-readiness.md) | PR1–PR7 | when you write a PR body, or when you check one before merge |
 | [retro](references/retro.md) | RT1–RT10 | when the engine writes a merge's timeline record, when a human starts a full retro, or when you write a lesson's PR |
-| [review-process](references/review-process.md) | RV1–RV9 | before you run, write or tune a review |
+| [review-process](references/review-process.md) | RV1–RV11 | before you run, write or tune a review |
 | [test-integrity](references/test-integrity.md) | TI1–TI5 | when you review a diff that edits an existing test, a snapshot or a golden file |
-| [verify-done](references/verify-done.md) | VB1–VB12 | when you build a change, before you call it ready, or when you check an implementer's evidence rows |
+| [verify-done](references/verify-done.md) | VB1–VB13 | when you build a change, before you call it ready, or when you check an implementer's evidence rows |
 <!-- /index -->
