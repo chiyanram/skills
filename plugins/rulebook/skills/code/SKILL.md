@@ -36,15 +36,7 @@ Code earns its place when the next change is easy and a test can reach every dec
 - Keep each method under the project's complexity gate, or cyclomatic 10 if none is set. A method with more than 7
   parameters, or a change that takes a file past 1000 lines, is a finding unless a structural reason is stated.
 
-**Bad**: an interface with one implementation and no fake.
-```java
-public interface LateFeeCalculator { Money feeFor(Loan loan, LocalDate returnedOn); }
-
-@Service
-public class LateFeeCalculatorImpl implements LateFeeCalculator { ... }
-```
-**Good**: the concrete class. Tests call it with real loans. An interface stays for a boundary such as
-`MemberNotifier`, which has a production adapter and a test fake.
+Example of a needless interface: [examples.md](examples.md#an-interface-with-one-implementation).
 
 ## Types
 
@@ -85,18 +77,7 @@ public class LateFeeCalculatorImpl implements LateFeeCalculator { ... }
   interrupt leaves the thread impossible to cancel or shut down.
 - Validate and compute before you mutate, so a method that fails leaves state as it was.
 
-**Bad**: the expected case is thrown.
-```java
-Loan borrow(String isbn, MemberId member) throws NoCopyOnShelfException { ... }
-```
-**Good**: the expected cases are in the type, and the controller switch must handle each one.
-```java
-sealed interface BorrowOutcome {
-    record Lent(Loan loan) implements BorrowOutcome {}
-    record NoCopyOnShelf() implements BorrowOutcome {}
-    record LoanLimitReached() implements BorrowOutcome {}
-}
-```
+Example of an expected case in the type: [examples.md](examples.md#an-expected-case-in-the-type).
 
 ## Names and smells
 

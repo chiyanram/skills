@@ -1,6 +1,6 @@
 ---
 name: agent
-description: Use when you write or review code that calls an LLM or language model or runs an agent: a provider adapter, stop reasons, streaming, token usage and fallback; the tool loop, approval and resume; prompt and context building, compaction and prompt caching; guards and tool risk; GenAI spans; evals; run budgets. Lists each agent reference and when to read it.
+description: "Use when you write or review code that calls an LLM or language model or runs an agent: a provider adapter, stop reasons, streaming, token usage and fallback; the tool loop, approval and resume; prompt and context building, compaction and prompt caching; guards and tool risk; GenAI spans; evals; run budgets. Lists each agent reference and when to read it."
 ---
 
 # Agent

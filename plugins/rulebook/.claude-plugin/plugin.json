@@ -3,5 +3,6 @@
   "version": "3.1.0",
   "description": "Generic procedures, with Java, Spring, Spock and Angular stack notes, and the /crq workflow.",
   "author": { "name": "chiyanram" },
-  "repository": "https://github.com/chiyanram/skills"
+  "repository": "https://github.com/chiyanram/skills",
+  "license": "MIT"
 }

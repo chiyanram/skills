@@ -23,7 +23,7 @@ claude plugin install rulebook@chiyanram
 npx skills add chiyanram/skills
 ```
 
-The repo is private. See the [root README](../../README.md#quick-start) for credentials and the worker-container setup.
+See the [root README](../../README.md#quick-start) for GitHub Copilot CLI and the worker-container setup.
 
 ## Two shapes, for now
 
@@ -51,6 +51,5 @@ list from the references, and `make lint` fails when it is stale.
 
 ## Where a rule comes from
 
-Each rule has a source. A rule goes in only after the operator says yes; the
-[ledger](../../docs/rulebook/approved-rules.md) lists every approved rule with its reason and source. How to propose one:
-[CONTRIBUTING.md](../../CONTRIBUTING.md).
+Each rule has two sources. A rule goes in only in a pull request the operator merges, and that pull request names the
+sources. How to propose one: [CONTRIBUTING.md](../../CONTRIBUTING.md).

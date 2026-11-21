@@ -13,7 +13,6 @@ CASES = {
     "routers": (["good"], ["unlisted", "no-router"]),
     "provenance": (["good"], ["citation", "preference", "credit", "date", "evidence", "repo-ref", "neutral",
                               "fileline", "section", "url", "nested-fence"]),
-    "ledger": (["good"], ["duplicate", "marker"]),
     "glossary": (["good"], ["avoid-word", "avoid-word-in-crq"]),
     "settings_keys": (["good"], ["number-after-key", "number-before-key", "value-in-span", "wrapped-line"]),
     "routing": (["good"], ["no-cases", "too-few", "misrouted", "near-miss-wins", "unknown-owner", "collision"]),

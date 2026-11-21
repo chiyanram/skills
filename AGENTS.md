@@ -22,15 +22,15 @@ make test   # python3 -m unittest: each check against its planted fixtures, the 
 
 ## MUSTs
 
-- Add a rule to a reference only with the operator's explicit yes and a row in `docs/rulebook/approved-rules.md`,
+- Add or change a rule only in a pull request the operator merges, with its two sources in the pull request body,
   because an unapproved rule reaches every project that installs the plugin.
 - Keep provenance out of `plugins/`: no citation, URL, date, credit or evidence note outside code, because the agent
-  needs the rule and the ledger keeps the source. `check_provenance.py` fails it. A copied toolbox skill's source and
+  needs the rule and the pull request keeps the source. `check_provenance.py` fails it. A copied toolbox skill's source and
   licence go only in `plugins/toolbox/THIRD_PARTY_NOTICES.md`.
 - Make every toolbox skill typed-only (`disable-model-invocation: true`), with no push or merge, because a person
   chooses when a tool runs. `check_toolbox.py` fails it.
 - Keep history out of the repo's own docs and code comments: say what and why, never who decided, when or on which
-  issue, because the ledger, git log and pull requests keep it. `check_history.py` fails an added line.
+  issue, because the git log and pull requests keep it. `check_history.py` fails an added line.
 - Keep `plugins/` generic: no project names, paths or business terms, because every project installs the same files.
 - Never edit a router table, a `version` or a `CHANGELOG*.md` by hand, because `make index` and the release write them.
 - Read Sonar rules for calibration only. Never copy their text, because their licence does not permit it.

@@ -1,5 +1,5 @@
-"""A rule file holds only what an agent needs to act; where a rule came from lives in the ledger
-(docs/rulebook/approved-rules.md).
+"""A skill file holds only what an agent needs to act. Where a rule came from lives in the pull request that added it,
+never in the skill.
 
 Fails on a shipped skill file (a SKILL.md or a reference under plugins/*/skills/; in the toolbox, a SKILL.md only)
 that carries provenance:

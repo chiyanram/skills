@@ -18,7 +18,7 @@ Where to look: <one to three places where a mistake would cost most>
 
 - [ ] Tests: <the planted cases under `tests/fixtures/` added or changed for each check; or none, and why>
 - [ ] Docs: <`README.md`, `CONTRIBUTING.md`, `PRINCIPLES.md` or a plugin README changed; or none, and why>
-- [ ] Rules: <each new or changed rule has the operator's yes and a row in `docs/rulebook/approved-rules.md`; or none>
+- [ ] Rules: <each new or changed rule, with its two sources; or none>
 - [ ] Formats: <a released format changed as a new `-vN` file, and what a tool must learn to read it; or none>
 - [ ] Generic: no project name, provenance or history note in `plugins/`; no `version` or `CHANGELOG*.md` edited by hand
 - [ ] Checks: `make index`, `make lint` and `make test` green

@@ -1,5 +1,4 @@
-"""The crq process files an engine reads: the lanes files, the review baseline and the role cards (docs/DESIGN.md
-section 4, #237).
+"""The crq process files an engine reads: the lanes files, the review baseline and the role cards.
 
 Fails when a lanes file misses a lane or a field, or lets a lane above tiny run without approval (the approval floor);
 when the lanes-v2 file is missing or does not validate against its schema, which covers the four lanes in order and

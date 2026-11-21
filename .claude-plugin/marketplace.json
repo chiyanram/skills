@@ -1,7 +1,7 @@
 {
   "name": "chiyanram",
   "owner": { "name": "chiyanram" },
-  "description": "Generic engineering skills, references and the /crq workflow, plus typed-only tools (chiyanram/skills#93).",
+  "description": "Generic engineering skills, references and the /crq workflow, plus typed-only tools.",
   "plugins": [
     {
       "name": "rulebook",
