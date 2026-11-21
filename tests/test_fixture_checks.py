@@ -16,6 +16,7 @@ CASES = {
     "ledger": (["good"], ["duplicate", "marker"]),
     "glossary": (["good"], ["avoid-word", "avoid-word-in-crq"]),
     "settings_keys": (["good"], ["number-after-key", "number-before-key", "value-in-span", "wrapped-line"]),
+    "generic": (["good"], ["coordinator-in-skill", "engine-in-notes"]),
     "routing": (["good"], ["no-cases", "too-few", "misrouted", "near-miss-wins", "unknown-owner", "collision"]),
 }
 
