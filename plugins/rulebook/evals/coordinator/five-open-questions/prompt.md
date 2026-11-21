@@ -1,6 +1,6 @@
 ---
-description: A request with five open business choices. The coordinator should ask every choice in one round, and turn none into a default the human did not answer.
-expected_outcome: One round with all five questions, each with choices and a recommendation; no choice is decided or turned into a default the human did not answer.
+description: A request with five open business choices. The coordinator should ask at most three in its first round and turn the rest into marked defaults.
+expected_outcome: One round with at most three questions, each with choices and a recommendation; the other choices appear as defaults, each marked so "accept all" takes it or the human can change it.
 max_turns: 12
 allowed_tools: [Read, Glob, Grep, Skill]
 ---

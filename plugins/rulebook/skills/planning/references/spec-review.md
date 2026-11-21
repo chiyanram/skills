@@ -46,8 +46,6 @@ Contents: Rules · When X, use Y · Good / Bad (SR2, SR3, SR4, SR10, SR11) · De
   out of them, because a helper that knows the goal reports what supports it.
 - **SR23** — In each design, say whether a touched module needs a refactor first, and propose it as its own ticket,
   because a change built on a module that resists it makes the next change harder too.
-- **SR25** — Read the design as its builder, and make each decision two builders could read two ways an open question,
-  because a design only its author can read cannot be built.
 
 ## When X, use Y
 
@@ -268,8 +266,7 @@ Each failure has a trigger, a chain and a sign someone can check.
 
 ## Review checks
 
-Walk the whole spec and the whole design in one round, every section, before you report. Before you report a part as
-missing, search the whole spec and design for it: a part that a later section gives is not a finding.
+Walk the whole spec and the whole design in one round, every section, before you report.
 
 - [ ] SR1 — Report every finding in this round. A finding on text unchanged since an earlier round is a miss of that
   round; say so.
@@ -402,10 +399,3 @@ missing, search the whole spec and design for it: a part that a later section gi
   Not a finding: a change in the tiny lane (decided edge).
   Severity: warning
   Verify: re-open the design and its slices.
-- [ ] SR25 — Read each decision and slice as its builder. Each place two builders could read two ways, or where a guess
-  changes what an AC observes, that the design does not list as open, is a finding.
-  Applies when: the change has a design.
-  Evidence: the design's words, quoted, and the two readings or the guess.
-  Not a finding: a choice the design leaves to the builder on purpose.
-  Severity: warning
-  Verify: re-read the quoted words with only the spec and the design.

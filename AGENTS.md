@@ -32,6 +32,12 @@ make test   # python3 -m unittest: each check against its planted fixtures, the 
 - Keep history out of the repo's own docs and code comments: say what and why, never who decided, when or on which
   issue, because the ledger, git log and pull requests keep it. `check_history.py` fails an added line.
 - Keep `plugins/` generic: no project names, paths or business terms, because every project installs the same files.
+- Write each rulebook skill so that a person or any agent can run it alone: its `SKILL.md` and the notes files beside
+  it name no engine, engine role or role card, because whoever installs the plugin has none of them.
+  `check_generic.py` fails it.
+- Check a change against the goal of the skill it touches before you design it, and tell the operator about each
+  conflict between that goal and the existing files when you take the issue, before any edit, because a design built
+  around a conflict hides it.
 - Never edit a router table, a `version` or a `CHANGELOG*.md` by hand, because `make index` and the release write them.
 - Read Sonar rules for calibration only. Never copy their text, because their licence does not permit it.
 - Never change a format file (`plugins/*/skills/*/process/schema/*-vN.schema.json`) once a release holds it. A change

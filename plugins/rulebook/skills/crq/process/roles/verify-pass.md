@@ -6,7 +6,7 @@ must_not_see: the implementer's report or account; the coordinator's conversatio
 hand_off: the JSON the run returns, no file; one entry per finding {id, bucket: act_on | consider | noted | dismissed, why, severity: blocker | warning | nit, grade: cited | walked | ran}; severity and grade only when lowered
 tools: [Read, Grep, Glob]
 enforced_guardrails: [read-only]
-rules: [RV1, RV2, RV4, RV6, RV7, RV8, RV11]
+rules: [RV1, RV2, RV4, RV6, RV7, RV8]
 ---
 
 # Verify pass
@@ -30,10 +30,6 @@ finder's, and no finding was added.
    - **consider**: it holds, but it is a judgement call, or its grade is cited only (RV7);
    - **noted**: it holds, but in code this change neither edits nor breaks: a follow-up ticket (RV2);
    - **dismissed**: it does not hold at that line, the rule does not say that, or it is a duplicate.
-
-   Dismiss a blocker only when you can quote the line, test or doc that refutes it. A finding you could not prove or
-   refute is consider, with the why "not checked" and what is missing: that nothing refuted it does not make it hold
-   (RV11). Judge each finding alone: one finding's bucket never moves another's.
 5. Set the finding's final severity and grade when the evidence is weaker than the finder said: a lower severity, or
    a lower grade (ran, then walked, then cited). Leave them out to keep the finder's. Never raise either: the engine
    refuses a verdict that does, and keeps the finding as consider (RV7).

@@ -11,8 +11,7 @@ When you reach for a word under "avoid", use the term instead. A check fails a c
 | **orchestrator** | the part of the engine that receives triggers, starts runs on runners, and records which runs are queued, in flight or finished | dispatcher, scheduler, control plane | — |
 | **task** | a kind of work, defined once and run many times: implement, automated review, rework, retro | job, workflow, action | — |
 | **trigger** | the event that starts a run: a human START, a human approval, or the run before | — | — |
-| **run** | one execution of a task on one runner, from its trigger to its end; a run never waits for a human, and the human's later answer triggers a new run | — | — |
-| **session** | one person's conversation with `/crq`; unlike a run, it waits for the human's answers | — | — |
+| **run** | one execution of a task on one runner, from its trigger to its end; a run never waits for a human, and the human's later answer triggers a new run | session | — |
 | **runner** | the disposable machine a run executes on; nothing on it survives the run | box, sandbox, server, host | — |
 | **ticket tracker** | where tickets live | issue tracker, project board | — |
 | **ticket** | one tracked piece of work | issue (for a ticket), story | story, stories |
@@ -40,7 +39,7 @@ When you reach for a word under "avoid", use the term instead. A check fails a c
 | **design** | the chosen shape, one rejected alternative, and the slices; the spec links it | plan (alone), architecture doc | — |
 | **slice** | one thin end-to-end piece of the design, with the command that proves it | task (for a slice), chunk | — |
 | **spec home** | where a project keeps its specs | — | — |
-| **ask** | a run or session that needs a human's decision asks every question on the frontier (each open decision whose parent decisions are settled) in one numbered round, and a run ends with status `asked`; rounds go on until no question is open; each question is numbered, carries 2 to 4 short choices (yes and no when "yes" is the only other choice) and a recommended answer, and is worded so "yes" accepts it; the project's `questions` setting can be `one-at-a-time` instead; never a guess; each answer goes into the spec before the next round | clarify inline, assume | — |
+| **ask** | a run that needs a human's decision ends with status `asked` and every open question at once, in one numbered round; a coordinator asks at most three and turns the rest into marked defaults that "accept all" takes; each question carries 2 to 4 short choices and one recommended choice, so the human answers with taps, "1A 2B" or "accept all"; the project's `questions` setting can be `one-at-a-time` instead; never a guess; the answer goes into the spec | clarify inline, assume | — |
 | **evidence row** | `{criterion, command, result}`: one AC and the plain command that proves it | proof, output | — |
 | **hand-off** | what a role leaves for the next role: a file, or the JSON a read-only run returns | summary, notes | — |
 | **ready check** | the engine re-running every evidence row at the head, checking that every AC has a row, plus the test checks and the lane check; the engine runs it in the `verify` phase | — | — |

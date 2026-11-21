@@ -23,9 +23,7 @@ lands, and nothing but the test changed.
 1. From the bug spec, take the input, the state, the current result and the expected result (AC12).
 2. Write one test with that input and state that expects the expected result, as an observable outcome (GA5).
    Follow the testing references for where the test goes and how it is named.
-3. Run it on the runner. It fails, and for the stated reason: a wrong result, not a setup or compile error. When it
-   passes, it does not reproduce the bug: do not change the test until it fails. End with status `asked`, and give the
-   command and what it returned.
+3. Run it on the runner. It fails, and for the stated reason: a wrong result, not a setup or compile error.
 4. Commit only the test, with the subject `test: failing test for <bug>`.
 5. Write the report: the command and the failure as the one evidence row, then stop.
 
