@@ -71,12 +71,12 @@ its `must_not_see` names or this conversation.
 7. **Build.** Run an [implementer](process/roles/implementer.md) subagent. Then do the ready check yourself: run
    every evidence row's command, and check that no test was removed, skipped or weakened (VB6). A red row sends the
    implementer back with that row, at most three rounds.
-8. **Code review.** Run one [finder](process/roles/finder.md) subagent per lens, up to the lane's lens cap in
+8. **Deslop.** Use the Skill tool for `rulebook:deslop` on the branch diff. Run every evidence row again after it.
+   Its reported items go into the final report, not into a commit. Code review then reads the tidied diff.
+9. **Code review.** Run one [finder](process/roles/finder.md) subagent per lens, up to the lane's lens cap in
    `process/lanes-v2.json`, each with the baseline in `process/review.json`. Then run one verify pass subagent on all
    findings. Send the `act_on` list, and only that list, to a new implementer subagent, then repeat the ready check
-   and this step, at most three rounds.
-9. **Deslop.** Use the Skill tool for `rulebook:deslop` on the branch diff. Run every evidence row again after it.
-   Its reported items go into the final report, not into a commit.
+   and this step, at most three rounds. Deslop does not run again.
 10. **Gate.** Run the project's full test command at the head commit. Red goes back to step 7, at most two rounds.
 11. **PR.** Check that `.factory/pr.md` meets [pr-readiness](references/pr-readiness.md). Then stop (stop 3): show
     the branch, the push command and the PR title, and push only on the human's yes.

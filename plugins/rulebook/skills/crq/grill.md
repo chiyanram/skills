@@ -1,53 +1,38 @@
 # Grill
 
-Ask the human until you both hold the same picture of the change. Facts are yours to find; decisions are the human's.
+Interview the user relentlessly until you reach a shared understanding. Map this as a **design tree**: every decision branches into the decisions that hang off it.
 
-## The question tree
+Work the tree in **rounds**. The **frontier** is every decision whose prerequisites are already settled: the questions you can ask _now_ without guessing at answers you haven't heard yet. Ask the whole frontier in one round: number each question and give your recommended answer. Then wait for the user's answers before the next round.
 
-Each decision opens the decisions that depend on it. The **frontier** is every open decision whose parents are
-settled: what you can ask now without guessing an answer you have not heard.
+Format a round like so:
 
-## Each round
-
-1. Find the facts first. A question the code, the docs or the research subagent can answer is not a question. Look it
-   up, and give the fact at `file:line` when you use it.
-2. Ask the whole frontier in one numbered round. Each question has two to four short choices and one recommended
-   choice, worded so "yes" accepts it. The human answers with "yes", "1A 2B" or their own words. With the project's
-   `questions: one-at-a-time`, ask the first question on the frontier only.
-3. Challenge each directive of the human's that nobody has examined, once: name the cost or the conflict you see, and
-   recommend. After the human answers, it is settled. Do not ask it again.
-4. Check a correction from the human against the code before you accept it. When the code disagrees, say so at
-   `file:line`, and ask once.
-5. Write the answers into the spec draft before the next round, each with the human's words.
-6. Work out the new frontier. A question that waits on another question in this round goes in a later round.
-
-Then stop (stop 1) and wait for the answers.
-
-## Done when
-
-- the frontier is empty: every branch of the tree is settled, and nothing is silently assumed;
-- every assumption is marked stated, inferred at `file:line`, or a default the human confirmed (SR19);
-- the human says the picture is right.
-
-A default goes in the spec only when the human confirmed it. A guess you would make yourself is a question.
-
-## Good / Bad
-
-**Bad**
-```text
-Q1 Retention period? Q2 Soft or hard delete? Q3 Batch size?
-(the rest assumed as defaults; grill ends)
 ```
-Q3 depends on Q2, and the defaults were never shown to the human.
+❓ **Q1** - **<question title>**: <question body, might be multiple paragraphs, including multiple choices>
 
-**Good**
-```text
-Round 1
-1. How long do we keep a deleted loan before the purge? A) 30 days  B) 90 days  C) 1 year
-   -> B: LoanRepository.java:21 keeps deletedAt, and nothing reads it after 60 days.
-2. Purge means a hard delete of the row? A) yes  B) move to an archive table
-   -> A: no report reads deleted loans (grep finds no reader of deleted_at).
-Batch size waits for answer 2.
+➡️ <your recommended answer>
+
+---
+
+❓ **Q2** - **<question title>**: <question body, might be multiple paragraphs, including multiple choices>
+
+➡️ <your recommended answer>
 ```
-Each question has choices and a recommendation, the facts come with `file:line`, and a question that depends on
-another waits.
+
+Word each question so "yes" accepts your recommended answer.
+
+Each round the user answers reshapes the tree: settled decisions push the frontier outward and unblock questions that depended on them. Recompute the frontier and ask the next round. A question whose answer depends on another question still open in this round belongs to a _later_ round, not this one.
+
+Finding _facts_ is your job, never the user's. When a frontier question needs a fact from the environment (filesystem, tools, etc.), dispatch a sub-agent with a fresh context window to find it; don't ask the user for anything you could look up yourself. Don't block on it: a running exploration is an unsettled prerequisite, so only the questions downstream of it wait for the sub-agent to report; ask the rest of the frontier now. The _decisions_ are the user's: put each to them and wait.
+
+The session is done when the frontier is empty: every branch of the design tree visited, nothing left silently assumed. Do not act on it until the user confirms you have reached a shared understanding.
+
+## In crq
+
+These lines are crq's own, on top of the grill above.
+
+- Challenge each decision the user hands you that nobody has examined, once: name its cost, recommend, then treat it
+  as settled and never ask it again.
+- When the user corrects you, check the correction against the code before you accept it. When the code disagrees,
+  say so at `file:line` and ask once.
+- After each round, write the user's answers into the spec, in their words, before you recompute the frontier.
+- A default goes in the spec only when the user confirmed it (SR19).

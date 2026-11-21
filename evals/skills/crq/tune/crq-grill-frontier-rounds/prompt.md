@@ -1,6 +1,6 @@
 ---
 description: A request with four open business choices, one of which depends on another. The grill should ask every choice it can ask now, hold the dependent one for a later round, and fix none as a silent default.
-expected_outcome: One round with the three independent choices, each with two to four options and a recommendation; the reminder question is held for a later round or asked as conditional on the loans answer; no business choice is decided or turned into a default the human did not answer; the turn ends waiting for the answers.
+expected_outcome: One round with the three independent choices, each with a recommendation, and options or wording that "yes" accepts; the reminder question is held for a later round or asked as conditional on the loans answer; no business choice is decided or turned into a default the human did not answer; the turn ends waiting for the answers.
 max_turns: 15
 allowed_tools: [Read, Glob, Grep, Skill]
 ---
