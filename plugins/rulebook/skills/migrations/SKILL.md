@@ -1,6 +1,6 @@
 ---
 name: migrations
-description: Use when you write or review a database migration: a new table, column, key, constraint or index, or a change that alters, indexes, renames, drops or backfills an existing table, or edits a merged migration. Lists each migrations reference and when to read it.
+description: "Use when you write or review a database migration: a new table, column, key, constraint or index, or a change that alters, indexes, renames, drops or backfills an existing table, or edits a merged migration. Lists each migrations reference and when to read it."
 ---
 
 # Migrations

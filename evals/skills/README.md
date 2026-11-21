@@ -1,8 +1,7 @@
 # Skills eval
 
 Measures one skill with its full text and with a shorter candidate, on a small fixed set of real tasks, scored only
-by that skill's own review checks. It is how a pruning PR shows that the cut is no worse
-(the pruning method, `docs/rulebook/pruning-method.md`).
+by that skill's own review checks. It is how a pruning PR shows that the cut is no worse.
 
 Every run is a real model call on your own Claude login, so it runs by hand: never in `make lint`, `make test` or CI.
 `scripts/skill_eval.py` stages and prints the command; it calls the model only with `--go`.

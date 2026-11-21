@@ -35,7 +35,7 @@ writes a merge's timeline record, when a human starts a full retro, or when you 
 | a human starts a full retro on a merged, rescued or reverted change or an escaped defect | RT2 to RT6, read from the RT1 record | the human picks where the analysis is worth a run (RT7) |
 | a mistake seen twice | a fix at the highest level that holds: structure, then a type, then a lint whose error names the fix, then a test (RT6) | a higher level stops the mistake; a written rule only asks |
 | the lesson can be checked by a tool | an action of type script or check, not rule (RT4, RT6) | a script never forgets |
-| the lesson needs judgement | an action of type rule (RT4, RT6) | every new rule still needs the operator's yes and a ledger row |
+| the lesson needs judgement | an action of type rule (RT4, RT6) | every new rule still needs a pull request the operator merges |
 | an existing check should have caught it but did not | a rewrite of that check, with this ticket as its example (RT3) | the check is mis-worded, not missing |
 | facts for the retro | the transcripts of the coordinator, implementer, finder and verify pass runs, and the PR's events; each number cited to one of them (RT5) | memory rounds off the bad parts |
 | a lesson found once | kept only if it recurs; otherwise noted and dropped (RT5) | a one-off is not a learning, and a rule per one-off becomes noise |

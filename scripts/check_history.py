@@ -1,13 +1,13 @@
 """A doc line or code comment outside plugins/ says what and why, never who decided, when, or on which issue.
 
-History has one home: the ledger for rules, and the git log, the pull requests and the ADRs for the rest. The check
+History has one home: the git log, the pull requests and the ADRs. The check
 reads only the lines a change adds since it left the base branch (default `origin/main`), so notes already on the base
 pass and go when a file is edited anyway. Uncommitted and untracked files count as added.
 
 It reads prose in markdown (not fences, inline code, link targets, headings or HTML comments) and comment text in code
 (a Python comment or docstring, a JS comment, a `#` comment in YAML, TOML, shell or a Makefile). It fails a who-decided
 phrase, an ISO date beside a person or decision word, and an issue number. It spares `plugins/` (check_provenance.py
-reads it), fixtures, `docs/agents/`, `evals/`, the CHANGELOGs, ledger rows, an ADR's or PRINCIPLES.md's status line
+reads it), fixtures, `docs/agents/`, `evals/`, the CHANGELOGs, an ADR's or PRINCIPLES.md's status line
 and an ADR's table rows, and one pointer line (`See` or `History:` and issue refs) per markdown section or code header.
 """
 import ast
@@ -36,7 +36,6 @@ HASH_COMMENT = re.compile(r"(?:^|\s)#(?!!)(.*)$")
 STATUS = re.compile(r"^\s*(?:\*\*)?Status(?:\*\*)?:", re.I)
 
 SPARED = ("plugins/", "tests/fixtures/", "docs/agents/", "evals/")
-LEDGER = "docs/rulebook/approved-rules.md"
 HASH_FILES = (".yml", ".yaml", ".toml", ".sh")
 
 
@@ -83,7 +82,7 @@ def markdown(path: str, lines: list[str]) -> tuple[dict[int, str], dict[int, int
             text, in_comment = text.split("-->", 1)[1], False
         if "<!--" in text:
             text, in_comment = text.split("<!--", 1)[0], True
-        if line.lstrip().startswith("|") and (path == LEDGER or adr):
+        if line.lstrip().startswith("|") and adr:
             continue
         if STATUS.match(line) and (adr or path == "PRINCIPLES.md"):
             continue

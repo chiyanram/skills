@@ -1,5 +1,5 @@
 """The skills eval: one skill's fixed tasks, run with the full skill and with a shorter candidate, scored by the
-skill's own review checks, and compared against an approved baseline (docs/rulebook/pruning-method.md).
+skill's own review checks, and compared against an approved baseline.
 
 Every run is a real model call on the operator's login, so this script only stages and prints the command unless
 `--go` is given. It never runs in `make lint`, `make test` or CI.

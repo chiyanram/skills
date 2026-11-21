@@ -8,9 +8,9 @@ from tests.support import FIXTURES, run_check
 
 HISTORY = FIXTURES / "history"
 
-FAILING = ["decided-by", "dated-decision", "issue", "other-repo", "ledger-prose", "py-comment", "docstring",
+FAILING = ["decided-by", "dated-decision", "issue", "other-repo", "py-comment", "docstring",
            "js-comment", "yml-comment", "make-comment", "second-pointer"]
-PASSING = ["plain", "bare-date", "code-span", "fence", "link", "heading", "html-comment", "py-string", "ledger-row",
+PASSING = ["plain", "bare-date", "code-span", "fence", "link", "heading", "html-comment", "py-string", 
            "adr", "principles-status", "changelog", "fixture", "docs-agents", "evals", "one-pointer", "module-pointer"]
 
 

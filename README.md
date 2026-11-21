@@ -14,30 +14,30 @@ source. A second plugin, [`toolbox`](plugins/toolbox/), holds tools a person typ
 their licence notices.
 
 - **One file, two readers.** The writer follows the rules. The reviewer checks the same rules.
-- **Load only what the task needs.** Each domain has a router, so an agent opens one reference, not the whole book.
+- **One short skill per job.** A skill is a short procedure an agent reads whole. A notes file beside it holds what
+  only some tasks need.
 - **Project values stay in the project.** Commands, paths and module names go in that project's own `AGENTS.md`.
 
-It is for teams that run coding agents (Claude Code, Codex, Cursor) and want one standard across their repos. The
+It is for teams that run coding agents and want one standard across their repos. Claude Code is the main harness and
+GitHub Copilot CLI the second; other agents get the skills on a best-effort basis. The
 current version is in the [changelog](CHANGELOG.md).
 
 ## Quick start
 
-The repo is private. Give git your GitHub credentials first.
+1. Install the plugins. On a machine with no GitHub SSH key, set `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1` first.
 
-```bash
-gh auth setup-git
-claude plugin marketplace add chiyanram/skills
-claude plugin install rulebook@chiyanram
-```
+   ```bash
+   claude plugin marketplace add chiyanram/skills
+   claude plugin install rulebook@chiyanram
+   claude plugin install toolbox@chiyanram
+   ```
 
-For other agent tools:
-
-```bash
-npx skills add chiyanram/skills
-```
-
-Then paste this block into your project's `AGENTS.md`, so the agent loads the skills on a task that does not name
-them:
+   In GitHub Copilot CLI, run `copilot plugin marketplace add chiyanram/skills`, then `copilot plugin install` for
+   each plugin. Other agents can try `npx skills add chiyanram/skills`, on a best-effort basis: it does not keep
+   typed-only skills or the hook.
+2. Paste this block into the file your agent reads for project instructions, so it loads the skills on a task that
+   does not name them. In Claude Code, a project with a `CLAUDE.md` reads that file: paste the block there, or keep it
+   in `AGENTS.md` and add the line `@AGENTS.md` to `CLAUDE.md`.
 
 <!-- agents-index: built by `make index` from plugins/rulebook/hooks/index.txt; do not edit by hand -->
 ```text
@@ -49,6 +49,9 @@ Rulebook skills (rulebook plugin). Load the skill before you start, even when th
 Then read the notes file that the skill names for your task.
 ```
 <!-- /agents-index -->
+
+3. Type `/toolbox:onboard` in the project once. It proposes the lines an agent needs for that project, such as its
+   verify command, which the skills read.
 
 If the agent skips the skills, set `RULEBOOK_INDEX=1` in the `env` of `.claude/settings.json`. The plugin then prints
 the same block at the start of each session.
@@ -65,27 +68,21 @@ managed settings:
 
 ```mermaid
 flowchart LR
-    T["task: write or<br/>review a test"] --> S["skill router<br/>testing/SKILL.md"]
-    S -->|"reads only what<br/>the task needs"| R["reference<br/>strategy.md"]
-    R --> A["writer follows the Rules,<br/>reviewer runs the Review checks"]
-    P["project AGENTS.md<br/>project-only values"] -.-> A
+    T["task: write or<br/>review a test"] --> S["skill<br/>testing/SKILL.md"]
+    S -->|"a notes file only<br/>when the task needs it"| N["notes file"]
+    S --> A["writer follows the steps,<br/>reviewer checks the same rules"]
+    N --> A
+    P["project instructions<br/>project-only values"] -.-> A
 ```
 
-Each domain is one skill. Its `SKILL.md` is a router: a table of its references and when to read each. Every
-reference has the same five sections, in this order:
+Each skill is a short procedure for one job: numbered steps, each rule with its *because*, and a Good / Bad pair only
+where a model's default is wrong. A rule has no ID: a reviewer names the skill and its section. `planning`, `obs`,
+`migrations` and `agent` still use an older router shape, with references in five sections, until each is rewritten.
 
-| section | holds |
-|---|---|
-| Rules | one line per rule: an ID, an instruction, and *because* + the failure it prevents |
-| When X, use Y | situation → rule → action |
-| Good / Bad | example pairs in a neutral domain |
-| Decided edges | cases settled once, so nobody argues them again |
-| Review checks | what a reviewer checks, each naming its rule ID |
-
-A project points at a reference by skill and name, never by path:
+A project points at a skill by name, never by path:
 
 ```text
-Tests here call the model: use the `testing` skill (rulebook plugin) and read its `llm-tests` reference.
+Tests here call the model: use the `testing` skill (rulebook plugin) and read its notes on tests that call a model.
 ```
 
 ## Use
@@ -108,7 +105,6 @@ The [plugin README](plugins/rulebook/README.md) has more on each skill.
 
 - [CONTRIBUTING.md](CONTRIBUTING.md): set up, add a rule, a reference or a check, and how releases work.
 - [AGENTS.md](AGENTS.md): instructions for coding agents that work in this repo.
-- [docs/rulebook/approved-rules.md](docs/rulebook/approved-rules.md): every approved rule, with its reason and source.
 
 ## License
 

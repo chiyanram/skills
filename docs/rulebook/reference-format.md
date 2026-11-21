@@ -21,7 +21,7 @@ before …". `make index` copies that sentence and the rule IDs into the domain 
 
 | section | holds | how to write it |
 |---|---|---|
-| **Rules** | the approved rules, one line each, with their ledger ID | only rules the operator approved; one sentence = instruction + "because" + the failure it prevents, ≤35 words; a rule with no reason is flagged for deletion |
+| **Rules** | the approved rules, one line each, with their ID | only approved rules; one sentence = instruction + "because" + the failure it prevents, ≤35 words; a rule with no reason is flagged for deletion |
 | **When X, use Y** | a decision table for choices inside the topic | situation → choice → why |
 | **Good / Bad** | one pair per rule that can be misread | see the Good / Bad rules below |
 | **Decided edges** | cases that look like violations but are allowed, and the reverse | *Skip when* · *Do not skip when* · *Confidence* |
@@ -59,8 +59,8 @@ field:
 1. A Good obeys **every** approved rule and house style, not only its own.
 2. Bad and Good come from the rule's source, adapted into one neutral domain. Where no source has a pair, write fresh
    neutral code. Never re-skin project code. No project names, paths or business terms. ≤15 lines each. The pair
-   carries no label or credit; its source is in the ledger.
-3. A real project mistake that shows the rule is needed is evidence. It goes in the rule's ledger row, never into the
+   carries no label or credit; its source is in the pull request that added it.
+3. A real project mistake that shows the rule is needed is evidence. It goes in the pull request body, never into the
    reference, and never as the start of an example.
 4. House style in examples: test names are "should …" sentences; `final var` in Java, `def` in Groovy; one argument
    per line with the closing parenthesis on the last argument; Spock for new tests.

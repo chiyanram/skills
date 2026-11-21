@@ -1,6 +1,6 @@
 # Principles
 
-Approved by the operator, 2026-11-11; K2–K6 and K9 changed 2026-11-12 (#327). Changed only by pull request.
+Changed only by a pull request the operator merges.
 
 What this repo holds to. Each principle is guidance: a change that departs from one says which and why in its pull
 request. `AGENTS.md` holds the hard rules; `CONTRIBUTING.md` holds the procedures.
@@ -45,14 +45,14 @@ only.
 ## K3
 
 A rule is short and says why: the instruction, then the failure it prevents. It enters only with its rulebook
-owner's yes; where it came from lives in the ledger, never in the rule.
+owner's yes; where it came from lives in the pull request that added it, never in the rule.
 
 **Why.** The reason lets the model apply a rule to cases it does not name; a bare rule is followed to the letter or
 not at all. The agent needs the rule and its reason, not its history. "Owner" rather than one named person, so a
 team's own rulebook works the same way.
 
-**How it's checked.** `check_provenance.py` fails a source in a shipped file, and `check_ledger.py` checks the ledger.
-The reason and the owner's yes are review only.
+**How it's checked.** `check_provenance.py` fails a source in a shipped file. The reason and the owner's yes are review
+only: the owner's yes is the merge.
 
 ## K4
 
@@ -70,7 +70,7 @@ references until their ticket (#340, #341); `check_routers.py` and `check_index.
 ## K5
 
 Rules grow from our own failures: a lesson lands as a rule in the skill, with its reason, and its origin goes in
-the ledger.
+the pull request that adds it.
 
 **Why.** Our own failures show where a rule is missing; a rule the model already follows is waste (K6).
 

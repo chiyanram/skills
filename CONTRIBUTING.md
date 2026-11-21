@@ -9,7 +9,8 @@ stays out, even when an agent likes it or another repo has it.
 ## Set up
 
 You need Python 3.10 or newer, Node `^22.22.2` or `>=24.15`, `git`, the GitHub CLI `gh`, and the Claude Code CLI
-(`npm install -g @anthropic-ai/claude-code`).
+(`npm install -g @anthropic-ai/claude-code`). The `python3` that macOS ships is 3.9, which fails `make lint` and
+`make test`; install a newer one and run `PYTHON=python3.12 make check`, or put it first on `PATH`.
 
 ```bash
 git clone https://github.com/chiyanram/skills.git
@@ -73,9 +74,8 @@ A good pull request does one thing and adds a test with every change to a check.
 
 - a change to a released format is a new version file, not an edit, and a new check, role or outside skill starts in
   the toolbox (the format and manual-first MUSTs in [AGENTS.md](AGENTS.md#musts));
-- every new or changed rule has the operator's yes and a row in `docs/rulebook/approved-rules.md`;
-- a new reference follows `docs/rulebook/reference-format.md` and is listed in `plugins/rulebook/README.md` and the root
-  `README.md`;
+- every new or changed rule names its two sources in the pull request body;
+- a new or rewritten skill follows the one skill shape ([Add a skill](#add-a-skill));
 - no `version` or `CHANGELOG*.md` is edited by hand.
 
 ## Commit messages
@@ -117,16 +117,16 @@ writes the message: semantic-release still cuts the releases.
 
 ```mermaid
 flowchart LR
-    I["issue labelled<br/>ready-for-agent"] --> R["research: sources<br/>and incidents"]
+    I["issue labelled<br/>ready-for-agent"] --> R["research: two sources<br/>and incidents"]
     R --> Q{"operator approves<br/>the table?"}
     Q -->|"no"| X["stays out"]
-    Q -->|"yes"| W["reference + ledger row<br/>make index · lint · test"]
+    Q -->|"yes"| W["rule in the skill + an eval case<br/>that fails without it"]
     W --> V["fresh review"]
-    V --> P["pull request"] --> M{"operator<br/>merges"}
+    V --> P["pull request<br/>with the sources"] --> M{"operator<br/>merges"}
 ```
 
 A rule issue starts when the operator labels it `ready-for-agent`, or says "start #N". The operator decides twice:
-at the approval table and at the merge.
+at the approval table and at the merge. The merge is the proof of the operator's yes.
 
 1. Read the issue, and list the rules that already cover its topic, so the new rules only fill gaps.
 2. Find two independent sources for each part of each rule: a file and line pinned to a commit, or an official doc
@@ -135,37 +135,33 @@ at the approval table and at the merge.
    before the table, not after it. Two parts of a rule from different sources count only for those parts.
 3. Show the operator one table, one row per rule: the rule as it would ship, where it goes, the sources for each part
    with how many are independent, the incidents, and a recommendation. Say above it what already covers the topic, and
-   below it what was left out and why. A part with one source is decided there, once, as the operator's preference,
-   and the ledger row's status says the preference covers the whole rule or only that part, so a reader can tell a
-   choice from industry practice.
+   below it what was left out and why. A part with one source is decided there, once, as the operator's preference.
    The operator's yes also covers the commits and pushes on the issue's branch until the pull request.
-4. Add a row to the [ledger](docs/rulebook/approved-rules.md): ID, reference, rule, *because* reason, source,
-   evidence, status. Add new sections at the end of the file, and change a rule with a new row that says
-   "Supersedes", never by editing the old row. Git merges the ledger with `union`, so two pull requests that both
-   add a section merge without a conflict.
-5. Write the rule into its reference. The source stays in the ledger, never in the reference: no citation, credit,
-   label, preference mark, evidence note or date (`check_provenance.py` fails it). Write the *because* as the plain
-   reason the choice is right, never a source name. Keep a tool's name only when it is the action itself, such as a
-   check to turn on. A mistake in a project's own code is evidence: its path goes in the ledger row, never in the
-   rule. Adapt a Good / Bad pair from the rule's source into one neutral domain, or write fresh neutral code; never
-   rename a project's code into a neutral domain, because the pair then teaches that project's names. Before you edit a
-   `crq` reference, check for an open pull request on the same file: wait if there is one, and note the change on
-   the crq issue (#210) when you go ahead.
-6. Have a fresh reviewer check each rule, grep and example, every Good / Bad pair against every rule, and every
-   ledger cite. Bring a fix that changes what a rule means (narrower, wider, split, or a part left with one source)
-   back to the operator before the pull request. Put every other fix in the review-fix commit and list it in the
-   pull request body.
-7. Open the pull request with `Closes #N`. The operator merges.
+4. Write the rule into its skill, with its *because*. Write an exception inline, next to the rule ("only when …",
+   "unless …"). The source never goes in the skill: no citation, credit, label, preference mark, evidence note or
+   date (`check_provenance.py` fails it). Keep a tool's name only when it is the action itself, such as a check to
+   turn on. Adapt a Good / Bad pair from the rule's source into one neutral domain, or write fresh neutral code; never
+   rename a project's code into a neutral domain, because the pair then teaches that project's names.
+5. Add an eval case that fails without the rule, and names the skill and the section it tests.
+6. Have a fresh reviewer check each rule, grep and example, and every Good / Bad pair against every rule. Bring a fix
+   that changes what a rule means (narrower, wider, split, or a part left with one source) back to the operator
+   before the pull request. Put every other fix in the review-fix commit and list it in the pull request body.
+7. Open the pull request with `Closes #N`. Its body names the two sources of each rule, and a mistake in a project's
+   own code that showed the rule was needed. The operator merges.
 
-## Add a reference
+## Add a skill
 
-1. Follow [the reference format](docs/rulebook/reference-format.md): a title, one paragraph with a "Read it when …"
-   sentence, then the five sections in order.
-2. Use a neutral domain in every Good / Bad pair. Never use a real project's names.
-3. Run `make index` to rebuild the domain's router table. When two pull requests conflict on that table, take either
-   side and run `make index` again.
-4. A new domain is a new skill folder with a `SKILL.md` router, one row in
-   [`plugins/rulebook/README.md`](plugins/rulebook/README.md) and one row in the root README.
+Every skill has one shape. A skill still in the older router shape keeps it until it is rewritten.
+
+1. `SKILL.md` is a short procedure for one job: numbered steps, each rule with its *because*, and a Good / Bad pair
+   only where a model's default is wrong. It is 120 lines or fewer. A notes file beside it holds what only some runs
+   need, such as one stack's traps.
+2. A rule has no ID. A reviewer's finding names the skill and its section.
+3. A rulebook skill holds knowledge and can be loaded by the model. A toolbox skill is a procedure a person starts and
+   is typed-only. A skill that another skill calls must be one the model can load.
+4. Use a neutral domain in every Good / Bad pair. Never use a real project's names.
+5. A new skill is a new folder with one row in [`plugins/rulebook/README.md`](plugins/rulebook/README.md) and one row
+   in the root README.
 
 ## Add a check
 
@@ -178,7 +174,7 @@ When review finds a case a check missed, plant that case first and watch it fail
 
 | check | fails when |
 |---|---|
-| `check_skills.py` | a `SKILL.md` has no `name` or `description`, its name is not its folder name, or its description is over 1024 characters |
+| `check_skills.py` | a `SKILL.md` has no `name` or `description`, its name is not its folder name, its description is over 1024 characters, it is over 120 lines, or an unquoted frontmatter value holds `: ` or ` #` or starts with a YAML indicator |
 | `check_versions.py` | a plugin's marketplace entry and its `plugin.json` disagree on the version |
 | `check_links.py` | a relative markdown link points at nothing |
 | `check_sizes.py` | root `AGENTS.md` reaches 200 lines, a rule is over 35 words, or an `AGENTS.md` chain is over 32 KiB |
@@ -186,14 +182,13 @@ When review finds a case a check missed, plant that case first and watch it fail
 | `check_index.py` | a plugin README does not link every skill router, a router's table or a lanes block differs from what `make index` builds, or a skill with `process/lanes-v2.json` has no lanes block, holds one twice or without its END marker after START, has a lanes-v2.json that is not valid, or has a process schema missing or not JSON |
 | `check_routers.py` | a skill folder ships references but has no `SKILL.md`, or its `SKILL.md` does not link each one |
 | `check_provenance.py` | a shipped skill file carries provenance outside code: a source citation, a URL, a preference line, a credit, an evidence note, a date or a reference to another repository's issue. In the toolbox it reads only each `SKILL.md` |
-| `check_ledger.py` | the ledger repeats a rule ID for the same reference without "Supersedes" in the later row, or holds a conflict marker |
 | `check_glossary.py` | a crq or planning file uses a word the crq glossary lists under `checked`; the error names the term to use |
 | `check_routing.py` | a skill router has no `evals/routing/<name>.json`, a file has fewer than 8 `should` or 8 `near_miss` requests, a `should` request does not rank its router first, a near miss does not rank its named owner above that router, or two router descriptions are 75% alike. It skips a typed-only skill, which nothing routes to. Word matching only: a model-graded run (`claude plugin eval`) costs tokens and stays manual |
 | `check_process.py` | a crq process schema (card, lanes, lanes-v2 or finding, in `process/schema/`) is missing or uses a keyword `scripts/schema_lite.py` does not run; the lanes file or a role card's frontmatter does not validate against its schema, which covers a lane that is missing, out of order or drops approval above tiny, and a guardrail ID outside the card schema's list; lanes-v2 is missing or breaks its graph rules: a lane phase outside the global order or out of it, a phase listed twice in the order, a phase with no outcomes, an outcome with no valid edge, an uncapped count, a phase with a counted edge and no `round-cap` outcome to `human`, a cap that is not an integer of at least 1, an unknown condition, a condition whose text is empty or not text, a lane above tiny with no plain `approval`, a lane that does not end in a plain `timeline-record`, an actor that is not a card role, human or engine, a `lens_cap` below 1, or a `lane_raise` to no phase; the review file's baseline is empty, has an entry that is not exactly a skill, or a skill and a reference, names one twice, or names one the plugin does not ship (a skill alone means its `SKILL.md`); a role card is not a known role, misses or adds a frontmatter field, cites a rule ID that no Rules section holds, or lacks the job, a "done when" line, numbered steps or an "it's working if" list; or its role has fewer than 3 eval scenarios, each a `prompt.md` and a grader |
 | `check_settings_keys.py` | a skill file names a settings key for a memory ceiling, machine size, port or timeout in backticks with a number in the same clause, outside fenced code: the rule names the key and the project's settings hold the value |
 | `check_toolbox.py` | a toolbox `SKILL.md` lacks `disable-model-invocation: true`, a toolbox skill has no section with `Source:`, `Commit:` and `Licence:` in `THIRD_PARTY_NOTICES.md` and is not listed under its `## Written here`, that list names no toolbox skill, or a toolbox file holds a `git push`, a `gh pr merge`, a `.cursor/` path or a Grok model |
 | `check_formats.py` | a `*-v<N>.schema.json` in a skill's `process/schema/` that the newest `rulebook--v*` tag holds differs from that tag or is gone, or the repo has no such tag. A change is a new `-v<N+1>` file beside it |
-| `check_history.py` | a line a change adds outside `plugins/` carries history: who decided, an ISO date beside a person or decision word, or an issue number, in markdown prose or a code comment. It reads the diff since `origin/main` (pass another base as the second argument) and spares ledger rows, ADR and `PRINCIPLES.md` status lines, CHANGELOGs, fixtures, `docs/agents/`, `evals/` and one `See #N` / `History: #N` pointer per section or code header |
+| `check_history.py` | a line a change adds outside `plugins/` carries history: who decided, an ISO date beside a person or decision word, or an issue number, in markdown prose or a code comment. It reads the diff since `origin/main` (pass another base as the second argument) and spares ADR and `PRINCIPLES.md` status lines, CHANGELOGs, fixtures, `docs/agents/`, `evals/` and one `See #N` / `History: #N` pointer per section or code header |
 
 ## Add a tool
 
@@ -232,7 +227,7 @@ claude plugin eval plugins/rulebook --eval-dir evals/finder --runs 1 --no-publis
 claude plugin eval plugins/rulebook --case planted-instruction --runs 1 --no-publish # one case
 ```
 
-To prune a skill, follow [the pruning method](docs/rulebook/pruning-method.md). Each case runs with and without the plugin; read the score difference in the report, not only the exit code. A card
+To prune a skill, keep a cut only if no check that must hold gets worse than the baseline by more than the noise. Each case runs with and without the plugin; read the score difference in the report, not only the exit code. A card
 change ships only if its scenarios do not get worse. Results land in a `results/` folder under the eval dir you ran,
 which git ignores.
 
@@ -268,7 +263,7 @@ Other types ship nothing and are not listed.
 |---|---|---|
 | `feat(<domain>): …` | minor | a new reference, rule or skill |
 | `fix(<domain>): …` | patch | a shipped rule, example or check says something wrong |
-| `feat(<domain>)!: …`, or a `BREAKING CHANGE:` footer | major | a rule ID is renamed or removed, or a reference moves |
+| `feat(<domain>)!: …`, or a `BREAKING CHANGE:` footer | major | a rule is removed or its meaning is reversed, or a skill is renamed or removed |
 | `docs`, `chore`, `test`, `ci`, `build`, `refactor`, `style` | none | anything that does not change what ships |
 | any type with scope `research`, `review` or `repo` | none | design work, even when it is a `feat` |
 | `feat(toolbox)`, `fix(toolbox)`, `feat(toolbox)!` | the toolbox only | a tool is added, changed or removed |
@@ -288,12 +283,11 @@ manual release. Preview the next release on `main` with `GITHUB_TOKEN=<token> np
 | `make lint`: `claude: command not found` | `npm install -g @anthropic-ai/claude-code` |
 | `check_index.py`: a table is stale | run `make index` and commit the router it rewrote |
 | `make test` fails in `test_release_config`, `test_release_notes` or `test_release_links` | run `npm ci`; the tests load the release config from `node_modules` |
-| `check_provenance.py` fails on a reference | move the citation, URL or date into the rule's ledger row |
+| `check_provenance.py` fails on a skill file | move the citation, URL or date into the pull request body |
 | `check_history.py` fails a line you added | say what and why; drop who decided, the date and the issue, which the PR and git log keep. One `See #N` line per section may point at the history |
 | `check_history.py`: cannot resolve `origin/main` | run `git fetch origin main` |
-| `check_ledger.py`: a rule ID repeats | a merge kept two edits of one row: keep the right one, or mark the newer row "Supersedes" |
-| `check_sizes.py`: a rule is over 35 words | shorten it; move detail to When X, use Y or Decided edges |
-| `claude plugin marketplace add` fails on clone | the repo is private: run `gh auth setup-git` |
+| `check_sizes.py`: a rule is over 35 words | shorten it; move detail into a notes file beside the skill |
+| `claude plugin marketplace add` or `/plugin install` fails on an SSH clone | set `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1` |
 | a merge to `main` did not release | expected: releases are manual. Open **Actions → release → Run workflow** on `main` |
 | the release fails with `RELEASE_TOKEN is not set` | add a repository secret `RELEASE_TOKEN`: the owner's token with Contents read and write, which the admin bypass of ruleset `main` lets through |
 

@@ -7,7 +7,9 @@ from pathlib import Path
 from tests.support import ROOT
 
 PLUGIN = Path("plugins/rulebook")
-SHIPPED = [Path("LICENSE"), PLUGIN / "README.md", PLUGIN / ".claude-plugin/icon.png"]
+# plugin.json names its licence, so the validator no longer needs the root LICENSE; check_plugin.py still fails a
+# repo with no LICENSE (tests/fixtures/plugin/no-license).
+SHIPPED = [PLUGIN / "README.md", PLUGIN / ".claude-plugin/icon.png"]
 
 
 def validate(repo: Path) -> subprocess.CompletedProcess:
