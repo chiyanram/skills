@@ -1,0 +1,7 @@
+---
+purpose: demo
+---
+
+Compare.
+
+{{reference}}

@@ -16,6 +16,9 @@ CASES = {
     "glossary": (["good"], ["avoid-word", "avoid-word-in-crq"]),
     "settings_keys": (["good"], ["number-after-key", "number-before-key", "value-in-span", "wrapped-line"]),
     "routing": (["good"], ["no-cases", "too-few", "misrouted", "near-miss-wins", "unknown-owner", "collision"]),
+    "eval_proof": (["good", "good-normal-unproven"],
+                   ["core-no-baseline", "core-reference-not-approved", "core-baseline-not-approved", "core-no-planted",
+                    "core-planted-failed", "stale-approved-baseline", "no-plugin", "unknown-tier"]),
 }
 
 

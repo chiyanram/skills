@@ -189,6 +189,7 @@ When review finds a case a check missed, plant that case first and watch it fail
 | `check_toolbox.py` | a toolbox `SKILL.md` lacks `disable-model-invocation: true`, a toolbox skill has no section with `Source:`, `Commit:` and `Licence:` in `THIRD_PARTY_NOTICES.md` and is not listed under its `## Written here`, that list names no toolbox skill, or a toolbox file holds a `git push`, a `gh pr merge`, a `.cursor/` path or a Grok model |
 | `check_formats.py` | a `*-v<N>.schema.json` in a skill's `process/schema/` that the newest `rulebook--v*` tag holds differs from that tag or is gone, or the repo has no such tag. A change is a new `-v<N+1>` file beside it |
 | `check_history.py` | a line a change adds outside `plugins/` carries history: who decided, an ISO date beside a person or decision word, or an issue number, in markdown prose or a code comment. It reads the diff since `origin/main` (pass another base as the second argument) and spares ADR and `PRINCIPLES.md` status lines, CHANGELOGs, fixtures, `docs/agents/`, `evals/` and one `See #N` / `History: #N` pointer per section or code header |
+| `check_eval_proof.py` | a skill that `evals/skills/settings.json` gives a tier lacks what its tier asks for: cases in both slices, an approved reference answer per case, an approved baseline whose summaries exist, and, for CORE, a passing planted check per llm grader. A summary or planted check made from other case files, or another judge, is stale. CORE fails on any gap; NORMAL prints a warning, except a stale summary behind an approved baseline |
 
 ## Add a tool
 
@@ -231,11 +232,39 @@ To prune a skill, keep a cut only if no check that must hold gets worse than the
 change ships only if its scenarios do not get worse. Results land in a `results/` folder under the eval dir you ran,
 which git ignores.
 
-## Run the skills eval
+## Prove a skill change
 
-A skill's own eval sits in `evals/skills/<skill>/`: a few real tasks, scored by that skill's review checks, run with
-the full skill and with a shorter candidate. A pruning PR shows its result beside the operator-approved baseline.
-The runs are real model calls and stay manual; see [evals/skills/README.md](evals/skills/README.md).
+A skill change ships with proof that it is no worse. The proof is an eval run that you can trust, and the operator
+approves it. Every run is a real model call, so it runs by hand, never in CI. CI checks the committed proof with
+`check_eval_proof.py`, which makes no model call.
+
+Each skill has a tier in `evals/skills/settings.json`:
+
+| tier | skills | proof |
+|---|---|---|
+| CORE | crq, code, testing | everything below, 5 runs per case, the arms in turn, a repeated baseline, planted answers for each llm grader, and the operator's hand check of 20 judge verdicts (18 or more must agree) |
+| NORMAL | every other skill | cases, approved reference answers, an approved baseline, 3 runs per case |
+| NONE | a change to wording only | `make lint` |
+
+Rules for every run:
+
+1. Start each case prompt with the typed slash (for example `/rulebook:deslop`), so the skill loads.
+2. The judge and the agent model are pinned in `settings.json`. Do not run with others.
+3. A run counts only when it ended without an error and its session file shows the skill was loaded. Any other run
+   is an error, never a FAIL.
+4. Each case has a `reference.md` answer. The operator approves it by setting `approved` in its frontmatter.
+5. Point a grader at the trace (`focus: trace`) when the work is in files or tool calls, not in the last message.
+   Use a free grader (`tool_used`, `regex`, `file_exists`) when the fact is mechanical.
+6. A CORE llm grader gates only after its 9 planted answers (3 right, 3 wrong, 3 near misses) give 0 false PASS and
+   at most 1 false FAIL.
+7. Commit the cases, the summaries and `baseline.json`. Keep raw transcripts out of the repo.
+
+The steps, in order, with no step skipped:
+
+1. Write the lesson as a rule in the skill, and add a case that fails without it.
+2. Run the baseline and the candidate with `scripts/skill_eval.py`. See [evals/skills/README.md](evals/skills/README.md).
+3. Open a pull request with the summaries.
+4. The operator approves the cases, the graders and the baseline, and merges.
 
 ## Releases
 

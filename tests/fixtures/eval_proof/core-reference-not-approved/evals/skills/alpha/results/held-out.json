@@ -1,0 +1,14 @@
+{
+  "skill": "alpha",
+  "arm": "full",
+  "slice": "held-out",
+  "judge_model": "claude-sonnet-5-5",
+  "inputs": {
+    "alpha-held-out-case/graders/finds-it.md": "d13133a9b59d7b51",
+    "alpha-held-out-case/prompt.md": "b9221b701f09fb2f",
+    "alpha-held-out-case/reference.md": "f1f95a1b981cbea6",
+    "reference-grader.md": "bffce56974ed15b3"
+  },
+  "cases": {},
+  "errors": {}
+}

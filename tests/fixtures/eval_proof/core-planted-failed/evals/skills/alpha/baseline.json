@@ -1,0 +1,8 @@
+{
+  "skill": "alpha",
+  "approved": "operator",
+  "tune": [
+    "evals/skills/alpha/results/tune.json"
+  ],
+  "held_out": "evals/skills/alpha/results/held-out.json"
+}

@@ -1,0 +1,23 @@
+{
+  "skill": "alpha",
+  "graders": {
+    "alpha-tune-case/finds-it": {
+      "gates": false,
+      "approved": "operator",
+      "grader_sha": "d13133a9b59d7b51",
+      "answers": 9,
+      "false_pass": 2,
+      "false_fail": 0,
+      "errors": []
+    },
+    "alpha-held-out-case/finds-it": {
+      "gates": false,
+      "approved": "operator",
+      "grader_sha": "d13133a9b59d7b51",
+      "answers": 9,
+      "false_pass": 2,
+      "false_fail": 0,
+      "errors": []
+    }
+  }
+}
