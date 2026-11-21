@@ -10,7 +10,7 @@ claude plugin marketplace add chiyanram/skills
 claude plugin install toolbox@chiyanram
 ```
 
-The repo is private. See the [root README](../../README.md#quick-start) for credentials.
+See the [root README](../../README.md#quick-start) for GitHub Copilot CLI and other agents.
 
 ## Tools
 
