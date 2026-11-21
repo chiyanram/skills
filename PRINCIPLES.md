@@ -15,7 +15,7 @@ request. `AGENTS.md` holds the hard rules; `CONTRIBUTING.md` holds the procedure
 - [K6](#k6) — Say only what the model wouldn't do, and keep it short.
 - [K7](#k7) — A script or lint beats a prose rule.
 - [K8](#k8) — This repo publishes the versioned format of what it ships.
-- [K9](#k9) — A skill is judged by use.
+- [K9](#k9) — A skill change ships with eval proof, sized by its tier.
 
 ## K1
 
@@ -108,11 +108,11 @@ format.
 
 ## K9
 
-A skill is judged by use. A change ships when its owner has used it on real work and found it no worse. When
-tuning a skill's wording or cutting it, run the local skills eval (`scripts/skill_eval.py`); its cases and results are
-not committed.
+A skill change ships with eval proof that it is no worse, sized by the skill's tier. The steps and the rules for a
+run you can trust are in [CONTRIBUTING.md, Prove a skill change](CONTRIBUTING.md#prove-a-skill-change).
 
-**Why.** A committed eval suite costs more than a one-person rulebook earns back, and real work finds what a fixed
-task set misses.
+**Why.** A verdict from a run that did not load the skill, that errored, or that a changed grader scored, proves
+nothing. Committed proof lets anyone check the claim on any machine.
 
-**How it's checked.** Review only: the pull request says what the change was used on, or "not yet used".
+**How it's checked.** `check_eval_proof.py` checks the committed cases, summaries and baseline against each skill's
+tier, with no model call. The operator approves each case, grader and baseline.

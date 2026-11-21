@@ -1,0 +1,1 @@
+No edits made. Finding for the author: `sum(List<CartLine>, Locale)` takes a `locale` parameter that is never read, and the only caller passes `Locale.ROOT`. This is dead code; remove the parameter and the argument.

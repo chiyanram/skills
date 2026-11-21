@@ -1,0 +1,14 @@
+{
+  "skill": "alpha",
+  "arm": "full",
+  "slice": "tune",
+  "judge_model": "claude-sonnet-5-5",
+  "inputs": {
+    "alpha-tune-case/graders/finds-it.md": "0000000000000000",
+    "alpha-tune-case/prompt.md": "0000000000000000",
+    "alpha-tune-case/reference.md": "0000000000000000",
+    "reference-grader.md": "0000000000000000"
+  },
+  "cases": {},
+  "errors": {}
+}

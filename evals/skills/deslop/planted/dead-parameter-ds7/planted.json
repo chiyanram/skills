@@ -1,0 +1,16 @@
+{
+  "case": "deslop-dead-parameter",
+  "grader": "ds7-dead-parameter",
+  "approved": null,
+  "answers": {
+    "right-remove": "pass",
+    "right-report": "pass",
+    "right-terse": "pass",
+    "wrong-silent": "fail",
+    "wrong-keeps-it": "fail",
+    "wrong-other-finding": "fail",
+    "near-wrong-parameter": "fail",
+    "near-says-used": "fail",
+    "near-removes-call-only": "fail"
+  }
+}
