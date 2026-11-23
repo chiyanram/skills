@@ -46,6 +46,8 @@ Contents: Rules · When X, use Y · Good / Bad (SR2, SR3, SR4, SR10, SR11) · De
   out of them, because a helper that knows the goal reports what supports it.
 - **SR23** — In each design, say whether a touched module needs a refactor first, and propose it as its own ticket,
   because a change built on a module that resists it makes the next change harder too.
+- **SR24** — Give each allowed state of a new or changed type its own variant, and store a value other fields decide
+  only as a cache with one owner, because guards get skipped and copies drift.
 
 ## When X, use Y
 
@@ -77,6 +79,8 @@ Contents: Rules · When X, use Y · Good / Bad (SR2, SR3, SR4, SR10, SR11) · De
 | a brief for a research helper or subagent | questions on how it works today ("how does X reach Y?"), with the wanted change kept in the design notes, not the brief (SR22) | the helper looks for what is there, not for what fits the goal |
 | a design adds to a module that is hard to change: long methods, tangled dependencies, no tests around the touched code | a "refactor first?" line naming the module and why, with the refactor proposed as its own ticket for a person to start (SR23) | a change built on it inherits the mess and leaves it worse |
 | a touched module is easy to change | one line: "refactor first: no", with the reason (SR23) | the answer is on record, so the reviewer need not ask |
+| a design adds a type with two flags, or a flag beside an optional field, and only some combinations are allowed | one variant per allowed state, each with only its own fields (SR24) | a combination the type can build is one a later change will build |
+| a design stores a value that other stored fields decide: a status, a count, an order index | work it out on read, or keep it only as a cache with one owner (SR24) | two copies of one fact drift apart |
 
 ## Good / Bad
 
@@ -263,6 +267,10 @@ Each failure has a trigger, a chain and a sign someone can check.
   **Do not skip when** the design plans to delete or reshape existing code (SR21). — **Confidence** high
 - **Skip when** the change is in the tiny lane: it has no design (LN2). — **Do not skip when** a design in any other
   lane touches an existing module (SR23). — **Confidence** high
+- **Skip when** the design names a stored copy as a cache with one owner. — **Do not skip when** the copy has no named
+  owner, or two writers update it (SR24). — **Confidence** medium
+- **Skip when** every combination of the type's fields is allowed: it has no forbidden state. — **Do not skip when**
+  one combination is never allowed, even if no code builds it today (SR24). — **Confidence** high
 
 ## Review checks
 
@@ -341,7 +349,8 @@ Walk the whole spec and the whole design in one round, every section, before you
   None is a finding.
   Applies when: the design adds an abstraction, a setting, a port or an extension point.
   Evidence: the new seam, and where you looked for a second user.
-  Not a finding: a second user that exists today or is built in this spec (decided edge).
+  Not a finding: a second user that exists today or is built in this spec (decided edge); the variants of one type,
+  which SR24 asks for.
   Severity: blocker
   Verify: search the code and the spec for a second user again.
 - [ ] SR15 — For each decision that is hard to reverse, surprising and a real tradeoff, find its ADR. None is a
@@ -399,3 +408,11 @@ Walk the whole spec and the whole design in one round, every section, before you
   Not a finding: a change in the tiny lane (decided edge).
   Severity: warning
   Verify: re-open the design and its slices.
+- [ ] SR24 — For each type or stored record the design adds or changes, list the field combinations it can hold. A
+  combination the domain forbids that the type still allows, or a stored field that other fields decide and that is not
+  a cache with one owner, is a finding.
+  Applies when: the design adds or changes a type, a record or a stored field.
+  Evidence: the type or field, quoted, and one forbidden combination it allows or the fields it repeats.
+  Not a finding: a cache with one owner; a type whose fields are all independent (decided edges).
+  Severity: warning
+  Verify: re-open the type and build the forbidden combination from its fields.
