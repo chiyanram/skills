@@ -16,7 +16,7 @@ See the [root README](../../README.md#quick-start) for GitHub Copilot CLI and ot
 
 | tool | type | what it does |
 |---|---|---|
-| [correct](skills/correct/SKILL.md) | `/toolbox:correct` | finds the mistakes agents repeat here and proposes a fix for each at the highest level: architecture, types, a lint, a test, then docs |
+| [correct](skills/correct/SKILL.md) | `/toolbox:correct` | finds the mistakes agents repeat here, and the turns their runs waste in traces, and proposes a fix for each at the highest level: architecture, types, a lint, a test, then docs |
 | [create-verification-skill](skills/create-verification-skill/SKILL.md) | `/toolbox:create-verification-skill` | generates a project-local skill that launches, checks and drives the app as a user does, with a feature map, and runs it once end to end before handover |
 | [maintain-verification-skill](skills/maintain-verification-skill/SKILL.md) | `/toolbox:maintain-verification-skill` | checks that skill and its feature map against the source and the running app, and commits only proven corrections |
 | [grilling](skills/grilling/SKILL.md) | `/toolbox:grilling` | asks about a plan or decision one question at a time, each with a recommended answer, until you agree on it |

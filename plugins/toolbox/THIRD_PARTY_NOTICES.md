@@ -9,7 +9,9 @@ written in this repo has no source to name; it is listed under [Written here](#w
 - Source: cursor/plugins, `pstack/skills/correct/SKILL.md` (pstack)
 - Commit: 2776ddd2355d6d6c8747d3964600f28daf62f049
 - Licence: MIT, Copyright (c) 2026 Lauren Tan
-- Changes: it proposes each fix and commits only what the operator approves; it leaves sharing commits to the operator.
+- Changes: it proposes each fix and commits only what the operator approves; it leaves sharing commits to the operator;
+  it also reads the traces of agent runs and finds the turns they waste, with a table of waste kinds; it ends with a
+  `caught:` line.
 
 ## grilling
 
