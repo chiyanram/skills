@@ -38,6 +38,8 @@ When you reach for a word under "avoid", use the term instead. A check fails a c
 | **AC** | one acceptance criterion in the spec, named AC-n, decidable by a test | requirement, condition | — |
 | **design** | the chosen shape, one rejected alternative, and the slices; the spec links it | plan (alone), architecture doc | — |
 | **slice** | one thin end-to-end piece of the design, with the command that proves it | task (for a slice), chunk | — |
+| **forbidden state** | a set of field values a type can hold that the domain never allows, such as a refund time on an open order; the fix is one variant per allowed state, each with only its own fields | invalid state, illegal state, forbidden combination | — |
+| **derived value** | a stored field that other fields already decide, such as the count of a list; work it out on read, or keep it only as a cache with one owner | stored copy, second copy, redundant state | — |
 | **spec home** | where a project keeps its specs | — | — |
 | **ask** | a run that needs a human's decision ends with status `asked` and every open question at once, in one numbered round; a coordinator asks at most three and turns the rest into marked defaults that "accept all" takes; each question carries 2 to 4 short choices and one recommended choice, so the human answers with taps, "1A 2B" or "accept all"; the project's `questions` setting can be `one-at-a-time` instead; never a guess; the answer goes into the spec | clarify inline, assume | — |
 | **evidence row** | `{criterion, command, result}`: one AC and the plain command that proves it | proof, output | — |

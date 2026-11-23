@@ -1,6 +1,6 @@
 ---
-description: A design adds an order record whose refund time may be set while the status is not cancelled, and a stored item count that the item list already decides. The design review should flag it under SR24.
-expected_outcome: The order-record decision gets an open or conflict verdict that names both the forbidden combination and the stored copy, under SR24.
+description: A design adds an order record with a forbidden state (a refund time while the status is not cancelled) and a derived value (an item count that the item list decides). The design review should flag both under SR24.
+expected_outcome: The order-record decision gets an open or conflict verdict that names both the forbidden state and the derived value, under SR24.
 max_turns: 12
 allowed_tools: [Read, Glob, Grep, Skill]
 ---

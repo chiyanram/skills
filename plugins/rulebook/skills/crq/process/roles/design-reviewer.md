@@ -33,7 +33,7 @@ nothing about quality (RV6).
    the named symbol; a moved or wrong cite is a conflict at the line it should name (SR2, SR3).
 3. Walk the design rules over every decision: SR10, SR11, SR12, SR13, SR14, SR15, SR17 and SR18; and for each
    existing module the design touches, its "refactor first?" answer (SR23); and for each type or stored record it adds
-   or changes, a field combination the domain forbids or a field that repeats what others decide (SR24).
+   or changes, a forbidden state it can hold or a derived value that is not a cache with one owner (SR24).
 4. Check the spec and the lane: ACs a test can decide; assumptions marked and confirmed (SR19); the lane fits the
    change (LN1); a one-way door lists each irreversible step and has a pre-mortem (LN3, SR20); slices that run end to
    end within the size limit, each naming its AC-n, with no AC left without one (PD4, PD5, PD9, PD11).
