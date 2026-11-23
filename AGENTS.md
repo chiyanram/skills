@@ -22,37 +22,35 @@ make test   # python3 -m unittest: each check against its planted fixtures, the 
 
 ## MUSTs
 
+`make lint` fails a break of each of these:
+
+- Keep provenance out of `plugins/`: no citation, URL, date, credit or evidence note outside code; a copied toolbox
+  skill's source and licence go only in `plugins/toolbox/THIRD_PARTY_NOTICES.md` (`check_provenance.py`).
+- Make every toolbox skill typed-only (`disable-model-invocation: true`), with no push or merge (`check_toolbox.py`).
+- Say what and why in the repo's own docs and code comments, never who decided, when or on which issue
+  (`check_history.py`).
+- Never change a format file (`plugins/*/skills/*/process/schema/*-vN.schema.json`) once a release holds it; a change
+  is a new `-v(N+1)` file beside it (`check_formats.py`).
+- Fill in every line of `.github/pull_request_template.md`, with no `<placeholder>`, because the squash merge makes
+  it the commit on `main` (`pr_body.py`).
+
+No check can enforce these:
+
 - Add or change a rule only in a pull request the operator merges, with its two sources in the pull request body,
   because an unapproved rule reaches every project that installs the plugin.
-- Keep provenance out of `plugins/`: no citation, URL, date, credit or evidence note outside code, because the agent
-  needs the rule and the pull request keeps the source. `check_provenance.py` fails it. A copied toolbox skill's source and
-  licence go only in `plugins/toolbox/THIRD_PARTY_NOTICES.md`.
-- Make every toolbox skill typed-only (`disable-model-invocation: true`), with no push or merge, because a person
-  chooses when a tool runs. `check_toolbox.py` fails it.
-- Keep history out of the repo's own docs and code comments: say what and why, never who decided, when or on which
-  issue, because the git log and pull requests keep it. `check_history.py` fails an added line.
 - Keep `plugins/` generic: no project names, paths or business terms, because every project installs the same files.
 - Never edit a router table, a `version` or a `CHANGELOG*.md` by hand, because `make index` and the release write them.
 - Read Sonar rules for calibration only. Never copy their text, because their licence does not permit it.
-- Never change a format file (`plugins/*/skills/*/process/schema/*-vN.schema.json`) once a release holds it. A change
-  is a new `-v(N+1)` file beside it, because a tool pins a release and reads that version's format, and an edit in place
-  breaks the tool on its next update. `check_formats.py` fails it.
 - Put a new role, phase or field in a new format version, and say in the pull request what a tool must learn to read
-  it, because a tool on the old version keeps working only if the old file stays, and its owner learns the change there.
+  it, because a tool on the old version keeps working only if the old file stays.
 - Start a new check, role or outside skill as a typed-only toolbox skill, and move it into the crq process only after
   measured use, with a person deciding each step up, because a step nobody has run by hand reaches every project's
   automatic flow unproven.
 - Make each branch in its own worktree from the latest `origin/main`, never in the main checkout:
-  `git fetch origin main && git worktree add .claude/worktrees/<slug> -b <type>/<issue>-<slug> origin/main`, because
-  agents and people working at once then never share a working tree. Bring the branch up to date with
-  `git rebase origin/main`, never a merge, and push it with `git push --force-with-lease`, because the lease refuses
-  to overwrite a push you have not fetched. Never force-push without a lease, onto another person's branch, or onto
-  `main`. A cloud session's own fresh clone, on the branch the session was given, counts as its worktree, because git
-  cannot check that branch out a second time.
-- Fill in every line of `.github/pull_request_template.md` and leave no `<placeholder>`, because the squash merge
-  makes the PR title the commit subject and the description its body on `main`, where neither can be edited.
-  `pr_body.py` fails a ready PR with a missing line, a placeholder, an unticked item, or a breaking change whose
-  line, `!` and `BREAKING CHANGE:` footer disagree.
+  `git fetch origin main && git worktree add .claude/worktrees/<slug> -b <type>/<issue>-<slug> origin/main`.
+  Update it with `git rebase origin/main`, never a merge, and push with `git push --force-with-lease`; never
+  force-push without a lease, onto another person's branch, or onto `main`. A cloud session's own fresh clone, on
+  the branch it was given, counts as its worktree.
 
 ## Where things go
 
