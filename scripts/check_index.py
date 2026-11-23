@@ -1,7 +1,11 @@
 """Each plugin README links every skill router, and each router's index block is what `make index` builds from its
 references, so a reference is never missing from its router and two PRs never merge rows by hand. A skill that ships
 process/lanes-v2.json holds its phase diagram and lanes table once each, as `make index` builds them. A plugin that
-ships hooks/index.txt has the same text in the root README's AGENTS.md block."""
+ships hooks/index.txt has the same text in the root README's AGENTS.md block.
+
+A skill that ships references with no router, and a plugin with no README, are skipped: check_routers and
+check_plugin report them.
+"""
 import json
 import sys
 from pathlib import Path
@@ -22,7 +26,7 @@ def linked(readme: Path) -> set[Path]:
 def router_problems(skill: Path) -> list[str]:
     router = skill / "SKILL.md"
     if not any(skill.glob("references/*.md")) or not router.is_file():
-        return []  # check_routers reports a skill that ships references without a router
+        return []
     current = router.read_text()
     built = with_table(current, table(skill))
     if built is None:
@@ -50,7 +54,7 @@ def plugin_problems(root: Path, entry: dict) -> list[str]:
     folder = root / entry["source"]
     readme = folder / "README.md"
     if not readme.is_file():
-        return []  # check_plugin reports the missing README
+        return []
     listed = linked(readme)
     unlinked = [f"{readme}: skill router `{router.relative_to(folder)}` is not linked"
                 for router in sorted(folder.glob("skills/*/SKILL.md")) if router.resolve() not in listed]

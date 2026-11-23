@@ -1,8 +1,8 @@
+"""Each check against its fixtures: the good ones must pass and the planted ones must fail."""
 import unittest
 
 from tests.support import FIXTURES, run_check
 
-# check name -> (fixtures that must pass, planted fixtures that must fail)
 CASES = {
     "versions": (["good", "apart"], ["mismatch", "missing"]),
     "links": (["good"], ["broken", "broken-after-nested-fence"]),
@@ -14,6 +14,7 @@ CASES = {
     "provenance": (["good"], ["citation", "preference", "credit", "date", "evidence", "repo-ref", "neutral",
                               "fileline", "section", "url", "nested-fence"]),
     "glossary": (["good"], ["avoid-word", "avoid-word-in-crq"]),
+    "comments": (["good", "good-at-baseline"], ["py-comment", "js-comment", "raised", "below-baseline"]),
     "settings_keys": (["good"], ["number-after-key", "number-before-key", "value-in-span", "wrapped-line"]),
     "routing": (["good"], ["no-cases", "too-few", "misrouted", "near-miss-wins", "unknown-owner", "collision"]),
     "eval_proof": (["good", "good-normal-unproven"],

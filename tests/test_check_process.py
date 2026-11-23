@@ -1,3 +1,8 @@
+"""The crq process check against planted cards, lanes files and reports.
+
+Each planted file is written to a temp dir, never committed, because a planted card under plugins/ would be found by
+the other checks.
+"""
 import json
 import re
 import shutil
@@ -59,9 +64,6 @@ def lanes_v2(change) -> str:
 
 REVIEW = {"baseline": [{"skill": "crq", "reference": "demo"}, {"skill": "crq"}]}
 
-# Written to a temp dir, never committed: a planted card under plugins/ would be found by the other checks.
-# Each planted case: (a path under the plugin root, its new text or None to delete it, and optionally a substring
-# the failure must print).
 PLANTED = {
     "role-not-file-name": ("skills/crq/process/roles/finder.md", CARD.replace("role: finder", "role: reviewer")),
     "missing-field": ("skills/crq/process/roles/finder.md", CARD.replace("must_not_see: the implementer's report\n", "")),
@@ -102,7 +104,6 @@ PLANTED = {
                                  json.dumps({"baseline": [{"skill": "missing"}]}), "baseline names `missing`"),
     "baseline-extra-field": ("skills/crq/process/review.json",
                              json.dumps({"baseline": [{"skill": "crq", "reference": "demo", "why": "x"}]})),
-    # lanes-v2: (path, new text, a substring the failure must print).
     "v2-missing": (V2, None, "process: no lanes-v2.json"),
     "v2-not-json": (V2, "{", "lanes-v2.json: not JSON"),
     "v2-no-schema": ("skills/crq/process/schema/lanes-v2.schema.json", None, "lanes-v2.schema.json: missing"),
@@ -137,7 +138,6 @@ PLANTED = {
                             "phases[2].id: 'Build_x' does not match"),
     "v2-report-version": (V2, lanes_v2(lambda d: d["phases"][2].update(report="urn:rulebook:crq:report:2")),
                           "phases[2].report: 'urn:rulebook:crq:report:2' is not"),
-    # lanes-v2 graph rules, run once the schema passes.
     "v2-lane-unknown-phase": (V2, lanes_v2(lambda d: d["lanes"][2]["phases"].insert(1, "triage")),
                               "lane `feature`: phase `triage` is not in the phase order"),
     "v2-lane-out-of-phase-order": (V2, lanes_v2(lambda d: d["lanes"][0]["phases"].reverse()),
@@ -197,7 +197,6 @@ PLANTED = {
 ROW = {"criterion": "AC-1", "command": "make test", "result": "OK"}
 QUESTION = {"question": "Which lane?", "choices": ["bug", "feature"], "recommended": 1}
 DEVIATION = {"what": "renamed f to g", "why": "g is free", "file": "a.py", "line": "4-6"}
-# Each report case: (the report, a substring of the first problem, or None when it is valid).
 REPORTS = {
     "done": ({"status": "done", "evidence": [ROW]}, None),
     "done-deferred-deviations": ({"status": "done", "evidence": [ROW], "deferred": ["inline x"],

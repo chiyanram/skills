@@ -20,6 +20,8 @@ declares as its `$id`.
 The roles, the card fields, the guardrail IDs and the lanes come from the versioned schemas the plugin ships in
 process/schema/ (card, lanes, lanes-v2, finding, and report for the writers' .factory/report.json); the check fails
 when one is missing or uses a keyword schema_lite cannot run.
+
+A baseline entry with no reference names a skill that is read whole: the engine reads its SKILL.md.
 """
 import json
 import re
@@ -156,7 +158,6 @@ def baseline_problems(path: Path, plugin: Path) -> list[str]:
             found.append(f"{path}: baseline entry {json.dumps(entry)} is not exactly {{skill}} or {{skill, reference}}")
             continue
         skill = plugin / "skills" / str(entry["skill"])
-        # A skill with no references is read whole: the entry names only the skill, and the engine reads its SKILL.md.
         name, file = ((f"{entry['skill']}/{entry['reference']}", skill / "references" / f"{entry['reference']}.md")
                       if "reference" in entry else (str(entry["skill"]), skill / "SKILL.md"))
         if name in seen:

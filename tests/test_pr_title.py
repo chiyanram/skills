@@ -1,3 +1,6 @@
+"""The PR title rule: scripts/pr_title.py prints the same error line CI printed, and .cz.toml holds the same pattern.
+.cz.toml is read with a regex, not tomllib, because tomllib needs Python 3.11 and the repo supports 3.10.
+"""
 import re
 import subprocess
 import sys
@@ -21,7 +24,6 @@ FAIL = (
     "feat(crq): a title with no issue",
     "feat: a title with no scope (#123)",
 )
-# The line the inline rule in ci.yml printed before this script held it.
 CI_ERROR = ("::error::PR title \"{title}\" must be 'type(scope): lower-case summary (#issue)', "
             "e.g. 'feat(testing): spock rule file (#123)'. See CONTRIBUTING.md#releases.")
 
@@ -46,7 +48,6 @@ class PrTitleTest(unittest.TestCase):
                 self.assertEqual(result.stdout, CI_ERROR.format(title=title) + "\n")
 
     def test_commitizen_schema_pattern_is_the_same_rule(self):
-        # A regex, not tomllib: tomllib needs Python 3.11 and the repo supports 3.10.
         found = re.search(r"^schema_pattern = '(.*)'$", (ROOT / ".cz.toml").read_text(), re.MULTILINE)
         self.assertIsNotNone(found, ".cz.toml has no schema_pattern line")
         self.assertEqual(found.group(1), pr_title.PATTERN)

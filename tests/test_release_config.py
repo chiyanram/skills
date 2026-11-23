@@ -1,3 +1,10 @@
+"""The release config: which plugin each commit releases, and as what.
+
+Only an upper-case `BREAKING CHANGE:` footer at the start of a line is breaking; a PR body's prose line is not.
+cosmiconfig loads package.json "release" and every .releaserc* ahead of release.config.mjs, so none may exist. The tag
+format is <plugin-name>--v<version>, as `claude plugin tag` and dependency version ranges use. The first release writes
+each changelog, so a missing one is not checked.
+"""
 import json
 import os
 import shutil
@@ -12,7 +19,6 @@ from tests.support import ROOT
 MARKETPLACE = ".claude-plugin/marketplace.json"
 PLUGINS = ("rulebook", "toolbox")
 
-# commit -> (rulebook release, toolbox release). The rulebook column is what the one-plugin config released.
 MATRIX = {
     "feat(crq): a rule": ("minor", None),
     "fix(testing): a wrong example": ("patch", None),
@@ -23,7 +29,6 @@ MATRIX = {
     "feat(toolbox): a tool": (None, "minor"),
     "fix(toolbox): a tool's step": (None, "patch"),
     "feat(toolbox)!: drop a tool": (None, "major"),
-    # Only an upper-case footer at the start of a line is breaking; a PR body's prose line is not.
     "feat(crq): a rule\n\n**Breaking change:** no. Nothing breaks.": ("minor", None),
     "fix(testing): an example\n\nBreaking change: no": ("patch", None),
     "feat(toolbox): a tool\n\n**Breaking change:** no.": (None, "minor"),
@@ -90,7 +95,6 @@ class ReleaseConfigTest(unittest.TestCase):
         cls.entries = json.loads((ROOT / MARKETPLACE).read_text())["plugins"]
 
     def test_should_have_no_other_config_that_semantic_release_would_load_first(self):
-        # cosmiconfig takes package.json "release" and every .releaserc* ahead of release.config.mjs.
         self.assertNotIn("release", json.loads((ROOT / "package.json").read_text()))
         self.assertEqual(sorted(p.name for p in ROOT.glob(".releaserc*")), [])
         self.assertEqual(sorted(p.name for p in ROOT.glob(".config/releaserc*")), [])
@@ -125,7 +129,6 @@ class ReleaseConfigTest(unittest.TestCase):
         self.assertIn("/x is gone.", notes["toolbox"])
 
     def test_should_tag_as_claude_plugin_tag_does(self):
-        # `claude plugin tag` and dependency version ranges both use <plugin-name>--v<version>.
         for plugin in PLUGINS:
             with self.subTest(plugin):
                 self.assertEqual(self.configs[plugin]["tagFormat"], f"{plugin}--v${{version}}")
@@ -149,7 +152,7 @@ class ReleaseConfigTest(unittest.TestCase):
         for plugin in PLUGINS:
             options = plugin_options(self.configs[plugin], "@semantic-release/changelog")
             changelog = ROOT / options["changelogFile"]
-            if changelog.is_file():  # the first release writes it
+            if changelog.is_file():
                 with self.subTest(plugin):
                     self.assertTrue(changelog.read_text().startswith(options["changelogTitle"] + "\n"))
 
