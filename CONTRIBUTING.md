@@ -189,6 +189,7 @@ When review finds a case a check missed, plant that case first and watch it fail
 | `check_toolbox.py` | a toolbox `SKILL.md` lacks `disable-model-invocation: true`, a toolbox skill has no section with `Source:`, `Commit:` and `Licence:` in `THIRD_PARTY_NOTICES.md` and is not listed under its `## Written here`, that list names no toolbox skill, or a toolbox file holds a `git push`, a `gh pr merge`, a `.cursor/` path or a Grok model |
 | `check_formats.py` | a `*-v<N>.schema.json` in a skill's `process/schema/` that the newest `rulebook--v*` tag holds differs from that tag or is gone, or the repo has no such tag. A change is a new `-v<N+1>` file beside it |
 | `check_history.py` | a line a change adds outside `plugins/` carries history: who decided, an ISO date beside a person or decision word, or an issue number, in markdown prose or a code comment. It reads the diff since `origin/main` (pass another base as the second argument) and spares ADR and `PRINCIPLES.md` status lines, CHANGELOGs, fixtures, `docs/agents/`, `evals/` and one `See #N` / `History: #N` pointer per section or code header |
+| `check_comments.py` | a `.py`, `.mjs` or `.js` file outside `tests/fixtures/` holds more comment lines than `scripts/comment-baseline.json` allows, or fewer without `--shrink` run. It keeps the module header, a line with an `http(s)` link and a tool directive. `/delete-comment` (`.claude/commands/delete-comment.md`) sorts and deletes the rest |
 | `check_eval_proof.py` | a skill that `evals/skills/settings.json` gives a tier lacks what its tier asks for: cases in both slices, an approved reference answer per case, an approved baseline whose summaries exist, and, for CORE, a passing planted check per llm grader. A summary or planted check made from other case files, or another judge, is stale. CORE fails on any gap; NORMAL prints a warning, except a stale summary behind an approved baseline |
 
 ## Add a tool
@@ -316,6 +317,7 @@ manual release. Preview the next release on `main` with `GITHUB_TOKEN=<token> np
 | `check_provenance.py` fails on a skill file | move the citation, URL or date into the pull request body |
 | `check_history.py` fails a line you added | say what and why; drop who decided, the date and the issue, which the PR and git log keep. One `See #N` line per section may point at the history |
 | `check_history.py`: cannot resolve `origin/main` | run `git fetch origin main` |
+| `check_comments.py` fails a file | say it in code or in the module docstring or header; after you delete comments, run `python3 scripts/check_comments.py --shrink` |
 | `check_sizes.py`: a rule is over 35 words | shorten it; move detail into a notes file beside the skill |
 | `claude plugin marketplace add` or `/plugin install` fails on an SSH clone | set `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1` |
 | a merge to `main` did not release | expected: releases are manual. Open **Actions → release → Run workflow** on `main` |

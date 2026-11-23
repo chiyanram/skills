@@ -1,15 +1,15 @@
 // semantic-release config, one release line per plugin. A module, not JSON, because the release notes need
 // their own templates and transform, which live in scripts/release_notes.mjs (#276).
 // RELEASE_PLUGIN picks the plugin; CI runs it once for each. Scope `toolbox` releases only the toolbox.
+// Design work never releases and is not listed in the notes, even as a feat or fix. commit-analyzer keeps the highest
+// release among matching rules, and a later `false` beats an earlier one, so the toolbox catch-all comes first: every
+// commit is "no release" unless a toolbox-scoped rule below raises it.
 import { parserOpts } from './scripts/release_parser.mjs'
 import { releaseNotes } from './scripts/release_notes.mjs'
 
-// Design work never releases and is not listed in the notes, even as a feat or fix (#287).
 const DESIGN_SCOPES = ['research', 'review', 'repo']
 const DESIGN = DESIGN_SCOPES.map((scope) => ({ scope, release: false }))
 
-// commit-analyzer keeps the highest release among matching rules, and a later `false` beats an earlier one, so the
-// catch-all comes first: every commit is "no release" unless a toolbox-scoped rule below raises it.
 const TOOLBOX_ONLY = [
   { release: false },
   { breaking: true, scope: 'toolbox', release: 'major' },

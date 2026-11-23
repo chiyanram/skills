@@ -10,7 +10,6 @@ export function crossRepoLinks(subject, { host, owner }) {
   })
 }
 
-// Each plugin's release notes list only its own commits: `keep(scope)` says whether a commit belongs to it.
 export function forScope(keep, transformCommit) {
   return (commit, context) => (keep(commit.scope ?? '') ? transformCommit(commit, context) : null)
 }

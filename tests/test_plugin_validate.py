@@ -1,3 +1,6 @@
+"""`claude plugin validate` on the shipped plugin. plugin.json names its licence, so the validator does not need the
+root LICENSE; check_plugin.py still fails a repo with no LICENSE.
+"""
 import shutil
 import subprocess
 import tempfile
@@ -7,8 +10,6 @@ from pathlib import Path
 from tests.support import ROOT
 
 PLUGIN = Path("plugins/rulebook")
-# plugin.json names its licence, so the validator no longer needs the root LICENSE; check_plugin.py still fails a
-# repo with no LICENSE (tests/fixtures/plugin/no-license).
 SHIPPED = [PLUGIN / "README.md", PLUGIN / ".claude-plugin/icon.png"]
 
 

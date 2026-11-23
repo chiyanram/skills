@@ -1,9 +1,10 @@
+"""The shape of the release notes: emoji sections, one bullet per change as `**scope** — subject · #ticket (PR #pr)`, and
+an update line for the plugin.
+"""
 import unittest
 
 from tests.test_release_config import node
 
-# The shape of the release notes (#276): emoji sections, one bullet per change
-# as `**scope** — subject · #ticket (PR #pr)`, and an update line for the plugin.
 NOTES = """
 import { generateNotes } from '@semantic-release/release-notes-generator'
 import { releaseConfig } from './release.config.mjs'

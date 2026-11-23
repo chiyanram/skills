@@ -4,7 +4,7 @@ PYTHON ?= python3
 
 check: lint test ## run everything CI runs
 
-lint: ## skill frontmatter, one version, links, size budgets, packaging, router index, skill routers, provenance, glossary words, routing, process files, toolbox, settings keys, released formats, history notes, eval proof, plugin validate
+lint: ## skill frontmatter, one version, links, size budgets, packaging, router index, skill routers, provenance, glossary words, routing, process files, toolbox, settings keys, released formats, history notes, code comments, eval proof, plugin validate
 	$(PYTHON) scripts/check_skills.py .
 	$(PYTHON) scripts/check_versions.py .
 	$(PYTHON) scripts/check_links.py .
@@ -20,6 +20,7 @@ lint: ## skill frontmatter, one version, links, size budgets, packaging, router 
 	$(PYTHON) scripts/check_settings_keys.py .
 	$(PYTHON) scripts/check_formats.py .
 	$(PYTHON) scripts/check_history.py .
+	$(PYTHON) scripts/check_comments.py .
 	$(PYTHON) scripts/check_eval_proof.py .
 	claude plugin validate --strict .
 	for plugin in plugins/*/; do claude plugin validate --strict --profile directory $$plugin || exit 1; done

@@ -1,3 +1,6 @@
+"""The SKILL.md check. Each case is written to a temp dir, never committed, because `npx skills add` walks the repo for
+SKILL.md files.
+"""
 import tempfile
 import unittest
 from pathlib import Path
@@ -6,7 +9,6 @@ from tests.support import run_check
 
 DESCRIPTION = "Use when testing the skill check."
 
-# Written to a temp dir, never committed: `npx skills add` walks the repo for SKILL.md files.
 CASES = {
     "good": f"---\nname: demo\ndescription: {DESCRIPTION}\n---\n# Demo\n",
     "good-folded": f"---\nname: demo\ndescription: >\n  {DESCRIPTION}\n  Second line.\n---\n# Demo\n",

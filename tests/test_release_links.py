@@ -1,3 +1,4 @@
+"""scripts/release_links.mjs: each subject as the conventionalcommits preset renders it, and the subject after the rewrite."""
 import json
 import subprocess
 import unittest
@@ -8,7 +9,6 @@ CONTEXT = {"host": "https://github.com", "owner": "chiyanram", "repository": "sk
 SKILLS = "https://github.com/chiyanram/skills/issues"
 OTHER = "https://github.com/chiyanram/other/issues"
 
-# subject as the conventionalcommits preset renders it -> subject after scripts/release_links.mjs
 CASES = {
     "bare repo#N, the 0.2.0 bug": (
         f"boundaries rule file (other[#31]({SKILLS}/31), 1 of 11) ([#113]({SKILLS}/113))",
