@@ -3,5 +3,19 @@
     "commit": "",
     "pr": "",
     "sessionUrl": false
+  },
+  "env": {
+    "RULEBOOK_REPORT_RULES": "1"
+  },
+  "extraKnownMarketplaces": {
+    "chiyanram": {
+      "source": {
+        "source": "github",
+        "repo": "chiyanram/skills"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "rulebook@chiyanram": true
   }
 }
