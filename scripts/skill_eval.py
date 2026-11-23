@@ -12,7 +12,7 @@ two summaries made from different inputs.
   stage     copy the plugin, swap in a candidate skill, add one slice of the skill's cases; print the eval command
   summarize reduce one or more `claude plugin eval --json` results to a kept summary under evals/skills/<skill>/results/
   baseline  record the full skill's tune rounds and held-out run as the skill's baseline, awaiting the operator
-  compare   set a candidate's summaries beside the baseline and say keep or drop
+  compare   set a candidate's summaries beside the baseline and say keep or drop; --rewrite lifts the size rule
   planted   stage the planted answers, which check that each grader passes right answers and fails wrong ones
   planted-report  score one planted run against the gate
 """
@@ -255,7 +255,7 @@ def input_drift(reference: dict, other: dict, label: str) -> list[str]:
 
 
 def compare(baseline: dict, rounds: list[dict], held_out: dict | None, cand_tune: dict, cand_held_out: dict | None,
-            floor: float, fresh_full: list[dict] | None = None) -> tuple[bool, list[str]]:
+            floor: float, fresh_full: list[dict] | None = None, rewrite: bool = False) -> tuple[bool, list[str]]:
     lines, keep = [], True
     if not baseline.get("approved"):
         lines.append("baseline: not approved by the operator yet, so no candidate can be kept")
@@ -271,7 +271,7 @@ def compare(baseline: dict, rounds: list[dict], held_out: dict | None, cand_tune
     tune_worse = worse(baseline_rates(rounds + (fresh_full or []), floor), cand_tune)
     lines += [f"tune worse beyond noise: {w}" for w in tune_worse]
     full_words = rounds[0]["skill_words"]
-    if cand_tune["skill_words"] >= full_words:
+    if cand_tune["skill_words"] >= full_words and not rewrite:
         lines.append(f"size: {cand_tune['skill_words']} words, not smaller than {full_words}")
         keep = False
     if held_out is None or cand_held_out is None:
@@ -414,6 +414,8 @@ def main(argv: list[str]) -> int:
     p.add_argument("--tune", type=Path, required=True, help="the candidate's tune summary")
     p.add_argument("--held-out", type=Path, help="the candidate's held-out summary")
     p.add_argument("--full", type=Path, nargs="*", help="full-skill summaries run beside the candidate (CORE)")
+    p.add_argument("--rewrite", action="store_true",
+                   help="the candidate changes what the skill teaches, so it may be larger than the baseline")
 
     p = sub.add_parser("planted")
     p.add_argument("skill")
@@ -489,7 +491,7 @@ def main(argv: list[str]) -> int:
     floor = conf["noise_floor_runs"] / tier_of(conf, args.skill)["runs"]
     keep, lines = compare(baseline, rounds, held_out, load(args.tune),
                           load(args.held_out) if args.held_out else None, floor,
-                          [load(p) for p in (args.full or [])])
+                          [load(p) for p in (args.full or [])], args.rewrite)
     print("\n".join(lines))
     return 0 if keep else 1
 

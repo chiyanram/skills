@@ -56,7 +56,8 @@ For a CORE skill, `--go` with a candidate runs one round at a time, the full ski
 writes a summary for each; pass the full skill's summary to `compare` with `--full`, and it joins the baseline's
 noise. `compare` exits `0` and says "keep" only when the baseline is approved, the inputs match, no case and grader
 passes less often than the baseline by more than the noise, the held-out slice is no worse, and the candidate has
-fewer words. The noise is the spread between the baseline's rounds, never less than `noise_floor_runs` runs' worth.
+fewer words. A rewrite changes what the skill teaches and may grow it: pass `--rewrite` and the word rule is
+skipped, the score rules still apply. The noise is the spread between the baseline's rounds, never less than `noise_floor_runs` runs' worth.
 
 ## Check a grader with planted answers
 

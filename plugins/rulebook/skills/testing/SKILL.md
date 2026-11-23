@@ -13,8 +13,10 @@ Answer each in one line. If one has no answer, do not write the test: a test wit
 and protects nothing.
 
 1. Which contract does it protect?
-2. Which realistic change would make it fail?
-3. Why does no existing test catch that already?
+2. Imagine two edits. A bug in that contract must turn the test red. A refactor that keeps every observable result
+   must leave it green. A test that stays green on the bug proves nothing; a test that goes red on the refactor is
+   pinned to the implementation.
+3. Why does no existing test catch that bug already?
 
 Then put it at the seam that owns the behaviour:
 
@@ -31,11 +33,19 @@ change cannot be told from one that was already red.
 
 ## Fixing a bug
 
-1. Write one test that fails for the bug's reason, at the seam that owns the behaviour. Run it and watch it fail: a
-   regression test that never failed proves nothing about the fix.
-2. Fix the code and watch it pass.
-3. Put the command and the failure output in the PR. Do not copy the test into every layer the bug crosses; copies
-   at mocked layers cannot see the bug.
+1. Test the premise. A bug report or a first guess names a cause, such as "`FreeShippingRule` is broken". Write
+   that premise as one sentence. Then write and run a test of the named code at the reported input, before you change
+   any code. A green result refutes the premise: the named code is correct, and the fault is upstream of it. Reading
+   the code is not a test of the premise.
+2. Find the seam that owns the wrong behaviour. Write one test there that fails for the bug's reason, run it, and
+   watch it go red. A regression test that never went red proves nothing about the fix.
+3. Ask whether the state that triggers the bug is legitimate. If it is, handle it where the code broke. If it must
+   never exist, fix the code that produced it, because a guard at the symptom hides the bug.
+4. Fix the code and watch the test go green. Every line you ship traces to evidence from steps 1 to 3. Revert each
+   line that a refuted premise motivated.
+5. Put the command and its red output in the PR. Keep the test at its one seam; copies at mocked layers cannot see
+   the bug. If the deciding fact took a deep dig, name the cheap, always-on signal (a log line, a metric, an
+   assertion) that would have shown it at first look.
 
 ## Choosing cases
 
@@ -64,7 +74,8 @@ Time.
 
 ## Writing the test
 
-- Assert observable behaviour, never a field default or the input you just passed in; those cannot fail for a defect.
+- Assert observable behaviour, never a field default or an input read straight back; those cannot fail for a defect.
+  When code routes two inputs of one type into separate places, a swap compiles: test that routing, because it can fail.
 - Double only what you do not own. Prefer the real object, then an in-memory fake of the port, then a stub. Mock only
   a call that is itself the behaviour. Never mock your own classes, a value object, or the class under test, because
   the test then breaks on refactors that keep behaviour.
@@ -77,7 +88,10 @@ Time.
 
 ## Junk tests
 
-Do not add a test, and flag one in review, when it:
+Prefer no new test to a junk test. Coverage is a measure, not a contract: when asked to raise coverage, add only
+tests that can go red for a defect, and name the reason for each test you leave out.
+
+Flag a test in review, and leave it out of your own work, when it:
 
 - has no assertion, or only a poll;
 - compares a value with itself or a copy of it;
@@ -92,22 +106,11 @@ None of these can fail for a real defect. Prove a test is junk before you delete
 guard of a contract (API, protocol, config, migration, storage, security, a promised default). A test that fails on
 main may be catching a real bug: reproduce it, never delete it.
 
-## Mutation testing
-
-Run mutation testing on the code you changed: PIT on the JVM, Stryker for TypeScript. It shows whether the tests
-would catch a bug, which coverage cannot.
-
-- Read each surviving mutant as a missing case. Name the RIGHT-BICEP or CORRECT case it reveals and add that test,
-  not a test aimed at the mutated line, or the next mutant on that line survives too.
-- NO_COVERAGE means the code is never reached; SURVIVED means it is reached and not asserted.
-- Keep the default mutators; the others flood the report with mutants no test can kill. Exclude only code with no
-  decisions in it, such as wiring and config, and never to raise the score.
-- Keep it a report, not a CI gate, until someone picks a threshold from a measured score.
-
 ## Stack notes
 
 Read the one that matches the code:
 
+- Mutation testing (PIT, Stryker) on the code you changed: [mutation.md](mutation.md).
 - Spock and Spring Boot integration tests: [stack.md](stack.md).
 - A Playwright end-to-end or smoke spec: the `playwright` skill.
 - Code that calls a language model: [model-calls.md](model-calls.md).
