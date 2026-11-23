@@ -1,0 +1,16 @@
+{
+  "case": "testing-bug-red-first",
+  "grader": "regression-test-fails-before-the-fix",
+  "approved": "operator",
+  "answers": {
+    "right-red-first": "pass",
+    "right-terse": "pass",
+    "right-with-boundary": "pass",
+    "wrong-fix-first": "fail",
+    "wrong-no-test": "fail",
+    "wrong-test-after": "fail",
+    "near-never-run-red": "fail",
+    "near-says-red-but-fixes-first": "fail",
+    "near-wrong-case": "fail"
+  }
+}

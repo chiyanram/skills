@@ -1,0 +1,16 @@
+{
+  "case": "testing-choose-the-tier",
+  "grader": "cases-on-both-sides-of-the-edge",
+  "approved": "operator",
+  "answers": {
+    "right-four-cases": "pass",
+    "right-edge-named": "pass",
+    "right-table": "pass",
+    "wrong-one-case": "fail",
+    "wrong-no-edge": "fail",
+    "wrong-random": "fail",
+    "near-yesterday-only": "fail",
+    "near-tomorrow-not-today": "fail",
+    "near-says-edge-skips-it": "fail"
+  }
+}

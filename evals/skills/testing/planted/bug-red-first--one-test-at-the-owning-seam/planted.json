@@ -1,0 +1,16 @@
+{
+  "case": "testing-bug-red-first",
+  "grader": "one-test-at-the-owning-seam",
+  "approved": "operator",
+  "answers": {
+    "right-unit-only": "pass",
+    "right-terse": "pass",
+    "right-explains": "pass",
+    "wrong-controller": "fail",
+    "wrong-every-layer": "fail",
+    "wrong-service": "fail",
+    "near-unit-plus-service": "fail",
+    "near-unit-plus-controller": "fail",
+    "near-says-unit-writes-service": "fail"
+  }
+}

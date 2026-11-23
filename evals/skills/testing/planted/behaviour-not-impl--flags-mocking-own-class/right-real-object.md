@@ -1,0 +1,1 @@
+`DiscountRules` is our own pure class, so do not mock it. Use `new PriceCalculator(new DiscountRules())` and assert `price(new Basket(100.00), Member.gold()) == 90.00`. The mock ties the spec to the internal call and breaks on a refactor that keeps the price.

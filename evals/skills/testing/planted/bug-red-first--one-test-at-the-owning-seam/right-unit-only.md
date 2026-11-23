@@ -1,0 +1,1 @@
+The regression test goes in LateFeePolicySpec, because LateFeePolicy owns the fee rule. I do not add the case to ReturnService or ReturnController tests; they mock the policy and could not see the bug anyway.

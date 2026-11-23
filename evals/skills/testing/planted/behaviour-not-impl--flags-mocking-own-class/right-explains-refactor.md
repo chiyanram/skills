@@ -1,0 +1,1 @@
+The spec verifies how the calculator talks to `DiscountRules`, not what price it returns. Since we own `DiscountRules`, use the real object; otherwise inlining `rateFor` would fail the test with the price unchanged.

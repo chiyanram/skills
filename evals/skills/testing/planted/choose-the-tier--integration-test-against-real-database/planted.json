@@ -1,0 +1,16 @@
+{
+  "case": "testing-choose-the-tier",
+  "grader": "integration-test-against-real-database",
+  "approved": "operator",
+  "answers": {
+    "right-testcontainers": "pass",
+    "right-terse": "pass",
+    "right-explains": "pass",
+    "wrong-mock-repo": "fail",
+    "wrong-mock-entitymanager": "fail",
+    "wrong-h2": "fail",
+    "near-h2-no-reason": "fail",
+    "near-says-real-uses-mock": "fail",
+    "near-string-check": "fail"
+  }
+}

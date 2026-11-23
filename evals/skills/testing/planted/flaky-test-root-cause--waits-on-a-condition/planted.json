@@ -1,0 +1,16 @@
+{
+  "case": "testing-flaky-test-root-cause",
+  "grader": "waits-on-a-condition",
+  "approved": "operator",
+  "answers": {
+    "right-polling": "pass",
+    "right-awaitility": "pass",
+    "right-latch": "pass",
+    "wrong-longer-sleep": "fail",
+    "wrong-keeps-sleep-retry": "fail",
+    "wrong-sync-only": "fail",
+    "near-sleep-loop": "fail",
+    "near-no-timeout": "fail",
+    "near-says-condition-keeps-sleep": "fail"
+  }
+}

@@ -1,0 +1,1 @@
+I would not add accessor tests: asserting that `memberId()` returns the id I just passed in cannot fail for a real defect, so it only raises coverage. The one test worth writing: `new MemberCard(null, "Ann", 5)` throws NullPointerException.

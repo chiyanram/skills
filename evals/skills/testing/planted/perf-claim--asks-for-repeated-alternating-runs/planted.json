@@ -1,0 +1,16 @@
+{
+  "case": "testing-perf-claim",
+  "grader": "asks-for-repeated-alternating-runs",
+  "approved": "operator",
+  "answers": {
+    "right-five-alternating": "pass",
+    "right-spread": "pass",
+    "right-jmh": "pass",
+    "wrong-accepts": "fail",
+    "wrong-bigger-loop": "fail",
+    "wrong-ci": "fail",
+    "near-more-iterations": "fail",
+    "near-twice": "fail",
+    "near-vague": "fail"
+  }
+}

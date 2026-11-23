@@ -1,0 +1,1 @@
+Cents to euros needs two decimal places. With three, every subtotal is ten times too small, so the test for `shippingFor(cart(10000))` expecting FREE fails, because 10.000 is under 100. Fix the conversion.

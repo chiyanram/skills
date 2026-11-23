@@ -1,0 +1,1 @@
+No tests for the accessors; they repeat the input and protect nothing. The default of 5 in `standard` is only worth a test if it is a promised default. Nothing reads it yet, so I would ask before adding one. Coverage alone is not a reason.

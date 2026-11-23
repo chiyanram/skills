@@ -1,0 +1,16 @@
+{
+  "case": "testing-behaviour-not-impl",
+  "grader": "flags-wildcard-argument",
+  "approved": "operator",
+  "answers": {
+    "right-wildcard": "pass",
+    "right-no-price": "pass",
+    "right-both": "pass",
+    "wrong-accepts": "fail",
+    "wrong-only-name": "fail",
+    "wrong-only-count": "fail",
+    "near-wildcard-praised": "fail",
+    "near-other-argument": "fail",
+    "near-vague": "fail"
+  }
+}

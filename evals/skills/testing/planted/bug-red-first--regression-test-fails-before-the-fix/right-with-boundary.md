@@ -1,0 +1,1 @@
+I add two cases to LateFeePolicySpec: returned on the due date costs nothing, returned one day late costs 25 cents. I run the spec before touching the code: the due-date case fails (25 cents instead of 0). Then I fix the off-by-one and both pass.

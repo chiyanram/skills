@@ -256,7 +256,8 @@ Rules for every run:
 5. Point a grader at the trace (`focus: trace`) when the work is in files or tool calls, not in the last message.
    Use a free grader (`tool_used`, `regex`, `file_exists`) when the fact is mechanical.
 6. A CORE llm grader gates only after its 9 planted answers (3 right, 3 wrong, 3 near misses) give 0 false PASS and
-   at most 1 false FAIL.
+   at most 1 false FAIL. Write a planted answer as a statement about the work, not as first-person reasoning: the
+   API can refuse to copy reasoning word for word, and the refused run is an error.
 7. Commit the cases, the summaries and `baseline.json`. Keep raw transcripts out of the repo.
 
 The steps, in order, with no step skipped:

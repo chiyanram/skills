@@ -1,0 +1,16 @@
+{
+  "case": "testing-behaviour-not-impl",
+  "grader": "flags-mocking-own-class",
+  "approved": "operator",
+  "answers": {
+    "right-real-object": "pass",
+    "right-terse": "pass",
+    "right-explains-refactor": "pass",
+    "wrong-accepts": "fail",
+    "wrong-other-issue": "fail",
+    "wrong-stub-value": "fail",
+    "near-stub-not-mock": "fail",
+    "near-wildcard-only": "fail",
+    "near-real-for-other": "fail"
+  }
+}

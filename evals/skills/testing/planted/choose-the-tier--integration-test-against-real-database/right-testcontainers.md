@@ -1,0 +1,1 @@
+`LoanRepositoryIT` with `@DataJpaTest` and a Testcontainers Postgres, like the other two repositories. Only the real database can show what the native query does; a mock of the repository would only repeat what we stub.

@@ -1,0 +1,16 @@
+{
+  "case": "testing-flaky-test-root-cause",
+  "grader": "rejects-the-retry",
+  "approved": "operator",
+  "answers": {
+    "right-rejects": "pass",
+    "right-terse": "pass",
+    "right-explains": "pass",
+    "wrong-accepts": "fail",
+    "wrong-both": "fail",
+    "wrong-ci-rerun": "fail",
+    "near-retry-once": "fail",
+    "near-temporary": "fail",
+    "near-silent": "fail"
+  }
+}

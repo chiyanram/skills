@@ -1,0 +1,16 @@
+{
+  "case": "testing-attack-the-premise",
+  "grader": "finds-the-units-mismatch",
+  "approved": "operator",
+  "answers": {
+    "right-moves-two": "pass",
+    "right-explains": "pass",
+    "right-terse": "pass",
+    "wrong-rule": "fail",
+    "wrong-rounding": "fail",
+    "wrong-no-cause": "fail",
+    "near-wrong-direction": "fail",
+    "near-right-place-wrong-fix": "fail",
+    "near-test-on-rule": "fail"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "case": "testing-test-that-cannot-fail",
+  "grader": "flags-expected-value-from-the-code",
+  "approved": "operator",
+  "answers": {
+    "right-hand-worked": "pass",
+    "right-terse": "pass",
+    "right-explains": "pass",
+    "wrong-accepts": "fail",
+    "wrong-only-if": "fail",
+    "wrong-name": "fail",
+    "near-constant": "fail",
+    "near-mock-rate": "fail",
+    "near-vague": "fail"
+  }
+}
