@@ -56,6 +56,11 @@ Then read the notes file that the skill names for your task.
 If the agent skips the skills, set `RULEBOOK_INDEX=1` in the `env` of `.claude/settings.json`. The plugin then prints
 the same block at the start of each session.
 
+To give a repo's sessions the report rules (picture first, each work-item number with context, one decision per
+message), set `RULEBOOK_REPORT_RULES=1` in the same `env`. The plugin then prints
+[`hooks/report-rules.txt`](plugins/rulebook/hooks/report-rules.txt) at the start of each session. Leave it unset
+where no person reads the replies, such as an unattended run.
+
 Update with `claude plugin marketplace update chiyanram`. To put the plugin in a worker container, add it to the
 managed settings:
 

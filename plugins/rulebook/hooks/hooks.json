@@ -1,5 +1,5 @@
 {
-  "description": "Prints the rulebook skill index at session start, only when RULEBOOK_INDEX=1.",
+  "description": "Prints the rulebook skill index at session start when RULEBOOK_INDEX=1, and the report rules when RULEBOOK_REPORT_RULES=1.",
   "hooks": {
     "SessionStart": [
       {
@@ -7,6 +7,10 @@
           {
             "type": "command",
             "command": "if [ \"$RULEBOOK_INDEX\" = 1 ]; then cat \"${CLAUDE_PLUGIN_ROOT}/hooks/index.txt\"; fi"
+          },
+          {
+            "type": "command",
+            "command": "if [ \"$RULEBOOK_REPORT_RULES\" = 1 ]; then cat \"${CLAUDE_PLUGIN_ROOT}/hooks/report-rules.txt\"; fi"
           }
         ]
       }
