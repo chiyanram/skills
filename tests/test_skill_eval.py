@@ -50,12 +50,13 @@ TWO_MISS = {"a": {"g1": [True, False, False], "g2": [True, True, True]}}
 
 
 class SkillEvalTest(unittest.TestCase):
-    def compare(self, cand, words=60, approved="operator", held_out=True):
+    def compare(self, cand, words=60, approved="operator", held_out=True, rewrite=False):
         rounds = [summary(ALL_PASS), summary(ALL_PASS)]
         base = {"approved": approved}
         held = summary(ALL_PASS, slice_="held-out") if held_out else None
         cand_held = summary(ALL_PASS, words, "candidate", "held-out") if held_out else None
-        return skill_eval.compare(base, rounds, held, summary(cand, words, "candidate"), cand_held, FLOOR)
+        return skill_eval.compare(base, rounds, held, summary(cand, words, "candidate"), cand_held, FLOOR,
+                                  rewrite=rewrite)
 
     def test_should_count_scored_graders_only(self):
         self.assertEqual(summary(ONE_MISS)["cases"]["a"], {"g1": {"passed": 2, "runs": 3},
@@ -80,6 +81,14 @@ class SkillEvalTest(unittest.TestCase):
 
     def test_should_drop_a_candidate_that_is_not_smaller(self):
         keep, _ = self.compare(ALL_PASS, words=100)
+        self.assertFalse(keep)
+
+    def test_should_keep_a_larger_rewrite_no_worse_than_the_baseline(self):
+        keep, lines = self.compare(ALL_PASS, words=100, rewrite=True)
+        self.assertTrue(keep, lines)
+
+    def test_should_drop_a_rewrite_worse_beyond_the_noise(self):
+        keep, _ = self.compare(TWO_MISS, words=100, rewrite=True)
         self.assertFalse(keep)
 
     def test_should_keep_nothing_against_an_unapproved_baseline(self):

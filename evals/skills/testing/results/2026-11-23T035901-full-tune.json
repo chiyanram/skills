@@ -1,0 +1,137 @@
+{
+  "agent_models": [
+    "claude-opus-5-5"
+  ],
+  "arm": "full",
+  "cases": {
+    "testing-attack-the-premise": {
+      "finds-the-units-mismatch": {
+        "passed": 5,
+        "runs": 5
+      },
+      "reference-match": {
+        "passed": 5,
+        "runs": 5
+      },
+      "tests-the-premise-before-the-fix": {
+        "passed": 5,
+        "runs": 5
+      }
+    },
+    "testing-behaviour-not-impl": {
+      "flags-mocking-own-class": {
+        "passed": 5,
+        "runs": 5
+      },
+      "flags-wildcard-argument": {
+        "passed": 5,
+        "runs": 5
+      },
+      "reference-match": {
+        "passed": 5,
+        "runs": 5
+      }
+    },
+    "testing-bug-red-first": {
+      "one-test-at-the-owning-seam": {
+        "passed": 5,
+        "runs": 5
+      },
+      "reference-match": {
+        "passed": 5,
+        "runs": 5
+      },
+      "regression-test-fails-before-the-fix": {
+        "passed": 5,
+        "runs": 5
+      }
+    },
+    "testing-choose-the-tier": {
+      "cases-on-both-sides-of-the-edge": {
+        "passed": 5,
+        "runs": 5
+      },
+      "integration-test-against-real-database": {
+        "passed": 5,
+        "runs": 5
+      },
+      "reference-match": {
+        "passed": 5,
+        "runs": 5
+      }
+    },
+    "testing-done-not-verified": {
+      "reference-match": {
+        "passed": 4,
+        "runs": 5
+      },
+      "verdict-is-not-verified": {
+        "passed": 4,
+        "runs": 5
+      }
+    },
+    "testing-no-junk-test": {
+      "no-test-of-accessors-or-inputs": {
+        "passed": 5,
+        "runs": 5
+      },
+      "reference-match": {
+        "passed": 5,
+        "runs": 5
+      }
+    },
+    "testing-perf-claim": {
+      "asks-for-repeated-alternating-runs": {
+        "passed": 5,
+        "runs": 5
+      },
+      "explains-the-number": {
+        "passed": 5,
+        "runs": 5
+      },
+      "reference-match": {
+        "passed": 5,
+        "runs": 5
+      }
+    }
+  },
+  "claude_version": [
+    "2.1.323"
+  ],
+  "cost_usd": 6.5836,
+  "errors": {},
+  "inputs": {
+    "reference-grader.md": "a180cb1b50d24b6c",
+    "testing-attack-the-premise/graders/finds-the-units-mismatch.md": "f7cc7b7ab0991096",
+    "testing-attack-the-premise/graders/tests-the-premise-before-the-fix.md": "b7149f573f7dff14",
+    "testing-attack-the-premise/prompt.md": "5b4acf506b0f5cff",
+    "testing-attack-the-premise/reference.md": "fa23c140faa0ff51",
+    "testing-behaviour-not-impl/graders/flags-mocking-own-class.md": "7687036a544751df",
+    "testing-behaviour-not-impl/graders/flags-wildcard-argument.md": "5f04ce70b232fc96",
+    "testing-behaviour-not-impl/prompt.md": "903922563d61a284",
+    "testing-behaviour-not-impl/reference.md": "cf8b76318893ab2a",
+    "testing-bug-red-first/graders/one-test-at-the-owning-seam.md": "ec30dd33786ce011",
+    "testing-bug-red-first/graders/regression-test-fails-before-the-fix.md": "903518714be6c965",
+    "testing-bug-red-first/prompt.md": "c3b468616b0f6bdf",
+    "testing-bug-red-first/reference.md": "c55f52554d199a0d",
+    "testing-choose-the-tier/graders/cases-on-both-sides-of-the-edge.md": "30b6e8b3e6d62645",
+    "testing-choose-the-tier/graders/integration-test-against-real-database.md": "deeab3c21b688bed",
+    "testing-choose-the-tier/prompt.md": "94393fb6a163e4c8",
+    "testing-choose-the-tier/reference.md": "adc8b7532b0a1993",
+    "testing-done-not-verified/graders/verdict-is-not-verified.md": "1d971227bf80477d",
+    "testing-done-not-verified/prompt.md": "364eb32882ba7108",
+    "testing-done-not-verified/reference.md": "e6b978ba6680c19f",
+    "testing-no-junk-test/graders/no-test-of-accessors-or-inputs.md": "2eb66a03036694ac",
+    "testing-no-junk-test/prompt.md": "b71f86a16683b96e",
+    "testing-no-junk-test/reference.md": "06425ebb7abbda8c",
+    "testing-perf-claim/graders/asks-for-repeated-alternating-runs.md": "58b3c5d0aa1023df",
+    "testing-perf-claim/graders/explains-the-number.md": "6136af2aa2a19e87",
+    "testing-perf-claim/prompt.md": "5d33658aedd22aa6",
+    "testing-perf-claim/reference.md": "10cfa06f85dbf1a3"
+  },
+  "judge_model": "claude-opus-5-5",
+  "skill": "testing",
+  "skill_words": 2426,
+  "slice": "tune",
+  "started_at": "2026-11-23T03:59:01.094Z"
+}
