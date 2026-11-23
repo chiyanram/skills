@@ -29,6 +29,8 @@ How each AC becomes its tests is owned by the `testing` skill.
   request and pass the gate again, because an approval covers only the text it saw.
 - **AC12** — Write a bug's spec in three parts: current behaviour, expected behaviour and behaviour that must not
   change, because a fix that names no unchanged behaviour can break it unseen.
+- **AC13** — End a feature or one-way-door spec with "How we will know it worked: <lever>, read at <where>, on
+  <when>", or "none: <why>", because a feature with no read-back point is never checked.
 
 ## When X, use Y
 
@@ -44,6 +46,7 @@ How each AC becomes its tests is owned by the `testing` skill.
 | an AC's text | a "should …" sentence about behaviour, in the standard form "should X when Y" (GA6) | the text becomes the test name |
 | a change to stored data or a default | an AC that starts from state from before the change (AC7) | existing rows need a backfill |
 | a noun in AC text | the glossary's word; a new noun defined in the spec first (AC9) | one shared, ubiquitous language; the AC text becomes the test name, so a wrong word reaches the code |
+| a lever for AC13 | a product metric, adoption, a benchmark, an error-rate or latency target, or a person's read; a person reads it on the date, no tool reminds them | the lever names what changes in the world, not in the code |
 | an edit to approved acceptance-criteria text | a spec change that passes the approval gate again (AC10) | an approval covers only the text as it stood when it was approved |
 | a bug | three parts: current, expected, and must not change (AC12) | the third part keeps the fix from breaking what works |
 
@@ -178,6 +181,9 @@ Every noun is the glossary's, so the test name uses the project's words.
   when** the change adds a column, changes a default or changes a stored value. — **Confidence** high
 - **Skip when** an edit after the approval gate changes only whitespace or a typo that keeps the meaning. — **Do not
   skip when** the edit changes a value, a table row, the text or a number (AC10, GA2). — **Confidence** medium
+- **Skip when** the lane is not feature or one-way-door: leave the AC13 line out, because a lever made up for a small
+  change is read as a promise. — **Do not skip when** the lane is feature or one-way-door; "none: <why>" is a full
+  answer there. — **Confidence** high
 
 ## Review checks
 
@@ -247,3 +253,10 @@ Walk every AC in the spec's acceptance-criteria section that the change adds or 
   Not a finding: none
   Severity: blocker
   Verify: re-open the bug spec.
+- [ ] AC13 — In a feature or one-way-door spec, a missing "How we will know it worked" line, or a lever with no place
+  or no date to read it, is a finding.
+  Applies when: the ticket's lane is feature or one-way-door.
+  Evidence: the spec's acceptance-criteria section, and the line or its absence.
+  Not a finding: "none: <why>" with a reason.
+  Severity: warning
+  Verify: re-open the spec.
