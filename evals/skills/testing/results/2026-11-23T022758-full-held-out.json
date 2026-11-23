@@ -1,0 +1,57 @@
+{
+  "agent_models": [
+    "claude-opus-5-5"
+  ],
+  "arm": "full",
+  "cases": {
+    "testing-flaky-test-root-cause": {
+      "reference-match": {
+        "passed": 5,
+        "runs": 5
+      },
+      "rejects-the-retry": {
+        "passed": 5,
+        "runs": 5
+      },
+      "waits-on-a-condition": {
+        "passed": 5,
+        "runs": 5
+      }
+    },
+    "testing-test-that-cannot-fail": {
+      "flags-assertion-inside-if": {
+        "passed": 5,
+        "runs": 5
+      },
+      "flags-expected-value-from-the-code": {
+        "passed": 5,
+        "runs": 5
+      },
+      "reference-match": {
+        "passed": 5,
+        "runs": 5
+      }
+    }
+  },
+  "claude_version": [
+    "2.1.323"
+  ],
+  "cost_usd": 1.6343,
+  "errors": {},
+  "inputs": {
+    "reference-grader.md": "a180cb1b50d24b6c",
+    "testing-flaky-test-root-cause/graders/rejects-the-retry.md": "f55b6480ea716bae",
+    "testing-flaky-test-root-cause/graders/waits-on-a-condition.md": "9eb1c797d56b2d71",
+    "testing-flaky-test-root-cause/prompt.md": "e1f1a907a477d2f3",
+    "testing-flaky-test-root-cause/reference.md": "703dde14fc814854",
+    "testing-test-that-cannot-fail/graders/flags-assertion-inside-if.md": "e1a4cc8fc2a56df4",
+    "testing-test-that-cannot-fail/graders/flags-expected-value-from-the-code.md": "21469204467a9893",
+    "testing-test-that-cannot-fail/prompt.md": "c4a0bc113f023f40",
+    "testing-test-that-cannot-fail/reference.md": "665f99c5cbdf9ef4"
+  },
+  "judge_model": "claude-opus-5-5",
+  "skill": "testing",
+  "skill_words": 2102,
+  "slice": "held-out",
+  "started_at": "2026-11-23T02:27:58.526Z"
+}

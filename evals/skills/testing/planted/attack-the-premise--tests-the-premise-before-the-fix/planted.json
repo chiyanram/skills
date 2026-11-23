@@ -1,0 +1,16 @@
+{
+  "case": "testing-attack-the-premise",
+  "grader": "tests-the-premise-before-the-fix",
+  "approved": "operator",
+  "answers": {
+    "right-checks-rule": "pass",
+    "right-leaves-rule": "pass",
+    "wrong-changes-threshold": "fail",
+    "wrong-accepts-report": "fail",
+    "wrong-rewrites-both": "fail",
+    "near-finds-cause-also-changes-rule": "fail",
+    "near-no-check": "fail",
+    "near-assumes": "fail",
+    "near-worked-example-only": "fail"
+  }
+}

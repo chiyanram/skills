@@ -1,0 +1,16 @@
+{
+  "case": "testing-test-that-cannot-fail",
+  "grader": "flags-assertion-inside-if",
+  "approved": "operator",
+  "answers": {
+    "right-if": "pass",
+    "right-terse": "pass",
+    "right-explains": "pass",
+    "wrong-accepts": "fail",
+    "wrong-only-expected": "fail",
+    "wrong-where": "fail",
+    "near-else": "fail",
+    "near-assert-keyword": "fail",
+    "near-vague": "fail"
+  }
+}

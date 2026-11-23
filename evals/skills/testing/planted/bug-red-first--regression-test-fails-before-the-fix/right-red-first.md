@@ -1,0 +1,1 @@
+Steps: 1. Add `def "no fee when returned on the due date"() { expect: policy.fee(due, due) == Money.ZERO }` to `LateFeePolicySpec`. 2. Run `./gradlew test --tests LateFeePolicySpec` and see it fail: expected 0, got 25 cents. 3. Remove the `+ 1`. 4. Run it again and see it pass. The PR shows the command and the red output.

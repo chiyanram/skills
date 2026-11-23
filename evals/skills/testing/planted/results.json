@@ -1,0 +1,153 @@
+{
+  "claude_version": "2.1.323",
+  "cost_usd": 7.8705745,
+  "graders": {
+    "testing-attack-the-premise/finds-the-units-mismatch": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "f7cc7b7ab0991096"
+    },
+    "testing-attack-the-premise/tests-the-premise-before-the-fix": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "b7149f573f7dff14"
+    },
+    "testing-behaviour-not-impl/flags-mocking-own-class": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "7687036a544751df"
+    },
+    "testing-behaviour-not-impl/flags-wildcard-argument": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "5f04ce70b232fc96"
+    },
+    "testing-bug-red-first/one-test-at-the-owning-seam": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "ec30dd33786ce011"
+    },
+    "testing-bug-red-first/regression-test-fails-before-the-fix": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "903518714be6c965"
+    },
+    "testing-choose-the-tier/cases-on-both-sides-of-the-edge": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "30b6e8b3e6d62645"
+    },
+    "testing-choose-the-tier/integration-test-against-real-database": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "deeab3c21b688bed"
+    },
+    "testing-done-not-verified/verdict-is-not-verified": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "1d971227bf80477d"
+    },
+    "testing-flaky-test-root-cause/rejects-the-retry": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "f55b6480ea716bae"
+    },
+    "testing-flaky-test-root-cause/waits-on-a-condition": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "9eb1c797d56b2d71"
+    },
+    "testing-no-junk-test/no-test-of-accessors-or-inputs": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "2eb66a03036694ac"
+    },
+    "testing-perf-claim/asks-for-repeated-alternating-runs": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "58b3c5d0aa1023df"
+    },
+    "testing-perf-claim/explains-the-number": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 1,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "6136af2aa2a19e87"
+    },
+    "testing-test-that-cannot-fail/flags-assertion-inside-if": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "e1a4cc8fc2a56df4"
+    },
+    "testing-test-that-cannot-fail/flags-expected-value-from-the-code": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "21469204467a9893"
+    }
+  },
+  "judge_model": "claude-opus-5-5",
+  "skill": "testing",
+  "started_at": "2026-11-22T07:27:14.551Z"
+}

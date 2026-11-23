@@ -1,0 +1,16 @@
+{
+  "case": "testing-perf-claim",
+  "grader": "explains-the-number",
+  "approved": "operator",
+  "answers": {
+    "right-50-keys": "pass",
+    "right-hit-rate": "pass",
+    "right-terse": "pass",
+    "wrong-accepts": "fail",
+    "wrong-laptop": "fail",
+    "wrong-jit": "fail",
+    "near-says-why-no-reason": "fail",
+    "near-cache-size": "fail",
+    "near-network": "fail"
+  }
+}

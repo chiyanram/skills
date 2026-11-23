@@ -1,0 +1,16 @@
+{
+  "case": "testing-no-junk-test",
+  "grader": "no-test-of-accessors-or-inputs",
+  "approved": "operator",
+  "answers": {
+    "right-declines": "pass",
+    "right-asks-about-default": "pass",
+    "right-terse": "pass",
+    "wrong-accessor-spec": "fail",
+    "wrong-many-tests": "fail",
+    "wrong-equals": "fail",
+    "near-null-plus-accessors": "fail",
+    "near-says-junk-adds-anyway": "fail",
+    "near-default-only-as-coverage": "fail"
+  }
+}
