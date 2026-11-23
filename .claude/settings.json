@@ -11,8 +11,7 @@
     "chiyanram": {
       "source": {
         "source": "github",
-        "repo": "chiyanram/skills",
-        "ref": "rulebook--v3.1.0"
+        "repo": "chiyanram/skills"
       }
     }
   },
