@@ -7,7 +7,7 @@ when you write a PR body, or when you check one before merge.
 
 - **PR1** — Open the PR body with its reason in one sentence and a link to the approved spec, because a
   human or finder who does not know why cannot judge whether the change does it.
-- **PR2** — Put the evidence table (VB5) in the PR body, because the merger needs the evidence rows without running
+- **PR2** — Put the evidence table (`code`'s verify notes) in the PR body, because the merger needs the evidence rows without running
   anything again.
 - **PR3** — State "Breaking change: yes" or "no", and for yes, what callers must change, because an unannounced break
   reaches callers before anyone warns them.
@@ -46,7 +46,7 @@ Why: a reserved loan could be renewed; it now cannot. Spec: #42
 Breaking change: no
 Rollback: revert this PR; no data changes.
 Where to look: LoanService.renew, the reservation check.
-Evidence at 4f2c9e1: (the VB5 table)
+Evidence at 4f2c9e1: (the evidence table from `code`'s verify notes)
 Change:
   M src/main/java/library/LoanService.java
   A src/test/groovy/library/RenewalSpec.groovy
@@ -67,7 +67,7 @@ The merger reads why, what could break, how to undo it and where to look first.
 Walk the PR body before merge.
 
 - [ ] PR1 — Find the one-sentence reason and the spec link at the top. Each one missing is a finding.
-- [ ] PR2 — Find the evidence table (VB5), at the pushed commit. Its absence is a finding.
+- [ ] PR2 — Find the evidence table, at the pushed commit. Its absence is a finding.
 - [ ] PR3 — Find the breaking-change line, and for yes, what callers must change. Its absence is a finding.
 - [ ] PR4 — Find the rollback line. Its absence is a finding.
 - [ ] PR5 — For a change of two files or more, find the file tree or call tree. Its absence is a finding.

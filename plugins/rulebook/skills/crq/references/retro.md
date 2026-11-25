@@ -59,7 +59,7 @@ No type, no owner, no date, no ticket. Nobody acts on either line.
 Actions:
 - script · fail the build when a renewal endpoint has no reservation test
   · owner: operator · due 2026-11-20 · ticket #77
-- check · CR1 example: "renewal ignores reservation" · owner: coordinator · due 2026-11-13 · ticket #78
+- check · code review example: "renewal ignores reservation" · owner: coordinator · due 2026-11-13 · ticket #78
 ```
 Each action says what kind of fix, who owns it, when, and where it is tracked.
 

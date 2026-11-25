@@ -51,8 +51,8 @@ field:
   severity decides the verify pass's bucket: a blocker becomes Act on (fixed before the gate), a warning becomes
   Consider (the human decides). A check with two tiers, such as a soft and a hard limit, names both: `blocker over
   the hard limit; warning over the soft limit`. A nit is never a check's severity.
-- **Verify** names what to re-open: a line, a section, a command. What the verify pass does with it is the `crq`
-  skill's `review-process` reference.
+- **Verify** names what to re-open: a line, a section, a command. What the verify pass does with it is the `code`
+  skill's review notes.
 
 ## Good / Bad rules
 
