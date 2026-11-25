@@ -81,8 +81,8 @@ flowchart LR
 ```
 
 Each skill is a short procedure for one job: numbered steps, each rule with its *because*, and a Good / Bad pair only
-where a model's default is wrong. A rule has no ID: a reviewer names the skill and its section. `planning`, `obs`
-and `agent` still use an older router shape, with references in five sections, until each is rewritten.
+where a model's default is wrong. A rule has no ID: a reviewer names the skill and its section. `planning` and
+`agent` still use an older router shape, with references in five sections, until each is rewritten.
 
 A project points at a skill by name, never by path:
 

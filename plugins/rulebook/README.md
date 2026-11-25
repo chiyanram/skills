@@ -5,7 +5,7 @@ file. Project-specific values (commands, paths, module names) stay in each proje
 
 Each domain is one skill: `testing`, `playwright`, `code`, `agent`, `migrations`, `obs` and `planning`. A skill is moving to
 one short procedure in `SKILL.md`, with a file beside it only for what some runs need, such as one stack's traps
-(`testing`, `code` and `migrations` so far). From a project's `AGENTS.md`, point at a skill or its file by name, never by path, because
+(`testing`, `code`, `migrations` and `obs` so far). From a project's `AGENTS.md`, point at a skill or its file by name, never by path, because
 the plugin's install folder differs per machine and per version:
 
 ```text

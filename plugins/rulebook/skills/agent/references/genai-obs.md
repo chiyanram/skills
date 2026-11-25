@@ -23,10 +23,10 @@ Contents: Rules · When X, use Y · Good / Bad (AE38, AE39, AE41) · Decided edg
 
 | situation | use | why |
 |---|---|---|
-| code calls a model | one client span, named and attributed per the GenAI semantic conventions | dashboards and alerts read those names (AE37) · spans through the facade: TR2 (`obs`'s `tracing`) |
+| code calls a model | one client span, named and attributed per the GenAI semantic conventions | dashboards and alerts read those names (AE37) · spans through the facade: `obs`, Tracing |
 | code runs a tool or an agent run | a tool span per call and an agent span per run, linked by call id | a run's trace shows which call did what (AE38) |
 | a tool returns an error result, not an exception | the tool span marked errored | a returned error otherwise looks successful (AE38) |
-| a span or log could hold a prompt, completion, system instruction or tool argument | nothing, unless the one deployment setting turns capture on | that content holds user data and is large (AE39) · secrets and bodies: LG4, TR3 (`obs`) |
+| a span or log could hold a prompt, completion, system instruction or tool argument | nothing, unless the one deployment setting turns capture on | that content holds user data and is large (AE39) · secrets and bodies: `obs`, Logging and Tracing |
 | code names a GenAI attribute or metric | a constant from the one file pinned to a dated conventions version | the conventions are still in development and rename fields (AE40) |
 | a model call ends, in any way | a call record with request id, served model, retry count and final-attempt latency | success-only records hide outages and cost (AE41) |
 
