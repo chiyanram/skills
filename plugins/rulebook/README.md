@@ -45,6 +45,7 @@ list from the references, and `make lint` fails when it is stale.
 | [code](skills/code/SKILL.md) | write, change or review production code: where logic goes, types, errors, names, comments; Java, Spring, JPA, Angular, concurrency, jobs, Redis, HTTP APIs and security in its notes |
 | [agent](skills/agent/SKILL.md) | write or review code that calls a model or runs an agent: adapter, tool loop, context, guards, GenAI spans, evals, budgets |
 | [deslop](skills/deslop/SKILL.md) | clean up an implemented branch's diff, behaviour-neutral, before review |
+| [skill-feedback](skills/skill-feedback/SKILL.md) | end a session and want its skill failures filed as issues for this repo |
 | [migrations](skills/migrations/SKILL.md) | write or review a database migration |
 | [obs](skills/obs/SKILL.md) | write or review a log call, a metric or a trace |
 | [planning](skills/planning/SKILL.md) | write or review a spec, its acceptance criteria, a design or a diagram |

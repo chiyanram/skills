@@ -99,6 +99,7 @@ Tests here call the model: use the `testing` skill (rulebook plugin) and read it
 | [code](plugins/rulebook/skills/code/SKILL.md) | write or review production code |
 | [agent](plugins/rulebook/skills/agent/SKILL.md) | write or review code that calls a model or runs an agent |
 | [deslop](plugins/rulebook/skills/deslop/SKILL.md) | clean up a branch's diff before review |
+| [skill-feedback](plugins/rulebook/skills/skill-feedback/SKILL.md) | turn a session's skill failures into issues |
 | [migrations](plugins/rulebook/skills/migrations/SKILL.md) | write or review a database migration |
 | [obs](plugins/rulebook/skills/obs/SKILL.md) | write or review a log call, a metric or a trace |
 | [planning](plugins/rulebook/skills/planning/SKILL.md) | write or review a spec, a design or a diagram |
