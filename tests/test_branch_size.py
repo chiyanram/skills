@@ -78,7 +78,7 @@ class BranchSizeTest(unittest.TestCase):
             "tests     2 lines   1 files",
             "evals     1 lines   1 files",
             "docs      0 lines   0 files",
-            "total     6 lines   3 files (PD9: 400 lines, 15 files)",
+            "total     6 lines   3 files (limit: 400 lines, 15 files)",
         ])
 
     def test_should_count_a_py_file_that_holds_both_markers(self):
@@ -104,21 +104,21 @@ class BranchSizeTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0)
         self.assertEqual(result.stdout.splitlines()[-1],
-                         "total    16 lines  16 files (PD9: 400 lines, 15 files) over PD9")
+                         "total    16 lines  16 files (limit: 400 lines, 15 files) over the limit")
 
     def test_should_say_over_pd9_past_the_line_limit(self):
         self.write({"docs/long.md": "x\n" * 401})
         self.commit("long")
 
-        self.assertTrue(self.size().stdout.splitlines()[-1].endswith("401 lines   1 files (PD9: 400 lines, 15 files) "
-                                                                     "over PD9"))
+        self.assertTrue(self.size().stdout.splitlines()[-1].endswith("401 lines   1 files (limit: 400 lines, 15 files) "
+                                                                     "over the limit"))
 
     def test_should_not_say_over_pd9_at_exactly_the_limits(self):
         self.write({f"docs/{n}.md": "x\n" for n in range(14)} | {"docs/long.md": "x\n" * 386})
         self.commit("fifteen files, four hundred lines")
 
         self.assertEqual(self.size().stdout.splitlines()[-1],
-                         "total   400 lines  15 files (PD9: 400 lines, 15 files)")
+                         "total   400 lines  15 files (limit: 400 lines, 15 files)")
 
     def test_should_count_against_the_merge_base_not_the_base_tip(self):
         self.write({"scripts/new.py": "1\n"})

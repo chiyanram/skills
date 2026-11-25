@@ -1,4 +1,5 @@
-"""The size of a branch against PD9: added lines and changed files, split into code, tests, evals and docs.
+"""The size of a branch against the pull-request size limit in planning's program-design notes: added lines and
+changed files, split into code, tests, evals and docs.
 
 Usage: python3 scripts/branch_size.py <base> [<head>]
 
@@ -12,8 +13,8 @@ import re
 import subprocess
 import sys
 
-PD9_LINES = 400
-PD9_FILES = 15
+LIMIT_LINES = 400
+LIMIT_FILES = 15
 BUCKETS = ("code", "tests", "evals", "docs")
 OPENING = re.compile(r"<!-- (index|lanes-[\w-]+):")
 HUNK = re.compile(r"^@@ -\d+(?:,(\d+))? \+(\d+)(?:,(\d+))? @@")
@@ -97,8 +98,8 @@ def measure(base: str, head: str) -> dict[str, list[int]]:
 def report(totals: dict[str, list[int]]) -> str:
     rows = [f"{name:<6}{lines:>5} lines {files:>3} files" for name, (lines, files) in totals.items()]
     lines, files = (sum(column) for column in zip(*totals.values()))
-    over = " over PD9" if lines > PD9_LINES or files > PD9_FILES else ""
-    rows.append(f"{'total':<6}{lines:>5} lines {files:>3} files (PD9: {PD9_LINES} lines, {PD9_FILES} files){over}")
+    over = " over the limit" if lines > LIMIT_LINES or files > LIMIT_FILES else ""
+    rows.append(f"{'total':<6}{lines:>5} lines {files:>3} files (limit: {LIMIT_LINES} lines, {LIMIT_FILES} files){over}")
     return "\n".join(rows)
 
 

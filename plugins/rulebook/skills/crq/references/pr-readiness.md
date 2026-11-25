@@ -72,5 +72,5 @@ Walk the PR body before merge.
 - [ ] PR4 — Find the rollback line. Its absence is a finding.
 - [ ] PR5 — For a change of two files or more, find the file tree or call tree. Its absence is a finding.
 - [ ] PR6 — Find "Where to look" with one to three places. Its absence is a finding.
-- [ ] PR7 — For a one-way door, find each readiness item; the alerts are the design's (SR18). Each one missing is a
+- [ ] PR7 — For a one-way door, find each readiness item; the alerts are the design's (`planning`'s spec-review notes). Each one missing is a
   finding.

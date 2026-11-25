@@ -5,7 +5,7 @@ file. Project-specific values (commands, paths, module names) stay in each proje
 
 Each domain is one skill: `testing`, `playwright`, `code`, `agent`, `migrations`, `obs` and `planning`. A skill is moving to
 one short procedure in `SKILL.md`, with a file beside it only for what some runs need, such as one stack's traps
-(`testing`, `code`, `migrations`, `obs` and `agent` so far). From a project's `AGENTS.md`, point at a skill or its file by name, never by path, because
+(every skill but `crq`). From a project's `AGENTS.md`, point at a skill or its file by name, never by path, because
 the plugin's install folder differs per machine and per version:
 
 ```text
@@ -27,10 +27,10 @@ See the [root README](../../README.md#quick-start) for GitHub Copilot CLI and th
 
 ## Two shapes, for now
 
-`testing` and `code` are short procedures: `SKILL.md` holds the steps and the rules, each with its reason, and Good / Bad pairs
-only where a model's default is wrong. The other skills still have a router `SKILL.md` and references with five
-sections (Rules, When X use Y, Good / Bad, Decided edges, Review checks), described in
-[reference-format.md](../../docs/rulebook/reference-format.md), until each is rewritten.
+Every skill but `crq` is a short procedure: `SKILL.md` holds the steps and the rules, each with its reason, with notes
+files beside it for what only some runs need, and Good / Bad pairs only where a model's default is wrong. `crq` still
+has a router `SKILL.md` and references with five sections (Rules, When X use Y, Good / Bad, Decided edges, Review
+checks), described in [reference-format.md](../../docs/rulebook/reference-format.md), until it is rewritten.
 
 ## Skills
 
