@@ -1,7 +1,6 @@
 """Each plugin README links every skill router, and each router's index block is what `make index` builds from its
-references, so a reference is never missing from its router and two PRs never merge rows by hand. A skill that ships
-process/lanes-v2.json holds its phase diagram and lanes table once each, as `make index` builds them. A plugin that
-ships hooks/index.txt has the same text in the root README's AGENTS.md block.
+references, so a reference is never missing from its router and two PRs never merge rows by hand. A plugin that ships
+hooks/index.txt has the same text in the root README's AGENTS.md block.
 
 A skill that ships references with no router, and a plugin with no README, are skipped: check_routers and
 check_plugin report them.
@@ -13,7 +12,6 @@ from pathlib import Path
 from agents_index import README, built
 from check_links import LINK, prose_lines
 from index_table import table, unreadable, with_table
-from lanes_render import files
 
 MARKETPLACE = Path(".claude-plugin/marketplace.json")
 
@@ -32,12 +30,6 @@ def router_problems(skill: Path) -> list[str]:
     if built is None:
         return [f"{router}: no index block; add the `make index` markers"]
     return unreadable(skill) or ([] if built == current else [f"{router}: index is stale; run `make index`"])
-
-
-def lanes_problems(skill: Path) -> list[str]:
-    updated, found = files(skill)
-    return found + [f"{path}: lanes block is stale; run make index" for path, text in updated.items()
-                    if text != path.read_text()]
 
 
 def agents_index_problems(root: Path, folder: Path) -> list[str]:
@@ -59,7 +51,7 @@ def plugin_problems(root: Path, entry: dict) -> list[str]:
     unlinked = [f"{readme}: skill router `{router.relative_to(folder)}` is not linked"
                 for router in sorted(folder.glob("skills/*/SKILL.md")) if router.resolve() not in listed]
     skills = sorted(folder.glob("skills/*/"))
-    return (unlinked + [p for skill in skills for p in router_problems(skill) + lanes_problems(skill)]
+    return (unlinked + [p for skill in skills for p in router_problems(skill)]
             + agents_index_problems(root, folder))
 
 

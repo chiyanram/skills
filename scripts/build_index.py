@@ -1,8 +1,7 @@
-"""Rewrites the index block of each skill router from its references, the lanes blocks of a skill from its
-process/lanes-v2.json, and the root README's AGENTS.md block from each plugin's hooks/index.txt (`make index`).
+"""Rewrites the index block of each skill router from its references, and the root README's AGENTS.md block from
+each plugin's hooks/index.txt (`make index`).
 
-A skill that ships references with no router is skipped: check_routers reports it. The lanes blocks are built
-after the router, because they read the new router.
+A skill that ships references with no router is skipped: check_routers reports it.
 """
 import json
 import sys
@@ -10,7 +9,6 @@ from pathlib import Path
 
 from agents_index import README, built
 from index_table import table, unreadable, with_table
-from lanes_render import files
 
 MARKETPLACE = Path(".claude-plugin/marketplace.json")
 
@@ -28,13 +26,6 @@ def build(skill: Path) -> list[str]:
     return problems
 
 
-def build_lanes(skill: Path) -> list[str]:
-    updated, problems = files(skill)
-    for path, text in updated.items():
-        path.write_text(text)
-    return problems
-
-
 def build_agents_index(root: Path, folder: Path) -> list[str]:
     found = built(root, folder)
     if found is None:
@@ -49,7 +40,7 @@ if __name__ == "__main__":
     root = Path(sys.argv[1] if len(sys.argv) > 1 else ".")
     entries = json.loads((root / MARKETPLACE).read_text()).get("plugins", [])
     skills = [skill for entry in entries for skill in sorted((root / entry["source"]).glob("skills/*/"))]
-    found = [p for skill in skills for p in build(skill) + build_lanes(skill)]
+    found = [p for skill in skills for p in build(skill)]
     found += [p for entry in entries for p in build_agents_index(root, root / entry["source"])]
     if found:
         print("\n".join(found))

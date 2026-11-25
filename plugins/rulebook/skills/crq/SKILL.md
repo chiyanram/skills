@@ -8,7 +8,6 @@ description: Use when you take a change from request to merge, or need its lane 
 One pipeline takes every change from a request to a merge. A coordinator talks with the human and plans. Fresh
 runs build and review. Scripts check what a model must not judge. The human approves the plan and merges.
 
-<!-- lanes-diagram: built by make index from process/lanes-v2.json; do not edit by hand -->
 ```text
 intake ─▶ research ─▶ clarify ─▶ spec ─▶ design ─▶ design-review ─▶ HUMAN approval ─▶ test-first
    ─▶ build ─▶ verify ─▶ cleanup ─▶ code-review ─▶ gate ─▶ pr ─▶ HUMAN merge ─▶ timeline-record
@@ -23,7 +22,6 @@ code-review    round-cap  ─▶ human
 gate           red        ─▶ build   cap gate_red = 2
 gate           round-cap  ─▶ human
 ```
-<!-- /lanes-diagram -->
 
 ## Phases
 
@@ -49,24 +47,6 @@ each phase applies.
 | merge | **human** | merge | — |
 | timeline-record | engine, no model | rounds, findings, tokens per phase, rescues | `retro` |
 | full retro (an extra task, not a phase; only when a human starts one) | retro run | each lesson as a rule, a script, a review check or nothing | `retro` |
-
-## Process files
-
-An engine reads these to run the same process a person runs with `/crq`.
-
-- [lanes.json](process/lanes.json): per lane, whether it needs approval, design review and test-first, its lenses
-  and its retro. An engine may make a lane stricter, never looser.
-- [lanes-v2.json](process/lanes-v2.json): the phase graph, each phase's actor and outcome edges, the round caps and
-  conditions, and per lane its phases, lens cap, review model and effort. It sits beside lanes.json until an engine
-  reads it.
-- [review.json](process/review.json): the baseline every automated review reads, whatever the repo's own
-  instruction files say. An entry names a skill and a reference, or a skill alone, which means its `SKILL.md`.
-- [glossary](process/glossary.md): the words every role card and hand-off uses.
-- Role cards, one per role, each with three eval scenarios in the plugin's `evals/<role>/`:
-  [coordinator](process/roles/coordinator.md), [design-reviewer](process/roles/design-reviewer.md),
-  [test-first](process/roles/test-first.md), [implementer](process/roles/implementer.md),
-  [cleanup](process/roles/cleanup.md), [finder](process/roles/finder.md), [verify
-  pass](process/roles/verify-pass.md), [retro](process/roles/retro.md). The onboarder's card is the engine's own.
 
 ## References
 
