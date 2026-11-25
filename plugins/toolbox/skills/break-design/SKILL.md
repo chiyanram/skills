@@ -11,9 +11,9 @@ follows the rules; this asks what input, timing or outage breaks it.
 
 ## Before you start
 
-Load the rulebook's `planning` skill and read its `break-the-design` reference in full: rules BK1–BK4, the break
+Load the rulebook's `planning` skill and read its `break-the-design` notes in full: the rules, the break
 catalogue and the closures. If the rulebook is not installed, or its `planning` skill has no `break-the-design`
-reference, stop and say this tool needs a rulebook that ships it. Never break a design from rules you recall.
+notes, stop and say this tool needs a rulebook that ships it. Never break a design from rules you recall.
 
 Ask for the spec and the design if the person did not give them. Read the code at the default branch.
 
@@ -21,20 +21,20 @@ Ask for the spec and the design if the person did not give them. Read the code a
 
 1. Read the spec and the design in full. List each decision that changes state, calls another system or takes new
    input. Skip a decision that only reads and calls nothing, unless the read feeds a later write.
-2. For each listed decision, find its rows in the break catalogue and try every scenario in them (BK1). Open the code
+2. For each listed decision, find its rows in the break catalogue and try every scenario in them. Open the code
    the decision cites: keep a trigger only when the design or today's code makes it reachable, and cite the decision
-   or the line (BK4).
+   or the line.
 3. Drop a scenario the design already closes, unless its closure misses the trigger, such as a retry with no key.
 4. Write each kept scenario with its trigger, its chain of effects, the first sign a person would see, and the AC-n or
-   decision it hits (BK2).
+   decision it hits.
 5. Propose one closure for each: a failure AC as `AC-n — should <refusal or recovery> when <trigger>`, a mitigation
-   with the signal that shows it working, or a risk for the person to accept by name (BK3).
+   with the signal that shows it working, or a risk for the person to accept by name.
 6. Give each a severity: blocker when it loses or corrupts data, moves money or crosses a trust boundary; warning
    otherwise.
 
 ## Report
 
-One block per scenario, in the shape of the reference's BK2 "Good" example, blockers first. If no decision needed the
+One block per scenario, in the shape of the notes' "Good" scenario example, blockers first. If no decision needed the
 catalogue, say so in one line. End with: the person decides; nothing here approves the design.
 
 ## Limits

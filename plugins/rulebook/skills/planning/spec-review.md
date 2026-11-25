@@ -1,0 +1,242 @@
+# Spec review
+
+How a spec and its design are researched, written and checked before approval: research, cited claims, open
+questions, intent, assumptions and a sound design. Read it when you write, revise or review a spec or a design before
+approval.
+
+## Rules
+
+### Research
+
+- Before the spec, research how the touched code works (its flow, where things live, gotchas at `file:line`) and why
+  it is shaped so (commits, PRs, issues), because changing code without its reason brings old bugs back. A change that
+  only adds new code has no history to read. Use one read-only helper for one file or function, and two to four, one
+  angle each, then one synthesis, for more than one module.
+- Give a research helper neutral questions about how the code works today, and keep the wanted change out of its
+  brief, because a helper that knows the goal reports what supports it.
+- Look up what code and docs can answer before you ask the human. Each question still open at approval names its
+  decider, options with a recommendation, and why it does not block building, because a bare question outlives the
+  build. A draft spec may hold open questions.
+
+### The spec
+
+- Check the intent for an actor, an action and a benefit, ACs a test can check, and an out-of-scope list, because
+  without them the builder guesses who it serves, when it is done, and where it stops.
+- List each assumption behind the spec as stated, inferred from code at `file:line`, or a chosen default, and have
+  the human confirm the last two, because an unconfirmed guess becomes a requirement. A fact about today's code that
+  the design cites needs no confirmation; a tiny-lane change has no spec.
+
+### The design
+
+- Cite `file:line` on the main branch for each claim about today's code, and open each cite when you review, because
+  an uncited false claim can settle a decision. The spec names no paths, and planned behaviour has no cite yet.
+- Resolve each cite with a check that can be run, because a drifted cite is otherwise found only by chance. A cite
+  pinned to a commit (`file:line @commit`) cannot drift.
+- Check each decision against the ADRs and patterns it touches, and report an unnamed departure, or two documents that
+  disagree, for the human to settle, because a silent departure overrides a recorded decision. A departure the design
+  names, with its reason and its new decision recorded, is a decision.
+- Name at least one real alternative and why it lost, and state each tradeoff as "we accept X for Y", because an
+  unstated cost later reads as an oversight and gets "fixed". A shape that a named constraint forced needs no invented
+  rival.
+- For each step that writes, sends or calls another system, say what happens when it fails, runs twice, or crashes
+  halfway, because partial state turns every retry into debugging.
+- When the design changes stored data, a public contract or a deploy, name the migration and the rollback, and mark
+  each irreversible step for the human's yes, because a shipped irreversible step cannot be undone. An add-only change
+  that old data and old clients survive says so in one line.
+- For each new input, endpoint or permission, name the trust boundary it crosses and the control at it, because a
+  design with no named boundary leaves security to whoever writes the code.
+- For each new failure mode, name the log, metric or alert that shows it in production, because users find an unseen
+  failure first.
+- Reuse an existing part that does the job, or say why it cannot serve, because a second copy drifts from the first.
+- Add an abstraction, setting, port or extension point only with a second user, today or in this spec, because a seam
+  with one user is indirection every later change pays for. The variants of one type are not seams.
+- Give a type one variant per allowed state, each with only its own fields, so it holds no forbidden state, and work
+  out a derived value on read or keep it only as a cache with one owner, because guards get skipped and copies drift.
+- Say for each existing module the design touches whether it needs a refactor first, and propose that refactor as its
+  own ticket, because a change built on a module that resists it makes the next change harder too.
+- Record a decision as an ADR when it is hard to reverse, surprising without context, and a real tradeoff, because the
+  next reader otherwise re-decides it without knowing why. Any other decision is one line in the design.
+- In a one-way-door design, write a pre-mortem: assume it failed, and name each failure with its trigger, chain of
+  effects, early sign and mitigation, because asking only whether it works hides how it fails.
+
+### The review
+
+- Report every finding in one round. A finding a later round raises on text that has not changed is a miss of the
+  earlier round, because findings raised one per round stretch one review over several.
+
+## Good / Bad
+
+### Cite today's behaviour in the design, not the spec
+
+**Bad**
+```markdown
+## Design — overdue reminders
+
+Today, loans renew automatically when no other member holds a reservation.
+So the reminder job emails only members whose loan is overdue.
+```
+The claim has no cite, so the reviewer cannot check it. If renewal is manual, the job misses every loan due today.
+
+**Good**
+```markdown
+## Design — overdue reminders
+
+Today, loans renew automatically when no other member holds a reservation
+(`loans/RenewalPolicy.java:42`, `canRenew`, on the main branch).
+So the reminder job emails only members whose loan is overdue.
+```
+The reviewer opens line 42 and confirms the claim before the decision rests on it. The spec for this change states
+the behaviour in words and names no path.
+
+### A drifted cite is a finding, found by a check
+
+**Bad**
+```markdown
+Renewal skips a loan with a reservation (`loans/RenewalPolicy.java:42`, `canRenew`).
+```
+```java
+42  import java.time.Clock;
+```
+`canRenew` moved to line 58 after a refactor. The cite now points at an import, and only a reader who opens it sees
+the drift.
+
+**Good**
+```text
+$ sed -n 42p loans/RenewalPolicy.java | grep -c canRenew
+0
+$ grep -n canRenew loans/RenewalPolicy.java
+58:    boolean canRenew(Loan loan) {
+```
+The check opens each cite's line and looks for the named symbol. Line 42 no longer holds `canRenew`, so the reviewer
+reports the cite in the design as drifted, with its new line.
+
+### Every open question names its decider, options and a recommendation
+
+**Bad**
+```markdown
+## Open questions
+
+- Should a renewal reset the overdue fine?
+- Do library sites share one reservation queue?
+```
+Nobody owns either question. The build starts, and both are still open when it ends.
+
+**Good**
+```markdown
+## Open questions
+
+- Should a renewal reset the overdue fine? Decides: the circulation lead.
+  Options: reset it; keep it. Recommended: keep it, because a renewal
+  does not repay the days already late.
+  Does not block: the fine stays as it is until the lead answers, and the
+  rule is one setting.
+```
+The queue question was answered from the site configuration before approval and moved into the design. The fine
+question names who decides it, the choices with a recommendation, and why building can go on.
+
+### Name the alternative that lost, and the cost you accept
+
+**Bad**
+```markdown
+## Design — overdue reminders
+
+The reminder job runs nightly and emails every member with an overdue loan.
+```
+One shape and no rival. When a member asks why a reminder came a day late, the next developer "fixes" the nightly
+run without knowing it was chosen.
+
+**Good**
+```markdown
+## Design — overdue reminders
+
+The reminder job runs nightly and emails every member with an overdue loan.
+
+Alternative: send each reminder when its loan falls due. Lost because it needs a
+timer per loan, which our job runner cannot hold.
+
+Tradeoffs:
+- We accept a reminder up to a day late for one nightly job and no per-loan timers.
+```
+The reader sees the delay was chosen, and what it bought.
+
+### Say what happens on failure, a rerun and a crash
+
+**Bad**
+```markdown
+The job selects overdue loans, sends one email per member, and marks each loan
+as reminded.
+```
+The design is silent on a crash after the emails go out and before the loans are marked. The next run sends every
+reminder again.
+
+**Good**
+```markdown
+The job selects overdue loans not yet reminded today, and for each member:
+1. records a reminder row keyed by (member, date), unique;
+2. sends the email, passing (member, date) as the mail provider's idempotency key;
+3. marks the row sent.
+
+Failure: a send error leaves the row unsent; a rerun the same night resends it
+with the same key. An unsent row from an earlier date is dropped, since that
+night records a fresh one.
+Twice: the unique key stops a second row, and the provider drops a second send
+with the same key.
+Crash halfway: an unsent row is resent with its key, so an email that already
+went out is not delivered twice.
+```
+Each step names its failure, its rerun and its crash, so a retry needs no debugging.
+
+### A pre-mortem names how it fails, not only that it might
+
+**Bad**
+```markdown
+## Pre-mortem — move loan history to its own table
+
+Risk: it might not scale. Mitigation: monitor performance.
+```
+"It might not scale" names no trigger, no chain and no sign, so nobody can watch for it or plan around it.
+
+**Good**
+```markdown
+## Pre-mortem — move loan history to its own table
+
+Failure: the copy runs while members still renew loans.
+Trigger: the backfill takes longer than the release window.
+Chain: renewals made during the copy land only in the old table; the old
+table is dropped; those renewals are lost.
+Early sign: the row counts of the two tables differ after the backfill.
+Mitigation: write to both tables from the release before the backfill, and
+drop the old table only after a week of equal counts.
+```
+Each failure has a trigger, a chain and a sign someone can check.
+
+## Review
+
+Walk the whole spec and the whole design in one round, every section, before you report.
+
+Each line is a finding, a blocker unless marked (warning).
+
+- (warning) A finding on text unchanged since an earlier round: report it, and name the miss; the finding keeps its
+  own severity.
+- In the research notes, no how at `file:line`, or a line the design deletes or reshapes with no stated why (a
+  commit, PR, issue, or "no recorded reason").
+- A research brief that states the wanted change or a planned design.
+- An open question at approval with no decider, options and recommendation, or reason it does not block; or one the
+  code or docs could answer.
+- An intent with no actor, action or benefit, no ACs a test can check, or no out-of-scope list.
+- No assumption list, or an inferred or default assumption the human has not answered.
+- A claim about today's code with no cite, a cite that does not show the claim, or a file path in the spec.
+- A main-branch cite that no longer points at its named symbol, by the cite check.
+- An unnamed departure from an ADR or pattern, or two documents that disagree.
+- No rejected alternative without a named forcing constraint, or a cost not stated as "we accept X for Y".
+- A step that writes, sends or calls out with no failure, rerun or crash-halfway answer.
+- A change to stored data, a public contract or a deploy with no migration or rollback, or an irreversible step not
+  marked for the human's yes.
+- A new input, endpoint or permission with no trust boundary and control.
+- A new failure mode with no log, metric or alert.
+- A new part that duplicates an existing one, neither reused nor ruled out.
+- A new abstraction, setting, port or extension point with no second user.
+- (warning) A type that can hold a forbidden state, or a derived value that is not a cache with one owner.
+- (warning) A touched module with no "refactor first?" answer, or a refactor folded into this change's slices.
+- A hard-to-reverse, surprising tradeoff decision with no ADR.
+- A one-way-door design with no pre-mortem, or a failure in it with no trigger, early sign or mitigation.
