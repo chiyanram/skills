@@ -14,8 +14,7 @@ request. `AGENTS.md` holds the hard rules; `CONTRIBUTING.md` holds the procedure
 - [K5](#k5) — Rules grow from our own failures.
 - [K6](#k6) — Say only what the model wouldn't do, and keep it short.
 - [K7](#k7) — A script or lint beats a prose rule.
-- [K8](#k8) — This repo publishes the versioned format of what it ships.
-- [K9](#k9) — A skill change ships with eval proof, sized by its tier.
+- [K8](#k8) — A skill change ships with eval proof, sized by its tier.
 
 ## K1
 
@@ -39,8 +38,7 @@ copy for the reviewer. A finding cites the skill and its section, or the rule's 
 
 **Why.** When the writer and the reviewer read different text, the review blocks on rules the writer was never shown.
 
-**How it's checked.** `check_process.py` fails a role card that cites a rule ID no Rules section holds. The rest is review
-only.
+**How it's checked.** Review only.
 
 ## K3
 
@@ -97,16 +95,6 @@ Where a check can run, ship a script or lint, not a prose rule.
 **How it's checked.** Review only.
 
 ## K8
-
-This repo publishes the versioned format of its cards, lanes and findings, and its CI checks every card against it.
-
-**Why.** This repo stands alone and owns its formats. A tool that uses it pins a version and reads that version's
-format.
-
-**How it's checked.** `check_process.py` validates every role card and the lanes file against the versioned schemas in
-`process/schema/`, and fails when a schema is missing.
-
-## K9
 
 A skill change ships with eval proof that it is no worse, sized by the skill's tier. The steps and the rules for a
 run you can trust are in [CONTRIBUTING.md, Prove a skill change](CONTRIBUTING.md#prove-a-skill-change).

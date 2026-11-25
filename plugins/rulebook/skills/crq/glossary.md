@@ -1,6 +1,6 @@
 # Glossary
 
-One word per idea. Every role card, lanes-v2 (`lanes-v2.json`) and every hand-off use these words, and only these.
+One word per idea. crq and planning use these words, and only these.
 When you reach for a word under "avoid", use the term instead. A check fails a crq or planning file that uses a word under "checked".
 
 ## The factory

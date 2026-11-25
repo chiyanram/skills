@@ -29,8 +29,6 @@ make test   # python3 -m unittest: each check against its planted fixtures, the 
 - Make every toolbox skill typed-only (`disable-model-invocation: true`), with no push or merge (`check_toolbox.py`).
 - Say what and why in the repo's own docs and code comments, never who decided, when or on which issue
   (`check_history.py`).
-- Never change a format file (`plugins/*/skills/*/process/schema/*-vN.schema.json`) once a release holds it; a change
-  is a new `-v(N+1)` file beside it (`check_formats.py`).
 - Fill in every line of `.github/pull_request_template.md`, with no `<placeholder>`, because the squash merge makes
   it the commit on `main` (`pr_body.py`).
 
@@ -63,7 +61,7 @@ No check can enforce these:
 
 ## Pointers
 
-- The principles behind the plugins, K1–K9: `PRINCIPLES.md`. A change that departs from one changes `PRINCIPLES.md` first, in its
+- The principles behind the plugins, K1–K8: `PRINCIPLES.md`. A change that departs from one changes `PRINCIPLES.md` first, in its
   own pull request, because skills rewritten against the old principles break them silently.
 - A new rule, reference or check: `CONTRIBUTING.md`.
 - Commit and PR format: `CONTRIBUTING.md#commit-messages`. Commit types and what each releases:

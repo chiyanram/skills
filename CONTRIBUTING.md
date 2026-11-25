@@ -24,7 +24,7 @@ To try your working copy in Claude Code: `claude plugin marketplace add ./`, the
 
 | target | what it does |
 |---|---|
-| `make index` | rebuilds the reference table in each skill's `SKILL.md` from its references, and a skill's phase diagram and lanes table from its `process/lanes-v2.json` |
+| `make index` | rebuilds the reference table in each skill's `SKILL.md` from its references |
 | `make lint` | runs every `scripts/check_*.py`, then `claude plugin validate --strict` |
 | `make test` | runs the unit tests in `tests/`; one module: `python3 -m unittest tests.test_fixture_checks` |
 | `make check` | `make lint` and `make test`, as CI runs them |
@@ -33,8 +33,8 @@ To try your working copy in Claude Code: `claude plugin marketplace add ./`, the
 One check against one folder: `python3 scripts/check_links.py tests/fixtures/links/broken`. It exits `0` when clean
 and `1` with one line per problem.
 
-The guards no test kills in one file: `python3 scripts/mutate.py scripts/lanes_render.py "python3 -m unittest
-tests.test_lanes_render"`. It exits `0` when every mutant is killed and `1` with one `survivor:` line per survivor.
+The guards no test kills in one file: `python3 scripts/mutate.py scripts/index_table.py "python3 -m unittest
+tests.test_build_index"`. It exits `0` when every mutant is killed and `1` with one `survivor:` line per survivor.
 
 One pull request title: `python3 scripts/pr_title.py "feat(testing): spock rule file (#123)"`. It exits `0` when the
 title follows the rule and `1` with the error CI prints.
@@ -179,15 +179,13 @@ When review finds a case a check missed, plant that case first and watch it fail
 | `check_links.py` | a relative markdown link points at nothing |
 | `check_sizes.py` | root `AGENTS.md` reaches 200 lines, a rule is over 35 words, or an `AGENTS.md` chain is over 32 KiB |
 | `check_plugin.py` | a plugin is not under `plugins/`, has no README or icon, or the repo has no LICENSE |
-| `check_index.py` | a plugin README does not link every skill router, a router's table or a lanes block differs from what `make index` builds, or a skill with `process/lanes-v2.json` has no lanes block, holds one twice or without its END marker after START, has a lanes-v2.json that is not valid, or has a process schema missing or not JSON |
+| `check_index.py` | a plugin README does not link every skill router, or a router's table differs from what `make index` builds |
 | `check_routers.py` | a skill folder ships references but has no `SKILL.md`, or its `SKILL.md` does not link each one |
 | `check_provenance.py` | a shipped skill file carries provenance outside code: a source citation, a URL, a preference line, a credit, an evidence note, a date or a reference to another repository's issue. In the toolbox it reads only each `SKILL.md` |
 | `check_glossary.py` | a crq or planning file uses a word the crq glossary lists under `checked`; the error names the term to use |
 | `check_routing.py` | a skill router has no `evals/routing/<name>.json`, a file has fewer than 8 `should` or 8 `near_miss` requests, a `should` request does not rank its router first, a near miss does not rank its named owner above that router, or two router descriptions are 75% alike. It skips a typed-only skill, which nothing routes to. Word matching only: a model-graded run (`claude plugin eval`) costs tokens and stays manual |
-| `check_process.py` | a crq process schema (card, lanes, lanes-v2 or finding, in `process/schema/`) is missing or uses a keyword `scripts/schema_lite.py` does not run; the lanes file or a role card's frontmatter does not validate against its schema, which covers a lane that is missing, out of order or drops approval above tiny, and a guardrail ID outside the card schema's list; lanes-v2 is missing or breaks its graph rules: a lane phase outside the global order or out of it, a phase listed twice in the order, a phase with no outcomes, an outcome with no valid edge, an uncapped count, a phase with a counted edge and no `round-cap` outcome to `human`, a cap that is not an integer of at least 1, an unknown condition, a condition whose text is empty or not text, a lane above tiny with no plain `approval`, a lane that does not end in a plain `timeline-record`, an actor that is not a card role, human or engine, a `lens_cap` below 1, or a `lane_raise` to no phase; the review file's baseline is empty, has an entry that is not exactly a skill, or a skill and a reference, names one twice, or names one the plugin does not ship (a skill alone means its `SKILL.md`); a role card is not a known role, misses or adds a frontmatter field, cites a rule ID that no Rules section holds, or lacks the job, a "done when" line, numbered steps or an "it's working if" list; or its role has fewer than 3 eval scenarios, each a `prompt.md` and a grader |
 | `check_settings_keys.py` | a skill file names a settings key for a memory ceiling, machine size, port or timeout in backticks with a number in the same clause, outside fenced code: the rule names the key and the project's settings hold the value |
 | `check_toolbox.py` | a toolbox `SKILL.md` lacks `disable-model-invocation: true`, a toolbox skill has no section with `Source:`, `Commit:` and `Licence:` in `THIRD_PARTY_NOTICES.md` and is not listed under its `## Written here`, that list names no toolbox skill, or a toolbox file holds a `git push`, a `gh pr merge`, a `.cursor/` path or a Grok model |
-| `check_formats.py` | a `*-v<N>.schema.json` in a skill's `process/schema/` that the newest `rulebook--v*` tag holds differs from that tag or is gone, or the repo has no such tag. A change is a new `-v<N+1>` file beside it |
 | `check_history.py` | a line a change adds outside `plugins/` carries history: who decided, an ISO date beside a person or decision word, or an issue number, in markdown prose or a code comment. It reads the diff since `origin/main` (pass another base as the second argument) and spares ADR and `PRINCIPLES.md` status lines, CHANGELOGs, fixtures, `docs/agents/`, `evals/` and one `See #N` / `History: #N` pointer per section or code header |
 | `check_comments.py` | a `.py`, `.mjs` or `.js` file outside `tests/fixtures/` holds more comment lines than `scripts/comment-baseline.json` allows, or fewer without `--shrink` run. It keeps the module header, a line with an `http(s)` link and a tool directive. `/delete-comment` (`.claude/commands/delete-comment.md`) sorts and deletes the rest |
 | `check_eval_proof.py` | a skill that `evals/skills/settings.json` gives a tier lacks what its tier asks for: cases in both slices, an approved reference answer per case, an approved baseline whose summaries exist, and, for CORE, a passing planted check per llm grader. A summary or planted check made from other case files, or another judge, is stale. CORE fails on any gap; NORMAL prints a warning, except a stale summary behind an approved baseline |
@@ -204,34 +202,6 @@ or merges. It comes one of two ways:
 
 Either way, add its row to the [toolbox README](plugins/toolbox/README.md) and title the PR `feat(toolbox): …`.
 `check_toolbox.py` fails a tool that is in neither place.
-
-## Run the role evals
-
-Each role card, `plugins/rulebook/skills/crq/process/roles/<role>.md`, gets three scenarios, each with graders,
-under `plugins/rulebook/evals/<role>/<case>/`: a `prompt.md` and a `graders/` folder, the format `claude plugin eval`
-reads. The role folders are `coordinator`, `design-reviewer`, `test-first`, `implementer`, `cleanup`, `finder`,
-`verify-pass` and `retro`. A folder appears with its first scenario. Give each case a name no other role
-uses, because the report lists cases by folder name only.
-
-These test the plugin on its own, in plain Claude Code. They do not test an engine, which keeps its own set.
-
-Each case's `prompt.md` says in its `description` what the role should do, and its graders say what passes.
-
-Each scenario folder names what the role must do; read it there, not here.
-
-Every run and every `llm` grader is a real model call on your own Claude login, so they run by hand, never in
-`make lint`, `make test` or CI. Run a role's scenarios after a change to its card or to a reference it reads, such as
-a `crq` review reference for the `finder`:
-
-```bash
-claude plugin eval plugins/rulebook --runs 1 --no-publish                            # every role
-claude plugin eval plugins/rulebook --eval-dir evals/finder --runs 1 --no-publish    # one role
-claude plugin eval plugins/rulebook --case planted-instruction --runs 1 --no-publish # one case
-```
-
-To prune a skill, keep a cut only if no check that must hold gets worse than the baseline by more than the noise. Each case runs with and without the plugin; read the score difference in the report, not only the exit code. A card
-change ships only if its scenarios do not get worse. Results land in a `results/` folder under the eval dir you ran,
-which git ignores.
 
 ## Prove a skill change
 

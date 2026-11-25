@@ -1,4 +1,4 @@
-"""The crq glossary (plugins/rulebook/skills/crq/process/glossary.md) gives one word per idea, and its `checked`
+"""The crq glossary (plugins/rulebook/skills/crq/glossary.md) gives one word per idea, and its `checked`
 column lists the avoid words a script can catch. This check fails when a crq or planning file uses a checked word,
 and names the term to use instead.
 
@@ -9,7 +9,7 @@ import re
 import sys
 from pathlib import Path
 
-GLOSSARY = Path("plugins/rulebook/skills/crq/process/glossary.md")
+GLOSSARY = Path("plugins/rulebook/skills/crq/glossary.md")
 SCOPE = (Path("plugins/rulebook/skills/crq"), Path("plugins/rulebook/skills/planning"))
 SUFFIXES = (".md", ".json")
 
