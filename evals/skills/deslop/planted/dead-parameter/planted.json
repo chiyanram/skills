@@ -1,6 +1,6 @@
 {
   "case": "deslop-dead-parameter",
-  "grader": "ds7-dead-parameter",
+  "grader": "dead-parameter",
   "approved": null,
   "answers": {
     "right-remove": "pass",

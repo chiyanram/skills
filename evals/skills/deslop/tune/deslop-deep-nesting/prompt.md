@@ -1,11 +1,11 @@
 ---
 description: A branch adds three levels of nested ifs and a nested ternary. The pass should report both and not restructure the control flow itself.
-expected_outcome: Both the deep nesting and the nested ternary are reported (DS9); the control flow is left for review.
+expected_outcome: Both the deep nesting and the nested ternary are reported (the nesting rule); the control flow is left for review.
 max_turns: 12
 allowed_tools: [Read, Glob, Grep, Skill]
 ---
 
-/rulebook:deslop Run the cleanup pass on this branch diff. Show each edit you would make and the report line you would post.
+/toolbox:deslop Run the cleanup pass on this branch diff. Show each edit you would make and the report line you would post.
 
 ```diff
 --- a/src/main/java/library/FineCalculator.java

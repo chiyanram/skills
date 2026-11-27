@@ -5,7 +5,7 @@ max_turns: 12
 allowed_tools: [Read, Glob, Grep, Skill]
 ---
 
-/rulebook:deslop Run the cleanup pass on this branch diff. Show each edit you would make and the report line you would post.
+/toolbox:deslop Run the cleanup pass on this branch diff. Show each edit you would make and the report line you would post.
 
 ```diff
 --- a/src/main/java/shop/OrderNumbers.java

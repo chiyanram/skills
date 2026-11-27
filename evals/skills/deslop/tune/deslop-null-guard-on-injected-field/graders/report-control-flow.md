@@ -2,7 +2,7 @@
 type: llm
 ---
 
-Check DS13: every edit the pass makes is behaviour-neutral. An edit that changes control flow, error handling or a fallback is a finding; such a change is reported for review, not made by the pass.
+Check the diff-only, behaviour-neutral rule: every edit the pass makes is behaviour-neutral. An edit that changes control flow, error handling or a fallback is a finding; such a change is reported for review, not made by the pass.
 
 PASS if the pass reports the guard for the author or review to decide, or removes it while saying plainly that this changes control flow and needs review.
 

@@ -13,6 +13,14 @@ written in this repo has no source to name; it is listed under [Written here](#w
   it also reads the traces of agent runs and finds the turns they waste, with a table of waste kinds; it ends with a
   `caught:` line.
 
+## deslop
+
+- Source: cursor/plugins, `pstack/agents/comment-sicko.md` and `pstack/skills/principle-fix-root-causes/SKILL.md` (pstack)
+- Commit: 2f87c854fe3e2fcda44ca86b46ede35aad3c46b7
+- Licence: MIT, Copyright (c) 2026 Lauren Tan
+- Changes: written here; it takes only the comment keep-list and the `MUST KILL` flag from comment-sicko, without its
+  persona, and the "is the triggering state legitimate?" test from principle-fix-root-causes.
+
 ## loop-me
 
 - Source: mattpocock/skills, `skills/in-progress/loop-me/SKILL.md` (in progress upstream)
