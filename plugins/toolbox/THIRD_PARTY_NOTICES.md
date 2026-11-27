@@ -16,9 +16,9 @@ written in this repo has no source to name; it is listed under [Written here](#w
 ## grilling
 
 - Source: mattpocock/skills, `skills/productivity/grilling/SKILL.md`
-- Commit: 4ae2317ddb22b046e26455e4f9c9b3aaaf62212d
+- Commit: 7739eaed7f8f3915437a8def198a6d0d7206dbc7
 - Licence: MIT, Copyright (c) 2026 Matt Pocock
-- Changes: one question at a time instead of a round, in plain words without the skill's own terms; typed-only.
+- Changes: typed-only; the text is copied word for word.
 
 ## loop-me
 
