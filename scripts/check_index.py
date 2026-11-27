@@ -1,9 +1,7 @@
-"""Each plugin README links every skill router, and each router's index block is what `make index` builds from its
-references, so a reference is never missing from its router and two PRs never merge rows by hand. A plugin that ships
-hooks/index.txt has the same text in the root README's AGENTS.md block.
+"""Each plugin README links every skill, so a skill is never missing from its plugin's list. A plugin that ships
+hooks/index.txt has the same text in the root README's AGENTS.md block, which `make index` writes.
 
-A skill that ships references with no router, and a plugin with no README, are skipped: check_routers and
-check_plugin report them.
+A plugin with no README is skipped: check_plugin reports it.
 """
 import json
 import sys
@@ -11,7 +9,6 @@ from pathlib import Path
 
 from agents_index import README, built
 from check_links import LINK, prose_lines
-from index_table import table, unreadable, with_table
 
 MARKETPLACE = Path(".claude-plugin/marketplace.json")
 
@@ -19,17 +16,6 @@ MARKETPLACE = Path(".claude-plugin/marketplace.json")
 def linked(readme: Path) -> set[Path]:
     targets = {target.split("#", 1)[0] for _, line in prose_lines(readme.read_text()) for target in LINK.findall(line)}
     return {(readme.parent / target).resolve() for target in targets if target}
-
-
-def router_problems(skill: Path) -> list[str]:
-    router = skill / "SKILL.md"
-    if not any(skill.glob("references/*.md")) or not router.is_file():
-        return []
-    current = router.read_text()
-    built = with_table(current, table(skill))
-    if built is None:
-        return [f"{router}: no index block; add the `make index` markers"]
-    return unreadable(skill) or ([] if built == current else [f"{router}: index is stale; run `make index`"])
 
 
 def agents_index_problems(root: Path, folder: Path) -> list[str]:
@@ -48,11 +34,9 @@ def plugin_problems(root: Path, entry: dict) -> list[str]:
     if not readme.is_file():
         return []
     listed = linked(readme)
-    unlinked = [f"{readme}: skill router `{router.relative_to(folder)}` is not linked"
-                for router in sorted(folder.glob("skills/*/SKILL.md")) if router.resolve() not in listed]
-    skills = sorted(folder.glob("skills/*/"))
-    return (unlinked + [p for skill in skills for p in router_problems(skill)]
-            + agents_index_problems(root, folder))
+    unlinked = [f"{readme}: skill `{skill.relative_to(folder)}` is not linked"
+                for skill in sorted(folder.glob("skills/*/SKILL.md")) if skill.resolve() not in listed]
+    return unlinked + agents_index_problems(root, folder)
 
 
 def problems(root: Path) -> list[str]:

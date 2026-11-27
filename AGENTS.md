@@ -13,7 +13,7 @@ only this one working.
 Run all three before you push. CI runs `make lint` and `make test` on every pull request and on push to `main`.
 
 ```bash
-make index  # rebuild each skill router's reference table from its references
+make index  # rebuild the root README's AGENTS.md block from each plugin's hooks/index.txt
 make lint   # every scripts/check_*.py, then `claude plugin validate --strict`
 make test   # python3 -m unittest: each check against its planted fixtures, the index builder, the release config
 ```
@@ -37,7 +37,7 @@ No check can enforce these:
 - Add or change a rule only in a pull request the operator merges, with its two sources in the pull request body,
   because an unapproved rule reaches every project that installs the plugin.
 - Keep `plugins/` generic: no project names, paths or business terms, because every project installs the same files.
-- Never edit a router table, a `version` or a `CHANGELOG*.md` by hand, because `make index` and the release write them.
+- Never edit the README's AGENTS.md block, a `version` or a `CHANGELOG*.md` by hand, because `make index` and the release write them.
 - Read Sonar rules for calibration only. Never copy their text, because their licence does not permit it.
 - Put a new role, phase or field in a new format version, and say in the pull request what a tool must learn to read
   it, because a tool on the old version keeps working only if the old file stays.
