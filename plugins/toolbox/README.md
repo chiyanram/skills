@@ -19,7 +19,6 @@ See the [root README](../../README.md#quick-start) for GitHub Copilot CLI and ot
 | [correct](skills/correct/SKILL.md) | `/toolbox:correct` | finds the mistakes agents repeat here, and the turns their runs waste in traces, and proposes a fix for each at the highest level: architecture, types, a lint, a test, then docs |
 | [create-verification-skill](skills/create-verification-skill/SKILL.md) | `/toolbox:create-verification-skill` | generates a project-local skill that launches, checks and drives the app as a user does, with a feature map, and runs it once end to end before handover |
 | [maintain-verification-skill](skills/maintain-verification-skill/SKILL.md) | `/toolbox:maintain-verification-skill` | checks that skill and its feature map against the source and the running app, and commits only proven corrections |
-| [grilling](skills/grilling/SKILL.md) | `/toolbox:grilling` | asks about a plan or decision in rounds, each question with a recommended answer, until you agree on it |
 | [loop-me](skills/loop-me/SKILL.md) | `/toolbox:loop-me` | grills you into workflow specs an agent could build without a question, kept in `workflows/*.md` |
 | [diagram-brief](skills/diagram-brief/SKILL.md) | `/toolbox:diagram-brief` | briefs a change as a `diff` call tree with proof, message vs diff, callers and what may break |
 | [onboard](skills/onboard/SKILL.md) | `/toolbox:onboard` | sets up a repo for the rulebook: its confirmed commands, which stack notes apply, and the codebase-health rule, as one block in `AGENTS.md` or `CLAUDE.md` |

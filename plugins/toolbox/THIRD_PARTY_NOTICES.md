@@ -13,20 +13,12 @@ written in this repo has no source to name; it is listed under [Written here](#w
   it also reads the traces of agent runs and finds the turns they waste, with a table of waste kinds; it ends with a
   `caught:` line.
 
-## grilling
-
-- Source: mattpocock/skills, `skills/productivity/grilling/SKILL.md`
-- Commit: 7739eaed7f8f3915437a8def198a6d0d7206dbc7
-- Licence: MIT, Copyright (c) 2026 Matt Pocock
-- Changes: typed-only; the text is copied word for word.
-
 ## loop-me
 
 - Source: mattpocock/skills, `skills/in-progress/loop-me/SKILL.md` (in progress upstream)
 - Commit: 4ae2317ddb22b046e26455e4f9c9b3aaaf62212d
 - Licence: MIT, Copyright (c) 2026 Matt Pocock
-- Changes: it reads the toolbox `grilling` skill as a file, because a typed-only skill cannot invoke another; one
-  question at a time, in plain words.
+- Changes: it loads the rulebook's `grilling` skill; one question at a time, in plain words.
 
 ## diagram-brief
 
