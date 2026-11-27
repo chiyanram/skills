@@ -1,0 +1,23 @@
+{
+  "skill": "grilling",
+  "should": [
+    "Grill me on this plan",
+    "Grill me about my idea before I start",
+    "Stress-test my thinking on this decision",
+    "Question my decision until we agree on it",
+    "Interview me about this idea until we share an understanding",
+    "Grill this decision with me, one round at a time",
+    "Ask me the questions this idea still leaves open",
+    "Challenge my idea with questions and give your recommended answers"
+  ],
+  "near_miss": [
+    {"prompt": "Write the spec and acceptance criteria for this plan", "owner": "planning"},
+    {"prompt": "Review this design before any code exists", "owner": "planning"},
+    {"prompt": "Take this ticket to a pull request", "owner": "crq"},
+    {"prompt": "Write a test for the plan service", "owner": "testing"},
+    {"prompt": "Review this Java code for errors", "owner": "code"},
+    {"prompt": "Add tracing spans to this idea's request handler", "owner": "obs"},
+    {"prompt": "Try to break this design before approval", "owner": "planning"},
+    {"prompt": "Write the migration this plan needs", "owner": "migrations"}
+  ]
+}

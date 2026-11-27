@@ -30,9 +30,9 @@ tests is owned by the `testing` skill.
   again, because an approval covers only the text it saw. A whitespace or typo edit that keeps the meaning is not one.
 - Write a bug's spec in three parts: current behaviour, expected behaviour, and behaviour that must not change,
   because a fix that names no unchanged behaviour can break it unseen.
-- End a feature or one-way-door spec with "How we will know it worked: <lever>, read at <where>, on <when>", or
+- End a feature spec, or any spec with the one-way-door flag, with "How we will know it worked: <lever>, read at <where>, on <when>", or
   "none: <why>", because a feature with no read-back point is never checked. A lever is a product metric, adoption, a
-  benchmark, an error-rate or latency target, or a person's read on the date. Other lanes leave the line out, because
+  benchmark, an error-rate or latency target, or a person's read on the date. Other specs leave the line out, because
   a lever made up for a small change is read as a promise.
 
 ## Good / Bad
@@ -170,5 +170,5 @@ Each line is a finding, a blocker unless marked (warning).
 - A noun not in the glossary, a related spec or this spec's own definitions.
 - AC text changed after approval with no new approval.
 - A bug spec missing its current, expected or must-not-change part.
-- (warning) A feature or one-way-door spec with no "How we will know it worked" line, or a lever with no place or no
+- (warning) A feature spec, or a spec with the one-way-door flag, with no "How we will know it worked" line, or a lever with no place or no
   date to read it.

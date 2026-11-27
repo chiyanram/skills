@@ -13,7 +13,7 @@
   ],
   "near_miss": [
     {
-      "prompt": "Write a test of the agent loop with a scripted fake model",
+      "prompt": "Write a unit test of the agent loop with a scripted fake model",
       "owner": "testing"
     },
     {

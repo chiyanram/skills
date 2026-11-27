@@ -1,59 +1,60 @@
 ---
 name: crq
-description: Use when you take a change from request to merge, or need its lane or the order of its phases. Lists the phases, who runs each, and each crq reference.
+description: Use when you take a ticket to a pull request - its lane and one-way door flag, which stages run and in what order, where it stops for the person, its plan card, resuming it on another machine, or whether its PR is ready. Runs each stage by its skill.
 ---
 
 # crq
 
-One pipeline takes every change from a request to a merge. A coordinator talks with the human and plans. Fresh
-runs build and review. Scripts check what a model must not judge. The human approves the plan and merges.
+One command takes a ticket to a pull request, for a person or any agent, on any tracker. crq knows the order and
+when to stop. Each stage's skill does the work.
 
 ```text
-intake ─▶ research ─▶ clarify ─▶ spec ─▶ design ─▶ design-review ─▶ HUMAN approval ─▶ test-first
-   ─▶ build ─▶ verify ─▶ cleanup ─▶ code-review ─▶ gate ─▶ pr ─▶ HUMAN merge ─▶ timeline-record
-
-design-review  act-on     ─▶ design  cap design_review_rounds = 3
-design-review  round-cap  ─▶ human
-approval       changes    ─▶ design
-verify         red        ─▶ build   cap ready = 3
-verify         round-cap  ─▶ human
-code-review    act-on     ─▶ build   cap code_review_rounds = 3
-code-review    round-cap  ─▶ human
-gate           red        ─▶ build   cap gate_red = 2
-gate           round-cap  ─▶ human
+/crq <ticket>
+  0 setup      first run in a repo only                                   setup.md
+  1 intake     ticket, parent map, blockers, linked PRs → lane and flag   lanes.md
+  2 plan card  the stages that run; each skip as "n/a: <why>"             card.md
+  3 grill      only what the ticket does not answer          STOP 1       grilling
+  4 spec       criteria a test decides; the design if the lane needs it   planning      STOP 2
+  5 red test   the bug lane: one test that fails for the bug's reason     testing
+  6 build      slices, one evidence row per criterion                     code (verify notes)
+  7 review     fresh reviewers, the lane's lens, at most 3 rounds         code (review notes)
+  8 deslop     optional                                                   deslop
+  9 check      the lane's rung from docs/agents/checks.md                 the project's command
+ 10 PR         the body by pr-readiness.md                   STOP 3       crq
+ 11 report     Decision · What ran @SHA · Open questions · Deviations · Follow-ups · Learnings · Next
 ```
 
-## Phases
+## Steps
 
-The lane picks which phases run (`lanes` reference). The `planning`, `testing` and `code` skills hold the rules
-each phase applies.
+1. **Setup.** When `docs/agents/checks.md` is missing, run [setup.md](setup.md). Done when the setup files exist.
+2. **Intake.** Read the ticket, its parent map, its blockers and its linked PRs. Search open issues and PRs for the
+   same words and files. Pick the lane and the flag by [lanes.md](lanes.md). Done when the lane is on the card.
+3. **Card.** Post the plan card on the ticket by [card.md](card.md). To resume, read the card and `git log`, start at
+   the first unchecked line and redo nothing, because the card and the history are the truth, not memory.
+4. **Run the lane.** Call each stage's skill in order. A stage ends with `status: done | blocked | needs-human` and
+   the path or link it wrote. Update the card, and start the next stage in the same turn. Only `done` moves on.
+   `blocked` shows its cause and waits. `needs-human` is a stop.
+5. **Check.** Run the lane's rung. Fix a red in the code (`code`'s verify notes). A red the machine caused (out of
+   memory, a service never healthy, a timeout before any test ran) is run again once; never change code for it.
+6. **PR.** Write the body by [pr-readiness.md](pr-readiness.md). The PR is ready only when the required checks on
+   its head commit pass.
+7. **Report** in the fixed sections above. The report is the input for the next session.
 
-| phase | who | produces | rules to apply |
-|---|---|---|---|
-| intake | coordinator | a ticket with its lane; a map of tickets when the work is unclear | `lanes` |
-| research | coordinator, read-only helpers | how the touched code works today, at `file:line`; parts to reuse; test patterns | `spec-review` (planning) |
-| clarify | coordinator with the human | answers on the ticket; each open question with its decider, options and recommendation | `spec-review` (planning) |
-| spec | coordinator | a draft PR with the intent quoted, acceptance criteria a test can decide, non-goals and edge cases | `acceptance-criteria` (planning) |
-| design | coordinator | the chosen shape and a rejected alternative; slices with their proving commands | `program-design`, `spec-review`, `diagrams` (planning) |
-| design-review | a design-reviewer run, then a verify pass | a verdict per decision and findings | `review` (code), `spec-review` (planning) |
-| approval | **human** | an explicit approval of the spec and design, at the PR's head, recorded with both hashes | `lanes` |
-| test-first | test-first, in the bug lane | one commit with a failing test that proves the bug | `verify` (code), the `testing` skill |
-| build | one fresh implementer run per PR | the slices as commits | `verify` (code), the `testing` skill and the `code` notes the diff touches |
-| verify | implementer, then the engine's ready check at the pushed commit | an evidence row per AC | `verify` (code), the `testing` skill |
-| cleanup | no lane runs it; a person types `/rulebook:deslop` | a behaviour-neutral tidy diff | `deslop` skill |
-| code-review | automated review: one finder run per lens, then a verify pass | findings in buckets | `review` (code), and the review list of every notes file and reference in scope |
-| gate | the gate: CI, a queue or a local run | green at the head commit | — |
-| pr | implementer | why, evidence, rollback, where to look | `pr-readiness`, `diagrams` (planning) |
-| merge | **human** | merge | — |
-| timeline-record | engine, no model | rounds, findings, tokens per phase, rescues | `retro` |
-| full retro (an extra task, not a phase; only when a human starts one) | retro run | each lesson as a rule, a script, a review check or nothing | `retro` |
+## The four stops
 
-## References
+1. A grill round waits for the person's answers.
+2. The spec and the design wait for the person's approval: the words on the ticket or PR, never an agent's. In the
+   bug lane it is the one criterion line on the card. It comes again when the spec changes: a criterion met only in
+   a weaker form, or a build that needs security work, a public API change, a new dependency or a second ticket.
+3. An act that cannot be undone and that the person has not allowed: push, PR, merge, a migration on shared data, a
+   delete.
+4. A review or build loop still red after 3 rounds.
 
-<!-- index: built by `make index` from each reference; do not edit by hand -->
-| reference | rule IDs | read it |
-|---|---|---|
-| [lanes](references/lanes.md) | LN1–LN4 | when you take in a new change, or when a change turns out bigger, riskier or smaller than its lane |
-| [pr-readiness](references/pr-readiness.md) | PR1–PR7 | when you write a PR body, or when you check one before merge |
-| [retro](references/retro.md) | RT1–RT10 | when the engine writes a merge's timeline record, when a human starts a full retro, or when you write a lesson's PR |
-<!-- /index -->
+Nothing else stops. Decide a reversible question yourself: take the default, go on, and report it with the one word
+that reverses it. A question about what the spec means is always a grill question.
+
+## A project's own flow
+
+`docs/agents/crq.md` may turn an optional stage on or off, raise a check rung, or swap a stage's skill
+(`grill = <another skill>`). It cannot remove grill, tests, build or review. A lower rung is written on the card like a
+skip.

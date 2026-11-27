@@ -81,8 +81,7 @@ flowchart LR
 ```
 
 Each skill is a short procedure for one job: numbered steps, each rule with its *because*, and a Good / Bad pair only
-where a model's default is wrong. A rule has no ID: a reviewer names the skill and its section. `crq` still uses an older router shape, with
-references in five sections, until it is rewritten.
+where a model's default is wrong. A rule has no ID: a reviewer names the skill and its section.
 
 A project points at a skill by name, never by path:
 
@@ -103,7 +102,8 @@ Tests here call the model: use the `testing` skill (rulebook plugin) and read it
 | [migrations](plugins/rulebook/skills/migrations/SKILL.md) | write or review a database migration |
 | [obs](plugins/rulebook/skills/obs/SKILL.md) | write or review a log call, a metric or a trace |
 | [planning](plugins/rulebook/skills/planning/SKILL.md) | write or review a spec, a design or a diagram |
-| [crq](plugins/rulebook/skills/crq/SKILL.md) | take a change from request to merge, or run one of its phases |
+| [crq](plugins/rulebook/skills/crq/SKILL.md) | take a ticket to a pull request, stage by stage, with four stops |
+| [grilling](plugins/rulebook/skills/grilling/SKILL.md) | want a plan, decision or idea questioned in rounds |
 
 The [plugin README](plugins/rulebook/README.md) has more on each skill.
 

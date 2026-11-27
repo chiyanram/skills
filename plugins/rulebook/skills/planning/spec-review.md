@@ -24,7 +24,7 @@ approval.
   without them the builder guesses who it serves, when it is done, and where it stops.
 - List each assumption behind the spec as stated, inferred from code at `file:line`, or a chosen default, and have
   the human confirm the last two, because an unconfirmed guess becomes a requirement. A fact about today's code that
-  the design cites needs no confirmation; a tiny-lane change has no spec.
+  the design cites needs no confirmation; a change in a lane with no spec has none to list.
 
 ### The design
 
@@ -56,7 +56,7 @@ approval.
   own ticket, because a change built on a module that resists it makes the next change harder too.
 - Record a decision as an ADR when it is hard to reverse, surprising without context, and a real tradeoff, because the
   next reader otherwise re-decides it without knowing why. Any other decision is one line in the design.
-- In a one-way-door design, write a pre-mortem: assume it failed, and name each failure with its trigger, chain of
+- In a design with the one-way-door flag, write a pre-mortem: assume it failed, and name each failure with its trigger, chain of
   effects, early sign and mitigation, because asking only whether it works hides how it fails.
 
 ### The review
@@ -239,4 +239,4 @@ Each line is a finding, a blocker unless marked (warning).
 - (warning) A type that can hold a forbidden state, or a derived value that is not a cache with one owner.
 - (warning) A touched module with no "refactor first?" answer, or a refactor folded into this change's slices.
 - A hard-to-reverse, surprising tradeoff decision with no ADR.
-- A one-way-door design with no pre-mortem, or a failure in it with no trigger, early sign or mitigation.
+- A design with the one-way-door flag and no pre-mortem, or a failure in it with no trigger, early sign or mitigation.

@@ -62,8 +62,7 @@ that does two jobs becomes two skills.
 dares to delete, and an agent picks a skill by its description.
 
 **How it's checked.** `check_skills.py` fails a skill with no description or one over 1024 characters, and
-`check_routing.py` fails a skill that does not win its own requests. Skills not yet rewritten keep their router and
-references until their ticket (#340, #341); `check_routers.py` and `check_index.py` check those.
+`check_routing.py` fails a skill that does not win its own requests.
 
 ## K5
 

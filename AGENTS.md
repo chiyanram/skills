@@ -52,8 +52,7 @@ No check can enforce these:
 
 ## Where things go
 
-- A rulebook skill is `plugins/rulebook/skills/<domain>/SKILL.md`: a short procedure with notes files beside it
-  (`testing`), or a router over `references/` until it is rewritten.
+- A rulebook skill is `plugins/rulebook/skills/<domain>/SKILL.md`: a short procedure with notes files beside it.
 - A toolbox skill is `plugins/toolbox/skills/<name>/SKILL.md`, typed-only. It is either copied, with its source,
   commit and licence in a `THIRD_PARTY_NOTICES.md` section, or written here and listed under that file's
   `## Written here`.
