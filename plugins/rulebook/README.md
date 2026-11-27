@@ -25,21 +25,17 @@ npx skills add chiyanram/skills
 
 See the [root README](../../README.md#quick-start) for GitHub Copilot CLI and the worker-container setup.
 
-## Two shapes, for now
+## One shape
 
-Every skill but `crq` is a short procedure: `SKILL.md` holds the steps and the rules, each with its reason, with notes
-files beside it for what only some runs need, and Good / Bad pairs only where a model's default is wrong. `crq` still
-has a router `SKILL.md` and references with five sections (Rules, When X use Y, Good / Bad, Decided edges, Review
-checks), described in [reference-format.md](../../docs/rulebook/reference-format.md), until it is rewritten.
+Every skill is a short procedure: `SKILL.md` holds the steps and the rules, each with its reason, with notes files
+beside it for what only some runs need, and Good / Bad pairs only where a model's default is wrong.
 
 ## Skills
 
-A router skill's `SKILL.md` lists its references, their rule IDs and when to read each one. `make index` builds that
-list from the references, and `make lint` fails when it is stale.
-
 | skill | read it when you |
 |---|---|
-| [crq](skills/crq/SKILL.md) | take a change from request to merge, or run one phase: lanes, spec, design, build, review, pull request, retro |
+| [crq](skills/crq/SKILL.md) | take a ticket to a pull request: its lane, its stages and stops, its plan card, resuming it, PR readiness |
+| [grilling](skills/grilling/SKILL.md) | want a plan, decision or idea questioned in rounds until you share an understanding |
 | [testing](skills/testing/SKILL.md) | choose, write or review a test: where it goes, which cases, junk tests, mutation testing; Spock, ITs and model calls in its notes |
 | [playwright](skills/playwright/SKILL.md) | write, run, fix or review a Playwright end-to-end or smoke spec: locators, waits, sign-in, fixtures, config, CI, traces, flakes |
 | [code](skills/code/SKILL.md) | write, change or review production code: where logic goes, types, errors, names, comments; Java, Spring, JPA, Angular, concurrency, jobs, Redis, HTTP APIs and security in its notes |

@@ -151,7 +151,7 @@ at the approval table and at the merge. The merge is the proof of the operator's
 
 ## Add a skill
 
-Every skill has one shape. A skill still in the older router shape keeps it until it is rewritten.
+Every skill has one shape.
 
 1. `SKILL.md` is a short procedure for one job: numbered steps, each rule with its *because*, and a Good / Bad pair
    only where a model's default is wrong. It is 120 lines or fewer. A notes file beside it holds what only some runs
@@ -186,6 +186,7 @@ When review finds a case a check missed, plant that case first and watch it fail
 | `check_routing.py` | a skill router has no `evals/routing/<name>.json`, a file has fewer than 8 `should` or 8 `near_miss` requests, a `should` request does not rank its router first, a near miss does not rank its named owner above that router, or two router descriptions are 75% alike. It skips a typed-only skill, which nothing routes to. Word matching only: a model-graded run (`claude plugin eval`) costs tokens and stays manual |
 | `check_settings_keys.py` | a skill file names a settings key for a memory ceiling, machine size, port or timeout in backticks with a number in the same clause, outside fenced code: the rule names the key and the project's settings hold the value |
 | `check_toolbox.py` | a toolbox `SKILL.md` lacks `disable-model-invocation: true`, a toolbox skill has no section with `Source:`, `Commit:` and `Licence:` in `THIRD_PARTY_NOTICES.md` and is not listed under its `## Written here`, that list names no toolbox skill, or a toolbox file holds a `git push`, a `gh pr merge`, a `.cursor/` path or a Grok model |
+| `check_generic.py` | a rulebook `SKILL.md` or notes file names an engine or its roles: `coordinator`, `onboarder`, `agent-factory`, `role card`, `the engine`, `an engine` |
 | `check_history.py` | a line a change adds outside `plugins/` carries history: who decided, an ISO date beside a person or decision word, or an issue number, in markdown prose or a code comment. It reads the diff since `origin/main` (pass another base as the second argument) and spares ADR and `PRINCIPLES.md` status lines, CHANGELOGs, fixtures, `docs/agents/`, `evals/` and one `See #N` / `History: #N` pointer per section or code header |
 | `check_comments.py` | a `.py`, `.mjs` or `.js` file outside `tests/fixtures/` holds more comment lines than `scripts/comment-baseline.json` allows, or fewer without `--shrink` run. It keeps the module header, a line with an `http(s)` link and a tool directive. `/delete-comment` (`.claude/commands/delete-comment.md`) sorts and deletes the rest |
 | `check_eval_proof.py` | a skill that `evals/skills/settings.json` gives a tier lacks what its tier asks for: cases in both slices, an approved reference answer per case, an approved baseline whose summaries exist, and, for CORE, a passing planted check per llm grader. A summary or planted check made from other case files, or another judge, is stale. CORE fails on any gap; NORMAL prints a warning, except a stale summary behind an approved baseline |
