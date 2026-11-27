@@ -6,13 +6,13 @@
     {
       "name": "rulebook",
       "source": "./plugins/rulebook",
-      "version": "3.1.0",
+      "version": "1.0.0",
       "description": "Generic procedures, with Java, Spring, Spock and Angular stack notes, and the /crq workflow."
     },
     {
       "name": "toolbox",
       "source": "./plugins/toolbox",
-      "version": "1.1.0",
+      "version": "1.0.0",
       "description": "Typed-only tools: each runs only when a person types it, and none pushes or merges."
     }
   ]
