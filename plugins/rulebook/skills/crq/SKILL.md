@@ -35,13 +35,13 @@ each phase applies.
 | clarify | coordinator with the human | answers on the ticket; each open question with its decider, options and recommendation | `spec-review` (planning) |
 | spec | coordinator | a draft PR with the intent quoted, acceptance criteria a test can decide, non-goals and edge cases | `acceptance-criteria` (planning) |
 | design | coordinator | the chosen shape and a rejected alternative; slices with their proving commands | `program-design`, `spec-review`, `diagrams` (planning) |
-| design-review | a design-reviewer run, then a verify pass | a verdict per decision and findings | `review-process`, `spec-review` (planning) |
+| design-review | a design-reviewer run, then a verify pass | a verdict per decision and findings | `review` (code), `spec-review` (planning) |
 | approval | **human** | an explicit approval of the spec and design, at the PR's head, recorded with both hashes | `lanes` |
-| test-first | test-first, in the bug lane | one commit with a failing test that proves the bug | `verify-done`, the `testing` skill |
-| build | one fresh implementer run per PR | the slices as commits | `verify-done`, the `testing` skill and the `code` references the diff touches |
-| verify | implementer, then the engine's ready check at the pushed commit | an evidence row per AC | `verify-done`, the `testing` skill |
+| test-first | test-first, in the bug lane | one commit with a failing test that proves the bug | `verify` (code), the `testing` skill |
+| build | one fresh implementer run per PR | the slices as commits | `verify` (code), the `testing` skill and the `code` notes the diff touches |
+| verify | implementer, then the engine's ready check at the pushed commit | an evidence row per AC | `verify` (code), the `testing` skill |
 | cleanup | no lane runs it; a person types `/rulebook:deslop` | a behaviour-neutral tidy diff | `deslop` skill |
-| code-review | automated review: one finder run per lens, then a verify pass | findings in buckets | `review-process`, `code-review`, `test-integrity` when the diff edits an existing test, and the Review checks of every reference in scope |
+| code-review | automated review: one finder run per lens, then a verify pass | findings in buckets | `review` (code), and the review list of every notes file and reference in scope |
 | gate | the gate: CI, a queue or a local run | green at the head commit | — |
 | pr | implementer | why, evidence, rollback, where to look | `pr-readiness`, `diagrams` (planning) |
 | merge | **human** | merge | — |
@@ -53,11 +53,7 @@ each phase applies.
 <!-- index: built by `make index` from each reference; do not edit by hand -->
 | reference | rule IDs | read it |
 |---|---|---|
-| [code-review](references/code-review.md) | CR1–CR8 | when you review a PR's code, or before you split a change |
 | [lanes](references/lanes.md) | LN1–LN4 | when you take in a new change, or when a change turns out bigger, riskier or smaller than its lane |
 | [pr-readiness](references/pr-readiness.md) | PR1–PR7 | when you write a PR body, or when you check one before merge |
 | [retro](references/retro.md) | RT1–RT10 | when the engine writes a merge's timeline record, when a human starts a full retro, or when you write a lesson's PR |
-| [review-process](references/review-process.md) | RV1–RV9 | before you run, write or tune a review |
-| [test-integrity](references/test-integrity.md) | TI1–TI5 | when you review a diff that edits an existing test, a snapshot or a golden file |
-| [verify-done](references/verify-done.md) | VB1–VB12 | when you build a change, before you call it ready, or when you check an implementer's evidence rows |
 <!-- /index -->

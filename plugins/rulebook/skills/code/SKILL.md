@@ -1,6 +1,6 @@
 ---
 name: code
-description: Use when you write or review production code - where logic goes, services and controllers, types, errors, names, smells and comments - and its notes on Java, Spring beans and configuration, JPA entities and repositories, Angular, concurrency, messaging and scheduled jobs, Redis, HTTP API design and security. Lists each code notes file and when to read it.
+description: Use when you write or review production code - where logic goes, services and controllers, types, errors, names, smells and comments - and its notes on Java, Spring beans and configuration, JPA entities and repositories, Angular, concurrency, messaging and scheduled jobs, Redis, HTTP API design and security, running a code review, and proving a change done. Lists each code notes file and when to read it.
 ---
 
 # Code
@@ -114,3 +114,5 @@ Read a note only when the change matches it:
 - A list endpoint, a change to a published request or response, an API version, or a client of another service:
   [http-api.md](http-api.md).
 - Outside input, a secret, a token, a guard or the security filter chain: [security.md](security.md).
+- Running or tuning a review, reviewing a PR's code or its edits to existing tests: [review.md](review.md).
+- Calling a change done, its evidence, a red check, a conflict or a quarantine: [verify.md](verify.md).

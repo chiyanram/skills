@@ -114,3 +114,4 @@ Read the one that matches the code:
 - Spock and Spring Boot integration tests: [stack.md](stack.md).
 - A Playwright end-to-end or smoke spec: the `playwright` skill.
 - Code that calls a language model: [model-calls.md](model-calls.md).
+- Reviewing an edit to an existing test, a snapshot or a golden file: the `code` skill's review notes.
