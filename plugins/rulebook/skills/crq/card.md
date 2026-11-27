@@ -1,7 +1,7 @@
 # The plan card
 
-One comment on the ticket, updated as each stage ends, so another session or machine resumes from it. Read it when
-you post, update or resume from a card.
+The session's todo list, one line per stage, ticked as each stage ends. Read it when you write the card or start a
+new session on a ticket already under way.
 
 ## Shape
 
@@ -18,15 +18,16 @@ crq · #502 — fix the health probe       lane: bug     flag: –
   [ ] PR
 ```
 
-- Post one card, and edit it in place; a second card splits the truth in two.
+- Write it in the session's todo list, not on the ticket: the ticket stays the person's.
 - Tick a line only on `status: done`, and add what the stage wrote: a path, a link or a count.
 - Write each skip as `[-] <stage>  n/a: <why>`, because a skip with no reason reads as forgotten.
-- Put the bug lane's criterion line and the person's approval, quoted, under the card.
+- Put the bug lane's criterion line under the card, and the person's approval in the PR body, quoted.
 
-## Resuming
+## A new session
 
-Read the card, then `git log` on the branch. Compare what is done with what is pending, start at the first unchecked
-line, and redo nothing. When the card and the history disagree, the history wins: fix the card first.
+Rebuild the card from what is there now, because the repo and the tracker are the truth, not memory: the branch and
+its `git log`, the spec and design files, the open PR and its checks, and the ticket's comments. Tick each stage whose
+output exists, start at the first one that has none, and redo nothing done.
 
 ## The report
 

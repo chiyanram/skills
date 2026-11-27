@@ -13,7 +13,9 @@ checks and the words of the domain. Read it when `docs/agents/checks.md` is miss
    1. Where do tickets live: GitHub, GitLab, Jira or local Markdown files?
    2. Which commands run the unit tests, one module, the smoke test and the full gate?
    3. Where do the glossary and the decision records live?
-3. Write the three files in the shapes below, show them, and commit only on the person's yes.
+3. Run the tracker's read command on one real ticket. When it fails (not logged in, no CLI, no access), stop and
+   give the cause, because every later stage reads the ticket.
+4. Write the three files in the shapes below, show them, and commit only on the person's yes.
 
 ## Shapes
 

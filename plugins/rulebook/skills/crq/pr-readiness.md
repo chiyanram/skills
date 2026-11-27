@@ -6,7 +6,8 @@ when you write a PR body, check one before merge, or call a PR ready.
 ## Rules
 
 - Open the body with its reason in one sentence and a link to the approved spec, because a person or reviewer who
-  does not know why cannot judge whether the change does it. A change with no spec links its ticket.
+  does not know why cannot judge whether the change does it. Quote the person's approval and the spec commit it
+  covers. A change with no spec links its ticket.
 - Put the evidence table from `code`'s verify notes in the body, because the merger needs the evidence without
   running anything again.
 - State "Breaking change: yes" or "no", and for yes, what callers must change, because an unannounced break reaches
@@ -48,7 +49,7 @@ The merger reads why, what could break, how to undo it and where to look first.
 
 Walk the PR body and its checks before merge. Each line is a finding.
 
-- No one-sentence reason, or no spec or ticket link, at the top.
+- No one-sentence reason, no spec or ticket link, or a spec with no quoted approval, at the top.
 - No evidence table at the pushed commit.
 - No breaking-change line, or a "yes" with no change for callers.
 - No rollback line.

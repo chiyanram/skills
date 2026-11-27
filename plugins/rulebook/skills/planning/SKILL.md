@@ -10,7 +10,7 @@ serves that.
 
 ## The order
 
-1. **Research** how the touched code works today and why, with neutral questions: [spec-review.md](spec-review.md),
+1. **Research** how the touched code works today and why, blind to the wanted change: [spec-review.md](spec-review.md),
    Research. Done when each claim you will make about today's code has a `file:line`.
 2. **Spec**: intent, assumptions, acceptance criteria and out of scope, behaviour only, no paths:
    [spec-review.md](spec-review.md), The spec, and [acceptance-criteria.md](acceptance-criteria.md). Done when every

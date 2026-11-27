@@ -12,8 +12,10 @@ approval.
   it is shaped so (commits, PRs, issues), because changing code without its reason brings old bugs back. A change that
   only adds new code has no history to read. Use one read-only helper for one file or function, and two to four, one
   angle each, then one synthesis, for more than one module.
-- Give a research helper neutral questions about how the code works today, and keep the wanted change out of its
-  brief, because a helper that knows the goal reports what supports it.
+- Research blind, in two steps. First write questions from the ticket, each about how the code works today, with the
+  files and links the ticket names, and none naming the wanted change. Then give only that questions file to a fresh
+  read-only helper, never the ticket, the spec or the wanted change, because a helper that knows the goal reports what
+  supports it. It reports what is there, with no fixes, critique or proposals.
 - Look up what code and docs can answer before you ask the human. Each question still open at approval names its
   decider, options with a recommendation, and why it does not block building, because a bare question outlives the
   build. A draft spec may hold open questions.
@@ -220,7 +222,8 @@ Each line is a finding, a blocker unless marked (warning).
   own severity.
 - In the research notes, no how at `file:line`, or a line the design deletes or reshapes with no stated why (a
   commit, PR, issue, or "no recorded reason").
-- A research brief that states the wanted change or a planned design.
+- A research question, or a helper's input, that states the wanted change or a planned design, or a helper that
+  read the ticket or spec.
 - An open question at approval with no decider, options and recommendation, or reason it does not block; or one the
   code or docs could answer.
 - An intent with no actor, action or benefit, no ACs a test can check, or no out-of-scope list.

@@ -4,7 +4,7 @@
     "Take this ticket to a pull request",
     "Which lane is this change in?",
     "Which stages run for this bug fix, and in what order?",
-    "Resume this ticket from its plan card on another machine",
+    "Pick up this ticket where the last session stopped",
     "Is this pull request ready to merge?",
     "Run this ticket through its stages up to the PR",
     "Where does crq stop and wait for me on this ticket?",
