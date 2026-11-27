@@ -220,7 +220,7 @@ Each skill has a tier in `evals/skills/settings.json`:
 
 Rules for every run:
 
-1. Start each case prompt with the typed slash (for example `/rulebook:deslop`), so the skill loads.
+1. Start each case prompt with the typed slash (for example `/toolbox:deslop`), so the skill loads.
 2. The judge and the agent model are pinned in `settings.json`. Do not run with others.
 3. A run counts only when it ended without an error and its session file shows the skill was loaded. Any other run
    is an error, never a FAIL.

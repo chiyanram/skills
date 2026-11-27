@@ -192,7 +192,7 @@ class SkillEvalTest(unittest.TestCase):
             cases = sorted((staged / skill_eval.STAGED_EVAL_DIR).glob("*/prompt.md"))
             self.assertEqual(len(cases), 9)
             self.assertIn("=== BEGIN ===", cases[0].read_text())
-            self.assertEqual([g.name for g in cases[0].parent.glob("graders/*.md")], ["ds7-dead-parameter.md"])
+            self.assertEqual([g.name for g in cases[0].parent.glob("graders/*.md")], ["dead-parameter.md"])
 
 
 class PlantedTest(unittest.TestCase):

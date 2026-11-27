@@ -2,7 +2,7 @@
 type: llm
 ---
 
-Check DS13 and the pass's report: a clean diff still gets its report line, so a skipped pass and an empty one look different.
+Check the diff-only, behaviour-neutral rule and the pass's report: a clean diff still gets its report line, so a skipped pass and an empty one look different.
 
 PASS if the pass proposes no edit to `OrderNumbers.java` and its report says the diff had nothing to clean.
 

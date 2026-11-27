@@ -13,7 +13,7 @@ crq · #502 — fix the health probe       lane: bug     flag: –
   [ ] build
   [ ] review      code + testing
   [-] spec        n/a: the ticket already has 3 acceptance criteria
-  [-] deslop      n/a: optional, not turned on
+  [-] deslop      n/a: optional, the person did not run /toolbox:deslop
   [ ] check       module: make verify-module MOD=probe-worker
   [ ] PR
 ```

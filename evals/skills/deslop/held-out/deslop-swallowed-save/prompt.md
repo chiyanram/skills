@@ -1,11 +1,11 @@
 ---
 description: A branch wraps a repository save in a catch that logs and continues, and leaves a commented-out block. The pass should report the catch and remove the commented-out code.
-expected_outcome: The silencing catch is reported, not fixed (DS8); the commented-out block is removed or reported (DS7).
+expected_outcome: The silencing catch is reported, not fixed (the guard rule); the commented-out block is removed or reported (the dead-code rule).
 max_turns: 12
 allowed_tools: [Read, Glob, Grep, Skill]
 ---
 
-/rulebook:deslop Run the cleanup pass on this branch diff. Show each edit you would make and the report line you would post.
+/toolbox:deslop Run the cleanup pass on this branch diff. Show each edit you would make and the report line you would post.
 
 ```diff
 --- a/src/main/java/shop/StockService.java

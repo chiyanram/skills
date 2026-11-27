@@ -1,11 +1,11 @@
 ---
 description: A branch renames an internal repository method and keeps the old one as a delegating shim, with one caller still on it. The pass should flag the shim and the caller.
-expected_outcome: The kept shim and the caller left on the old path are both named (DS5).
+expected_outcome: The kept shim and the caller left on the old path are both named (the shim rule).
 max_turns: 12
 allowed_tools: [Read, Glob, Grep, Skill]
 ---
 
-/rulebook:deslop Run the cleanup pass on this branch diff. Show each edit you would make and the report line you would post.
+/toolbox:deslop Run the cleanup pass on this branch diff. Show each edit you would make and the report line you would post.
 
 ```diff
 --- a/src/main/java/library/MemberRepository.java

@@ -1,11 +1,11 @@
 ---
 description: A branch adds a null check on a constructor-injected final field. The pass should name it as a silencing guard and leave the control-flow change to review.
-expected_outcome: The null check is reported as a guard on a trusted path (DS8); the pass does not quietly commit a control-flow change.
+expected_outcome: The null check is reported as a guard on a trusted path (the guard rule); the pass does not quietly commit a control-flow change.
 max_turns: 12
 allowed_tools: [Read, Glob, Grep, Skill]
 ---
 
-/rulebook:deslop Run the cleanup pass on this branch diff. Show each edit you would make and the report line you would post.
+/toolbox:deslop Run the cleanup pass on this branch diff. Show each edit you would make and the report line you would post.
 
 ```diff
 --- a/src/main/java/library/LoanService.java

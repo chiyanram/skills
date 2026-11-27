@@ -33,7 +33,8 @@ current version is in the [changelog](CHANGELOG.md).
    ```
 
    In GitHub Copilot CLI, run `copilot plugin marketplace add chiyanram/skills`, then `copilot plugin install` for
-   each plugin. Other agents can try `npx skills add chiyanram/skills`, on a best-effort basis: it does not keep
+   each plugin. Copilot CLI cannot keep a skill typed-only, so a toolbox skill can load there without being typed.
+   Other agents can try `npx skills add chiyanram/skills`, on a best-effort basis: it does not keep
    typed-only skills or the hook.
 2. Paste this block into the file your agent reads for project instructions, so it loads the skills on a task that
    does not name them. In Claude Code, a project with a `CLAUDE.md` reads that file: paste the block there, or keep it
@@ -97,7 +98,6 @@ Tests here call the model: use the `testing` skill (rulebook plugin) and read it
 | [playwright](plugins/rulebook/skills/playwright/SKILL.md) | write, run or fix a Playwright end-to-end or smoke spec |
 | [code](plugins/rulebook/skills/code/SKILL.md) | write or review production code |
 | [agent](plugins/rulebook/skills/agent/SKILL.md) | write or review code that calls a model or runs an agent |
-| [deslop](plugins/rulebook/skills/deslop/SKILL.md) | clean up a branch's diff before review |
 | [skill-feedback](plugins/rulebook/skills/skill-feedback/SKILL.md) | turn a session's skill failures into issues |
 | [migrations](plugins/rulebook/skills/migrations/SKILL.md) | write or review a database migration |
 | [obs](plugins/rulebook/skills/obs/SKILL.md) | write or review a log call, a metric or a trace |
