@@ -11,7 +11,7 @@ HISTORY = FIXTURES / "history"
 FAILING = ["decided-by", "dated-decision", "issue", "other-repo", "py-comment", "docstring",
            "js-comment", "yml-comment", "make-comment", "second-pointer"]
 PASSING = ["plain", "bare-date", "code-span", "fence", "link", "heading", "html-comment", "py-string", 
-           "adr", "principles-status", "changelog", "fixture", "docs-agents", "evals", "one-pointer", "module-pointer"]
+           "adr", "changelog", "fixture", "docs-agents", "evals", "one-pointer", "module-pointer"]
 
 
 class Branch:

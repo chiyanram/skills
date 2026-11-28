@@ -29,7 +29,7 @@ test: ## each check against its planted fixtures, the index builder and the rele
 index: ## rebuild the root README's AGENTS.md block from each plugin's hooks/index.txt
 	$(PYTHON) scripts/build_index.py .
 
-size: ## changed lines and files against PD9
+size: ## changed lines and files against the pull-request size limits
 	$(PYTHON) scripts/branch_size.py origin/main
 
 help: ## list the targets

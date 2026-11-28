@@ -60,9 +60,7 @@ No check can enforce these:
 
 ## Pointers
 
-- The principles behind the plugins, K1–K8: `PRINCIPLES.md`. A change that departs from one changes `PRINCIPLES.md` first, in its
-  own pull request, because skills rewritten against the old principles break them silently.
-- A new rule, reference or check: `CONTRIBUTING.md`.
+- What a skill must be, and how to add a rule, a skill or a check: `CONTRIBUTING.md`.
 - Commit and PR format: `CONTRIBUTING.md#commit-messages`. Commit types and what each releases:
   `CONTRIBUTING.md#releases`.
 - Issues: GitHub issues on `chiyanram/skills`, through `gh`. See `docs/agents/issue-tracker.md`,

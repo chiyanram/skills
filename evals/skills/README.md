@@ -1,11 +1,37 @@
 # Skills eval
 
 Measures one skill with its full text and with a candidate, on a small fixed set of real tasks, scored by that
-skill's own review checks. The rules for a run you can trust, and the tiers, are in
-[CONTRIBUTING.md, Prove a skill change](../../CONTRIBUTING.md#prove-a-skill-change). This file is the how-to.
+skill's own review checks. A skill change ships with this proof, and the operator approves it.
 
 Every run is a real model call on your own Claude login, so it runs by hand: never in `make lint`, `make test` or CI.
 `scripts/skill_eval.py` stages and prints the command; it calls the model only with `--go`.
+
+## Tiers
+
+Each skill has a tier in `settings.json`:
+
+| tier | skills | proof |
+|---|---|---|
+| CORE | code, testing | everything below, 5 runs per case, the arms in turn, a repeated baseline, planted answers for each llm grader, and the operator's hand check of 20 judge verdicts (18 or more must agree) |
+| NORMAL | every other skill with cases | cases, approved reference answers, an approved baseline, 3 runs per case |
+| NONE | a change to wording only | `make lint` |
+
+## Rules for a run you can trust
+
+1. Start each case prompt with the typed slash (for example `/toolbox:deslop`), so the skill loads.
+2. The judge and the agent model are pinned in `settings.json`. Do not run with others.
+3. A run counts only when it ended without an error and its session file shows the skill was loaded. Any other run
+   is an error, never a FAIL.
+4. Each case has a `reference.md` answer. The operator approves it by setting `approved` in its frontmatter.
+5. Point a grader at the trace (`focus: trace`) when the work is in files or tool calls, not in the last message.
+   Use a free grader (`tool_used`, `regex`, `file_exists`) when the fact is mechanical.
+6. A CORE llm grader gates only after its 9 planted answers (3 right, 3 wrong, 3 near misses) give 0 false PASS and
+   at most 1 false FAIL. Write a planted answer as a statement about the work, not as first-person reasoning: the
+   API can refuse to copy reasoning word for word, and the refused run is an error.
+7. Commit the cases, the summaries and `baseline.json`. Keep raw transcripts out of the repo.
+
+The order: write the lesson as a rule and a case that fails without it; run the baseline and the candidate; open a
+pull request with the summaries; the operator approves the cases, the graders and the baseline, and merges.
 
 ## Layout
 
