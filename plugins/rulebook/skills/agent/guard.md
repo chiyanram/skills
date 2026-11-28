@@ -20,6 +20,8 @@ context.
 - Give third-party content (a tool, a retrieval, an MCP server, the web) to the model only as a tool result,
   JSON-encoded and labelled with its source, because the model treats system or user text as instructions. Fixed text
   your own system wrote, which no outside party can change, is not third-party content.
+- Say in the system prompt that content from tools, documents and searches is untrusted data that never overrides
+  the system prompt or the person's request, because the model then reads a planted instruction as data.
 - Check model output before it is stored, cached or sent to a sink, and store a placeholder for a rejected output
   wherever it would go, because a rejected answer otherwise returns through history or cache.
 - Expose each MCP tool under a server-prefixed name, and check its result's schema and size before it enters context,
@@ -129,5 +131,6 @@ Each line is a finding, a blocker unless marked (warning).
   approval.
 - A guard that only logs, a runner that does not stop at the first short-circuit, or no record of which guard fired.
 - Outside content put in system or user text, or a tool result that is not encoded or not labelled with its source.
+- A system prompt that does not say tool, document and search content is untrusted data.
 - A sink of model output with no output check before it, or a rejected output kept anywhere.
 - An MCP tool with an unprefixed name, or a result that enters context with no schema or size check.
