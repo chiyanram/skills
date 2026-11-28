@@ -65,7 +65,7 @@ line is posted.
 | comment slop | a comment outside the keep-list above | the comment rule above; `code`, Comments |
 | defensive checks | a null check, `try`/`catch` or guard for a state the types or the callers exclude | the guard rule above; `code`, Types |
 | swallowed failure | a `catch` that continues quietly or returns an empty result | `code`, Errors; always a report, never a fix |
-| fake fallback | on an error or missing config, production code that returns a mock, stub, fake or sample data | the guard rule above; remove it and fail with the real error |
+| fake fallback | on an error or missing config, production code that returns a mock, stub, fake or sample data; or a made-up default, such as `"undefined"`, `"unknown"`, `0` or `-1`, for a value that must exist | the guard rule above; remove it and fail with the real error |
 | type laundering | a cast through `Object` or a raw type, a new `@SuppressWarnings`, untrusted JSON held as `Map<String, Object>` past the adapter, a string where an enum exists | `code`, Types and Comments; `code`'s security notes, Outside input |
 | one-use indirection | a helper, wrapper or variable that adds no domain meaning | `code`, Where logic goes; keep anything that carries a domain name |
 | fallbacks and shims | a retry, default, alias or second code path with no named contract and no removal plan | the shim and dead-code rules above; `code`'s concurrency notes, Retries |
