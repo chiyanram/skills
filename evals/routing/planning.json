@@ -10,7 +10,9 @@
     "Review this spec and its design",
     "Turn this request into a spec with acceptance criteria",
     "Split this work item before any code exists",
-    "Write the design and spec for a one-way door change"
+    "Write the design and spec for a one-way door change",
+    "Chart a map for this big goal",
+    "This goal is too big for one ticket; chart the decisions first"
   ],
   "near_miss": [
     {
@@ -44,6 +46,10 @@
     {
       "prompt": "Design the HTTP API endpoints for refunds",
       "owner": "code"
+    },
+    {
+      "prompt": "Where are we across all my unfinished work?",
+      "owner": "chief-of-staff"
     }
   ]
 }

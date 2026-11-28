@@ -36,6 +36,7 @@ beside it for what only some runs need, and Good / Bad pairs only where a model'
 |---|---|
 | [crq](skills/crq/SKILL.md) | take a ticket to a pull request: its lane, its stages and stops, its plan card, resuming it, PR readiness |
 | [grilling](skills/grilling/SKILL.md) | want a plan, decision or idea questioned in rounds until you share an understanding |
+| [chief-of-staff](skills/chief-of-staff/SKILL.md) | want to know where you are across all your open work in every repo you list, what waits on you, and the one next move |
 | [testing](skills/testing/SKILL.md) | choose, write or review a test: where it goes, which cases, junk tests, mutation testing; Spock, ITs and model calls in its notes |
 | [playwright](skills/playwright/SKILL.md) | write, run, fix or review a Playwright end-to-end or smoke spec: locators, waits, sign-in, fixtures, config, CI, traces, flakes |
 | [code](skills/code/SKILL.md) | write, change or review production code: where logic goes, types, errors, names, comments; Java, Spring, JPA, Angular, concurrency, jobs, Redis, HTTP APIs and security in its notes |

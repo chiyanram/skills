@@ -37,6 +37,7 @@ the table cannot say.
    or write `none`: an existing implementation; a PR closed without merge, or a ticket closed as declined, for the same
    change; a revert on the ticket's files (`git log --oneline --grep=Revert -- <files>`). In the bug lane, run the bug
    once and put its output under the criterion line, because a bug not reproduced can be fixed for the wrong reason.
+   Assign the ticket to the person by the tracker file's assign line.
    Done when the lane and the flag from [lanes.md](lanes.md) are on the card.
 3. **Card.** Write the plan card as the session's todo list by [card.md](card.md). A new session rebuilds it from
    what is there now and redoes nothing done. Done when every stage is a line, pending or `n/a: <why>`.

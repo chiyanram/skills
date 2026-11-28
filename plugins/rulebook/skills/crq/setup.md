@@ -27,10 +27,16 @@ checks and the words of the domain. Read it when `docs/agents/checks.md` is miss
 ```markdown
 # Issue tracker: GitHub
 - Read a ticket: gh issue view <n> --comments
+- Who am I: gh api user -q .login
+- Assign a ticket: gh issue edit <n> --add-assignee @me
 - Comment on a ticket: gh issue comment <n> --body "..."
+- List open tickets: gh issue list --state open --json number,title,labels,assignees,createdAt,blockedBy
+- List open PRs with checks: gh pr list --state open --json number,title,headRefName,isDraft,reviewRequests,statusCheckRollup
 - Search tickets and PRs: gh search issues "<words>" --repo <owner>/<repo> --state all; gh search prs "<words>" --repo <owner>/<repo> --state all
 - Create a ticket: gh issue create --title "..." --body "..."
 - Link a PR to a ticket: "Closes #<n>" in the PR body
+- Priority labels: none (or: p1, p2, p3, highest first)
+- Map labels: map, decision
 ```
 
 `docs/agents/checks.md`:

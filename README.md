@@ -66,6 +66,7 @@ Update with `claude plugin marketplace update chiyanram`.
 | [writing](plugins/rulebook/skills/writing/SKILL.md) | write or review a doc, a README, an AGENTS.md, a skill or a PR body |
 | [crq](plugins/rulebook/skills/crq/SKILL.md) | take a ticket to ready to merge, stage by stage, with four stops |
 | [grilling](plugins/rulebook/skills/grilling/SKILL.md) | want a plan, decision or idea questioned in rounds |
+| [chief-of-staff](plugins/rulebook/skills/chief-of-staff/SKILL.md) | want to know where you are across all your open work, and the one next move |
 
 
 A project points at a skill by name, never by path: "use the `testing` skill (rulebook plugin) and read its notes on
