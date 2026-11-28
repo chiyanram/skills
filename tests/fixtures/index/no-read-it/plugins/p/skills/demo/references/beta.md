@@ -1,3 +1,0 @@
-# Beta
-
-How to beta.

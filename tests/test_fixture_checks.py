@@ -6,11 +6,9 @@ from tests.support import FIXTURES, run_check
 CASES = {
     "versions": (["good", "apart"], ["mismatch", "missing"]),
     "links": (["good"], ["broken", "broken-after-nested-fence"]),
-    "sizes": (["good", "good-template", "rules-heading-ours"],
-              ["root-too-long", "chain-over-32k", "rule-too-long", "rules-heading-variant", "no-rules-section"]),
+    "sizes": (["good"], ["root-too-long", "chain-over-32k"]),
     "plugin": (["good"], ["source-is-root", "root-is-a-plugin", "no-readme", "no-icon", "no-license"]),
-    "index": (["good"], ["unlisted", "stale", "no-block", "no-read-it", "agents-stale", "agents-no-block"]),
-    "routers": (["good"], ["unlisted", "no-router"]),
+    "index": (["good"], ["unlisted", "agents-stale", "agents-no-block"]),
     "provenance": (["good"], ["citation", "preference", "credit", "date", "evidence", "repo-ref", "neutral",
                               "fileline", "section", "url", "nested-fence"]),
     "glossary": (["good"], ["avoid-word", "avoid-word-in-crq"]),

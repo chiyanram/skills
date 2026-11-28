@@ -82,8 +82,7 @@ trap; elsewhere the rule and its reason are enough.
 **Why.** Every line costs context on every run, so text the model would follow anyway is waste. A run given the goal
 and the limits is not railroaded. An example teaches best where the model would otherwise write the trap.
 
-**How it's checked.** `check_sizes.py` fails a rule in a reference over 35 words and an instruction chain over its
-budget. Pruning is review only.
+**How it's checked.** `check_sizes.py` fails an instruction chain over its budget, and `check_skills.py` a `SKILL.md` over 120 lines. Pruning is review only.
 
 ## K7
 

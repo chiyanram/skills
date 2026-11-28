@@ -4,14 +4,13 @@ PYTHON ?= python3
 
 check: lint test ## run everything CI runs
 
-lint: ## skill frontmatter, one version, links, size budgets, packaging, router index, skill routers, provenance, glossary words, routing, toolbox, settings keys, history notes, engine words, code comments, eval proof, plugin validate
+lint: ## skill frontmatter, one version, links, size budgets, packaging, skill list and AGENTS.md block, provenance, glossary words, routing, toolbox, settings keys, history notes, engine words, code comments, eval proof, plugin validate
 	$(PYTHON) scripts/check_skills.py .
 	$(PYTHON) scripts/check_versions.py .
 	$(PYTHON) scripts/check_links.py .
 	$(PYTHON) scripts/check_sizes.py .
 	$(PYTHON) scripts/check_plugin.py .
 	$(PYTHON) scripts/check_index.py .
-	$(PYTHON) scripts/check_routers.py .
 	$(PYTHON) scripts/check_provenance.py .
 	$(PYTHON) scripts/check_glossary.py .
 	$(PYTHON) scripts/check_routing.py .
@@ -27,7 +26,7 @@ lint: ## skill frontmatter, one version, links, size budgets, packaging, router 
 test: ## each check against its planted fixtures, the index builder and the release config
 	$(PYTHON) -m unittest discover --start-directory tests --top-level-directory .
 
-index: ## rebuild each skill router's reference table from its references
+index: ## rebuild the root README's AGENTS.md block from each plugin's hooks/index.txt
 	$(PYTHON) scripts/build_index.py .
 
 size: ## changed lines and files against PD9
