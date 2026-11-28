@@ -144,6 +144,7 @@ next one with `GITHUB_TOKEN=<token> npm run release:preview` (`RELEASE_PLUGIN=to
 | `check_index.py`: the AGENTS.md block is stale | run `make index` and commit the README it rewrote |
 | `make test` fails in `test_release_*` | run `npm ci`; the tests load the release config from `node_modules` |
 | `check_provenance.py` fails on a skill file | move the citation, URL or date into the pull request body |
+| `check_words.py` fails a word | rewrite the sentence with the plain word; a word in a code span or fence does not count |
 | `check_history.py` fails a line you added | say what and why; the PR and git log keep who, when and the issue |
 | `check_comments.py` fails a file | say it in code or the module docstring; after you delete comments, run `python3 scripts/check_comments.py --shrink` |
 | the release fails with `RELEASE_TOKEN is not set` | add a repository secret `RELEASE_TOKEN`: the owner's token with Contents read and write |

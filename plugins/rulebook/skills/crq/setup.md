@@ -16,8 +16,9 @@ checks and the words of the domain. Read it when `docs/agents/checks.md` is miss
 3. Run the tracker's read command on one real ticket. When it fails (not logged in, no CLI, no access), stop and
    give the cause, because every later stage reads the ticket.
 4. Write the three files in the shapes below, and one line, "Agent setup for this repo: `docs/agents/`.", in
-   `AGENTS.md`; when only `CLAUDE.md` exists, in `CLAUDE.md`; when neither exists, create `AGENTS.md` with that line.
-   Show them, and commit only on the person's yes.
+   `AGENTS.md`. When only `CLAUDE.md` exists, move its rules into a new `AGENTS.md` with that line, and leave
+   `@AGENTS.md` as the one line of `CLAUDE.md`, because a second copy of the rules drifts. When neither exists,
+   create `AGENTS.md` with that line. Show them, and commit only on the person's yes.
 
 ## Shapes
 

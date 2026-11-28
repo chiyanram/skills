@@ -1,0 +1,49 @@
+{
+  "skill": "writing",
+  "should": [
+    "Rewrite this README so a new person can run the project",
+    "Review the AGENTS.md for this repo",
+    "Tighten the sentences in this doc",
+    "Our CLAUDE.md repeats the rules; fix it",
+    "Write the PR body for this branch",
+    "Review this agent instruction for words that mean two things",
+    "Add a term to the glossary",
+    "This doc mixes a how-to and a reference; split it",
+    "Edit the skill text so each sentence carries one idea",
+    "Rewrite this skill instruction so it says what to do, not only what to avoid"
+  ],
+  "near_miss": [
+    {
+      "prompt": "Write the spec and acceptance criteria for the export feature",
+      "owner": "planning"
+    },
+    {
+      "prompt": "Draw a diagram of the design before any code exists",
+      "owner": "planning"
+    },
+    {
+      "prompt": "Take this docs ticket from request to merge",
+      "owner": "crq"
+    },
+    {
+      "prompt": "Remove the restating comments from this Java class",
+      "owner": "code"
+    },
+    {
+      "prompt": "Write a unit test for the export service",
+      "owner": "testing"
+    },
+    {
+      "prompt": "Build the prompt and context for the model call",
+      "owner": "agent"
+    },
+    {
+      "prompt": "Write the migration that renames the export column",
+      "owner": "migrations"
+    },
+    {
+      "prompt": "Add a log call and a metric for the export job",
+      "owner": "obs"
+    }
+  ]
+}

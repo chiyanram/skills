@@ -37,7 +37,7 @@ nothing.
 2. **Find the gaps.** Read the whole session, including the part before any summary: the harness transcript holds
    it when the context was compacted. Done when every correction, retraction and redo is listed with its quote.
 3. **Trace each gap to its owner.** Read the rule in the installed skill, or the tooling file, before you name it.
-   Drop a gap that an existing rule already covers and that the agent simply missed, and say which rule. Done when
+   Drop a gap that an existing rule already covers and that the agent missed, and say which rule. Done when
    each gap has an owner or a one-line reason it has none.
 4. **Search for a twin**: `gh issue list -R chiyanram/skills --state open --search "<skill or file> <two key words>"`.
    A match becomes a comment draft on that issue. Done when each gap is a new issue or a comment on a named one.
