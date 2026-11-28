@@ -16,11 +16,21 @@ Read it when you try to break a design before approval, or when you close the br
 - Close each kept scenario in exactly one way, because an open scenario is forgotten by build time:
   - a failure AC, `AC-n — should <refusal or recovery> when <trigger>`, when the system must refuse or recover in a
     way a test can see;
-  - a mitigation in the design, with the signal that shows it in production, when the fix is a shape: a key, a lock,
-    a constraint, an order of steps;
+  - a mitigation in the design, with the signal that shows it in production, when the fix is a shape: a key, a lock
+    (only by the race rule below), a constraint, an order of steps;
   - a named accepted risk in the spec (the scenario, who accepts it, the sign to watch), when the fix costs more than
     the risk.
   A scenario whose closure the design already names is closed, if that closure covers the trigger.
+- For a scenario whose trigger is in today's code, run it when the run takes minutes (a failing test, a script, command
+  output) and mark it `proven` with that output; otherwise mark it `cited` with the line, because the human weighs a
+  shown failure above an argued one.
+- For a race, first ask whether each writer can own its own key, row or file; choose a lock only when the domain needs
+  one shared target, such as one stock count for the last item, because a lock where separate keys would do adds waiting
+  and risks a deadlock.
+- For a decision whose correctness depends on the order of steps (a retry, a queue, a read then a write, a migration's
+  phases), write its rules as invariants quoted from the grill record ("an order is never charged twice"), draw its
+  states as a `mermaid` `stateDiagram` in those words with each state that breaks a rule marked, and close each breaking
+  path as a break scenario, by the rules above, because a list of scenarios misses the order nobody thought of.
 
 ## The break catalogue
 
@@ -54,6 +64,7 @@ S1 — hits decision 3, AC-2
   trigger:    the payment service charges the card, then the reply times out after 5 seconds
   chain:      the order stays unpaid; the customer pays again; the card is charged twice
   first sign: a support ticket about a double charge
+  mark:       cited (PaymentClient.java:88, the charge call with no key)
   closure:    mitigation — send the order id as an idempotency key on every charge attempt
 ```
 The trigger is reachable from decision 3, the effect is concrete, and the closure is one of the three kinds.
@@ -84,3 +95,7 @@ Each line is a finding, a blocker unless marked (warning).
 - (warning) A reported scenario with no trigger, chain, first sign, or AC-n or decision it hits.
 - A kept scenario with no closure, or more than one.
 - (warning) A scenario with no cited decision or code line that makes its trigger reachable.
+- (warning) A scenario on today's code with no `proven` or `cited` mark.
+- A lock chosen for a race where each writer could own its own key, row or file.
+- An order-dependent decision with no invariants quoted from the grill record, no state chart, or a breaking path with
+  no closure.

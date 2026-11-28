@@ -10,7 +10,8 @@ build a change, before you call it ready, or when you check an implementer's evi
   guess an acceptance criterion, because a guessed criterion ships the wrong behaviour with passing tests. A test that
   fails and looks wrong is an open question too, not an edit to the test.
 - Give each changed behaviour a test that fails when the change is reverted, because a test that passes either way
-  proves nothing about the change. A refactor with no behaviour change names the tests that cover it instead.
+  proves nothing about the change. A refactor with no behaviour change names its pin instead (`planning`'s spec-review
+  notes, refactor first).
 - For a bug fix, have a test-first run write the failing test from the bug spec before the fix is written, and paste
   its red output (`testing` skill, Fixing a bug), because an implementer that tests its own fix shares its misreading.
   When the bug cannot be reproduced in a test, diagnose it by the `testing` skill's diagnose notes.

@@ -37,9 +37,13 @@ design. Read it when you write, revise or review a spec or a design before appro
 - Check each decision against the ADRs and patterns it touches, and report an unnamed departure, or two documents that
   disagree, for the human to settle, because a silent departure overrides a recorded decision. A departure the design
   names, with its reason and its new decision recorded, is a decision.
-- Name at least one real alternative and why it lost, and state each tradeoff as "we accept X for Y", because an
-  unstated cost later reads as an oversight and gets "fixed". A shape that a named constraint forced needs no invented
-  rival.
+- Sketch two shapes (the caller's usage and the types, no bodies) before you choose, and pick the one where each piece
+  of state has one owner, each task has one way to do it, and the caller needs to know least. Name the other and why it
+  lost, and state each tradeoff as "we accept X for Y", because an alternative written after the choice is a straw man,
+  and an unstated cost later reads as an oversight and gets "fixed". A shape that a named constraint forced needs no
+  invented rival.
+- When the same workaround appears in two places, redesign the shape in the design instead of patching a third, because
+  each workaround shows a shape that does not fit.
 - For each step that writes, sends or calls another system, say what happens when it fails, runs twice, or crashes
   halfway, because partial state turns every retry into debugging.
 - When the design changes stored data, a public contract or a deploy, name the migration and the rollback, and mark
@@ -55,7 +59,10 @@ design. Read it when you write, revise or review a spec or a design before appro
 - Give a type one variant per allowed state, each with only its own fields, because a guard against a forbidden state
   gets skipped. Work out a derived value on read, or keep it only as a cache with one owner, because a copy drifts.
 - Say for each existing module the design touches whether it needs a refactor first, and propose that refactor as its
-  own ticket, because building the change on a module that resists the change makes the next change harder too.
+  own ticket, because building the change on a module that resists the change makes the next change harder too. The
+  refactor ticket names its pin (the tests, snapshot or old-against-new diff that hold today's behaviour; a type
+  check or lint is not a pin) and the trace it shortens, such as "a reader of X opens 2 files, not 5", because a
+  refactor that shortens no trace adds churn for nothing.
 - Record a decision as an ADR when it is hard to reverse, surprising without context, and a real tradeoff, because the
   next reader otherwise re-decides it without knowing why. Any other decision is one line in the design.
 - In a design with the one-way-door flag, write a **pre-mortem**: assume it failed, and name each failure with its
@@ -242,12 +249,14 @@ and each finding names the source it rests on. Each line under a criterion is a 
 
 ### 3. A sound shape
 
-- No rejected alternative, unless the design names the constraint that forced its shape; or a cost not stated as "we
-  accept X for Y".
+- No rejected alternative, unless the design names the constraint that forced its shape; a rejected shape whose loss is
+  not one of: state with two owners, a task with two ways to do it, or a caller that must know more; or a cost not
+  stated as "we accept X for Y".
 - A new part that duplicates an existing one, neither reused nor ruled out.
 - A new abstraction, setting, port or extension point with no second user.
 - (warning) A type that can hold a forbidden state, or a derived value that is not a cache with one owner.
 - (warning) A touched module with no "refactor first?" answer, or a refactor folded into this change's slices.
+- (warning) A refactor-first ticket with no pin or no trace it shortens.
 
 ### 4. Safe when it fails
 
