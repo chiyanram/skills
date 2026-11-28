@@ -20,6 +20,8 @@ signatures, or its build slices and their proof, or when the build needs to chan
   slice can land green goes expand, migrate in batches, contract.
 - Name for every slice the command and test filter that prove it, and the manual step, or "Manual: none" when the
   slice has no surface to try, because a check with no named command does not get run.
+- For a slice that claims a speed, memory or load effect, name the metric, the probe command, the trunk baseline
+  measured before the change and the value that fails, because a perf claim with no baseline cannot fail.
 - Name for every slice the AC-n it delivers, and give every AC a slice, because an AC with no slice is found missing
   only after the build.
 - Plan each pull request within 400 changed lines and 15 files, generated files not counted, and make a slice past
@@ -33,6 +35,10 @@ signatures, or its build slices and their proof, or when the build needs to chan
   when that change fits the pull-request size limit, because a kept old path is a second way to do the task. Past the
   limit, or when no slice lands green, go expand, migrate in batches, contract (the slices rule), and delete the old
   path in the contract step.
+- Do a mechanical edit across many files with a rerunnable script or codemod. Prove it on one unit done by hand
+  first, and commit it in the PR, because a reviewer can rerun a script but not a hand edit.
+- Move each test of the old API to assert the same behaviour through the new one. Delete a test that pins only the
+  old API's internals, and name it in the PR, so the reviewer sees each deleted test with its reason.
 - Put file paths, signatures and trees in the design, and only behaviour in the spec, because paths and code in a
   spec go stale fast. A behaviour a user or an outside system sees belongs in the spec.
 - Settle a question that paper cannot decide, such as a layout, a state flow or a timing, with a throwaway prototype on
