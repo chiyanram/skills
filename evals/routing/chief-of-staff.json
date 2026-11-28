@@ -1,0 +1,69 @@
+{
+  "skill": "chief-of-staff",
+  "should": [
+    "Where am I across all my unfinished work?",
+    "What waits on me across my repos today?",
+    "I lost the thread; show me the map",
+    "What should I start next across all my tickets?",
+    "Rank my open work and name the one next move",
+    "Catch me up on all my work in every repo",
+    "What is waiting on me, and what should I start next?",
+    "Give me the one next move across my repos",
+    "We keep going round in circles; the work is stuck",
+    "This is not working and we are stuck; what should we do?"
+  ],
+  "near_miss": [
+    {
+      "prompt": "Take this ticket to a pull request",
+      "owner": "crq"
+    },
+    {
+      "prompt": "Pick up this ticket where the last session stopped",
+      "owner": "crq"
+    },
+    {
+      "prompt": "Is this pull request ready to merge?",
+      "owner": "crq"
+    },
+    {
+      "prompt": "Write the spec and acceptance criteria for this ticket",
+      "owner": "planning"
+    },
+    {
+      "prompt": "Grill me on this plan",
+      "owner": "grilling"
+    },
+    {
+      "prompt": "Add a log call and a metric for the ranking job",
+      "owner": "obs"
+    },
+    {
+      "prompt": "Rewrite this README so a new person can run the project",
+      "owner": "writing"
+    },
+    {
+      "prompt": "Write a unit test for the ranking function",
+      "owner": "testing"
+    },
+    {
+      "prompt": "This test keeps failing, fix it",
+      "owner": "testing"
+    },
+    {
+      "prompt": "Review this PR for code errors",
+      "owner": "code"
+    },
+    {
+      "prompt": "Break this feature into tickets and order them",
+      "owner": "planning"
+    },
+    {
+      "prompt": "What is the state of ticket 94 and its PR?",
+      "owner": "crq"
+    },
+    {
+      "prompt": "Diagnose why this test fails one run in ten",
+      "owner": "testing"
+    }
+  ]
+}

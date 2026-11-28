@@ -40,6 +40,45 @@ The skill copies no file. Its rules are written here, in our words, from the sou
 - Changes: no file copied. It takes the negation rule as "say the positive target", and the no-op test as "delete a
   sentence that changes no decision".
 
+## chief-of-staff
+
+The skill copies no file. Its rules are written here, in our words, from the sources below.
+
+- Source: mattpocock/skills, `skills/in-progress/chief-of-staff/SKILL.md` (chief-of-staff)
+- Commit: 49dd158d1076134a641b33efb035946536778336
+- Licence: MIT, Copyright (c) 2026 Matt Pocock
+- Changes: no file copied. It takes the picture rebuilt from the tracker on each run, a problem seen on two or more
+  tickets turned into a proposed ticket, and a decision line that points at its ticket instead of copying it. Left
+  out: schedules, all work in subagents, the data sources, and the improvement search on every message.
+
+- Source: mattpocock/skills, `skills/engineering/wayfinder/SKILL.md` (wayfinder)
+- Commit: 49dd158d1076134a641b33efb035946536778336
+- Licence: MIT, Copyright (c) 2026 Matt Pocock
+- Changes: no file copied. It takes plan, do not build, with the build handed to `crq`; a ticket named with its
+  context, not a bare number; the assignee as the claim; the frontier as open, unblocked and unclaimed tickets; and a
+  second read of the tracker before a next move, because other sessions edit it. Left out: the map issue and its
+  sections, ticket types, research subagents, the fog of war and out of scope.
+
+- Source: cursor/plugins, `pstack/skills/recall/SKILL.md` (recall)
+- Commit: d42aff08aa58965d2735c4ead61a9af82b89d0d0
+- Licence: MIT, Copyright (c) 2026 Lauren Tan
+- Changes: no file copied. It takes routing a one-ticket request away, naming the scope read, sweeping the tracker
+  and PRs inline, one status tag per item from a command run this turn, at most five items, one next move, and
+  cutting detail before items. Left out: the transcript mining, the subagent fan-out and the chat-history sources.
+
+## planning
+
+The maps notes copy no file. They are written here, in our words, from the source below.
+
+- Source: mattpocock/skills, `skills/engineering/wayfinder/SKILL.md` (wayfinder)
+- Commit: 49dd158d1076134a641b33efb035946536778336
+- Licence: MIT, Copyright (c) 2026 Matt Pocock
+- Changes: no file copied. The maps notes take the map as one ticket with a destination, a one-line gist per closed
+  decision, open tickets found by query, questions not yet clear and out of scope; decision tickets of four types,
+  one question each, closed with their answer as a comment; and a grill ticket the agent never answers. They use our
+  own labels from the tracker file, the blocker rule of the program-design notes and the tickets that `crq` builds.
+  Left out: the `wayfinder:` labels, research subagents and their branches, and the rule of one ticket per session.
+
 ## MIT License
 
 Applies to every MIT section above, each with its own copyright line:

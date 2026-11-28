@@ -21,8 +21,8 @@ crq · #502 — fix the health probe       lane: bug     flag: –
 
 - Under the header, restate the goal in one sentence and the smallest change that meets it, because a misread
   ticket found at the spec's approval has cost a whole stage.
-- Write the card in the session's todo list, not on the ticket, because the ticket is the person's. The one write an
-  agent makes on a ticket is the grill record ([grill.md](grill.md)).
+- Write the card in the session's todo list, not on the ticket, because the ticket is the person's. An agent writes two
+  things on a ticket: the assignee at intake, and the grill record ([grill.md](grill.md)).
 - Tick a line only on `status: done`, and add what the stage wrote: a path, a link or a count.
 - Write each skip as `[-] <stage>  n/a: <why>`, because a skip with no reason reads as forgotten.
 - Put the bug lane's criterion line under the card, and the person's approval in the PR body, quoted.

@@ -1,6 +1,6 @@
 ---
 name: planning
-description: Use when you write or review a spec for a new feature, its acceptance criteria, a design or a work item before any code exists, a break-the-design pass, or a diagram in a doc or a chat reply. Lists each planning notes file and when to read it.
+description: Use when you write or review a spec for a new feature, its acceptance criteria, a design or a work item before any code exists, a break-the-design pass, a map of the decisions for a big goal, or a diagram in a doc or a chat reply. Lists each planning notes file and when to read it.
 ---
 
 # Planning
@@ -33,6 +33,7 @@ serves that.
 - A design's call trees, file trees, types and signatures, build slices and their proof, the size of a pull request,
   a prototype, or a change during the build: [program-design.md](program-design.md).
 - Trying to break a design, or closing the scenarios that did: [break-the-design.md](break-the-design.md).
+- A goal too big for one ticket, where the way is not clear yet: chart a map by [maps.md](maps.md).
 - A diagram in a design, a spec, a decision record, a Markdown doc or a chat reply: [diagrams.md](diagrams.md).
 - A guide, a README or any project doc, its claims and counts, or which spec a change updates:
   [writing-docs.md](writing-docs.md).
