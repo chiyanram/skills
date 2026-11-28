@@ -42,6 +42,8 @@ design. Read it when you write, revise or review a spec or a design before appro
   lost, and state each tradeoff as "we accept X for Y", because an alternative written after the choice is a straw man,
   and an unstated cost later reads as an oversight and gets "fixed". A shape that a named constraint forced needs no
   invented rival.
+- For a design the person marks contested, ask the person to run `/toolbox:arena` on the shape before you choose, or
+  name the risk when the toolbox is not installed, because one author's two sketches share that author's blind spots.
 - When the same workaround appears in two places, redesign the shape in the design instead of patching a third, because
   each workaround shows a shape that does not fit.
 - For each step that writes, sends or calls another system, say what happens when it fails, runs twice, or crashes

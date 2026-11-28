@@ -67,6 +67,23 @@ written in this repo has no source to name; it is listed under [Written here](#w
 - Changes: a "changed" pass ends in one commit made with the operator's yes, and the operator pushes it and opens the
   PR, where the source ships a PR itself; `.claude/skills/verify-*/` paths, not the Cursor folder.
 
+## improve-architecture
+
+- Source: mattpocock/skills, `skills/engineering/improve-codebase-architecture/SKILL.md`, and the words of `skills/engineering/codebase-design/SKILL.md`
+- Commit: 7739eaed7f8f3915437a8def198a6d0d7206dbc7
+- Licence: MIT, Copyright (c) 2026 Matt Pocock
+- Changes: a Markdown report outside the repo instead of an HTML page; a short word list instead of the vocabulary
+  skill; the explorer starts by crq's worker notes; writes to the glossary and decision records only on the person's
+  yes; it ends with a refactor-first ticket and its pin.
+
+## arena
+
+- Source: cursor/plugins, `pstack/skills/arena/SKILL.md` (pstack)
+- Commit: dd24b6707267cd89c6621c4efc6fa91a1d0666ec
+- Licence: MIT, Copyright (c) 2026 Lauren Tan
+- Changes: the judge is a different model wherever the harness offers one, not always another vendor; no model list
+  from a Cursor file; candidates start by crq's worker notes; it verifies by code's verify notes.
+
 ## Written here
 
 - `break-design`
