@@ -1,18 +1,18 @@
 # Spec review
 
-How a spec and its design are researched, written and checked before approval: research, cited claims, open
-questions, intent, assumptions and a sound design. Read it when you write, revise or review a spec or a design before
-approval.
+**You own whether the builder can build the right thing from this text alone.** How a spec and its design are
+researched, written and checked before approval: research, cited claims, open questions, intent, assumptions and a sound
+design. Read it when you write, revise or review a spec or a design before approval.
 
 ## Rules
 
 ### Research
 
-- Before the spec, research how the touched code works (its flow, where things live, gotchas at `file:line`) and why
-  it is shaped so (commits, PRs, issues), because changing code without its reason brings old bugs back. A change that
-  only adds new code has no history to read. Use one read-only helper for one file or function, and two to four, one
-  angle each, then one synthesis, for more than one module.
-- Research blind, in two steps. First write questions from the ticket, each about how the code works today, with the
+- Before the spec, research how the touched code works (its flow, where things live, gotchas at `file:line`) and why it
+  is shaped so (commits, PRs, issues), because changing code without its reason brings old bugs back. A change that only
+  adds new code has no history to read. For one file or function, use one read-only helper. For more than one module,
+  use two to four helpers, one angle each, then one helper that joins their results.
+- Research **blind**, in two steps. First write questions from the ticket, each about how the code works today, with the
   files and links the ticket names, and none naming the wanted change. Then give only that questions file to a fresh
   read-only helper, never the ticket, the spec or the wanted change, because a helper that knows the goal reports what
   supports it. It reports what is there, with no fixes, critique or proposals.
@@ -22,18 +22,18 @@ approval.
 
 ### The spec
 
-- Check the intent for an actor, an action and a benefit, ACs a test can check, and an out-of-scope list, because
-  without them the builder guesses who it serves, when it is done, and where it stops.
+- Give the spec an intent with an actor, an action and a benefit, ACs a test can check, and an out-of-scope list,
+  because without them the builder guesses who it serves, when it is done, and where it stops.
 - List each assumption behind the spec as stated, inferred from code at `file:line`, or a chosen default, and have
   the human confirm the last two, because an unconfirmed guess becomes a requirement. A fact about today's code that
   the design cites needs no confirmation; a change in a lane with no spec has none to list.
 
 ### The design
 
-- Cite `file:line` on the main branch for each claim about today's code, and open each cite when you review, because
+- **Cite** `file:line` on the main branch for each claim about today's code, and open each cite when you review, because
   an uncited false claim can settle a decision. The spec names no paths, and planned behaviour has no cite yet.
-- Resolve each cite with a check that can be run, because a drifted cite is otherwise found only by chance. A cite
-  pinned to a commit (`file:line @commit`) cannot drift.
+- Verify each cite with a check that can be run (the **cite check**), because a drifted cite is otherwise found only by
+  chance. A cite pinned to a commit (`file:line @commit`) cannot drift.
 - Check each decision against the ADRs and patterns it touches, and report an unnamed departure, or two documents that
   disagree, for the human to settle, because a silent departure overrides a recorded decision. A departure the design
   names, with its reason and its new decision recorded, is a decision.
@@ -45,26 +45,26 @@ approval.
 - When the design changes stored data, a public contract or a deploy, name the migration and the rollback, and mark
   each irreversible step for the human's yes, because a shipped irreversible step cannot be undone. An add-only change
   that old data and old clients survive says so in one line.
-- For each new input, endpoint or permission, name the trust boundary it crosses and the control at it, because a
+- For each new input, endpoint or permission, name the **trust boundary** it crosses and the control at it, because a
   design with no named boundary leaves security to whoever writes the code.
 - For each new failure mode, name the log, metric or alert that shows it in production, because users find an unseen
   failure first.
 - Reuse an existing part that does the job, or say why it cannot serve, because a second copy drifts from the first.
 - Add an abstraction, setting, port or extension point only with a second user, today or in this spec, because a seam
   with one user is indirection every later change pays for. The variants of one type are not seams.
-- Give a type one variant per allowed state, each with only its own fields, so it holds no forbidden state, and work
-  out a derived value on read or keep it only as a cache with one owner, because guards get skipped and copies drift.
+- Give a type one variant per allowed state, each with only its own fields, because a guard against a forbidden state
+  gets skipped. Work out a derived value on read, or keep it only as a cache with one owner, because a copy drifts.
 - Say for each existing module the design touches whether it needs a refactor first, and propose that refactor as its
-  own ticket, because a change built on a module that resists it makes the next change harder too.
+  own ticket, because building the change on a module that resists the change makes the next change harder too.
 - Record a decision as an ADR when it is hard to reverse, surprising without context, and a real tradeoff, because the
   next reader otherwise re-decides it without knowing why. Any other decision is one line in the design.
-- In a design with the one-way-door flag, write a pre-mortem: assume it failed, and name each failure with its trigger, chain of
-  effects, early sign and mitigation, because asking only whether it works hides how it fails.
+- In a design with the one-way-door flag, write a **pre-mortem**: assume it failed, and name each failure with its
+  trigger, chain of effects, early sign and mitigation, because asking only whether it works hides how it fails.
 
 ### The review
 
-- Report every finding in one round. A finding a later round raises on text that has not changed is a miss of the
-  earlier round, because findings raised one per round stretch one review over several.
+- Report every finding in one round. If a later round raises a finding on text that has not changed, count it as a miss
+  of the earlier round, because findings raised one per round stretch one review over several.
 
 ## Good / Bad
 
@@ -214,32 +214,52 @@ Each failure has a trigger, a chain and a sign someone can check.
 
 ## Review
 
-Walk the whole spec and the whole design in one round, every section, before you report.
+Walk the whole spec and the whole design in one round, every section, before you report. Grade six
+**criteria**, each pass or fail; a criterion that does not apply says so in one line. Each line under a criterion is a
+finding, a blocker unless marked (warning).
 
-Each line is a finding, a blocker unless marked (warning).
+- (warning) A miss: a finding on text unchanged since an earlier round. Report the finding at its own severity, and add
+  this warning for the miss.
 
-- (warning) A finding on text unchanged since an earlier round: report it, and name the miss; the finding keeps its
-  own severity.
-- In the research notes, no how at `file:line`, or a line the design deletes or reshapes with no stated why (a
-  commit, PR, issue, or "no recorded reason").
-- A research question, or a helper's input, that states the wanted change or a planned design, or a helper that
-  read the ticket or spec.
+### 1. Grounded in today's code
+
+- Research notes that do not show how the code works at `file:line`, or a line the design deletes or reshapes with no
+  stated reason (a commit, PR, issue, or "no recorded reason").
+- Research that is not **blind**: a question or a helper's input that states the wanted change or a planned design, or a
+  helper that read the ticket or spec.
+- A claim about today's code with no cite, a cite that does not show the claim, or a file path in the spec.
+- A main-branch cite that no longer points at its named symbol, by the **cite check**.
+
+### 2. A complete, testable spec
+
 - An open question at approval with no decider, options and recommendation, or reason it does not block; or one the
   code or docs could answer.
 - An intent with no actor, action or benefit, no ACs a test can check, or no out-of-scope list.
 - No assumption list, or an inferred or default assumption the human has not answered.
-- A claim about today's code with no cite, a cite that does not show the claim, or a file path in the spec.
-- A main-branch cite that no longer points at its named symbol, by the cite check.
-- An unnamed departure from an ADR or pattern, or two documents that disagree.
-- No rejected alternative without a named forcing constraint, or a cost not stated as "we accept X for Y".
-- A step that writes, sends or calls out with no failure, rerun or crash-halfway answer.
-- A change to stored data, a public contract or a deploy with no migration or rollback, or an irreversible step not
-  marked for the human's yes.
-- A new input, endpoint or permission with no trust boundary and control.
-- A new failure mode with no log, metric or alert.
+
+### 3. A sound shape
+
+- No rejected alternative, unless the design names the constraint that forced its shape; or a cost not stated as "we
+  accept X for Y".
 - A new part that duplicates an existing one, neither reused nor ruled out.
 - A new abstraction, setting, port or extension point with no second user.
 - (warning) A type that can hold a forbidden state, or a derived value that is not a cache with one owner.
 - (warning) A touched module with no "refactor first?" answer, or a refactor folded into this change's slices.
+
+### 4. Safe when it fails
+
+- A step that writes, sends or calls out with no failure, rerun or crash-halfway answer.
+- A change to stored data, a public contract or a deploy with no migration or rollback, or an irreversible step not
+  marked for the human's yes.
+- A design with the one-way-door flag and no pre-mortem, or a failure in it with no trigger, chain of effects, early
+  sign or mitigation.
+
+### 5. Guarded and visible in production
+
+- A new input, endpoint or permission with no trust boundary and control.
+- A new failure mode with no log, metric or alert.
+
+### 6. Fits what was decided
+
+- An unnamed departure from an ADR or pattern, or two documents that disagree.
 - A hard-to-reverse, surprising tradeoff decision with no ADR.
-- A design with the one-way-door flag and no pre-mortem, or a failure in it with no trigger, early sign or mitigation.
