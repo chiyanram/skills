@@ -4,8 +4,11 @@
 against six **criteria** and reports each finding at its `file:line`. The passes, buckets and rounds a review runs
 in are in [review-run.md](review-run.md).
 
-Walk the approved spec and design, then the whole diff, with the review list of every notes file in scope. Each
-criterion ends as pass or fail; a criterion that does not apply says so in one line.
+Read `docs/agents/domain.md` first, by crq's [worker.md](../crq/worker.md); skip what the project's tooling already
+enforces. Walk the approved spec and
+design, then the whole diff, with the review list of every notes file in scope, then the project's code rubric when
+`domain.md` names one. Each criterion ends as `met`, `unmet` or `n/a` with its reason. Each finding names the source
+it rests on: a rule here, a decision record, a project standard or a spec line.
 
 ## 1. Matches the approved spec
 

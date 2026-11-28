@@ -12,10 +12,12 @@ checks and the words of the domain. Read it when `docs/agents/checks.md` is miss
    guess they can correct faster than a blank:
    1. Where do tickets live: GitHub, GitLab, Jira or local Markdown files?
    2. Which commands run the unit tests, one module, the smoke test and the full gate?
-   3. Where do the glossary and the decision records live?
+   3. Where do the glossary, the decision records and the coding standards live?
 3. Run the tracker's read command on one real ticket. When it fails (not logged in, no CLI, no access), stop and
    give the cause, because every later stage reads the ticket.
-4. Write the three files in the shapes below, show them, and commit only on the person's yes.
+4. Write the three files in the shapes below, and one line, "Agent setup for this repo: `docs/agents/`.", in
+   `AGENTS.md`; when only `CLAUDE.md` exists, in `CLAUDE.md`; when neither exists, create `AGENTS.md` with that line.
+   Show them, and commit only on the person's yes.
 
 ## Shapes
 
@@ -46,9 +48,22 @@ checks and the words of the domain. Read it when `docs/agents/checks.md` is miss
 
 ```markdown
 # Domain docs
-- Glossary: GLOSSARY.md at the root
+- Glossary: GLOSSARY.md at the root (a GLOSSARY-MAP.md points at one per context)
 - Decision records: docs/adr/
+- Standards: CONTRIBUTING.md, docs/architecture/
+- Review rubrics: none (or: spec → docs/agents/spec-checks.md, code → docs/agents/code-checks.md)
+
+Before you explore, read the glossary and the decision records that touch the area. If a file here does not
+exist, proceed silently; do not suggest creating it.
+Use the glossary's words. Do not drift to a synonym the glossary avoids.
+If your work contradicts a decision record, say so: "Contradicts ADR-0007 (event-sourced orders), but worth
+reopening because …". Never override one silently.
+A documented standard here wins over a rulebook rule that says otherwise.
 ```
+
+A review rubric file is the project's own: a table of its sources of authority, highest first (for example its ADRs,
+then `CONTRIBUTING.md`, then this rulebook), and the checks only this project needs. A
+review walks its rulebook criteria first, then that file.
 
 A rung the project does not have says `none`. The lane that needs it then runs the next rung up and says so on the
 card.
