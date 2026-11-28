@@ -1,0 +1,1 @@
+`reserve` throws `new ResponseStatusException(HttpStatus.CONFLICT, "already held")` for a duplicate and `new ResponseStatusException(HttpStatus.CONFLICT, "limit reached")` at 5 holds, and returns the saved `Hold` otherwise.

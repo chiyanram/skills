@@ -1,0 +1,1 @@
+`LateFeePolicy.feeCents(LocalDate due, LocalDate returned, Optional<BranchId> branch)` charges 25 cents after 2 grace days. The `branch` argument is ignored for now, so no per-branch configuration exists yet, but callers already pass it.

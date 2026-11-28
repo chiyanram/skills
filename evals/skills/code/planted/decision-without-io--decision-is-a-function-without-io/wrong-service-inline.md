@@ -1,0 +1,1 @@
+`LoanService.renew(loanId)` loads the loan, calls `reservations.existsByTitleId`, and in the same method checks `loan.dueOn().isBefore(LocalDate.now(clock))`, the renewal count and the reservation, then extends and saves.

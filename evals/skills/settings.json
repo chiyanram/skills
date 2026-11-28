@@ -8,7 +8,8 @@
   },
   "skills": {
     "deslop": "NORMAL",
-    "testing": "CORE"
+    "testing": "CORE",
+    "code": "CORE"
   },
   "planted": {"answers_per_grader": 9, "false_pass_max": 0, "false_fail_max": 1}
 }

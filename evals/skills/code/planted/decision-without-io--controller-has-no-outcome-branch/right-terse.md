@@ -1,0 +1,1 @@
+`LoanController.renew` now only calls `service.renew(loanId)` and switches over the returned `RenewalOutcome`: `Renewed r -> ok(LoanResponse.from(r.loan()))`, each refusal 409. The controller holds no repository.

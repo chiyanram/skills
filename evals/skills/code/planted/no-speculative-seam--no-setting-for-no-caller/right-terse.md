@@ -1,0 +1,1 @@
+No per-branch rate: `ReturnService` is the only caller and every branch charges 25 cents after 2 grace days, so the setting would be generality nobody uses. `CENTS_PER_DAY = 25` and `GRACE_DAYS = 2` are constants.

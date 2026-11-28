@@ -1,0 +1,16 @@
+{
+  "case": "code-decision-without-io",
+  "grader": "decision-is-a-function-without-io",
+  "approved": "operator",
+  "answers": {
+    "right-full": "pass",
+    "right-terse": "pass",
+    "right-on-loan": "pass",
+    "wrong-controller-kept-long": "fail",
+    "wrong-service-inline": "fail",
+    "wrong-policy-calls-repo": "fail",
+    "near-service-tangled-long": "fail",
+    "near-now-no-argument": "fail",
+    "near-static-in-service": "pass"
+  }
+}

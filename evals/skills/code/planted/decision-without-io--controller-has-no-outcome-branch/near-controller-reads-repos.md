@@ -1,0 +1,1 @@
+`RenewalPolicy.decide(loan, reserved, today)` is pure. `LoanController` loads the loan with `loans.findById`, reads `reservations.existsByTitleId`, calls `RenewalPolicy.decide`, and switches over the decision for the status.

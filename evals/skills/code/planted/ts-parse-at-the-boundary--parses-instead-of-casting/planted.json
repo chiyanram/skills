@@ -1,0 +1,16 @@
+{
+  "case": "code-ts-parse-at-the-boundary",
+  "grader": "parses-instead-of-casting",
+  "approved": "operator",
+  "answers": {
+    "right-full": "pass",
+    "right-terse": "pass",
+    "right-guard": "pass",
+    "wrong-style-long": "fail",
+    "wrong-accepts-cast": "fail",
+    "wrong-non-null": "fail",
+    "near-missing-cast-long": "fail",
+    "near-shallow-guard": "fail",
+    "near-swap-only-long": "pass"
+  }
+}

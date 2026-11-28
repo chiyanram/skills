@@ -1,0 +1,16 @@
+{
+  "case": "code-refactor-pin-the-contract",
+  "grader": "keeps-every-edge",
+  "approved": "operator",
+  "answers": {
+    "right-full": "pass",
+    "right-terse": "pass",
+    "right-flat": "pass",
+    "wrong-pin-but-bug-long": "fail",
+    "wrong-ge-10000": "fail",
+    "wrong-de-express-first": "fail",
+    "near-unified-threshold": "pass",
+    "near-gt-4999": "pass",
+    "near-gt-5000": "fail"
+  }
+}

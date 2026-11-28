@@ -1,0 +1,1 @@
+`LoanController.renew` is one line: `return RenewalResponses.of(service.renew(loanId));`. `RenewalResponses.of` switches over the outcome with every case listed. The controller has no repository and no rule check.

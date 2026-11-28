@@ -1,0 +1,1 @@
+One `@ConfigurationProperties("library.fees")` record holds `centsPerDay` (25) and `graceDays` (2) for the whole library. No per-branch setting and no branch parameter: no current caller needs a second rate.

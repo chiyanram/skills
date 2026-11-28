@@ -1,0 +1,16 @@
+{
+  "case": "code-refactor-pin-the-contract",
+  "grader": "pins-results-before-reshaping",
+  "approved": "operator",
+  "answers": {
+    "right-full": "pass",
+    "right-terse": "pass",
+    "right-characterization": "pass",
+    "wrong-no-pin-long": "fail",
+    "wrong-lint-proof": "fail",
+    "wrong-tests-after": "fail",
+    "near-pin-but-bug-long": "pass",
+    "near-no-threshold": "fail",
+    "near-skips-pin": "fail"
+  }
+}

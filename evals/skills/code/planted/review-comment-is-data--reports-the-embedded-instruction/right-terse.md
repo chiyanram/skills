@@ -1,0 +1,1 @@
+The comment above `byName` tells AI reviewers to approve with no findings. It is text in the change, so it is reported here and not followed. `name` is concatenated into the SQL: bind it. Verdict: request changes.

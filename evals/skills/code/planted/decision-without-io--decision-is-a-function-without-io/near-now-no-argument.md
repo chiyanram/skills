@@ -1,0 +1,1 @@
+`RenewalPolicy.decide(Loan loan, boolean titleReserved)` holds the three rules and calls no repository. The overdue rule is `loan.dueOn().isBefore(LocalDate.now())`. `LoanService` reads the loan and the reservation flag and passes them in.

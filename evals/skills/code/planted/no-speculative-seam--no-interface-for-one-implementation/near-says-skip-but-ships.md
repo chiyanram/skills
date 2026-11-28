@@ -1,0 +1,1 @@
+An interface is not needed for one implementation. The code keeps it anyway, as requested: `public interface FeeCalculator { long feeCents(LocalDate due, LocalDate returned); }` and `class FeeCalculatorImpl implements FeeCalculator` with 25 cents after 2 grace days.

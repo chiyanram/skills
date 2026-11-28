@@ -314,7 +314,7 @@ def stage_planted(skill: str, work: Path, evals: Path = EVALS) -> Path:
             shutil.copy(grader, case / "graders" / grader.name)
             (case / "prompt.md").write_text(
                 f"---\ndescription: A planted {'right' if should_pass else 'wrong'} answer for {spec['grader']}.\n"
-                "expected_outcome: The reply is the planted text, word for word.\nmax_turns: 2\n---\n\n"
+                "expected_outcome: The reply is the planted text, word for word.\nmax_turns: 2\ntimeout_seconds: 600\n---\n\n"
                 "Reply with the text between the two marker lines, word for word, and nothing else. "
                 "Do not add the marker lines and do not use any tool.\n\n=== BEGIN ===\n" + text + "\n=== END ===\n")
     return staged

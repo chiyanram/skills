@@ -1,0 +1,1 @@
+`HoldOutcome` is sealed with `Placed(Hold)` and `AlreadyHeld()`. The limit is a different kind of failure, so `reserve` throws `HoldLimitReachedException` at 5 holds, and the global handler maps it to 409.

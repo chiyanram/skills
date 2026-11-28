@@ -1,0 +1,1 @@
+`LoanService` holds `static RenewalDecision decide(Loan loan, boolean titleReserved, LocalDate today)`, which uses only its arguments. `renew(loanId)` in the same class does `findById`, `existsByTitleId` and `LocalDate.now(clock)`, calls `decide`, and saves only when the answer is `Renewable`.

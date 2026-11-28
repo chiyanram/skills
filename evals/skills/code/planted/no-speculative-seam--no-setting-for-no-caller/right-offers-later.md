@@ -1,0 +1,1 @@
+The rate and grace days stay as constants in `LateFeePolicy`. Per-branch configuration is left out because no caller needs a second rate today; it is a small change when the first branch with another rate is ticketed.
