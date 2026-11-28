@@ -12,6 +12,7 @@ CASES = {
     "provenance": (["good"], ["citation", "preference", "credit", "date", "evidence", "repo-ref", "neutral",
                               "fileline", "section", "url", "nested-fence"]),
     "glossary": (["good"], ["avoid-word", "avoid-word-in-crq"]),
+    "words": (["good"], ["ai-word", "wrapped-phrase", "root-doc", "british-spelling"]),
     "comments": (["good", "good-at-baseline"], ["py-comment", "js-comment", "raised", "below-baseline"]),
     "settings_keys": (["good"], ["number-after-key", "number-before-key", "value-in-span", "wrapped-line"]),
     "routing": (["good"], ["no-cases", "too-few", "misrouted", "near-miss-wins", "unknown-owner", "collision"]),

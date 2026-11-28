@@ -4,7 +4,7 @@ PYTHON ?= python3
 
 check: lint test ## run everything CI runs
 
-lint: ## skill frontmatter, one version, links, size budgets, packaging, skill list and AGENTS.md block, provenance, glossary words, routing, toolbox, settings keys, history notes, engine words, code comments, eval proof, plugin validate
+lint: ## skill frontmatter, one version, links, size budgets, packaging, skill list and AGENTS.md block, provenance, glossary words, filler words, routing, toolbox, settings keys, history notes, engine words, code comments, eval proof, plugin validate
 	$(PYTHON) scripts/check_skills.py .
 	$(PYTHON) scripts/check_versions.py .
 	$(PYTHON) scripts/check_links.py .
@@ -13,6 +13,7 @@ lint: ## skill frontmatter, one version, links, size budgets, packaging, skill l
 	$(PYTHON) scripts/check_index.py .
 	$(PYTHON) scripts/check_provenance.py .
 	$(PYTHON) scripts/check_glossary.py .
+	$(PYTHON) scripts/check_words.py .
 	$(PYTHON) scripts/check_routing.py .
 	$(PYTHON) scripts/check_toolbox.py .
 	$(PYTHON) scripts/check_settings_keys.py .

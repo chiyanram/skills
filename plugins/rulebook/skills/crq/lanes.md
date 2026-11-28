@@ -10,7 +10,7 @@ the change turns out bigger or riskier than its lane.
 | feature | ✔ | ✔ | ✔ | – | ✔ | code + testing | full gate | break the design, deslop |
 | bug | ✔ | – | – | ✔ | ✔ | code + testing | module | spec, design |
 | tests only | short | – | – | – | ✔ | testing | changed tests | – |
-| docs only | – | – | – | – | ✔ | code | lint | – |
+| docs only | – | – | – | – | ✔ | writing | lint | – |
 | config or command | short | – | – | – | ✔ | code | smoke | – |
 
 A short grill asks only what blocks the build. The check rungs are the commands in `docs/agents/checks.md`.

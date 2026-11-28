@@ -63,6 +63,7 @@ Update with `claude plugin marketplace update chiyanram`.
 | [migrations](plugins/rulebook/skills/migrations/SKILL.md) | write or review a database migration |
 | [obs](plugins/rulebook/skills/obs/SKILL.md) | write or review a log call, a metric or a trace |
 | [planning](plugins/rulebook/skills/planning/SKILL.md) | write or review a spec, a design or a diagram |
+| [writing](plugins/rulebook/skills/writing/SKILL.md) | write or review a doc, a README, an AGENTS.md, a skill or a PR body |
 | [crq](plugins/rulebook/skills/crq/SKILL.md) | take a ticket to ready to merge, stage by stage, with four stops |
 | [grilling](plugins/rulebook/skills/grilling/SKILL.md) | want a plan, decision or idea questioned in rounds |
 
