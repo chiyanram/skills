@@ -12,7 +12,7 @@ When you reach for a word under "avoid", use the term instead. A check fails a c
 | **PR** | a pull request | MR, merge request | MR, merge request |
 | **lane** | which stages a change gets, by its kind: feature, bug, tests only, docs only, or config or command | size, type, category | — |
 | **one-way-door flag** | the mark on any lane for a change to stored data, a schema, a public contract or a deploy; it adds the yes per irreversible step and the readiness items | one-way-door lane | — |
-| **stage** | one step of crq's flow, done by one skill: intake, grill, spec, red test, build, review, deslop, check, PR, report | phase, step | — |
+| **stage** | one step of crq's flow, done by one skill: intake, grill, spec, red test, build, review, deslop, check, PR, watch, report | phase, step | — |
 | **status** | how a stage ends: `done`, `blocked` or `needs-human` | outcome, result | — |
 | **stop** | one of the four points where crq waits for the person | gate (for a stop), checkpoint | — |
 | **plan card** | the session's todo list of each stage, ticked, pending or skipped with `n/a: <why>`; a new session rebuilds it from the branch, the PR and the ticket | checklist, status comment | — |
@@ -28,5 +28,8 @@ When you reach for a word under "avoid", use the term instead. A check fails a c
 | **check rung** | one command from `docs/agents/checks.md`: lint, changed tests, module, smoke or full gate; each lane names its rung | — | — |
 | **finding** | one problem at `file:line`, with the rule it breaks, quoted | comment, remark | — |
 | **bucket** | what happens to a verified finding: Act on, Consider, nit, Noted or Dismissed | severity (for a bucket) | — |
+| **verdict** | `PASS`, `ISSUES` or `BLOCKED` at a PR's head, from an agent that did not write the PR | sign-off, approval (for a verdict) | — |
+| **stack** | a chain of PRs, each based on the branch of the one below it | train, chain | — |
+| **trunk** | the branch every PR finally merges into, such as `main` | master (for the role) | — |
 | **lens** | one set of review lists a fresh reviewer applies, set by the lane | perspective, reviewer type | — |
 | **break scenario** | one way a design fails: a trigger, its chain of effects, the first sign, the AC-n or decision it hits, and one closure (a failure AC, a mitigation or an accepted risk) | edge case, risk (alone), what-if | — |

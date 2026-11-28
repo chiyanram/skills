@@ -42,3 +42,6 @@ Follow-ups      each ticket filed
 Learnings       what a skill got wrong or lacked, for skill feedback
 Next            the next stage, or the one step the person takes
 ```
+
+Before you write `What ran @SHA`, match each line to a command this session ran at that commit. Write `not run` on a
+line with no such command, because the next session trusts the report and runs nothing again.
