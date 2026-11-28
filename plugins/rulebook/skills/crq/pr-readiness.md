@@ -28,6 +28,8 @@ when you write a PR body, check one before merge, or call a PR ready.
 - Call a PR ready to merge only when every required check on its head commit passed and the host reports it mergeable,
   such as `gh pr view <n> --json mergeStateStatus` printing `CLEAN`, and read it again after any edit to the body,
   because an edit can start a run that cancels the one that passed.
+- When a required check is red on trunk too, link the trunk ticket for it, or file one, and never call the PR ready
+  over that check, because a check that is not this PR's fault still leaves the gate red.
 - After a merge command, read the PR back (`gh pr view <n> --json state,mergedAt,baseRefName`): landed reads merged,
   with trunk as its base, because a merge queue or a requested auto-merge reports success without a merge.
 
@@ -83,5 +85,6 @@ Walk the PR body and its checks before merge. Each line is a finding.
 - No "Where to look" with one to three places.
 - A one-way door missing a readiness item.
 - A PR called ready while a required check on its head is pending, failed or cancelled.
+- A check red on trunk too, with no linked trunk ticket.
 - An evidence row or verdict from an older commit with no patch-id match to the head.
 - A stacked PR merged above one without `PASS`, a merge done by an agent, or a merge reported with no read-back.

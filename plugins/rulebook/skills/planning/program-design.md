@@ -25,7 +25,8 @@ signatures, or its build slices and their proof, or when the build needs to chan
 - Name for every slice the AC-n it delivers, and give every AC a slice, because an AC with no slice is found missing
   only after the build.
 - Plan each pull request within 400 changed lines and 15 files, generated files not counted, and make a slice past
-  either limit its own ticket, because one writer and one review handle that size well.
+  either limit its own ticket, because one writer and one review handle that size well. Count a moved line twice,
+  its delete and its add, because the reviewer reads both sides.
 - When slices become tickets, publish each blocker before the tickets it blocks, and give each ticket `Blocked by: #<n>`
   or `Blocked by: none (can start now)`, because a `#<n>` can name only a ticket that exists, and two people who start
   dependent slices at once build on code that is not there. A blocked ticket may start as a PR stacked on its blocker's
@@ -170,6 +171,21 @@ Slice 2: A returned book goes to the first member in the queue.
 ```
 A reviewer can run the same command and the same manual step.
 
+### Count a moved line twice
+
+**Bad**
+```text
+Slice 1: move LoanRules (300 lines) into loan/. Size: about 300 changed lines.
+```
+The diff deletes 300 lines and adds 300, so the reviewer reads 600.
+
+**Good**
+```text
+Slice 1: move LoanRules (300 lines) into loan/. Size: 600 changed lines (300 deleted, 300 added):
+past 400, so the move is its own ticket and lands first.
+```
+The estimate counts what the reviewer reads.
+
 ## Review
 
 Walk the whole design and every slice in it. During the build, also walk the diff against the design.
@@ -184,7 +200,7 @@ Each line is a finding, a blocker unless marked (warning).
   refactor.
 - A slice that says only "tests pass", with no command, test filter, or manual step or "Manual: none".
 - A slice with no AC-n, or an AC that no slice names.
-- A plan over 400 lines or 15 files with no slice moved to its own ticket.
+- A plan over 400 lines or 15 files with no slice moved to its own ticket, or a move counted once.
 - A file path, signature or code block in the spec.
 - Prototype code in the pull request's diff, or a prototype-backed decision with no answer and evidence.
 - A prototype with no question at its top, or its answer not on the ticket.
