@@ -32,9 +32,10 @@ and when to stop. Each stage's skill does the work.
    [lanes.md](lanes.md). Done when the lane is on the card.
 3. **Card.** Write the plan card as the session's todo list by [card.md](card.md). A new session rebuilds it from
    what is there now (branch, `git log`, PR, its checks, ticket comments) and redoes nothing done.
-4. **Run the lane.** Call each stage's skill in order. A stage ends with `status: done | blocked | needs-human` and
-   the path or link it wrote. Tick the card, and start the next stage in the same turn. Only `done` moves on.
-   `blocked` shows its cause and waits. `needs-human` is a stop.
+4. **Run the lane.** Start every helper or reviewer with the first line `Read <path>/worker.md before anything else.`,
+   `<path>` this skill's folder, by [worker.md](worker.md). Call each stage's skill in order. A stage ends with
+   `status: done | blocked | needs-human` and the path or link it wrote. Tick the card, and start the next stage in the same
+   turn. Only `done` moves on. `blocked` shows its cause and waits. `needs-human` is a stop.
 5. **Check.** Run the lane's rung, and treat a red by `code`'s verify notes: fix the code, never re-run it yourself.
    A red the machine caused (out of memory, a service never healthy) goes to the person with its cause.
 6. **PR.** Write the body by [pr-readiness.md](pr-readiness.md). The PR is ready only when the required checks on

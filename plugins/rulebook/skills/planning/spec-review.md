@@ -214,9 +214,12 @@ Each failure has a trigger, a chain and a sign someone can check.
 
 ## Review
 
-Walk the whole spec and the whole design in one round, every section, before you report. Grade six
-**criteria**, each pass or fail; a criterion that does not apply says so in one line. Each line under a criterion is a
-finding, a blocker unless marked (warning).
+Read `docs/agents/domain.md` first, by crq's [worker.md](../crq/worker.md). When the spec's change touches no code,
+build file or migration, skip the standards that `domain.md` lists, and mark criteria 3 to 5 `n/a: no code in scope`.
+Walk the whole spec and the whole design in one round, every section, before you report. Grade six **criteria**, then
+the project's spec rubric when `domain.md` names one. Each criterion ends as `met`, `unmet` or `n/a` with its reason,
+and each finding names the source it rests on. Each line under a criterion is a finding, a blocker unless marked
+(warning).
 
 - (warning) A miss: a finding on text unchanged since an earlier round. Report the finding at its own severity, and add
   this warning for the miss.
