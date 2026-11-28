@@ -21,7 +21,8 @@ and when to stop. Each stage's skill does the work.
   8 deslop     optional: the person types /toolbox:deslop                 deslop (toolbox)
   9 check      the lane's rung from docs/agents/checks.md                 the project's command
  10 PR         the body by pr-readiness.md                   STOP 3       crq
- 11 report     Decision · What ran @SHA · Open questions · Deviations · Follow-ups · Learnings · Next
+ 11 watch      conflicts → threads → checks until ready to merge          watch.md
+ 12 report     Decision · What ran @SHA · Open questions · Deviations · Follow-ups · Learnings · Next
 ```
 
 ## Steps
@@ -40,7 +41,8 @@ and when to stop. Each stage's skill does the work.
    A red the machine caused (out of memory, a service never healthy) goes to the person with its cause.
 6. **PR.** Write the body by [pr-readiness.md](pr-readiness.md). The PR is ready only when the required checks on
    its head commit pass.
-7. **Report** in the fixed sections above. The report is the input for the next session.
+7. **Watch** the open PR by [watch.md](watch.md) until it is ready to merge or a stop is reached.
+8. **Report** in the fixed sections above. The report is the input for the next session.
 
 ## The four stops
 
