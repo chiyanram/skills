@@ -7,8 +7,9 @@ new session on a ticket already under way.
 
 ```text
 crq · #502 — fix the health probe       lane: bug     flag: –
+  goal: the probe reports down when the database is down · smallest change: check the pool in ProbeHandler
   [x] intake      ticket, map #500, blocker #498 (closed), no linked PR
-  [x] grill       2 questions, answered
+  [x] grill       2 questions, answered; grill record round 1 on the ticket
   [ ] red test
   [ ] build
   [ ] review      code + testing
@@ -18,16 +19,19 @@ crq · #502 — fix the health probe       lane: bug     flag: –
   [ ] PR
 ```
 
-- Write it in the session's todo list, not on the ticket: the ticket stays the person's.
+- Under the header, restate the goal in one sentence and the smallest change that meets it, because a misread
+  ticket found at the spec's approval has cost a whole stage.
+- Write the card in the session's todo list, not on the ticket, because the ticket is the person's. The one write an
+  agent makes on a ticket is the grill record ([grill.md](grill.md)).
 - Tick a line only on `status: done`, and add what the stage wrote: a path, a link or a count.
 - Write each skip as `[-] <stage>  n/a: <why>`, because a skip with no reason reads as forgotten.
 - Put the bug lane's criterion line under the card, and the person's approval in the PR body, quoted.
 
 ## A new session
 
-Rebuild the card from what is there now, because the repo and the tracker are the truth, not memory: the branch and
-its `git log`, the spec and design files, the open PR and its checks, and the ticket's comments. Tick each stage whose
-output exists, start at the first one that has none, and redo nothing done.
+Rebuild the card from what is there now, because the repo and the tracker are the truth, not memory: the branch and its
+`git log`, the spec and design files, the open PR and its checks, and the ticket's comments, its grill records first.
+Tick each stage whose output exists, start at the first one that has none, and redo nothing done.
 
 ## The report
 

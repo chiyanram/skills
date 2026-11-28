@@ -27,6 +27,7 @@ checks and the words of the domain. Read it when `docs/agents/checks.md` is miss
 # Issue tracker: GitHub
 - Read a ticket: gh issue view <n> --comments
 - Comment on a ticket: gh issue comment <n> --body "..."
+- Search tickets and PRs: gh search issues "<words>" --repo <owner>/<repo> --state all; gh search prs "<words>" --repo <owner>/<repo> --state all
 - Create a ticket: gh issue create --title "..." --body "..."
 - Link a PR to a ticket: "Closes #<n>" in the PR body
 ```
