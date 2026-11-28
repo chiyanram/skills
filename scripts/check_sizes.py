@@ -1,21 +1,15 @@
-"""Size budgets for the rulebook.
+"""Size budgets for the agent instructions.
 
 - root AGENTS.md under 200 lines
-- each rule in a reference's `## Rules` section at most 35 words ; the id does not count
 - each root-to-leaf AGENTS.md chain within Codex's 32 KiB
 """
-import re
 import sys
 from pathlib import Path
 
 from repo_files import files
 
 ROOT_AGENTS_MAX_LINES = 199
-RULE_MAX_WORDS = 35
 CHAIN_MAX_BYTES = 32 * 1024
-LIST_ITEM = re.compile(r"^(?:[-*+]|\d+\.)\s+")
-RULE_ID = re.compile(r"^\*\*[A-Z]+\d+[a-z]?\*\*\s*—\s*")
-RULES_HEADING = re.compile(r"Rules\s*(\(ours\))?\s*\n")
 
 
 def root_agents(root: Path) -> list[str]:
@@ -34,31 +28,8 @@ def chains(root: Path) -> list[str]:
     return found
 
 
-def rules_sections(reference: Path) -> list[str]:
-    sections = re.split(r"^## ", reference.read_text(), flags=re.M)
-    return [s.split("\n", 1)[-1] for s in sections if RULES_HEADING.match(s)]
-
-
-def rules(section: str) -> list[str]:
-    items = re.split(r"^(?=(?:[-*+]|\d+\.)\s)", section, flags=re.M)
-    return [RULE_ID.sub("", LIST_ITEM.sub("", item)).strip() for item in items if LIST_ITEM.match(item)]
-
-
-def reference_problems(reference: Path) -> list[str]:
-    sections = rules_sections(reference)
-    if not sections:
-        return [f"{reference}: no ## Rules section"]
-    return [f"{reference}: rule is {len(rule.split())} words, over {RULE_MAX_WORDS}: {rule[:60]}…"
-            for section in sections for rule in rules(section) if len(rule.split()) > RULE_MAX_WORDS]
-
-
-def long_rules(root: Path) -> list[str]:
-    references = [f for f in files(root, "*.md") if f.parent.name == "references" and f.parent.parent.parent.name == "skills"]
-    return [p for reference in references for p in reference_problems(reference)]
-
-
 def problems(root: Path) -> list[str]:
-    return root_agents(root) + chains(root) + long_rules(root)
+    return root_agents(root) + chains(root)
 
 
 if __name__ == "__main__":

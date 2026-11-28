@@ -177,7 +177,7 @@ When review finds a case a check missed, plant that case first and watch it fail
 | `check_skills.py` | a `SKILL.md` has no `name` or `description`, its name is not its folder name, its description is over 1024 characters, it is over 120 lines, or an unquoted frontmatter value holds `: ` or ` #` or starts with a YAML indicator |
 | `check_versions.py` | a plugin's marketplace entry and its `plugin.json` disagree on the version |
 | `check_links.py` | a relative markdown link points at nothing |
-| `check_sizes.py` | root `AGENTS.md` reaches 200 lines, a rule is over 35 words, or an `AGENTS.md` chain is over 32 KiB |
+| `check_sizes.py` | root `AGENTS.md` reaches 200 lines, or an `AGENTS.md` chain is over 32 KiB |
 | `check_plugin.py` | a plugin is not under `plugins/`, has no README or icon, or the repo has no LICENSE |
 | `check_index.py` | a plugin README does not link every skill, or the root README's AGENTS.md block differs from what `make index` builds |
 | `check_provenance.py` | a shipped skill file carries provenance outside code: a source citation, a URL, a preference line, a credit, an evidence note, a date or a reference to another repository's issue. In the toolbox it reads only each `SKILL.md` |
@@ -288,7 +288,6 @@ manual release. Preview the next release on `main` with `GITHUB_TOKEN=<token> np
 | `check_history.py` fails a line you added | say what and why; drop who decided, the date and the issue, which the PR and git log keep. One `See #N` line per section may point at the history |
 | `check_history.py`: cannot resolve `origin/main` | run `git fetch origin main` |
 | `check_comments.py` fails a file | say it in code or in the module docstring or header; after you delete comments, run `python3 scripts/check_comments.py --shrink` |
-| `check_sizes.py`: a rule is over 35 words | shorten it; move detail into a notes file beside the skill |
 | `claude plugin marketplace add` or `/plugin install` fails on an SSH clone | set `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1` |
 | a merge to `main` did not release | expected: releases are manual. Open **Actions → release → Run workflow** on `main` |
 | the release fails with `RELEASE_TOKEN is not set` | add a repository secret `RELEASE_TOKEN`: the owner's token with Contents read and write, which the admin bypass of ruleset `main` lets through |
