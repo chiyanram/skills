@@ -20,9 +20,11 @@ when you write a PR body, check one before merge, or call a PR ready.
   a mistake costs most.
 - For a one-way door, list under their own heading each dependency's failure plan, timeout and retry, an alert per new
   failure, the expected load and a staged rollout, because an irreversible change cannot be fixed after shipping.
-- Call a PR ready only when every required check on its head commit passed and the host reports it mergeable, such
-  as `gh pr view <n> --json mergeStateStatus` printing `CLEAN`, and read it again after any edit to the body, because
-  an edit can start a run that cancels the one that passed.
+- Open a PR ready for review. Open a draft only for work that will take more commits before anyone should read it,
+  and mark it ready when the last one is pushed, because a draft hides finished work from its reviewers.
+- Call a PR ready to merge only when every required check on its head commit passed and the host reports it mergeable,
+  such as `gh pr view <n> --json mergeStateStatus` printing `CLEAN`, and read it again after any edit to the body,
+  because an edit can start a run that cancels the one that passed.
 
 ## Good / Bad
 
