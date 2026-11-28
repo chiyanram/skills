@@ -89,4 +89,17 @@ Use `toHaveScreenshot` only for a defect a role or text check cannot see: layout
   operating system, in CI or in the same container image, with `--update-snapshots`; a baseline made on a laptop
   never matches Linux CI.
 - Mask what changes on its own: `mask: [page.getByTestId('clock')]`. Fix the clock and the data too.
-- Update a baseline only for a change you meant, and review the image diff in the pull request like code.
+- Before a change you claim has no visual effect, make sure the screen has a baseline. If it has none, make one from
+  the code before your edit, then run your change against it; do not commit that laptop baseline. With no baseline,
+  the claim is a guess.
+- A failing diff is a fail: find the pixels that moved and why. Never raise `maxDiffPixels`, `maxDiffPixelRatio` or
+  `threshold`, or edit the `expect.toHaveScreenshot` options or the baseline image to make it pass, because the
+  baseline and its tolerance are the spec. Mask only a region you showed changes on its own, never one because it
+  failed, and fix its source too.
+- If your change moved pixels you did not mean to move, fix or revert that change. Never add markup or CSS whose only
+  job is to match the old image, because it hides the real change from the next reader.
+- Run `--update-snapshots` only for a change you meant: a design change, a new screen, or a Playwright, browser or
+  image upgrade. Run it only on the tests the change touched (`file:line`), on CI's operating system, and review each
+  image diff in the pull request like code, because one broad run rewrites the baselines that caught a regression.
+- If the baseline itself looks wrong, stop and ask, because then the spec is wrong and only its owner can say what is
+  right.
