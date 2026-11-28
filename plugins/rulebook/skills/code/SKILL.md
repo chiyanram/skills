@@ -114,5 +114,6 @@ Read a note only when the change matches it:
 - A list endpoint, a change to a published request or response, an API version, or a client of another service:
   [http-api.md](http-api.md).
 - Outside input, a secret, a token, a guard or the security filter chain: [security.md](security.md).
-- Running or tuning a review, reviewing a PR's code or its edits to existing tests: [review.md](review.md).
+- Reviewing a PR's code or its edits to existing tests: [review.md](review.md).
+- Running or tuning any review, its passes, buckets and rounds: [review-run.md](review-run.md).
 - Calling a change done, its evidence, a red check, a conflict or a quarantine: [verify.md](verify.md).

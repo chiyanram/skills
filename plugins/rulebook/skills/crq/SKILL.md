@@ -17,7 +17,7 @@ and when to stop. Each stage's skill does the work.
   4 spec       criteria a test decides; the design if the lane needs it   planning      STOP 2
   5 red test   the bug lane: one test that fails for the bug's reason     testing
   6 build      slices, one evidence row per criterion                     code (verify notes)
-  7 review     fresh reviewers, the lane's lens, at most 3 rounds         code (review notes)
+  7 review     fresh reviewers, the lane's lens, at most 3 rounds         code (review-run notes)
   8 deslop     optional: the person types /toolbox:deslop                 deslop (toolbox)
   9 check      the lane's rung from docs/agents/checks.md                 the project's command
  10 PR         the body by pr-readiness.md                   STOP 3       crq
