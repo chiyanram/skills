@@ -40,7 +40,8 @@ Read the one file that matches the job before you do anything else. The Rules be
 2. Decide what failed: the app, the spec, or the environment (`debugging.md`). A step that fails at the same place
    with the same error on every run is the app or a changed screen, not a flake.
 3. Fix every line the evidence covers, not only the one that failed; the screen at failure shows the names the next
-   lines need. Never add a sleep or raise a timeout to get past it.
+   lines need. Never add a sleep, raise a timeout or loosen a screenshot tolerance to get past it.
+   Refresh a baseline only for a change you meant (`running.md`).
 4. Rerun only that test while you fix it: by `file:line`, `--retries=0`, and `--headed` when you need to see it.
 5. After it passes, run it ten times, `--repeat-each=10 --retries=0`. Ten of ten, or it is still flaky.
 
