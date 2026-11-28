@@ -1,6 +1,6 @@
 ---
 name: testing
-description: Use when you write, change or review a test, or choose where a test goes - unit tests and Spock specs, integration tests, property-based and mutation tests, and tests of code that calls a language model.
+description: Use when you write, change or review a test, choose where a test goes, or diagnose a hard bug - unit tests and Spock specs, integration tests, property-based and mutation tests, and tests of code that calls a language model.
 ---
 
 # Testing
@@ -33,12 +33,15 @@ change cannot be told from one that was already red.
 
 ## Fixing a bug
 
+A hard bug (step 1 stays green, or it is flaky, slow or seen in one environment) runs [diagnose.md](diagnose.md) first.
+
 1. Test the premise. A bug report or a first guess names a cause, such as "`FreeShippingRule` is broken". Write
    that premise as one sentence. Then write and run a test of the named code at the reported input, before you change
    any code. A green result refutes the premise: the named code is correct, and the fault is upstream of it. Reading
    the code is not a test of the premise.
 2. Find the seam that owns the wrong behaviour. Write one test there that fails for the bug's reason, run it, and
-   watch it go red. A regression test that never went red proves nothing about the fix.
+   watch it go red. A regression test that never went red proves nothing about the fix. When no seam can hold the
+   real bug pattern, say so in the PR: that is the finding.
 3. Ask whether the state that triggers the bug is legitimate. If it is, handle it where the code broke. If it must
    never exist, fix the code that produced it, because a guard at the symptom hides the bug.
 4. Fix the code and watch the test go green. Every line you ship traces to evidence from steps 1 to 3. Revert each

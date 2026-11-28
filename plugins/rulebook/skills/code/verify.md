@@ -13,13 +13,15 @@ build a change, before you call it ready, or when you check an implementer's evi
   proves nothing about the change. A refactor with no behaviour change names the tests that cover it instead.
 - For a bug fix, have a test-first run write the failing test from the bug spec before the fix is written, and paste
   its red output (`testing` skill, Fixing a bug), because an implementer that tests its own fix shares its misreading.
-  When the bug cannot be reproduced in a test, say so and ask.
+  When the bug cannot be reproduced in a test, diagnose it by the `testing` skill's diagnose notes.
 - Never delete, skip or weaken a test to reach green; fix the code, or ask, because a weakened test hides the defect
   it was written to catch. A test whose behaviour the spec removes goes with it, named in the PR.
 - Call a change ready only when its build, lint and touched tests pass at the pushed commit, checked by a script,
   because an implementer's "done" is a report, not evidence.
 - For each acceptance criterion a user can see (a screen, an API response, a message), drive the running app and
-  paste the call and what came back, because passing tests can still leave the feature broken for the user.
+  paste the call and what came back, because passing tests can still leave the feature broken for the user. A run
+  that shows neither the expected result nor the failure, or that runs on another surface than the criterion names,
+  is not a pass, because a test of one branch does not show what the user sees.
 - Map every acceptance criterion to its evidence in the PR (criterion, command, result, at the pushed commit),
   because a criterion with no evidence is unproved:
 
