@@ -25,6 +25,8 @@ See the [root README](../../README.md#quick-start) for GitHub Copilot CLI and ot
 | [onboard](skills/onboard/SKILL.md) | `/toolbox:onboard` | sets up a repo for the rulebook: its confirmed commands, which stack notes apply, and the codebase-health rule, as one block in `AGENTS.md` or `CLAUDE.md` |
 | [break-design](skills/break-design/SKILL.md) | `/toolbox:break-design` | tries to break a design before you approve it: each reachable failure with one proposed closure, using the rulebook's break catalogue |
 | [software-factory](skills/software-factory/SKILL.md) | `/toolbox:software-factory` | the shared words for designing a software factory: tasks, runs, runners and the services they plug into, with a survey per slot |
+| [improve-architecture](skills/improve-architecture/SKILL.md) | `/toolbox:improve-architecture` | finds where the code is hard to change, with a deletion test per suspect, and turns the one you pick into a refactor-first ticket with its pin |
+| [arena](skills/arena/SKILL.md) | `/toolbox:arena` | runs several agents on one design task from one commit, scores them by a hidden rubric and a judge on another model, and builds the best with grafts from the rest |
 | [weigh-source](skills/weigh-source/SKILL.md) | `/toolbox:weigh-source` | weighs a shared article, talk or post against this project's design and the field: what to take, reject or watch |
 
 A tool joins only after it has been read in full, tied to a real moment in our work, and tried once on a named task.
