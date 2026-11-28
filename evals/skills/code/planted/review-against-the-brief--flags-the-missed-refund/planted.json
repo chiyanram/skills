@@ -1,0 +1,16 @@
+{
+  "case": "code-review-against-the-brief",
+  "grader": "flags-the-missed-refund",
+  "approved": "operator",
+  "answers": {
+    "right-full": "pass",
+    "right-terse": "pass",
+    "right-reorder": "pass",
+    "wrong-style-long": "fail",
+    "wrong-ac2-met": "fail",
+    "wrong-misses-refund-long": "fail",
+    "near-refund-amount": "fail",
+    "near-test-gap-only": "fail",
+    "near-blunt": "pass"
+  }
+}

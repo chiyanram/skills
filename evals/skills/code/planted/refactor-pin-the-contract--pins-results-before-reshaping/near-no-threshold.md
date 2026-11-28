@@ -1,0 +1,1 @@
+A test pins today's results before the change: DE 1000 standard = 490, DE 8000 express = 0, AT 20000 express = 1990, AT 500 standard = 1490. It is green on the current code, then the method becomes guard clauses.

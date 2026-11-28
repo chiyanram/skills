@@ -1,0 +1,1 @@
+`LoanService.renew` handles the renewal count and the reservation. The controller first checks `if (loan.dueOn().isBefore(LocalDate.now(clock))) return ResponseEntity.status(409).build();` and then calls the service.

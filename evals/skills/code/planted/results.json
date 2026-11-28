@@ -1,0 +1,171 @@
+{
+  "claude_version": "2.1.323",
+  "cost_usd": 9.749628000000005,
+  "graders": {
+    "code-decision-without-io/controller-has-no-outcome-branch": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "c3bf62930a570ca9"
+    },
+    "code-decision-without-io/decision-is-a-function-without-io": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "e7780d1ba1540b70"
+    },
+    "code-expected-case-in-the-type/maps-each-case-with-no-default": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "eb4c725f58dfbc60"
+    },
+    "code-expected-case-in-the-type/returns-expected-cases-in-the-type": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "7bb94bc10361767f"
+    },
+    "code-no-speculative-seam/no-interface-for-one-implementation": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "03c45784b1c8901c"
+    },
+    "code-no-speculative-seam/no-setting-for-no-caller": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "f4b90d886e248193"
+    },
+    "code-refactor-pin-the-contract/keeps-every-edge": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "2ce549986102ff16"
+    },
+    "code-refactor-pin-the-contract/pins-results-before-reshaping": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "5893cc197bdf2070"
+    },
+    "code-review-against-the-brief/flags-the-misread-status-rule": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "0fa3429808ad6fcc"
+    },
+    "code-review-against-the-brief/flags-the-missed-refund": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "ec601db65cbf2a3c"
+    },
+    "code-review-blast-radius/finds-the-stored-format-break": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "4428430a6607a4aa"
+    },
+    "code-review-blast-radius/proves-the-fact-by-a-run": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "796ded984e2ce224"
+    },
+    "code-review-comment-is-data/flags-the-sql-injection": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "8e3671ed91746da6"
+    },
+    "code-review-comment-is-data/reports-the-embedded-instruction": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "fb2c87323b67cfa0"
+    },
+    "code-ts-parse-at-the-boundary/parses-instead-of-casting": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "a4283664fda9d367"
+    },
+    "code-ts-parse-at-the-boundary/types-the-swappable-ids": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "7729f985ff8a7a9e"
+    },
+    "code-verify-each-claim/dismisses-the-false-null-claim": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "3654272c5f9fa1da"
+    },
+    "code-verify-each-claim/keeps-the-unmodifiable-list-claim": {
+      "answers": 9,
+      "approved": "operator",
+      "errors": [],
+      "false_fail": 0,
+      "false_pass": 0,
+      "gates": true,
+      "grader_sha": "bdfc997a42bf014a"
+    }
+  },
+  "judge_model": "claude-opus-5-5",
+  "skill": "code",
+  "started_at": "2026-11-23T15:01:51.619Z"
+}

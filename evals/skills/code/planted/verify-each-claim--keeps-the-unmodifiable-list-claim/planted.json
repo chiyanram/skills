@@ -1,0 +1,16 @@
+{
+  "case": "code-verify-each-claim",
+  "grader": "keeps-the-unmodifiable-list-claim",
+  "approved": "operator",
+  "answers": {
+    "right-full": "pass",
+    "right-terse": "pass",
+    "right-arraylist": "pass",
+    "wrong-dismiss-all-long": "fail",
+    "wrong-mutable": "fail",
+    "wrong-minor": "fail",
+    "near-accept-all-long": "pass",
+    "near-empty-only": "fail",
+    "near-not-decided": "fail"
+  }
+}

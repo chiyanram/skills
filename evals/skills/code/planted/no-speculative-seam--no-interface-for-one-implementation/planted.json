@@ -1,0 +1,16 @@
+{
+  "case": "code-no-speculative-seam",
+  "grader": "no-interface-for-one-implementation",
+  "approved": "operator",
+  "answers": {
+    "right-full": "pass",
+    "right-terse": "pass",
+    "right-offers-later": "pass",
+    "wrong-comply-long": "fail",
+    "wrong-interface-for-mocking": "fail",
+    "wrong-silent-concrete": "fail",
+    "near-concrete-with-branch-long": "pass",
+    "near-interface-no-config-long": "fail",
+    "near-says-skip-but-ships": "fail"
+  }
+}

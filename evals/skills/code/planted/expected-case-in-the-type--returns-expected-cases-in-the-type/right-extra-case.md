@@ -1,0 +1,1 @@
+`HoldOutcome` is sealed with four records: `Placed(Hold hold)`, `AlreadyHeld()`, `LimitReached(int limit)` and `MemberNotFound()`. `reserve` returns one of them and throws nothing for a refusal; the 404 case is added because `memberId` may name no member.

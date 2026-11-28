@@ -1,0 +1,16 @@
+{
+  "case": "code-review-against-the-brief",
+  "grader": "flags-the-misread-status-rule",
+  "approved": "operator",
+  "answers": {
+    "right-full": "pass",
+    "right-terse": "pass",
+    "right-delivered": "pass",
+    "wrong-style-long": "fail",
+    "wrong-ac1-met": "fail",
+    "wrong-misses-status-long": "fail",
+    "near-cancelled-again": "pass",
+    "near-null-status": "fail",
+    "near-optional-extra": "fail"
+  }
+}

@@ -12,7 +12,7 @@ Each skill has a tier in `settings.json`:
 
 | tier | skills | proof |
 |---|---|---|
-| CORE | code, testing | everything below, 5 runs per case, the arms in turn, a repeated baseline, planted answers for each llm grader, and the operator's hand check of 20 judge verdicts (18 or more must agree) |
+| CORE | code, testing | everything below, 5 runs per case, the arms in turn, a repeated baseline, planted answers for each llm grader, and the operator's read of each verdict the machine doubts: each FAIL and each split judge vote |
 | NORMAL | every other skill with cases | cases, approved reference answers, an approved baseline, 3 runs per case |
 | NONE | a change to wording only | `make lint` |
 

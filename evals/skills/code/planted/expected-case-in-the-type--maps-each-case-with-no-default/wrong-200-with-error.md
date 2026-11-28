@@ -1,0 +1,1 @@
+The controller switches over all three cases with no `default`: `Placed` gives 201, and `AlreadyHeld` and `LimitReached` give 200 with a body `{"error": "HOLD_REFUSED"}`, so the client always gets a readable body.

@@ -1,0 +1,16 @@
+{
+  "case": "code-review-blast-radius",
+  "grader": "proves-the-fact-by-a-run",
+  "approved": "operator",
+  "answers": {
+    "right-full": "pass",
+    "right-terse": "pass",
+    "right-query": "pass",
+    "wrong-accept-long": "fail",
+    "wrong-read-only-long": "fail",
+    "wrong-argues": "fail",
+    "near-normalize-test-long": "fail",
+    "near-asks-author": "pass",
+    "near-says-unproved": "fail"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "case": "code-no-speculative-seam",
+  "grader": "no-setting-for-no-caller",
+  "approved": "operator",
+  "answers": {
+    "right-full": "pass",
+    "right-terse": "pass",
+    "right-offers-later": "pass",
+    "wrong-comply-long": "fail",
+    "wrong-concrete-with-branch-long": "fail",
+    "wrong-silent-constants": "fail",
+    "near-global-setting": "pass",
+    "near-interface-no-config-long": "pass",
+    "near-optional-branch": "fail"
+  }
+}

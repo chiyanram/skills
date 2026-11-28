@@ -1,0 +1,16 @@
+{
+  "case": "code-expected-case-in-the-type",
+  "grader": "returns-expected-cases-in-the-type",
+  "approved": "operator",
+  "answers": {
+    "right-full": "pass",
+    "right-terse": "pass",
+    "right-extra-case": "pass",
+    "wrong-throws-long": "fail",
+    "wrong-optional": "fail",
+    "wrong-response-status": "fail",
+    "near-default-long": "pass",
+    "near-limit-thrown": "fail",
+    "near-string-code": "fail"
+  }
+}

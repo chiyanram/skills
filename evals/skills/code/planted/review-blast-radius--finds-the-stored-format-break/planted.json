@@ -1,0 +1,16 @@
+{
+  "case": "code-review-blast-radius",
+  "grader": "finds-the-stored-format-break",
+  "approved": "operator",
+  "answers": {
+    "right-full": "pass",
+    "right-terse": "pass",
+    "right-table": "pass",
+    "wrong-accept-long": "fail",
+    "wrong-sms-only": "fail",
+    "wrong-normalize-test-long": "fail",
+    "near-read-only-long": "pass",
+    "near-import-only": "fail",
+    "near-lookup-safe": "fail"
+  }
+}

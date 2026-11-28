@@ -1,0 +1,16 @@
+{
+  "case": "code-ts-parse-at-the-boundary",
+  "grader": "types-the-swappable-ids",
+  "approved": "operator",
+  "answers": {
+    "right-full": "pass",
+    "right-terse": "pass",
+    "right-object-argument": "pass",
+    "wrong-style-long": "fail",
+    "wrong-misses-swap": "fail",
+    "wrong-cast-only": "fail",
+    "near-swap-only-long": "fail",
+    "near-missing-cast-long": "pass",
+    "near-comment-fix": "fail"
+  }
+}

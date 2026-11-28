@@ -1,0 +1,1 @@
+`RenewalPolicy.decide(loan, titleReserved, today)` returns `Renewable`, `LimitReached`, `TitleReserved` or `Overdue` and touches no repository. `LoanService.renew` reads the loan, `existsByTitleId` and `LocalDate.now(clock)`, then calls it and saves only when renewable.

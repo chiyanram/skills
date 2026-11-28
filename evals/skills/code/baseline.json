@@ -1,0 +1,10 @@
+{
+  "approved": "operator",
+  "held_out": "evals/skills/code/results/2026-11-28T110559-full-held-out.json",
+  "recorded": "2026-11-28",
+  "skill": "code",
+  "tune": [
+    "evals/skills/code/results/2026-11-28T095313-full-tune.json",
+    "evals/skills/code/results/2026-11-28T103059-full-tune.json"
+  ]
+}

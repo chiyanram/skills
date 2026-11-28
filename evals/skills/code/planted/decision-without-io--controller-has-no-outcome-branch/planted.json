@@ -1,0 +1,16 @@
+{
+  "case": "code-decision-without-io",
+  "grader": "controller-has-no-outcome-branch",
+  "approved": "operator",
+  "answers": {
+    "right-full": "pass",
+    "right-terse": "pass",
+    "right-statuses": "pass",
+    "wrong-controller-kept-long": "fail",
+    "wrong-overdue-in-controller": "fail",
+    "wrong-one-line": "fail",
+    "near-tangled-service-long": "pass",
+    "near-controller-reads-repos": "fail",
+    "near-mapper-class": "pass"
+  }
+}

@@ -1,0 +1,1 @@
+`LateFeePolicy` is a concrete class that `ReturnService` calls directly. The interface is left out because only one class would implement it; when a second fee rule is ticketed, extract `FeeCalculator` then.

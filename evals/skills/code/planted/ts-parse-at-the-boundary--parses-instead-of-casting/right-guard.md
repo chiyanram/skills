@@ -1,0 +1,1 @@
+Replace the cast with a guard on `unknown`: `function isOrder(x: unknown): x is Order` that checks `id` and `customerId` are strings, `totalCents` is an integer and `lines` is an array of valid lines, and throw when it returns false.

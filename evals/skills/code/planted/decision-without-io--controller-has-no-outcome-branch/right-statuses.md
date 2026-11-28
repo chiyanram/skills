@@ -1,0 +1,1 @@
+The controller takes only `LoanService`. It maps the returned outcome with a switch that lists every case: `Renewed` 200, `Overdue` 409, `LimitReached` 409, `TitleReserved` 409. The rule checks are in the service.

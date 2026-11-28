@@ -1,0 +1,1 @@
+The rule moves onto the entity: `Loan.renewalRefusal(boolean titleReserved, LocalDate today)` returns `Optional<Refusal>` from `renewals`, `dueOn` and the two arguments, with no repository call. `LoanService` does `findById`, `existsByTitleId` and `LocalDate.now(clock)` and passes the results in.

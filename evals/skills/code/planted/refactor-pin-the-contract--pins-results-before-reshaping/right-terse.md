@@ -1,0 +1,1 @@
+Step 1: a parameterized test of today's results (DE 4999 and 5000, standard and express; AT 10000 and 10001 standard; AT express 20000), run green on the current code. Step 2: guard clauses. Step 3: the same test green.

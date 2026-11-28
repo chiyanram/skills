@@ -1,0 +1,1 @@
+`RenewalPolicy` is a bean that takes `ReservationRepository`. `decide(loan, today)` checks the due date and the count, then calls `reservations.existsByTitleId(loan.titleId())` for the last rule. The controller calls the service, which calls the policy.

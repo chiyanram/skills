@@ -1,0 +1,1 @@
+Ask the author for an integration test that stores a member with `0049…`, as the old import wrote it, and looks it up through `MemberLookupService` after the change. Until it runs green, the change is not shown safe.

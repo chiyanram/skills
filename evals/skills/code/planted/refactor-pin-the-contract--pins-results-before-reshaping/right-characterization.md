@@ -1,0 +1,1 @@
+Characterization tests come first and run on the current code: (DE, 5000, express) = 0, (DE, 4999, standard) = 490, (AT, 10000, standard) = 1490, (AT, 10001, standard) = 0. All green. Then the method is flattened into guard clauses, and the same tests stay green.

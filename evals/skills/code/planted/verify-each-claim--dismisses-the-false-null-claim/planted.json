@@ -1,0 +1,16 @@
+{
+  "case": "code-verify-each-claim",
+  "grader": "dismisses-the-false-null-claim",
+  "approved": "operator",
+  "answers": {
+    "right-full": "pass",
+    "right-terse": "pass",
+    "right-verdict-line": "pass",
+    "wrong-accept-all-long": "fail",
+    "wrong-defensive": "fail",
+    "wrong-optional": "fail",
+    "near-dismiss-all-long": "pass",
+    "near-no-reason": "fail",
+    "near-wrong-reason": "fail"
+  }
+}
