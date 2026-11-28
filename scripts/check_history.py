@@ -7,7 +7,7 @@ pass and go when a file is edited anyway. Uncommitted and untracked files count 
 It reads prose in markdown (not fences, inline code, link targets, headings or HTML comments) and comment text in code
 (a Python comment or docstring, a JS comment, a `#` comment in YAML, TOML, shell or a Makefile). It fails a who-decided
 phrase, an ISO date beside a person or decision word, and an issue number. It spares `plugins/` (check_provenance.py
-reads it), fixtures, `docs/agents/`, `evals/`, the CHANGELOGs, an ADR's or PRINCIPLES.md's status line
+reads it), fixtures, `docs/agents/`, `evals/`, the CHANGELOGs, an ADR's status line
 and an ADR's table rows, and one pointer line (`See` or `History:` and issue refs) per markdown section or code header.
 """
 import ast
@@ -84,7 +84,7 @@ def markdown(path: str, lines: list[str]) -> tuple[dict[int, str], dict[int, int
             text, in_comment = text.split("<!--", 1)[0], True
         if line.lstrip().startswith("|") and adr:
             continue
-        if STATUS.match(line) and (adr or path == "PRINCIPLES.md"):
+        if STATUS.match(line) and adr:
             continue
         prose[number] = LINK_TARGET.sub("", CODE_SPAN.sub("``", text))
         sections[number] = section
