@@ -15,6 +15,7 @@ When you reach for a word under "avoid", use the term instead. A check fails a c
 | **stage** | one step of crq's flow, done by one skill: intake, grill, spec, red test, build, review, deslop, check, PR, watch, report | phase, step | — |
 | **status** | how a stage ends: `done`, `blocked` or `needs-human` | outcome, result | — |
 | **stop** | one of the four points where crq waits for the person | gate (for a stop), checkpoint | — |
+| **grill record** | one ticket comment per grill round: Settled (each answer quoted), Still open (each with its decider), and glossary and ADR gaps | grill notes, grill log | — |
 | **plan card** | the session's todo list of each stage, ticked, pending or skipped with `n/a: <why>`; a new session rebuilds it from the branch, the PR and the ticket | checklist, status comment | — |
 | **grill round** | every question whose prerequisites are settled, asked at once, each with a recommended answer | — | — |
 | **approval** | the person's words that release the build, quoted in the PR body with the commit of the spec they approved; a later edit to the spec needs it again; an agent never approves | sign-off | — |
