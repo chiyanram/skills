@@ -23,12 +23,24 @@ signatures, or its build slices and their proof, or when the build needs to chan
 - Name for every slice the AC-n it delivers, and give every AC a slice, because an AC with no slice is found missing
   only after the build.
 - Plan each pull request within 400 changed lines and 15 files, generated files not counted, and make a slice past
-  either limit its own issue, because one writer and one review handle that size well.
+  either limit its own ticket, because one writer and one review handle that size well.
+- When slices become tickets, publish each blocker before the tickets it blocks, and give each ticket `Blocked by: #<n>`
+  or `Blocked by: none (can start now)`, because a `#<n>` can name only a ticket that exists, and two people who start
+  dependent slices at once build on code that is not there. A blocked ticket may start as a PR stacked on its blocker's
+  branch (`crq`'s pr-readiness notes, Stacked PRs). A refactor-first ticket blocks the slices it eases. The parent lists
+  the tickets in landing order, which can start now and which wait for which, and the files each may touch.
+- Change an internal API by moving every caller and deleting the old one in the same change, with no compatibility shim,
+  when that change fits the pull-request size limit, because a kept old path is a second way to do the task. Past the
+  limit, or when no slice lands green, go expand, migrate in batches, contract (the slices rule), and delete the old
+  path in the contract step.
 - Put file paths, signatures and trees in the design, and only behaviour in the spec, because paths and code in a
   spec go stale fast. A behaviour a user or an outside system sees belongs in the spec.
-- Settle a question that paper cannot decide, such as a layout, a state flow or a timing, with a throwaway prototype
-  on its own branch, and carry only its verdict and evidence into the design, because prototype code is not built to
-  ship. A question that code or docs answer needs no prototype.
+- Settle a question that paper cannot decide, such as a layout, a state flow or a timing, with a throwaway prototype on
+  its own branch, and carry only its answer and evidence into the design, because prototype code is not built to ship.
+  Write the question at the prototype's top, and build none without one. Keep its state logic in one module with no I/O,
+  and print the whole state after each action, because the reader judges the state flow from that printout, not from a
+  UI. Put the prototype's answer on the ticket with a link to the branch, because an answer nobody can find gets asked
+  again. A question that code or docs answer needs no prototype.
 - During the build, leave the approved design as it is, and post each changed type, signature or file placement as a
   `[writer] DEVIATION:` note on the PR, with what, why and `file:line`, because an edit to the design makes its
   approval stale. A change that alters what an AC observes is a spec change, not a deviation: stop and ask the human.
@@ -166,8 +178,11 @@ Each line is a finding, a blocker unless marked (warning).
   refactor.
 - A slice that says only "tests pass", with no command, test filter, or manual step or "Manual: none".
 - A slice with no AC-n, or an AC that no slice names.
-- A plan over 400 lines or 15 files with no slice moved to its own issue.
+- A plan over 400 lines or 15 files with no slice moved to its own ticket.
 - A file path, signature or code block in the spec.
-- Prototype code in the pull request's diff, or a prototype-backed decision with no verdict and evidence.
+- Prototype code in the pull request's diff, or a prototype-backed decision with no answer and evidence.
+- A prototype with no question at its top, or its answer not on the ticket.
+- A ticket with no `Blocked by:` line, tickets published before their blockers, or a parent with no landing order.
+- An internal API change that keeps the old path or a compatibility shim, outside an expand-contract refactor.
 - A type, signature or placement in the diff that differs from the design with no `[writer] DEVIATION:` note, an edit
   to the approved design, or a note that changes what an AC observes.

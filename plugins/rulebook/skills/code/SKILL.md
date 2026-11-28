@@ -29,9 +29,9 @@ Code earns its place when the next change is easy and a test can reach every dec
   transaction, because two calls left to the caller let one commit without the other.
 - Return a response type from a controller, never a persistence entity, because an entity leaks every field it owns
   and ties the API to the schema.
-- Add an interface only where two implementations exist now (a test fake counts) or at a module boundary. Remove a
-  pass-through method, a single-caller wrapper or a one-implementation adapter. Each adds a layer to trace and hides
-  nothing.
+- Add an interface only where two implementations exist now (a test fake counts) or at a module boundary. Imagine
+  deleting each pass-through method, single-caller wrapper or one-implementation adapter inside a module; if no
+  complexity comes back in its callers, remove it, because it adds a layer to trace and hides nothing.
 - When callers read two or more fields of a record to decide something, move that logic onto the record.
 - Keep each method under the project's complexity gate, or cyclomatic 10 if none is set. A method with more than 7
   parameters, or a change that takes a file past 1000 lines, is a finding unless a structural reason is stated.
